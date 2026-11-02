@@ -11,104 +11,33 @@ import com.google.common.primitives.Ints
 import java.math.RoundingMode
 import kotlin.math.max
 
-class DefaultAudioTrackBufferSizeProvider
-private constructor(builder: Builder) : AudioTrackBufferSizeProvider {
-    class Builder {
-        var minPcmBufferDurationUs = MIN_PCM_BUFFER_DURATION_US
-        var maxPcmBufferDurationUs = MAX_PCM_BUFFER_DURATION_US
-        var pcmBufferMultiplicationFactor = PCM_BUFFER_MULTIPLICATION_FACTOR
-        var passthroughBufferDurationUs = PASSTHROUGH_BUFFER_DURATION_US
-        var offloadBufferDurationUs = OFFLOAD_BUFFER_DURATION_US
-        var ac3BufferMultiplicationFactor = AC3_BUFFER_MULTIPLICATION_FACTOR
-        var dtshdBufferMultiplicationFactor = DTSHD_BUFFER_MULTIPLICATION_FACTOR
-        var targetPcmBufferDurationUs = DEFAULT_PCM_BUFFER_DURATION_US
-
-        @Deprecated(
-            """This constraint does not apply to the new default fixed buffer size logic. Use
-          {@link #setTargetPcmBufferDurationUs(int)} to configure a fixed buffer size instead. This
-          is only used if {@link #setPcmBufferMultiplicationFactor(int)} is explicitly set to
-          enable deprecated dynamic logic."""
-        )
-        fun setMinPcmBufferDurationUs(minPcmBufferDurationUs: Int): Builder {
-            this.minPcmBufferDurationUs = minPcmBufferDurationUs
-            return this
-        }
-
-        @Deprecated(
-            """This constraint does not apply to the new default fixed buffer size logic. Use
-          {@link #setTargetPcmBufferDurationUs(int)} to configure a fixed buffer size instead. This
-          is only used if {@link #setPcmBufferMultiplicationFactor(int)} is explicitly set to
-          enable deprecated dynamic logic."""
-        )
-        fun setMaxPcmBufferDurationUs(maxPcmBufferDurationUs: Int): Builder {
-            this.maxPcmBufferDurationUs = maxPcmBufferDurationUs
-            return this
-        }
-
-        @Deprecated(
-            """Use the default fixed buffer size logic instead, or configure a fixed target
-          using {@link #setTargetPcmBufferDurationUs(int)}. Pass {@link C#LENGTH_UNSET} to not use
-          this factor."""
-        )
-        fun setPcmBufferMultiplicationFactor(pcmBufferMultiplicationFactor: Int): Builder {
-            this.pcmBufferMultiplicationFactor = pcmBufferMultiplicationFactor
-            return this
-        }
-
-        fun setTargetPcmBufferDurationUs(targetPcmBufferDurationUs: Int): Builder {
-            this.targetPcmBufferDurationUs = targetPcmBufferDurationUs
-            return this
-        }
-
-        fun setPassthroughBufferDurationUs(passthroughBufferDurationUs: Int): Builder {
-            this.passthroughBufferDurationUs = passthroughBufferDurationUs
-            return this
-        }
-
-        fun setOffloadBufferDurationUs(offloadBufferDurationUs: Int): Builder {
-            this.offloadBufferDurationUs = offloadBufferDurationUs
-            return this
-        }
-
-        fun setAc3BufferMultiplicationFactor(ac3BufferMultiplicationFactor: Int): Builder {
-            this.ac3BufferMultiplicationFactor = ac3BufferMultiplicationFactor
-            return this
-        }
-
-        fun setDtshdBufferMultiplicationFactor(dtshdBufferMultiplicationFactor: Int): Builder {
-            this.dtshdBufferMultiplicationFactor = dtshdBufferMultiplicationFactor
-            return this
-        }
-
-        fun build(): DefaultAudioTrackBufferSizeProvider {
-            return DefaultAudioTrackBufferSizeProvider(this)
-        }
-    }
+class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
 
     @Deprecated(
         """This constraint does not apply to the new default fixed buffer size logic. Use
         {@link #targetPcmBufferDurationUs} to configure a fixed buffer size instead. This is only
         used if {@link #pcmBufferMultiplicationFactor} is set to enable deprecated dynamic logic."""
     )
-    private val minPcmBufferDurationUs = builder.minPcmBufferDurationUs
+    private val minPcmBufferDurationUs = MIN_PCM_BUFFER_DURATION_US
 
     @Deprecated(
         """This constraint does not apply to the new default fixed buffer size logic. Use
         {@link #targetPcmBufferDurationUs} to configure a fixed buffer size instead. This is only
         used if {@link #pcmBufferMultiplicationFactor} is set to enable deprecated dynamic logic."""
     )
-    private val maxPcmBufferDurationUs = builder.maxPcmBufferDurationUs
+    private val maxPcmBufferDurationUs = MAX_PCM_BUFFER_DURATION_US
 
     @Deprecated(
         """Use the default fixed buffer size logic instead, or {@link C#LENGTH_UNSET} to not
         use this factor."""
     )
-    private val pcmBufferMultiplicationFactor = builder.pcmBufferMultiplicationFactor
-    private val passthroughBufferDurationUs = builder.passthroughBufferDurationUs
-    private val offloadBufferDurationUs = builder.offloadBufferDurationUs
-    val ac3BufferMultiplicationFactor = builder.ac3BufferMultiplicationFactor
-    val dtshdBufferMultiplicationFactor = builder.dtshdBufferMultiplicationFactor
-    private val targetPcmBufferDurationUs = builder.targetPcmBufferDurationUs
+    var pcmBufferMultiplicationFactor = PCM_BUFFER_MULTIPLICATION_FACTOR
+    var passthroughBufferDurationUs = PASSTHROUGH_BUFFER_DURATION_US
+    var offloadBufferDurationUs = OFFLOAD_BUFFER_DURATION_US
+    var ac3BufferMultiplicationFactor = AC3_BUFFER_MULTIPLICATION_FACTOR
+    var dtshdBufferMultiplicationFactor = DTSHD_BUFFER_MULTIPLICATION_FACTOR
+    var targetPcmBufferDurationUs = DEFAULT_PCM_BUFFER_DURATION_US
+
 
     override fun getBufferSizeInBytes(
         minBufferSizeInBytes: Int,

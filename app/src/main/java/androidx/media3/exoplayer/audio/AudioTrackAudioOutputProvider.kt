@@ -34,91 +34,23 @@ import com.google.common.base.Supplier
 import com.google.common.base.Suppliers
 import java.util.function.BiConsumer
 
-class AudioTrackAudioOutputProvider private constructor(builder: Builder) : AudioOutputProvider {
-    class Builder(context: Context?) {
-        val context: Context? = context?.applicationContext
-        var audioTrackBuilderModifier: BiConsumer<AudioTrack.Builder?, OutputConfig?>? =
-            null
-        var audioOffloadSupportProvider: AudioOffloadSupportProvider? =
-            null
-        var bufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
-        var audioCapabilities: AudioCapabilities? = null
-        var maxPlaybackSpeed = DefaultAudioSink.MAX_PLAYBACK_SPEED
-
-        @Suppress("deprecation") // Supporting deprecated AudioTrack customization path.
-        var audioTrackProvider: AudioTrackProvider? = null
-
-        init {
-            if (context == null) {
-                audioCapabilities = AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
-            }
-        }
-
-        @RequiresApi(24)
-        fun setAudioTrackBuilderModifier(
-            audioTrackBuilderModifier: BiConsumer<AudioTrack.Builder?, OutputConfig?>?
-        ): Builder {
-            this.audioTrackBuilderModifier = audioTrackBuilderModifier
-            return this
-        }
-
-        fun setAudioOffloadSupportProvider(
-            audioOffloadSupportProvider: AudioOffloadSupportProvider?
-        ): Builder {
-            this.audioOffloadSupportProvider = audioOffloadSupportProvider
-            return this
-        }
-
-        fun setAudioTrackBufferSizeProvider(
-            bufferSizeProvider: AudioTrackBufferSizeProvider
-        ): Builder {
-            this.bufferSizeProvider = bufferSizeProvider
-            return this
-        }
-
-        fun setMaxPlaybackSpeed(maxPlaybackSpeed: Float): Builder {
-            Preconditions.checkArgument(maxPlaybackSpeed >= 1f)
-            this.maxPlaybackSpeed = maxPlaybackSpeed
-            return this
-        }
-
-        fun setAudioCapabilities(audioCapabilities: AudioCapabilities?): Builder {
-            if (context == null) {
-                this.audioCapabilities = audioCapabilities
-            }
-            return this
-        }
-
-        fun setAudioTrackProvider(audioTrackProvider: AudioTrackProvider?): Builder {
-            this.audioTrackProvider = audioTrackProvider
-            return this
-        }
-
-        fun build(): AudioTrackAudioOutputProvider {
-            if (audioOffloadSupportProvider == null) {
-                audioOffloadSupportProvider = DefaultAudioOffloadSupportProvider(context)
-            }
-            return AudioTrackAudioOutputProvider(this)
-        }
-    }
-
-    private val context: Context? = builder.context
+class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
+    private val context: Context? = context?.applicationContext
 
     @Suppress("deprecation") // Supporting deprecated AudioTrack customization path.
-    private val audioTrackProvider: AudioTrackProvider? = builder.audioTrackProvider
+     var audioTrackProvider: AudioTrackProvider? = null
     private val builderModifier: BiConsumer<AudioTrack.Builder?, OutputConfig?>? =
-        builder.audioTrackBuilderModifier
-    private val audioTrackBufferSizeProvider = builder.bufferSizeProvider
-    private val audioOffloadSupportProvider: AudioOffloadSupportProvider =
-        builder.audioOffloadSupportProvider!!
+        null
+     var audioTrackBufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
+    var audioOffloadSupportProvider: AudioOffloadSupportProvider =
+        DefaultAudioOffloadSupportProvider(context)
     private val capabilityChangeListener: CapabilityChangeListener? =
-        if (builder.context == null) null else CapabilityChangeListener()
-    private val maxPlaybackSpeed = builder.maxPlaybackSpeed
+        if (context == null) null else CapabilityChangeListener()
+    private val maxPlaybackSpeed = DefaultAudioSink.MAX_PLAYBACK_SPEED
     private var listeners: ListenerSet<AudioOutputProvider.Listener>? = null
     private var clock = Clock.DEFAULT
 
-    var audioCapabilities: AudioCapabilities? = builder.audioCapabilities
-        private set
+    var audioCapabilities: AudioCapabilities? = null
     private var audioCapabilitiesReceiver: AudioCapabilitiesReceiver? = null
     private var playbackLooper: Looper? = null
     private var contextWithDeviceId: Context? = null
@@ -262,7 +194,7 @@ class AudioTrackAudioOutputProvider private constructor(builder: Builder) : Audi
             }
             if (audioTrackProvider != null) {
                 val audioTrackConfig = getAudioTrackConfig(config)
-                audioTrack = audioTrackProvider.getAudioTrack(
+                audioTrack = audioTrackProvider!!.getAudioTrack(
                     audioTrackConfig,
                     config.audioAttributes,
                     audioSessionId,

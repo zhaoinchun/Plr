@@ -144,7 +144,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
 
         companion object {
             val DEFAULT: AudioTrackBufferSizeProvider =
-                DefaultAudioTrackBufferSizeProvider.Builder().build()
+                DefaultAudioTrackBufferSizeProvider()
         }
     }
 
@@ -282,12 +282,15 @@ class DefaultAudioSink private constructor(builder: Builder) :
                     audioTrackBufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
                 }
                 audioOutputProvider =
-                    AudioTrackAudioOutputProvider.Builder(context)
-                        .setAudioCapabilities(if (context != null) null else audioCapabilities)
-                        .setAudioOffloadSupportProvider(audioOffloadSupportProvider)
-                        .setAudioTrackBufferSizeProvider(audioTrackBufferSizeProvider!!)
-                        .setAudioTrackProvider(audioTrackProvider)
-                        .build()
+                    AudioTrackAudioOutputProvider(context).apply {
+                        this.audioCapabilities =
+                            if (context != null) null else this@Builder.audioCapabilities
+                        this.audioOffloadSupportProvider =
+                            this@Builder.audioOffloadSupportProvider!!
+                        this.audioTrackBufferSizeProvider =
+                            this@Builder.audioTrackBufferSizeProvider!!
+                        this.audioTrackProvider = this@Builder.audioTrackProvider
+                    }
             } else {
                 Preconditions.checkState(audioOffloadSupportProvider == null)
                 Preconditions.checkState(audioTrackBufferSizeProvider == null)
@@ -424,7 +427,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
         auxEffectInfo = AuxEffectInfo(AuxEffectInfo.NO_AUX_EFFECT_ID, 0f)
         mediaPositionParameters =
             MediaPositionParameters(
-                PlaybackParameters.DEFAULT,  0,  0
+                PlaybackParameters.DEFAULT, 0, 0
             )
         _playbackParameters = PlaybackParameters.DEFAULT
         skipSilenceEnabled = DEFAULT_SKIP_SILENCE
@@ -938,7 +941,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
                     outputConfig.channelMask,
                     outputConfig.encoding,
                     outputConfig.bufferSize,
-                    configuration!!.inputFormat,  
+                    configuration!!.inputFormat,
                     outputConfig.isOffload,
                     e
                 )
@@ -1351,8 +1354,8 @@ class DefaultAudioSink private constructor(builder: Builder) :
     private fun setAudioProcessorPlaybackParameters(playbackParameters: PlaybackParameters) {
         val mediaPositionParameters =
             MediaPositionParameters(
-                playbackParameters,  
-                C.TIME_UNSET,  
+                playbackParameters,
+                C.TIME_UNSET,
                 C.TIME_UNSET
             )
         if (this.isAudioOutputInitialized) {
@@ -1385,8 +1388,8 @@ class DefaultAudioSink private constructor(builder: Builder) :
                 DEFAULT_SKIP_SILENCE
         mediaPositionParametersCheckpoints.add(
             MediaPositionParameters(
-                audioProcessorPlaybackParameters,  
-                max(0, presentationTimeUs),  
+                audioProcessorPlaybackParameters,
+                max(0, presentationTimeUs),
                 configuration!!.framesToDurationUs(this.writtenFrames)
             )
         )
@@ -1473,7 +1476,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
         }
         reportSkippedSilenceHandler!!.removeCallbacksAndMessages(null)
         reportSkippedSilenceHandler!!.postDelayed(
-            Runnable { this.maybeReportSkippedSilence() },  
+            Runnable { this.maybeReportSkippedSilence() },
             REPORT_SKIPPED_SILENCE_DELAY_MS.toLong()
         )
     }
@@ -1509,7 +1512,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
     }
 
     private fun getFormatConfig(format: Format): FormatConfig {
-        return getFormatConfig(format,  C.LENGTH_UNSET)
+        return getFormatConfig(format, C.LENGTH_UNSET)
     }
 
     private fun getFormatConfig(format: Format, preferredBufferSize: Int): FormatConfig {

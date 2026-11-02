@@ -51,6 +51,7 @@ import androidx.media3.common.util.Size
 import androidx.media3.common.util.StuckPlayerDetector
 import androidx.media3.common.util.StuckPlayerException
 import androidx.media3.common.util.Util
+import androidx.media3.common.util.Util.currentOrMainLooper
 import androidx.media3.common.util.WakeLockManager
 import androidx.media3.common.util.WifiLockManager
 import androidx.media3.exoplayer.ExoPlayer.AudioOffloadListener
@@ -62,10 +63,12 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.analytics.DefaultAnalyticsCollector
 import androidx.media3.exoplayer.analytics.MediaMetricsListener
 import androidx.media3.exoplayer.analytics.PlayerId
+import androidx.media3.exoplayer.audio.AudioOutputProvider
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
 import androidx.media3.exoplayer.image.ImageOutput
 import androidx.media3.exoplayer.metadata.MetadataOutput
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MaskingMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
@@ -74,16 +77,19 @@ import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import androidx.media3.exoplayer.source.TimelineWithUpdatedMediaItem
 import androidx.media3.exoplayer.source.TrackGroupArray
 import androidx.media3.exoplayer.text.TextOutput
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.trackselection.TrackSelectionArray
 import androidx.media3.exoplayer.trackselection.TrackSelector
 import androidx.media3.exoplayer.trackselection.TrackSelectorResult
 import androidx.media3.exoplayer.upstream.BandwidthMeter
+import androidx.media3.exoplayer.upstream.DefaultBandwidthMeter
 import androidx.media3.exoplayer.video.VideoDecoderOutputBufferRenderer
 import androidx.media3.exoplayer.video.VideoFrameMetadataListener
 import androidx.media3.exoplayer.video.VideoRendererEventListener
 import androidx.media3.exoplayer.video.spherical.CameraMotionListener
 import androidx.media3.exoplayer.video.spherical.SphericalGLSurfaceView
 import androidx.media3.exoplayer.video.spherical.SphericalGLSurfaceView.VideoSurfaceListener
+import androidx.media3.extractor.DefaultExtractorsFactory
 import com.google.common.base.Preconditions
 import java.lang.ref.WeakReference
 import java.util.Locale
@@ -94,44 +100,50 @@ import kotlin.math.min
 
 // The constructor may be executed on a background thread. Wait with accessing the player from
 // the app thread until the constructor finished executing.
-internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?) : BasePlayer(),
+ class ExoPlayerImpl(
+    val context: Context,
+    val renderersFactory: RenderersFactory = DefaultRenderersFactory(context),
+    val mediaSourceFactory: MediaSource.Factory = DefaultMediaSourceFactory(
+        context, DefaultExtractorsFactory()
+    ),
+    val _trackSelector: TrackSelector = DefaultTrackSelector(context),
+    val loadControl: LoadControl = DefaultLoadControl(),
+    val bandwidthMeter: BandwidthMeter = DefaultBandwidthMeter.getSingletonInstance(context),
+    wrappingPlayer: Player? = null
+) : BasePlayer(),
     ExoPlayer {
-    val permanentAvailableCommands: Player.Commands
+    lateinit var permanentAvailableCommands: Player.Commands
     private val constructorFinished: ConditionVariable = ConditionVariable()
-    private val applicationContext: Context = builder.context.applicationContext
+    private val applicationContext: Context = context.applicationContext
     private val wrappingPlayer: Player = wrappingPlayer ?: this
-    private val renderers: Array<Renderer>
-    private val secondaryRenderers: Array<Renderer?>
-    private val _trackSelector: TrackSelector = builder.trackSelectorSupplier.get()
-    private val playbackInfoUpdateHandler: HandlerWrapper?
-    private val playbackInfoUpdateListener: PlaybackInfoUpdateListener
-    private val internalPlayer: ExoPlayerImplInternal
-    private val listeners: ListenerSet<Player.Listener>
+    private lateinit var renderers: Array<Renderer>
+    private lateinit var secondaryRenderers: Array<Renderer?>
+    private var playbackInfoUpdateHandler: HandlerWrapper? = null
+    private lateinit var playbackInfoUpdateListener: PlaybackInfoUpdateListener
+    private lateinit var internalPlayer: ExoPlayerImplInternal
+    private lateinit var listeners: ListenerSet<Player.Listener>
     private val audioOffloadListeners: CopyOnWriteArraySet<AudioOffloadListener> =
         CopyOnWriteArraySet<AudioOffloadListener>()
     private val period: Timeline.Period = Timeline.Period()
     private val mediaSourceHolderSnapshots = mutableListOf<MediaSourceHolderSnapshot>()
-    private val useLazyPreparation: Boolean = builder.useLazyPreparation
-    private val mediaSourceFactory: MediaSource.Factory = builder.mediaSourceFactorySupplier.get()
-    private val _analyticsCollector: AnalyticsCollector =
-        builder.analyticsCollectorFunction.apply(builder.clock)
-    override val applicationLooper: Looper = builder.looper
-    private val bandwidthMeter: BandwidthMeter = builder.bandwidthMeterSupplier.get()
-    override val clock: Clock = builder.clock
+    private val useLazyPreparation = true
+    override val applicationLooper: Looper = currentOrMainLooper
+    override val clock: Clock = Clock.DEFAULT
+    private val _analyticsCollector: AnalyticsCollector = DefaultAnalyticsCollector(clock)
     private val componentListener: ComponentListener = ComponentListener()
     private val frameMetadataListener: FrameMetadataListener = FrameMetadataListener()
-    private val audioBecomingNoisyManager: AudioBecomingNoisyManager
-    private val streamVolumeManager: StreamVolumeManager?
-    private val wakeLockManager: WakeLockManager
-    private val wifiLockManager: WifiLockManager
-    private val detachSurfaceTimeoutMs: Long = builder.detachSurfaceTimeoutMs
-    private val suitableOutputChecker: SuitableOutputChecker?
-    private val audioSessionIdState: BackgroundThreadStateHandler<Int>
-    private val stuckPlayerDetector: StuckPlayerDetector
-    private val virtualDeviceIdChangeListener: VirtualDeviceIdChangeListener?
+    private lateinit var audioBecomingNoisyManager: AudioBecomingNoisyManager
+    private var streamVolumeManager: StreamVolumeManager? = null
+    private lateinit var wakeLockManager: WakeLockManager
+    private lateinit var wifiLockManager: WifiLockManager
+    private val detachSurfaceTimeoutMs: Long = ExoPlayer.DEFAULT_DETACH_SURFACE_TIMEOUT_MS
+    private var suitableOutputChecker: SuitableOutputChecker? = null
+    private lateinit var audioSessionIdState: BackgroundThreadStateHandler<Int>
+    private lateinit var stuckPlayerDetector: StuckPlayerDetector
+    private var virtualDeviceIdChangeListener: VirtualDeviceIdChangeListener? = null
     private val audioListenerManager = CodecParameterListenerManager(C.TRACK_TYPE_AUDIO)
     private val videoListenerManager = CodecParameterListenerManager(C.TRACK_TYPE_VIDEO)
-    val emptyTrackSelectorResult: TrackSelectorResult
+    lateinit var  emptyTrackSelectorResult: TrackSelectorResult
     private var _repeatMode: @Player.RepeatMode Int = 0
     private var _shuffleModeEnabled = false
     private var pendingOperationAcks = 0
@@ -140,12 +152,12 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
     private var foregroundMode = false
     private var scrubbingModeEnabled = false
     private var disabledTrackTypesWithoutScrubbingMode: MutableSet<Int>? = null
-    private var _scrubbingModeParameters: ScrubbingModeParameters? = builder.scrubbingModeParameters
-    private var _seekParameters: SeekParameters? = builder.seekParameters
+    private var _scrubbingModeParameters: ScrubbingModeParameters? = ScrubbingModeParameters.DEFAULT
+    private var _seekParameters: SeekParameters? = SeekParameters.DEFAULT
     private var _shuffleOrder: ShuffleOrder = DefaultShuffleOrder(0)
     private var _preloadConfiguration: PreloadConfiguration? = PreloadConfiguration.DEFAULT
-    private var _pauseAtEndOfMediaItems = builder.pauseAtEndOfMediaItems
-    private var enforceAdPlaybackOnTimelineRefresh = builder.enforceAdPlaybackOnTimelineRefresh
+    private var _pauseAtEndOfMediaItems = false
+    private var enforceAdPlaybackOnTimelineRefresh = true
     private var _availableCommands: Player.Commands? = null
     private var _mediaMetadata: MediaMetadata? = null
     private var _playlistMetadata: MediaMetadata? = null
@@ -157,38 +169,61 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
     private var sphericalGLSurfaceView: SphericalGLSurfaceView? = null
     private var surfaceHolderSurfaceIsVideoOutput = false
     private var textureView: TextureView? = null
-    private var _videoScalingMode: @C.VideoScalingMode Int = builder.videoScalingMode
+    private var _videoScalingMode: @C.VideoScalingMode Int = C.VIDEO_SCALING_MODE_DEFAULT
     private var _videoChangeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int =
-        builder.videoChangeFrameRateStrategy
+        C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
     private var _surfaceSize: Size? = Size.UNKNOWN
     private var _videoDecoderCounters: DecoderCounters? = null
     private var _audioDecoderCounters: DecoderCounters? = null
-    private var _audioAttributes: AudioAttributes? = builder.audioAttributes
+    private var _audioAttributes: AudioAttributes? = AudioAttributes.DEFAULT
     private var _volume = 0f
     private var unmuteVolume = 0f
-    private var _skipSilenceEnabled = builder.skipSilenceEnabled
+    private var _skipSilenceEnabled = false
     private var currentCueGroup: CueGroup? = null
     private var videoFrameMetadataListener: VideoFrameMetadataListener? = null
     private var cameraMotionListener: CameraMotionListener? = null
     private var throwsWhenUsingWrongThread = false
     private var hasNotifiedFullWrongThreadWarning = false
-    private var priority: @C.Priority Int = builder.priority
-    private var priorityTaskManager: PriorityTaskManager? = builder.priorityTaskManager
+    private var priority: @C.Priority Int = C.PRIORITY_PLAYBACK
+    private var priorityTaskManager: PriorityTaskManager? = null
     private var isPriorityTaskManagerRegistered = false
     private var playerReleased = false
     private var _deviceInfo: DeviceInfo? = DeviceInfo.UNKNOWN
     override var videoSize: VideoSize? = VideoSize.UNKNOWN
-    private var seekBackIncrementMs: Long = builder.seekBackIncrementMs
-    private var seekForwardIncrementMs: Long = builder.seekForwardIncrementMs
-    private var maxSeekToPreviousPositionMs: Long = builder.maxSeekToPreviousPositionMs
+    private var seekBackIncrementMs: Long = C.DEFAULT_SEEK_BACK_INCREMENT_MS
+    private var seekForwardIncrementMs: Long = C.DEFAULT_SEEK_FORWARD_INCREMENT_MS
+    private var maxSeekToPreviousPositionMs: Long = C.DEFAULT_MAX_SEEK_TO_PREVIOUS_POSITION_MS
     private var staticAndDynamicMediaMetadata: MediaMetadata? = null
-    private var playbackInfo: PlaybackInfo
+    private lateinit var  playbackInfo: PlaybackInfo
     private var maskingWindowIndex = 0
     private var maskingWindowPositionMs: Long = 0
 
-    init {
-        val eventHandler = Handler(builder.looper)
-        val renderersFactory = builder.renderersFactorySupplier.get()
+    var deviceVolumeControlEnabled = false
+    var playerName: String = ""
+    var livePlaybackSpeedControl: LivePlaybackSpeedControl =
+        DefaultLivePlaybackSpeedControl.Builder().build()
+    var releaseTimeoutMs = ExoPlayer.DEFAULT_RELEASE_TIMEOUT_MS
+    var dynamicSchedulingEnabled = true
+    var perStreamMediaProgressionEnabled = false
+    var playbackLooperProvider: PlaybackLooperProvider? = null
+    var foregroundModeTimeoutMs: Long = 0
+    var usePlatformDiagnostics = true
+    var _handleAudioBecomingNoisy = false
+    var suppressPlaybackOnUnsuitableOutput = false
+    var _wakeMode: @C.WakeMode Int = C.WAKE_MODE_NONE
+    var wakeModeSet: Boolean = false
+    var stuckBufferingDetectionTimeoutMs = ExoPlayer.DEFAULT_STUCK_BUFFERING_DETECTION_TIMEOUT_MS
+    var _stuckPlayingDetectionTimeoutMs = if (ExoPlayer.experimentalEnableStuckPlayingDetection)
+        ExoPlayer.DEFAULT_STUCK_PLAYING_DETECTION_TIMEOUT_MS else Int.MAX_VALUE
+    var stuckPlayingNotEndingTimeoutMs = if (ExoPlayer.experimentalEnableStuckPlayingDetection)
+        ExoPlayer.DEFAULT_STUCK_PLAYING_NOT_ENDING_TIMEOUT_MS else Int.MAX_VALUE
+    var stuckSuppressedDetectionTimeoutMs = ExoPlayer.DEFAULT_STUCK_SUPPRESSED_DETECTION_TIMEOUT_MS
+    var audioOutputProvider: AudioOutputProvider? = null
+    var handleAudioFocus = false
+
+    fun init() {
+        val eventHandler = Handler(applicationLooper)
+        val renderersFactory = renderersFactory
         renderers =
             renderersFactory.createRenderers(
                 eventHandler,
@@ -216,7 +251,7 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
             )
         }
         listeners =
-            ListenerSet(builder.looper, clock) { listener: Player.Listener, flags: FlagSet? ->
+            ListenerSet(applicationLooper, clock) { listener: Player.Listener, flags: FlagSet? ->
                 listener.onEvents(
                     this.wrappingPlayer,
                     Player.Events(flags!!)
@@ -250,16 +285,16 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
                 Player.COMMAND_SET_TRACK_SELECTION_PARAMETERS,
                 _trackSelector.isSetParametersSupported
             )
-            .addIf(Player.COMMAND_GET_DEVICE_VOLUME, builder.deviceVolumeControlEnabled)
-            .addIf(Player.COMMAND_SET_DEVICE_VOLUME, builder.deviceVolumeControlEnabled)
+            .addIf(Player.COMMAND_GET_DEVICE_VOLUME, deviceVolumeControlEnabled)
+            .addIf(Player.COMMAND_SET_DEVICE_VOLUME, deviceVolumeControlEnabled)
             .addIf(
                 Player.COMMAND_SET_DEVICE_VOLUME_WITH_FLAGS,
-                builder.deviceVolumeControlEnabled
+                deviceVolumeControlEnabled
             )
-            .addIf(Player.COMMAND_ADJUST_DEVICE_VOLUME, builder.deviceVolumeControlEnabled)
+            .addIf(Player.COMMAND_ADJUST_DEVICE_VOLUME, deviceVolumeControlEnabled)
             .addIf(
                 Player.COMMAND_ADJUST_DEVICE_VOLUME_WITH_FLAGS,
-                builder.deviceVolumeControlEnabled
+                deviceVolumeControlEnabled
             )
             .build().also { permanentAvailableCommands = it }
         _availableCommands =
@@ -271,11 +306,11 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
         playbackInfoUpdateHandler = clock.createHandler(applicationLooper, null)
         playbackInfoUpdateListener =
             PlaybackInfoUpdateListener { playbackInfoUpdate: PlaybackInfoUpdate ->
-                playbackInfoUpdateHandler.post { handlePlaybackInfo(playbackInfoUpdate) }
+                playbackInfoUpdateHandler!!.post { handlePlaybackInfo(playbackInfoUpdate) }
             }
         playbackInfo = PlaybackInfo.createDummy(emptyTrackSelectorResult)
         _analyticsCollector.setPlayer(this.wrappingPlayer, applicationLooper)
-        val playerId = PlayerId(builder.playerName)
+        val playerId = PlayerId(playerName)
         internalPlayer =
             ExoPlayerImplInternal(
                 applicationContext,
@@ -283,25 +318,25 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
                 secondaryRenderers,
                 _trackSelector,
                 emptyTrackSelectorResult,
-                builder.loadControlSupplier.get(),
+                loadControl,
                 bandwidthMeter,
                 _repeatMode,
                 _shuffleModeEnabled,
                 _analyticsCollector,
                 _seekParameters,
-                builder.livePlaybackSpeedControl,
-                builder.releaseTimeoutMs,
+                livePlaybackSpeedControl,
+                releaseTimeoutMs,
                 _pauseAtEndOfMediaItems,
-                builder.dynamicSchedulingEnabled,
-                builder.perStreamMediaProgressionEnabled,
+                dynamicSchedulingEnabled,
+                perStreamMediaProgressionEnabled,
                 applicationLooper,
                 clock,
                 playbackInfoUpdateListener,
                 playerId,
-                builder.playbackLooperProvider,
+                playbackLooperProvider,
                 _preloadConfiguration!!,
                 frameMetadataListener,
-                builder.enforceAdPlaybackOnTimelineRefresh
+                enforceAdPlaybackOnTimelineRefresh
             )
         val playbackLooper = internalPlayer.playbackLooper
 
@@ -317,12 +352,12 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
         addListener(_analyticsCollector)
         bandwidthMeter.addEventListener(Handler(applicationLooper), _analyticsCollector)
         addAudioOffloadListener(componentListener)
-        if (builder.foregroundModeTimeoutMs > 0) {
-            internalPlayer.experimentalSetForegroundModeTimeoutMs(builder.foregroundModeTimeoutMs)
+        if (foregroundModeTimeoutMs > 0) {
+            internalPlayer.experimentalSetForegroundModeTimeoutMs(foregroundModeTimeoutMs)
         }
         if (Build.VERSION.SDK_INT >= 31) {
             Api31.registerMediaMetricsListener(
-                applicationContext, this, builder.usePlatformDiagnostics, playerId
+                applicationContext, this, usePlatformDiagnostics, playerId
             )
         }
 
@@ -348,12 +383,11 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
         }
         audioBecomingNoisyManager =
             AudioBecomingNoisyManager(
-                builder.context, playbackLooper, builder.looper, componentListener, clock
+                context, playbackLooper, applicationLooper, componentListener, clock
             )
-        audioBecomingNoisyManager.setEnabled(builder.handleAudioBecomingNoisy)
+        audioBecomingNoisyManager.setEnabled(_handleAudioBecomingNoisy)
 
-        if (builder.suppressPlaybackOnUnsuitableOutput) {
-            suitableOutputChecker = builder.suitableOutputChecker
+        if (suppressPlaybackOnUnsuitableOutput) {
             suitableOutputChecker!!.enable(
                 { isSelectedOutputSuitableForPlayback: Boolean ->
                     onSelectedOutputSuitabilityChanged(
@@ -369,9 +403,9 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
             suitableOutputChecker = null
         }
 
-        streamVolumeManager = if (builder.deviceVolumeControlEnabled) {
+        streamVolumeManager = if (deviceVolumeControlEnabled) {
             StreamVolumeManager(
-                builder.context,
+                context,
                 componentListener,
                 _audioAttributes!!.volumeControlStream,
                 playbackLooper,
@@ -381,34 +415,34 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
         } else {
             null
         }
-        var wakeMode = builder.wakeMode
-        if (!builder.wakeModeSet) {
+        var wakeMode = _wakeMode
+        if (!wakeModeSet) {
             wakeMode =
-                if (builder.stuckBufferingDetectionTimeoutMs == Int.MAX_VALUE || builder.stuckPlayingDetectionTimeoutMs == Int.MAX_VALUE || builder.stuckPlayingNotEndingTimeoutMs == Int.MAX_VALUE || builder.stuckSuppressedDetectionTimeoutMs == Int.MAX_VALUE)
+                if (stuckBufferingDetectionTimeoutMs == Int.MAX_VALUE || _stuckPlayingDetectionTimeoutMs == Int.MAX_VALUE || stuckPlayingNotEndingTimeoutMs == Int.MAX_VALUE || stuckSuppressedDetectionTimeoutMs == Int.MAX_VALUE)
                     C.WAKE_MODE_NONE
                 else
                     C.WAKE_MODE_LOCAL
         }
-        wakeLockManager = WakeLockManager(builder.context, playbackLooper, clock)
+        wakeLockManager = WakeLockManager(context, playbackLooper, clock)
         wakeLockManager.setEnabled(wakeMode != C.WAKE_MODE_NONE)
-        wifiLockManager = WifiLockManager(builder.context, playbackLooper, clock)
+        wifiLockManager = WifiLockManager(context, playbackLooper, clock)
         wifiLockManager.setEnabled(wakeMode == C.WAKE_MODE_NETWORK)
         virtualDeviceIdChangeListener =
-            if (Build.VERSION.SDK_INT >= 34) VirtualDeviceIdChangeListener(builder.context) else null
+            if (Build.VERSION.SDK_INT >= 34) VirtualDeviceIdChangeListener(context) else null
 
         stuckPlayerDetector =
             StuckPlayerDetector(
                 this,
                 componentListener,
                 clock,
-                builder.stuckBufferingDetectionTimeoutMs,
-                builder.stuckPlayingDetectionTimeoutMs,
-                builder.stuckPlayingNotEndingTimeoutMs,
-                builder.stuckSuppressedDetectionTimeoutMs
+                stuckBufferingDetectionTimeoutMs,
+                _stuckPlayingDetectionTimeoutMs,
+                stuckPlayingNotEndingTimeoutMs,
+                stuckSuppressedDetectionTimeoutMs
             )
 
         internalPlayer.setScrubbingModeParameters(_scrubbingModeParameters)
-        internalPlayer.setAudioAttributes(_audioAttributes, builder.handleAudioFocus)
+        internalPlayer.setAudioAttributes(_audioAttributes, handleAudioFocus)
         sendRendererMessage(
             C.TRACK_TYPE_AUDIO,
             Renderer.MSG_SET_AUDIO_ATTRIBUTES,
@@ -431,11 +465,11 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
             frameMetadataListener
         )
         sendRendererMessage(Renderer.MSG_SET_PRIORITY, priority)
-        if (builder.audioOutputProvider != null) {
+        if (audioOutputProvider != null) {
             sendRendererMessage(
                 C.TRACK_TYPE_AUDIO,
                 Renderer.MSG_SET_AUDIO_OUTPUT_PROVIDER,
-                builder.audioOutputProvider
+                audioOutputProvider
             )
         }
         Log.i(
@@ -1123,7 +1157,7 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
         wifiLockManager.setStayAwake(false)
         suitableOutputChecker?.disable()
         if (virtualDeviceIdChangeListener != null && Build.VERSION.SDK_INT >= 34) {
-            virtualDeviceIdChangeListener.release()
+            virtualDeviceIdChangeListener!!.release()
         }
         stuckPlayerDetector.release()
         if (!internalPlayer.release()) {
@@ -1619,7 +1653,7 @@ internal class ExoPlayerImpl(builder: ExoPlayer.Builder, wrappingPlayer: Player?
         listeners.remove(listener)
     }
 
-    override fun setWakeMode(@C.WakeMode wakeMode: @C.WakeMode Int) {
+    override fun setWakeMode(wakeMode: @C.WakeMode Int) {
         when (wakeMode) {
             C.WAKE_MODE_NONE -> {
                 wakeLockManager.setEnabled(false)

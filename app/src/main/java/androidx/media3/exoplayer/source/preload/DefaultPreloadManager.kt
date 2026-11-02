@@ -183,17 +183,17 @@ class DefaultPreloadManager private constructor(builder: Builder) :
             return this
         }
 
-        fun buildExoPlayer(exoPlayerBuilder: ExoPlayer.Builder = ExoPlayer.Builder(context)): ExoPlayer {
-            buildExoPlayerCalled = true
-            return exoPlayerBuilder
-                .setMediaSourceFactory(mediaSourceFactorySupplier.get())
-                .setBandwidthMeter(bandwidthMeterSupplier.get())
-                .setRenderersFactory(renderersFactorySupplier.get())
-                .setLoadControl(loadControlSupplier.get())
-                .setPlaybackLooperProvider(preloadLooperProvider)
-                .setTrackSelector(trackSelectorFactory.createTrackSelector(context))
-                .build()
-        }
+//        fun buildExoPlayer(exoPlayerBuilder: ExoPlayer.Builder = ExoPlayer.Builder(context)): ExoPlayer {
+//            buildExoPlayerCalled = true
+//            return exoPlayerBuilder
+//                .setMediaSourceFactory(mediaSourceFactorySupplier.get())
+//                .setBandwidthMeter(bandwidthMeterSupplier.get())
+//                .setRenderersFactory(renderersFactorySupplier.get())
+//                .setLoadControl(loadControlSupplier.get())
+//                .setPlaybackLooperProvider(preloadLooperProvider)
+//                .setTrackSelector(trackSelectorFactory.createTrackSelector(context))
+//                .build()
+//        }
 
         override fun build(): DefaultPreloadManager {
             Preconditions.checkState(!buildCalled)

@@ -20,6 +20,7 @@ import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.ExoPlayerImpl
 import androidx.media3.ui.PlayerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,18 +66,14 @@ class ExoVideoSwitchActivity : AppCompatActivity(), CoroutineScope by MainScope(
 
     fun f() {
         MainScope().launch {
+            DefaultLoadControl.Builder()
+                .setBufferDurationsMs(1_500, 5_000, 300, 800)
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build()
             player = withContext(Dispatchers.Default) {
-                Log.e(TAG, "f: s")
-                ExoPlayer.Builder(this@ExoVideoSwitchActivity)
-                    .setLoadControl(
-                        DefaultLoadControl.Builder()
-                            .setBufferDurationsMs(1_500, 5_000, 300, 800)
-                            .setPrioritizeTimeOverSizeThresholds(true)
-                            .build()
-                    )
-                    .build().also {
-                        Log.e(TAG, "f: s2")
-                    }
+                ExoPlayerImpl(this@ExoVideoSwitchActivity).apply {
+                    init()
+                }
             }
             player.apply {
                 repeatMode = Player.REPEAT_MODE_OFF
