@@ -523,11 +523,10 @@ class MediaCodecAudioRenderer constructor(
                 }
             }
             audioSink.configure(
-                AudioSinkConfig.Builder(audioSinkInputFormat)
-                    .setOutputChannelMapping(channelMap)
-                    .setTimeline(getTimeline()!!)
-                    .setMediaPeriodId(mediaPeriodId)
-                    .build()
+                AudioSinkConfig(audioSinkInputFormat,
+                    outputChannelMapping = channelMap,
+                    timeline = getTimeline(),
+                    mediaPeriodId = mediaPeriodId)
             )
         } catch (e: AudioSink.ConfigurationException) {
             throw createRendererException(

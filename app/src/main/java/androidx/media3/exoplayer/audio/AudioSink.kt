@@ -12,7 +12,6 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.Clock
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import com.google.common.base.Preconditions
 import com.google.common.primitives.ImmutableIntArray
 import java.nio.ByteBuffer
 
@@ -32,72 +31,17 @@ interface AudioSink {
         fun onAudioSessionIdChanged(audioSessionId: Int) {}
     }
 
-    data class AudioSinkConfig private constructor(
+    data class AudioSinkConfig(
         val format: Format,
         @Deprecated(
             """Use similar config values on lower-level components like {@link
      *     AudioOutputProvider.FormatConfig#preferredBufferSize} instead."""
         )
-        val preferredBufferSizeOverride: Int,
-        val outputChannelMapping: ImmutableIntArray?,
-        val timeline: Timeline,
-        val mediaPeriodId: MediaPeriodId?,
-    ) {
-        private constructor(builder: Builder) : this(
-            builder.format,
-            builder.preferredBufferSizeOverride,
-            builder.outputChannelMapping,
-            builder.timeline,
-            builder.mediaPeriodId
-        )
-
-        class Builder {
-            val format: Format
-            var preferredBufferSizeOverride: Int
-            var outputChannelMapping: ImmutableIntArray?
-            var timeline: Timeline
-            var mediaPeriodId: MediaPeriodId?
-
-            constructor(format: Format) {
-                this.format = format
-                this.preferredBufferSizeOverride = 0
-                this.outputChannelMapping = null
-                this.timeline = Timeline.EMPTY
-                this.mediaPeriodId = null
-            }
-
-            @Deprecated(
-                """Use similar setters on lower-level components like {@link AudioOutput} instead,
-            e.g. by modifying {@link AudioOutputProvider.FormatConfig#preferredBufferSize}."""
-            )
-            fun setPreferredBufferSizeOverride(preferredBufferSizeOverride: Int): Builder {
-                this.preferredBufferSizeOverride = preferredBufferSizeOverride
-                return this
-            }
-
-            fun setOutputChannelMapping(outputChannelMapping: ImmutableIntArray?): Builder {
-                this.outputChannelMapping = outputChannelMapping
-                return this
-            }
-
-            fun setTimeline(timeline: Timeline): Builder {
-                this.timeline = timeline
-                return this
-            }
-
-            fun setMediaPeriodId(mediaPeriodId: MediaPeriodId?): Builder {
-                this.mediaPeriodId = mediaPeriodId
-                return this
-            }
-
-            fun build(): AudioSinkConfig {
-                if (!timeline.isEmpty && mediaPeriodId != null) {
-                    Preconditions.checkArgument(timeline.getIndexOfPeriod(mediaPeriodId!!.periodUid) != C.INDEX_UNSET)
-                }
-                return AudioSinkConfig(this)
-            }
-        }
-    }
+        val preferredBufferSizeOverride: Int = 0,
+        val outputChannelMapping: ImmutableIntArray? = null,
+        val timeline: Timeline = Timeline.EMPTY,
+        val mediaPeriodId: MediaPeriodId? = null,
+    )
 
     class AudioTrackConfig(
         val encoding: @C.Encoding Int,
@@ -193,13 +137,14 @@ interface AudioSink {
     fun configure(
         inputFormat: Format, specifiedBufferSize: Int, outputChannels: IntArray?
     ) {
+        val outputChannelMapping =
+            if (outputChannels == null) null else ImmutableIntArray.copyOf(outputChannels)
         configure(
-            AudioSinkConfig.Builder(inputFormat)
-                .setPreferredBufferSizeOverride(specifiedBufferSize)
-                .setOutputChannelMapping(
-                    if (outputChannels == null) null else ImmutableIntArray.copyOf(outputChannels)
-                )
-                .build()
+            AudioSinkConfig(
+                inputFormat,
+                preferredBufferSizeOverride = specifiedBufferSize,
+                outputChannelMapping = outputChannelMapping
+            )
         )
     }
 

@@ -38,10 +38,10 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
     private val context: Context? = context?.applicationContext
 
     @Suppress("deprecation") // Supporting deprecated AudioTrack customization path.
-     var audioTrackProvider: AudioTrackProvider? = null
+    var audioTrackProvider: AudioTrackProvider? = null
     private val builderModifier: BiConsumer<AudioTrack.Builder?, OutputConfig?>? =
         null
-     var audioTrackBufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
+    var audioTrackBufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
     var audioOffloadSupportProvider: AudioOffloadSupportProvider =
         DefaultAudioOffloadSupportProvider(context)
     private val capabilityChangeListener: CapabilityChangeListener? =
@@ -162,19 +162,19 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
                     bitrate,
                     (if (usePlaybackParameters) maxPlaybackSpeed else DefaultAudioSink.DEFAULT_PLAYBACK_SPEED).toDouble()
                 )
-        return OutputConfig.Builder()
-            .setSampleRate(outputSampleRate)
-            .setChannelMask(outputChannelConfig)
-            .setEncoding(outputEncoding)
-            .setBufferSize(bufferSize)
-            .setAudioSessionId(formatConfig.audioSessionId)
-            .setAudioAttributes(formatConfig.audioAttributes)
-            .setIsOffload(outputMode == DefaultAudioSink.OUTPUT_MODE_OFFLOAD)
-            .setIsTunneling(formatConfig.enableTunneling)
-            .setUsePlaybackParameters(usePlaybackParameters)
-            .setUseOffloadGapless(useOffloadGapless)
-            .setVirtualDeviceId(formatConfig.virtualDeviceId)
-            .build()
+        return OutputConfig(
+            sampleRate = outputSampleRate,
+            channelMask = outputChannelConfig,
+            encoding = outputEncoding,
+            bufferSize = bufferSize,
+            audioSessionId = formatConfig.audioSessionId,
+            audioAttributes = formatConfig.audioAttributes,
+            isOffload = outputMode == DefaultAudioSink.OUTPUT_MODE_OFFLOAD,
+            isTunneling = formatConfig.enableTunneling,
+            usePlaybackParameters = usePlaybackParameters,
+            useOffloadGapless = useOffloadGapless,
+            virtualDeviceId = formatConfig.virtualDeviceId
+        )
     }
 
     @Throws(AudioOutputProvider.InitializationException::class)

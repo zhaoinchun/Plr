@@ -491,11 +491,10 @@ class DefaultAudioSink private constructor(builder: Builder) :
             return AudioOffloadSupport.DEFAULT_UNSUPPORTED
         }
         val formatSupport = audioOutputProvider.getFormatSupport(getFormatConfig(format))
-        return AudioOffloadSupport.Builder()
-            .setIsFormatSupported(formatSupport.isFormatSupportedForOffload)
-            .setIsGaplessSupported(formatSupport.isGaplessSupportedForOffload)
-            .setIsSpeedChangeSupported(formatSupport.isSpeedChangeSupportedForOffload)
-            .build()
+        return AudioOffloadSupport(
+            isFormatSupported = formatSupport.isFormatSupportedForOffload,
+            isSpeedChangeSupported = formatSupport.isSpeedChangeSupportedForOffload,
+        )
     }
 
     override fun getCurrentPositionUs(sourceEnded: Boolean): Long {
@@ -683,17 +682,14 @@ class DefaultAudioSink private constructor(builder: Builder) :
             if (audioSessionIdChanged) {
                 pendingAudioSessionIdChangeConfirmation = true
                 this.configuration = configuration.copyWithOutputConfig(
-                    configuration.outputConfig.buildUpon().setAudioSessionId(audioSessionId)
-                        .build()
+                    configuration.outputConfig.copy(audioSessionId = audioSessionId)
                 )
                 if (pendingConfiguration != null) {
                     pendingConfiguration =
                         pendingConfiguration!!.copyWithOutputConfig(
                             pendingConfiguration!!
                                 .outputConfig
-                                .buildUpon()
-                                .setAudioSessionId(audioSessionId)
-                                .build()
+                                .copy(audioSessionId = audioSessionId)
                         )
                 }
                 listener!!.onAudioSessionIdChanged(audioSessionId)
@@ -890,7 +886,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
                 }
 
                 val retryConfiguration =
-                    configuration.outputConfig.buildUpon().setBufferSize(bufferSize).build()
+                    configuration.outputConfig.copy(bufferSize = bufferSize)
                 try {
                     val audioOutput = buildAudioOutput(retryConfiguration)
                     this.configuration = configuration.copyWithOutputConfig(retryConfiguration)
@@ -1516,17 +1512,18 @@ class DefaultAudioSink private constructor(builder: Builder) :
     }
 
     private fun getFormatConfig(format: Format, preferredBufferSize: Int): FormatConfig {
-        return FormatConfig.Builder(format)
-            .setAudioAttributes(audioAttributes!!)
-            .setEnableHighResolutionPcmOutput(enableFloatOutput)
-            .setEnablePlaybackParameters(preferAudioOutputPlaybackParameters)
-            .setEnableOffload(offloadMode != AudioSink.OFFLOAD_MODE_DISABLED)
-            .setPreferredDevice(preferredDevice)
-            .setAudioSessionId(audioSessionId)
-            .setEnableTunneling(tunneling)
-            .setPreferredBufferSize(preferredBufferSize)
-            .setVirtualDeviceId(virtualDeviceId)
-            .build()
+        return FormatConfig(
+            format,
+            audioAttributes = audioAttributes!!,
+            enableHighResolutionPcmOutput = enableFloatOutput,
+            enablePlaybackParameters = preferAudioOutputPlaybackParameters,
+            enableOffload = offloadMode != AudioSink.OFFLOAD_MODE_DISABLED,
+            preferredDevice = preferredDevice,
+            audioSessionId = audioSessionId,
+            enableTunneling = tunneling,
+            preferredBufferSize = preferredBufferSize,
+            virtualDeviceId = virtualDeviceId
+        )
     }
 
     private fun playPendingData() {

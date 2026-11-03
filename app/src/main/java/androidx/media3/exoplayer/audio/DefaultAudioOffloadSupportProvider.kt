@@ -104,10 +104,10 @@ class DefaultAudioOffloadSupportProvider(context: Context? = null) : AudioOffloa
             if (!AudioManager.isOffloadedPlaybackSupported(audioFormat, audioAttributes)) {
                 return AudioOffloadSupport.DEFAULT_UNSUPPORTED
             }
-            return AudioOffloadSupport.Builder()
-                .setIsFormatSupported(true)
-                .setIsSpeedChangeSupported(isOffloadVariableRateSupported)
-                .build()
+            return AudioOffloadSupport(
+                isFormatSupported = true,
+                isSpeedChangeSupported = isOffloadVariableRateSupported
+            )
         }
 
         @RequiresApi(31)
@@ -121,16 +121,15 @@ class DefaultAudioOffloadSupportProvider(context: Context? = null) : AudioOffloa
             if (playbackOffloadSupport == AudioManager.PLAYBACK_OFFLOAD_NOT_SUPPORTED) {
                 return AudioOffloadSupport.DEFAULT_UNSUPPORTED
             }
-            val audioOffloadSupport = AudioOffloadSupport.Builder()
             // (b/191950723) Gapless is not supported pre-API 33 due to playback position
             // issue upon transition of gapless tracks
             val isGaplessSupported =
                 Build.VERSION.SDK_INT > 32 && playbackOffloadSupport == AudioManager.PLAYBACK_OFFLOAD_GAPLESS_SUPPORTED
-            return audioOffloadSupport
-                .setIsFormatSupported(true)
-                .setIsGaplessSupported(isGaplessSupported)
-                .setIsSpeedChangeSupported(isOffloadVariableRateSupported)
-                .build()
+            return AudioOffloadSupport(
+                isFormatSupported = true,
+                isGaplessSupported = isGaplessSupported,
+                isSpeedChangeSupported = isOffloadVariableRateSupported,
+            )
         }
 
         @RequiresApi(33)
@@ -139,18 +138,19 @@ class DefaultAudioOffloadSupportProvider(context: Context? = null) : AudioOffloa
             audioAttributes: android.media.AudioAttributes,
             isOffloadVariableRateSupported: Boolean
         ): AudioOffloadSupport {
-            val directSupport = AudioManager.getDirectPlaybackSupport(audioFormat, audioAttributes)
+            val directSupport =
+                AudioManager.getDirectPlaybackSupport(audioFormat, audioAttributes)
             if ((directSupport and AudioManager.DIRECT_PLAYBACK_OFFLOAD_SUPPORTED) == 0) {
                 return AudioOffloadSupport.DEFAULT_UNSUPPORTED
             }
             val isGaplessSupported =
                 ((directSupport and AudioManager.DIRECT_PLAYBACK_OFFLOAD_GAPLESS_SUPPORTED)
                         == AudioManager.DIRECT_PLAYBACK_OFFLOAD_GAPLESS_SUPPORTED)
-            return AudioOffloadSupport.Builder()
-                .setIsFormatSupported(true)
-                .setIsGaplessSupported(isGaplessSupported)
-                .setIsSpeedChangeSupported(isOffloadVariableRateSupported)
-                .build()
+            return AudioOffloadSupport(
+                isFormatSupported = true,
+                isGaplessSupported = isGaplessSupported,
+                isSpeedChangeSupported = isOffloadVariableRateSupported
+            )
         }
     }
 }

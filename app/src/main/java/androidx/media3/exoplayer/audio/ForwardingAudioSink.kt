@@ -12,13 +12,14 @@ class ForwardingAudioSink(private val sink: AudioSink) : AudioSink by sink {
     override fun configure(
         inputFormat: Format, specifiedBufferSize: Int, outputChannels: IntArray?
     ) {
+        val outputChannelMapping =
+            if (outputChannels == null) null else ImmutableIntArray.copyOf(outputChannels)
         configure(
-            AudioSinkConfig.Builder(inputFormat)
-                .setPreferredBufferSizeOverride(specifiedBufferSize)
-                .setOutputChannelMapping(
-                    if (outputChannels == null) null else ImmutableIntArray.copyOf(outputChannels)
-                )
-                .build()
+            AudioSinkConfig(
+                inputFormat,
+                preferredBufferSizeOverride = specifiedBufferSize,
+                outputChannelMapping = outputChannelMapping
+            )
         )
     }
 }

@@ -75,7 +75,8 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     private var outputBuffer: SimpleDecoderOutputBuffer? = null
     private var decoderDrmSession: DrmSession? = null
     private var sourceDrmSession: DrmSession? = null
-    private var decoderReinitializationState: @ReinitializationState Int = REINITIALIZATION_STATE_NONE
+    private var decoderReinitializationState: @ReinitializationState Int =
+        REINITIALIZATION_STATE_NONE
     private var decoderReceivedBuffers = false
     private var audioTrackNeedsConfigure = true
     private var currentPositionUs: Long = 0
@@ -83,7 +84,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     private var inputStreamEnded = false
     private var outputStreamEnded = false
     private var outputStreamOffsetUs: Long = 0
-    private val pendingOutputStreamOffsetsUs= LongArray(MAX_PENDING_OUTPUT_STREAM_OFFSET_COUNT)
+    private val pendingOutputStreamOffsetsUs = LongArray(MAX_PENDING_OUTPUT_STREAM_OFFSET_COUNT)
     private var pendingOutputStreamOffsetCount = 0
     private var hasPendingReportedSkippedSilence = false
     private var hasReportedAudioPositionAdvancing = false
@@ -92,7 +93,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     private var lastBufferInStreamPresentationTimeUs = C.TIME_UNSET
     private var nextBufferToWritePresentationTimeUs = C.TIME_UNSET
     private var firstNotReadyTimeMs = C.TIME_UNSET
-    private var hasBeenReady= false
+    private var hasBeenReady = false
     private var wakeupListener: WakeupListener? = null
     private var playbackThreadExecutor: Executor? = null
 
@@ -196,6 +197,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
                 C.RESULT_FORMAT_READ -> {
                     onInputFormatChanged(formatHolder)
                 }
+
                 C.RESULT_BUFFER_READ -> {
                     // End of stream read having not read a format.
                     Preconditions.checkState(flagsOnlyBuffer.isEndOfStream)
@@ -209,6 +211,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
                     }
                     return
                 }
+
                 else -> {
                     // We still don't have a format and can't make progress without one.
                     return
@@ -349,11 +352,12 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
                     .setRoleFlags(inputFormat!!.roleFlags)
                     .build()
             audioSink.configure(
-                AudioSinkConfig.Builder(outputFormat)
-                    .setOutputChannelMapping(getChannelMapping(decoder))
-                    .setTimeline(getTimeline())
-                    .setMediaPeriodId(mediaPeriodId)
-                    .build()
+                AudioSinkConfig(
+                    outputFormat,
+                    outputChannelMapping = getChannelMapping(decoder),
+                    timeline = getTimeline(),
+                    mediaPeriodId = mediaPeriodId
+                )
             )
             audioTrackNeedsConfigure = false
         }
