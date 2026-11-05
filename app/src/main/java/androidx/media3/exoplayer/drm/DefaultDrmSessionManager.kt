@@ -31,90 +31,17 @@ import com.google.common.collect.Sets
 import java.util.UUID
 import kotlin.concurrent.Volatile
 
-class DefaultDrmSessionManager private constructor(
-    uuid: UUID,
-    exoMediaDrmProvider: ExoMediaDrm.Provider,
-    callback: MediaDrmCallback,
-    keyRequestParameters: HashMap<String, String>,
-    multiSession: Boolean,
-    useDrmSessionsForClearContentTrackTypes: IntArray,
-    playClearSamplesWithoutKeys: Boolean,
-    loadErrorHandlingPolicy: LoadErrorHandlingPolicy,
-    sessionKeepaliveMs: Long
+class DefaultDrmSessionManager(
+    private val uuid: UUID = C.WIDEVINE_UUID,
+    private val exoMediaDrmProvider: ExoMediaDrm.Provider = FrameworkMediaDrm.DEFAULT_PROVIDER,
+    private val callback: MediaDrmCallback,
+    private val keyRequestParameters: MutableMap<String, String> = HashMap(),
+    private val multiSession: Boolean = false,
+    private val useDrmSessionsForClearContentTrackTypes: IntArray = IntArray(0),
+    private val playClearSamplesWithoutKeys: Boolean = true,
+    private val loadErrorHandlingPolicy: LoadErrorHandlingPolicy = DefaultLoadErrorHandlingPolicy(),
+    private val sessionKeepaliveMs: Long = DEFAULT_SESSION_KEEPALIVE_MS
 ) : DrmSessionManager {
-    class Builder {
-        private val keyRequestParameters: HashMap<String, String> = HashMap<String, String>()
-        private var uuid: UUID = C.WIDEVINE_UUID
-        private var exoMediaDrmProvider = FrameworkMediaDrm.DEFAULT_PROVIDER
-        private var multiSession = false
-        private var useDrmSessionsForClearContentTrackTypes = IntArray(0)
-        private var playClearSamplesWithoutKeys = true
-        private var loadErrorHandlingPolicy: LoadErrorHandlingPolicy =
-            DefaultLoadErrorHandlingPolicy()
-        private var sessionKeepaliveMs = DEFAULT_SESSION_KEEPALIVE_MS
-
-        fun setKeyRequestParameters(keyRequestParameters: MutableMap<String, String>?): Builder {
-            this.keyRequestParameters.clear()
-            if (keyRequestParameters != null) {
-                this.keyRequestParameters.putAll(keyRequestParameters)
-            }
-            return this
-        }
-
-        fun setUuidAndExoMediaDrmProvider(
-            uuid: UUID, exoMediaDrmProvider: ExoMediaDrm.Provider
-        ): Builder {
-            this.uuid = uuid
-            this.exoMediaDrmProvider = exoMediaDrmProvider
-            return this
-        }
-
-        fun setMultiSession(multiSession: Boolean): Builder {
-            this.multiSession = multiSession
-            return this
-        }
-
-        fun setUseDrmSessionsForClearContent(
-            vararg useDrmSessionsForClearContentTrackTypes: Int
-        ): Builder {
-            for (trackType: @C.TrackType Int in useDrmSessionsForClearContentTrackTypes) {
-                Preconditions.checkArgument(trackType == C.TRACK_TYPE_VIDEO || trackType == C.TRACK_TYPE_AUDIO)
-            }
-            this.useDrmSessionsForClearContentTrackTypes =
-                useDrmSessionsForClearContentTrackTypes.clone()
-            return this
-        }
-
-        fun setPlayClearSamplesWithoutKeys(playClearSamplesWithoutKeys: Boolean): Builder {
-            this.playClearSamplesWithoutKeys = playClearSamplesWithoutKeys
-            return this
-        }
-
-        fun setLoadErrorHandlingPolicy(loadErrorHandlingPolicy: LoadErrorHandlingPolicy): Builder {
-            this.loadErrorHandlingPolicy = loadErrorHandlingPolicy
-            return this
-        }
-
-        fun setSessionKeepaliveMs(sessionKeepaliveMs: Long): Builder {
-            Preconditions.checkArgument(sessionKeepaliveMs > 0 || sessionKeepaliveMs == C.TIME_UNSET)
-            this.sessionKeepaliveMs = sessionKeepaliveMs
-            return this
-        }
-
-        fun build(mediaDrmCallback: MediaDrmCallback): DefaultDrmSessionManager {
-            return DefaultDrmSessionManager(
-                uuid,
-                exoMediaDrmProvider,
-                mediaDrmCallback,
-                keyRequestParameters,
-                multiSession,
-                useDrmSessionsForClearContentTrackTypes,
-                playClearSamplesWithoutKeys,
-                loadErrorHandlingPolicy,
-                sessionKeepaliveMs
-            )
-        }
-    }
 
     class MissingSchemeDataException(uuid: UUID) : Exception("Media does not support uuid: $uuid")
 
@@ -124,27 +51,20 @@ class DefaultDrmSessionManager private constructor(
     @IntDef(value = [MODE_PLAYBACK, MODE_QUERY, MODE_DOWNLOAD, MODE_RELEASE])
     annotation class Mode
 
-    private val uuid: UUID
-    private val exoMediaDrmProvider: ExoMediaDrm.Provider
-    private val callback: MediaDrmCallback
-    private val keyRequestParameters: HashMap<String, String>
-    private val multiSession: Boolean
-    private val useDrmSessionsForClearContentTrackTypes: IntArray
-    private val playClearSamplesWithoutKeys: Boolean
-    private val provisioningManagerImpl: ProvisioningManagerImpl
-    private val loadErrorHandlingPolicy: LoadErrorHandlingPolicy
-    private val referenceCountListener: ReferenceCountListenerImpl
-    private val sessionKeepaliveMs: Long
-    private val sessions: MutableList<DefaultDrmSession>
-    private val preacquiredSessionReferences: MutableSet<PreacquiredSessionReference?>
-    private val keepaliveSessions: MutableSet<DefaultDrmSession?>
+    private val provisioningManagerImpl = ProvisioningManagerImpl()
+    private val referenceCountListener = ReferenceCountListenerImpl()
+    private val sessions: MutableList<DefaultDrmSession> = ArrayList<DefaultDrmSession>()
+    private val preacquiredSessionReferences: MutableSet<PreacquiredSessionReference?> =
+        Sets.newIdentityHashSet<PreacquiredSessionReference?>()
+    private val keepaliveSessions: MutableSet<DefaultDrmSession?> =
+        Sets.newIdentityHashSet<DefaultDrmSession?>()
     private var prepareCallsCount = 0
     private var exoMediaDrm: ExoMediaDrm? = null
     private var placeholderDrmSession: DefaultDrmSession? = null
     private var noMultiSessionDrmSession: DefaultDrmSession? = null
     private var playbackLooper: Looper? = null
     private var playbackHandler: Handler? = null
-    private var mode: Int
+    private var mode: Int = MODE_PLAYBACK
     private var offlineLicenseKeySetId: ByteArray? = null
     private var playerId: PlayerId? = null
 
@@ -153,21 +73,6 @@ class DefaultDrmSessionManager private constructor(
 
     init {
         Preconditions.checkArgument(C.COMMON_PSSH_UUID != uuid, "Use C.CLEARKEY_UUID instead")
-        this.uuid = uuid
-        this.exoMediaDrmProvider = exoMediaDrmProvider
-        this.callback = callback
-        this.keyRequestParameters = keyRequestParameters
-        this.multiSession = multiSession
-        this.useDrmSessionsForClearContentTrackTypes = useDrmSessionsForClearContentTrackTypes
-        this.playClearSamplesWithoutKeys = playClearSamplesWithoutKeys
-        this.loadErrorHandlingPolicy = loadErrorHandlingPolicy
-        provisioningManagerImpl = ProvisioningManagerImpl()
-        referenceCountListener = ReferenceCountListenerImpl()
-        mode = MODE_PLAYBACK
-        sessions = ArrayList<DefaultDrmSession>()
-        preacquiredSessionReferences = Sets.newIdentityHashSet<PreacquiredSessionReference?>()
-        keepaliveSessions = Sets.newIdentityHashSet<DefaultDrmSession?>()
-        this.sessionKeepaliveMs = sessionKeepaliveMs
     }
 
     fun setMode(mode: @Mode Int, offlineLicenseKeySetId: ByteArray?) {

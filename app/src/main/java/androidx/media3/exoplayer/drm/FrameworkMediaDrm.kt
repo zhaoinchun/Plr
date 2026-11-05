@@ -30,6 +30,7 @@ import com.google.common.base.Preconditions
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
+import java.util.HashMap
 import java.util.UUID
 
 class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
@@ -125,7 +126,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         scope: ByteArray,
         schemeDatas: List<DrmInitData.SchemeData>?,
         keyType: Int,
-        optionalParameters: HashMap<String, String>?
+        optionalParameters: MutableMap<String, String>?
     ): ExoMediaDrm.KeyRequest {
         var schemeData: DrmInitData.SchemeData? = null
         var initData: ByteArray? = null
@@ -139,7 +140,9 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             mimeType = adjustRequestMimeType(uuid, schemeData.mimeType)
         }
         val request =
-            mediaDrm.getKeyRequest(scope, initData, mimeType, keyType, optionalParameters)
+            mediaDrm.getKeyRequest(scope, initData, mimeType, keyType,
+                optionalParameters as HashMap<String?, String?>?
+            )
 
         val requestData = adjustRequestData(uuid, request.data)
         var licenseServerUrl = adjustLicenseServerUrl(request.getDefaultUrl())

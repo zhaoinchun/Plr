@@ -35,7 +35,7 @@ class DummyExoMediaDrm : ExoMediaDrm {
         scope: ByteArray,
         schemeDatas: List<DrmInitData.SchemeData>?,
         keyType: Int,
-        optionalParameters: HashMap<String, String>?
+        optionalParameters: MutableMap<String, String>?
     ): ExoMediaDrm.KeyRequest {
         // Should not be invoked. No session should exist.
         throw IllegalStateException()

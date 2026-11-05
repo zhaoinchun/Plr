@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.drm
 
 import android.os.ConditionVariable
@@ -23,7 +22,7 @@ class OfflineLicenseHelper(
     private val drmSessionManager: DefaultDrmSessionManager,
     private val eventDispatcher: DrmSessionEventListener.EventDispatcher
 ) {
-    private val drmListenerConditionVariable= ConditionVariable()
+    private val drmListenerConditionVariable = ConditionVariable()
     private val handlerThread: HandlerThread = HandlerThread("ExoPlayer:OfflineLicenseHelper")
     private val handler: Handler
 
@@ -264,7 +263,7 @@ class OfflineLicenseHelper(
                 drmConfiguration.licenseUri!!.toString(),
                 drmConfiguration.forceDefaultLicenseUri,
                 drmConfiguration.licenseRequestHeaders,
-                dataSourceFactory, 
+                dataSourceFactory,
                 null,
                 eventDispatcher
             )
@@ -276,7 +275,7 @@ class OfflineLicenseHelper(
             eventDispatcher: DrmSessionEventListener.EventDispatcher
         ): OfflineLicenseHelper {
             return newWidevineInstance(
-                defaultLicenseUrl, 
+                defaultLicenseUrl,
                 false,
                 dataSourceFactory,
                 eventDispatcher
@@ -292,7 +291,7 @@ class OfflineLicenseHelper(
             return newWidevineInstance(
                 defaultLicenseUrl,
                 forceDefaultLicenseUrl,
-                dataSourceFactory, 
+                dataSourceFactory,
                 null,
                 eventDispatcher
             )
@@ -307,7 +306,7 @@ class OfflineLicenseHelper(
         ): OfflineLicenseHelper {
             return newWidevineInstance(
                 defaultLicenseUrl,
-                forceDefaultLicenseUrl, 
+                forceDefaultLicenseUrl,
                 null,
                 dataSourceFactory,
                 optionalKeyRequestParameters,
@@ -331,9 +330,10 @@ class OfflineLicenseHelper(
                 }
             }
             return OfflineLicenseHelper(
-                DefaultDrmSessionManager.Builder()
-                    .setKeyRequestParameters(optionalKeyRequestParameters)
-                    .build(httpDrmCallback),
+                DefaultDrmSessionManager(
+                    keyRequestParameters = optionalKeyRequestParameters ?: HashMap<String, String> (),
+                    callback = httpDrmCallback
+                ),
                 eventDispatcher
             )
         }

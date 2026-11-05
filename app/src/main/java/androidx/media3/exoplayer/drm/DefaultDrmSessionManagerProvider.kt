@@ -3,6 +3,7 @@ package androidx.media3.exoplayer.drm
 import androidx.annotation.GuardedBy
 import androidx.media3.common.MediaItem
 import androidx.media3.datasource.DataSource
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import com.google.common.primitives.Ints
 
@@ -65,20 +66,17 @@ class DefaultDrmSessionManagerProvider : DrmSessionManagerProvider {
         for (entry in drmConfiguration.licenseRequestHeaders.entries) {
             httpDrmCallback.setKeyRequestProperty(entry.key, entry.value)
         }
-        val drmSessionManagerBuilder =
-            DefaultDrmSessionManager.Builder()
-                .setUuidAndExoMediaDrmProvider(
-                    drmConfiguration.scheme, FrameworkMediaDrm.DEFAULT_PROVIDER
-                )
-                .setMultiSession(drmConfiguration.multiSession)
-                .setPlayClearSamplesWithoutKeys(drmConfiguration.playClearContentWithoutKey)
-                .setUseDrmSessionsForClearContent(
-                    *Ints.toArray(drmConfiguration.forcedSessionTrackTypes)
-                )
-        if (drmLoadErrorHandlingPolicy != null) {
-            drmSessionManagerBuilder.setLoadErrorHandlingPolicy(drmLoadErrorHandlingPolicy!!)
-        }
-        val drmSessionManager = drmSessionManagerBuilder.build(httpDrmCallback)
+        val drmSessionManager =
+            DefaultDrmSessionManager(
+                uuid = drmConfiguration.scheme,
+                exoMediaDrmProvider = FrameworkMediaDrm.DEFAULT_PROVIDER,
+                callback = httpDrmCallback,
+                multiSession = drmConfiguration.multiSession,
+                loadErrorHandlingPolicy = drmLoadErrorHandlingPolicy
+                    ?: DefaultLoadErrorHandlingPolicy(),
+                playClearSamplesWithoutKeys = drmConfiguration.playClearContentWithoutKey,
+                useDrmSessionsForClearContentTrackTypes = Ints.toArray(drmConfiguration.forcedSessionTrackTypes)
+            )
         drmSessionManager.setMode(
             DefaultDrmSessionManager.MODE_PLAYBACK,
             drmConfiguration.getKeySetId()

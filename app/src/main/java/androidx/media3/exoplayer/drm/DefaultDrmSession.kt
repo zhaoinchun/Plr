@@ -41,7 +41,7 @@ internal class DefaultDrmSession(
     private val playClearSamplesWithoutKeys: Boolean,
     private val isPlaceholderSession: Boolean,
     offlineLicenseKeySetId: ByteArray?,
-    private val keyRequestParameters: HashMap<String, String>,
+    private val keyRequestParameters: MutableMap<String, String>,
     private val callback: MediaDrmCallback,
     private val playbackLooper: Looper,
     private val loadErrorHandlingPolicy: LoadErrorHandlingPolicy,
