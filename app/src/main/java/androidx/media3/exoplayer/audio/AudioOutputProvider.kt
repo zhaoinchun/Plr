@@ -39,63 +39,14 @@ interface AudioOutputProvider {
         val useOffloadGapless: Boolean = false,
     )
 
-    class FormatSupport private constructor(builder: Builder) {
-        class Builder {
-            var isFormatSupportedForOffload = false
-            var isGaplessSupportedForOffload = false
-            var isSpeedChangeSupportedForOffload = false
-            var supportLevel: @SupportLevel Int
-
-            constructor() {
-                supportLevel = FORMAT_UNSUPPORTED
-            }
-
-            constructor(other: FormatSupport) {
-                isFormatSupportedForOffload = other.isFormatSupportedForOffload
-                isGaplessSupportedForOffload = other.isGaplessSupportedForOffload
-                isSpeedChangeSupportedForOffload = other.isSpeedChangeSupportedForOffload
-                supportLevel = other.supportLevel
-            }
-
-            fun setIsFormatSupportedForOffload(isFormatSupportedForOffload: Boolean): Builder {
-                this.isFormatSupportedForOffload = isFormatSupportedForOffload
-                return this
-            }
-
-            fun setIsGaplessSupportedForOffload(isGaplessSupportedForOffload: Boolean): Builder {
-                this.isGaplessSupportedForOffload = isGaplessSupportedForOffload
-                return this
-            }
-
-            fun setIsSpeedChangeSupportedForOffload(isSpeedChangeSupportedForOffload: Boolean): Builder {
-                this.isSpeedChangeSupportedForOffload = isSpeedChangeSupportedForOffload
-                return this
-            }
-
-            fun setFormatSupportLevel(supportLevel: @SupportLevel Int): Builder {
-                this.supportLevel = supportLevel
-                return this
-            }
-
-            fun build(): FormatSupport {
-                check(
-                    !(!isFormatSupportedForOffload
-                            && (isGaplessSupportedForOffload || isSpeedChangeSupportedForOffload))
-                ) {
-                    ("Secondary offload attribute fields are true but primary isFormatSupportedForOffload"
-                            + " is false")
-                }
-                return FormatSupport(this)
-            }
-        }
-
-        val isFormatSupportedForOffload = builder.isFormatSupportedForOffload
-        val isGaplessSupportedForOffload = builder.isGaplessSupportedForOffload
-        val isSpeedChangeSupportedForOffload = builder.isSpeedChangeSupportedForOffload
-        val supportLevel: @SupportLevel Int = builder.supportLevel
-
+    data class FormatSupport(
+        var isFormatSupportedForOffload: Boolean = false,
+        var isGaplessSupportedForOffload: Boolean = false,
+        var isSpeedChangeSupportedForOffload: Boolean = false,
+        var supportLevel: @SupportLevel Int = FORMAT_UNSUPPORTED,
+    ) {
         companion object {
-            val UNSUPPORTED: FormatSupport = Builder().build()
+            val UNSUPPORTED: FormatSupport = FormatSupport()
         }
     }
 

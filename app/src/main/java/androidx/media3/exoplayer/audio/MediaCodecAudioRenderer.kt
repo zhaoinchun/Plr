@@ -113,15 +113,14 @@ class MediaCodecAudioRenderer constructor(
         mediaCodecSelector,
         eventHandler,
         eventListener,
-        DefaultAudioSink.Builder()
-            .setAudioCapabilities( // For backward compatibility, null == default.
-                MoreObjects.firstNonNull<AudioCapabilities?>(
-                    audioCapabilities,
-                    AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
-                )
+        DefaultAudioSink(
+            audioCapabilities = MoreObjects.firstNonNull<AudioCapabilities?>(
+                audioCapabilities,
+                AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
             )
-            .setAudioProcessors(audioProcessors)
-            .build()
+        ).apply {
+            setAudioProcessors(audioProcessors)
+        }
     )
 
     constructor(
@@ -129,11 +128,11 @@ class MediaCodecAudioRenderer constructor(
         mediaCodecSelector: MediaCodecSelector?,
         eventHandler: Handler? = null,
         eventListener: AudioRendererEventListener,
-        audioSink: AudioSink = DefaultAudioSink.Builder(context).build()
+        audioSink: AudioSink = DefaultAudioSink(context)
     ) : this(
         context,
         MediaCodecAdapter.Factory.getDefault(context),
-        mediaCodecSelector,  
+        mediaCodecSelector,
         false,
         eventHandler,
         eventListener,
@@ -523,10 +522,12 @@ class MediaCodecAudioRenderer constructor(
                 }
             }
             audioSink.configure(
-                AudioSinkConfig(audioSinkInputFormat,
+                AudioSinkConfig(
+                    audioSinkInputFormat,
                     outputChannelMapping = channelMap,
                     timeline = getTimeline(),
-                    mediaPeriodId = mediaPeriodId)
+                    mediaPeriodId = mediaPeriodId
+                )
             )
         } catch (e: AudioSink.ConfigurationException) {
             throw createRendererException(
@@ -904,7 +905,7 @@ class MediaCodecAudioRenderer constructor(
             codecMaxInputSize
         )
         // Set codec configuration values.
-        mediaFormat.setInteger(MediaFormat.KEY_PRIORITY, 0 )
+        mediaFormat.setInteger(MediaFormat.KEY_PRIORITY, 0)
         if (codecOperatingRate != CODEC_OPERATING_RATE_UNSET && !deviceDoesntSupportOperatingRate()) {
             mediaFormat.setFloat(MediaFormat.KEY_OPERATING_RATE, codecOperatingRate)
         }
@@ -1079,7 +1080,7 @@ class MediaCodecAudioRenderer constructor(
             return MediaCodecUtil.getDecoderInfosSoftMatch(
                 mediaCodecSelector,
                 format,
-                requiresSecureDecoder, 
+                requiresSecureDecoder,
                 false
             )
         }

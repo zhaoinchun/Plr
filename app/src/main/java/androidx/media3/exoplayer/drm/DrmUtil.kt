@@ -104,12 +104,10 @@ object DrmUtil {
                             SystemClock.elapsedRealtime()
                         )
                             .setUri(statsDataSource.lastOpenedUri)
-                            .setResponseHeaders(statsDataSource.lastResponseHeaders!!)
+                            .setResponseHeaders(statsDataSource.lastResponseHeaders)
                             .setBytesLoaded(response.size.toLong())
                             .build()
-                    return MediaDrmCallback.Response.Builder(response)
-                        .setLoadEventInfo(loadEventInfo)
-                        .build()
+                    return MediaDrmCallback.Response(response,loadEventInfo)
                 } catch (e: InvalidResponseCodeException) {
                     val redirectUrl = getRedirectUrl(e, manualRedirectCount)
                     if (redirectUrl == null) {

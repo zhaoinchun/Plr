@@ -140,7 +140,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     }
 
     @RequiresApi(34)
-    
+
      // TODO: b/470367414 - Run experiments and enable by default.
     fun experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
         enableMediaCodecBufferDecodeOnlyFlag: Boolean
@@ -606,11 +606,11 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildAudioSink(
         context: Context?, enableFloatOutput: Boolean, enableAudioOutputPlaybackParams: Boolean
-    ): AudioSink? {
-        return DefaultAudioSink.Builder(context)
-            .setEnableFloatOutput(enableFloatOutput)
-            .setEnableAudioOutputPlaybackParameters(enableAudioOutputPlaybackParams)
-            .build()
+    ): AudioSink {
+        return DefaultAudioSink(context).apply {
+            this.enableFloatOutput = enableFloatOutput
+            preferAudioOutputPlaybackParameters = enableFloatOutput
+        }
     }
 
     override fun createSecondaryRenderer(

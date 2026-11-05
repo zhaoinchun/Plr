@@ -65,8 +65,16 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class DefaultAudioSink private constructor(builder: Builder) :
-    AudioSink {
+class DefaultAudioSink(
+    context: Context? = null,
+    audioOutputProvider: AudioOutputProvider? = null,
+    audioOffloadSupportProvider: AudioOffloadSupportProvider? = null,
+    var audioProcessorChain: androidx.media3.common.audio.AudioProcessorChain? = DefaultAudioProcessorChain(
+        arrayOf()
+    ),
+    audioTrackBufferSizeProvider: AudioTrackBufferSizeProvider? = null,
+    audioCapabilities: AudioCapabilities? = null
+) : AudioSink {
     @Deprecated("Use {@link AudioTrackAudioOutputProvider} instead.")
     interface AudioTrackProvider {
         fun getAudioTrack(
@@ -154,150 +162,8 @@ class DefaultAudioSink private constructor(builder: Builder) :
         ): AudioOffloadSupport
     }
 
-    class Builder {
-        val context: Context?
-        var audioCapabilities: AudioCapabilities?
-        var audioProcessorChain: androidx.media3.common.audio.AudioProcessorChain? = null
-        var enableFloatOutput = false
-        var enableAudioOutputPlaybackParameters = false
-        var buildCalled = false
-        var audioTrackBufferSizeProvider: AudioTrackBufferSizeProvider? =
-            null
-        var audioOutputProvider: AudioOutputProvider? = null
-        var audioTrackProvider: AudioTrackProvider? = null
-        var audioOffloadSupportProvider: AudioOffloadSupportProvider? =
-            null
-        var audioOffloadListener: AudioOffloadListener? = null
-
-        @Deprecated("Use {@link #Builder(Context)} instead.")
-        constructor() {
-            this.context = null
-            audioCapabilities = AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
-        }
-
-        constructor(context: Context?) {
-            this.context = context
-            audioCapabilities = AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
-        }
-
-        @Deprecated(
-            """These {@linkplain AudioCapabilities audio capabilities} are only used in the
-          absence of a {@linkplain Context context}. In the case when the {@code Context} is {@code
-     *     null} and the {@code audioCapabilities} is not set to the {@code Builder}, the default
-          capabilities (no encoded audio passthrough support) should be assumed."""
-        )
-        fun setAudioCapabilities(audioCapabilities: AudioCapabilities?): Builder {
-            this.audioCapabilities = audioCapabilities!!
-            return this
-        }
-
-        fun setAudioProcessors(audioProcessors: Array<AudioProcessor>): Builder {
-            return setAudioProcessorChain(DefaultAudioProcessorChain(audioProcessors!!))
-        }
-
-        fun setAudioProcessorChain(
-            audioProcessorChain: androidx.media3.common.audio.AudioProcessorChain?
-        ): Builder {
-            this.audioProcessorChain = audioProcessorChain!!
-            return this
-        }
-
-        fun setEnableFloatOutput(enableFloatOutput: Boolean): Builder {
-            this.enableFloatOutput = enableFloatOutput
-            return this
-        }
-
-        @Deprecated("Use {@link #setEnableAudioOutputPlaybackParameters(boolean)} instead.")
-        fun setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams: Boolean): Builder {
-            return setEnableAudioOutputPlaybackParameters(enableAudioTrackPlaybackParams)
-        }
-
-        fun setEnableAudioOutputPlaybackParameters(
-            enableAudioOutputPlaybackParameters: Boolean
-        ): Builder {
-            this.enableAudioOutputPlaybackParameters = enableAudioOutputPlaybackParameters
-            return this
-        }
-
-        @Deprecated(
-            """Use {@link #setAudioOutputProvider(AudioOutputProvider)} instead and customize
-          {@link
-     *     AudioTrackAudioOutputProvider.Builder#setAudioTrackBufferSizeProvider(AudioTrackBufferSizeProvider)}."""
-        )
-        fun setAudioTrackBufferSizeProvider(
-            audioTrackBufferSizeProvider: AudioTrackBufferSizeProvider?
-        ): Builder {
-            this.audioTrackBufferSizeProvider = audioTrackBufferSizeProvider
-            return this
-        }
-
-        @Deprecated(
-            """Use {@link #setAudioOutputProvider(AudioOutputProvider)} instead and customize
-          {@link
-     *     AudioTrackAudioOutputProvider.Builder#setAudioOffloadSupportProvider(AudioOffloadSupportProvider)}."""
-        )
-        fun setAudioOffloadSupportProvider(
-            audioOffloadSupportProvider: AudioOffloadSupportProvider?
-        ): Builder {
-            this.audioOffloadSupportProvider = audioOffloadSupportProvider
-            return this
-        }
-
-        fun setExperimentalAudioOffloadListener(
-            audioOffloadListener: AudioOffloadListener?
-        ): Builder {
-            this.audioOffloadListener = audioOffloadListener
-            return this
-        }
-
-        @Deprecated(
-            """Use {@link #setAudioOutputProvider(AudioOutputProvider)} instead and customize
-          {@link AudioTrackAudioOutputProvider.Builder#setAudioTrackBuilderModifier(BiConsumer)} or
-          wrap {@link AudioTrackAudioOutputProvider} in a {@link ForwardingAudioOutputProvider}."""
-        )
-        fun setAudioTrackProvider(audioTrackProvider: AudioTrackProvider?): Builder {
-            this.audioTrackProvider = audioTrackProvider
-            return this
-        }
-
-        fun setAudioOutputProvider(audioOutputProvider: AudioOutputProvider?): Builder {
-            Preconditions.checkState(
-                context != null, "Cannot set AudioOutputProvider without a Context"
-            )
-            this.audioOutputProvider = audioOutputProvider
-            return this
-        }
-
-        fun build(): DefaultAudioSink {
-            Preconditions.checkState(!buildCalled)
-            buildCalled = true
-            if (audioProcessorChain == null) {
-                audioProcessorChain = DefaultAudioProcessorChain(arrayOf())
-            }
-            if (audioOutputProvider == null) {
-                if (audioOffloadSupportProvider == null) {
-                    audioOffloadSupportProvider = DefaultAudioOffloadSupportProvider(context)
-                }
-                if (audioTrackBufferSizeProvider == null) {
-                    audioTrackBufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
-                }
-                audioOutputProvider =
-                    AudioTrackAudioOutputProvider(context).apply {
-                        this.audioCapabilities =
-                            if (context != null) null else this@Builder.audioCapabilities
-                        this.audioOffloadSupportProvider =
-                            this@Builder.audioOffloadSupportProvider!!
-                        this.audioTrackBufferSizeProvider =
-                            this@Builder.audioTrackBufferSizeProvider!!
-                        this.audioTrackProvider = this@Builder.audioTrackProvider
-                    }
-            } else {
-                Preconditions.checkState(audioOffloadSupportProvider == null)
-                Preconditions.checkState(audioTrackBufferSizeProvider == null)
-                Preconditions.checkState(audioTrackProvider == null)
-            }
-            return DefaultAudioSink(this)
-        }
+    fun setAudioProcessors(audioProcessors: Array<AudioProcessor>) {
+        audioProcessorChain = (DefaultAudioProcessorChain(audioProcessors))
     }
 
     @MustBeDocumented
@@ -306,31 +172,50 @@ class DefaultAudioSink private constructor(builder: Builder) :
     @IntDef(value = [OUTPUT_MODE_PCM, OUTPUT_MODE_OFFLOAD, OUTPUT_MODE_PASSTHROUGH])
     annotation class OutputMode
 
-    private val context: Context?
-    private val audioProcessorChain: androidx.media3.common.audio.AudioProcessorChain? =
-        builder.audioProcessorChain
-    private val enableFloatOutput: Boolean = builder.enableFloatOutput
-    private val channelMappingAudioProcessor: ChannelMappingAudioProcessor
-    private val trimmingAudioProcessor: TrimmingAudioProcessor
-    private val toInt16PcmAudioProcessor: ToInt16PcmAudioProcessor
-    private val toFloatPcmAudioProcessor: ToFloatPcmAudioProcessor
-    private val availableAudioProcessors: List<AudioProcessor>
-    private val mediaPositionParametersCheckpoints: ArrayDeque<MediaPositionParameters>
-    private val preferAudioOutputPlaybackParameters: Boolean =
-        builder.enableAudioOutputPlaybackParameters
-    private var offloadMode: @OffloadMode Int
+    private val context: Context? = context?.applicationContext
+    var enableFloatOutput: Boolean = false
+    private val channelMappingAudioProcessor = ChannelMappingAudioProcessor()
+    private val trimmingAudioProcessor = TrimmingAudioProcessor()
+    private val toInt16PcmAudioProcessor = ToInt16PcmAudioProcessor()
+    private val toFloatPcmAudioProcessor = ToFloatPcmAudioProcessor()
+    private val availableAudioProcessors: List<AudioProcessor> =
+        listOf(trimmingAudioProcessor, channelMappingAudioProcessor)
+    private val mediaPositionParametersCheckpoints = ArrayDeque<MediaPositionParameters>()
+    var preferAudioOutputPlaybackParameters: Boolean = false
+    private var offloadMode: @OffloadMode Int = AudioSink.OFFLOAD_MODE_DISABLED
     private var audioOutputListener: AudioOutputListener? = null
-    private val initializationExceptionPendingExceptionHolder: PendingExceptionHolder<AudioSink.InitializationException>
-
-    private val writeExceptionPendingExceptionHolder: PendingExceptionHolder<AudioSink.WriteException>
-    private val audioOffloadListener: AudioOffloadListener?
+    private val initializationExceptionPendingExceptionHolder: PendingExceptionHolder<AudioSink.InitializationException> =
+        PendingExceptionHolder()
+    private val writeExceptionPendingExceptionHolder: PendingExceptionHolder<AudioSink.WriteException> =
+        PendingExceptionHolder()
+    private val audioOffloadListener: AudioOffloadListener? = null
 
     private var playerId: PlayerId? = null
     private var listener: AudioSink.Listener? = null
     private var pendingConfiguration: Configuration? = null
     private var configuration: Configuration? = null
     private var audioProcessingPipeline: AudioProcessingPipeline? = null
-    private var audioOutputProvider: AudioOutputProvider
+    var audioTrackProvider: AudioTrackProvider? = null
+    private var audioOutputProvider: AudioOutputProvider = run {
+        if (audioOutputProvider == null) {
+            val audioOffloadSupportProvider =
+                audioOffloadSupportProvider ?: DefaultAudioOffloadSupportProvider(context)
+            val audioTrackBufferSizeProvider =
+                audioTrackBufferSizeProvider ?: AudioTrackBufferSizeProvider.DEFAULT
+            AudioTrackAudioOutputProvider(context).apply {
+                this.audioCapabilities =
+                    if (context != null) null else this@DefaultAudioSink.audioCapabilities
+                this.audioOffloadSupportProvider = audioOffloadSupportProvider
+                this.audioTrackBufferSizeProvider = audioTrackBufferSizeProvider
+                this.audioTrackProvider = this@DefaultAudioSink.audioTrackProvider
+            }
+        } else {
+            Preconditions.checkState(audioOffloadSupportProvider == null)
+            Preconditions.checkState(audioTrackBufferSizeProvider == null)
+            Preconditions.checkState(audioTrackProvider == null)
+            audioOutputProvider
+        }
+    }
     private var audioOutputProviderListener: AudioOutputProvider.Listener? = null
     private var audioOutput: AudioOutput? = null
     override var audioAttributes: AudioAttributes? = AudioAttributes.DEFAULT
@@ -346,7 +231,9 @@ class DefaultAudioSink private constructor(builder: Builder) :
             reconfigureAndFlush()
         }
     private var afterDrainParameters: MediaPositionParameters? = null
-    private var mediaPositionParameters: MediaPositionParameters
+    private var mediaPositionParameters = MediaPositionParameters(
+        PlaybackParameters.DEFAULT, 0, 0
+    )
     private var _playbackParameters: PlaybackParameters = PlaybackParameters.DEFAULT
         set(value) {
             if (useAudioOutputPlaybackParams()) {
@@ -372,7 +259,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
             _playbackParameters = value
         }
 
-    override var skipSilenceEnabled: Boolean = false
+    override var skipSilenceEnabled: Boolean = DEFAULT_SKIP_SILENCE
         set(value) {
             field = value
             setAudioProcessorPlaybackParameters(
@@ -389,7 +276,7 @@ class DefaultAudioSink private constructor(builder: Builder) :
     private var startMediaTimeUsNeedsInit = false
     private var startMediaTimeUs: Long = 0
     private var outputStreamOffsetUs: Long = 0
-    private var volume: Float
+    private var volume: Float = 1f
 
     private var inputBuffer: ByteBuffer? = null
     private var inputBufferAccessUnitCount = 0
@@ -400,9 +287,9 @@ class DefaultAudioSink private constructor(builder: Builder) :
 
     private var playing = false
     private var externalAudioSessionIdProvided = false
-    private var audioSessionId: Int
+    private var audioSessionId: Int = C.AUDIO_SESSION_ID_UNSET
     private var pendingAudioSessionIdChangeConfirmation = false
-    private var auxEffectInfo: AuxEffectInfo
+    private var auxEffectInfo = AuxEffectInfo(AuxEffectInfo.NO_AUX_EFFECT_ID, 0f)
     private var preferredDevice: AudioDeviceInfo? = null
     private var virtualDeviceId: Int
     private var tunneling = false
@@ -414,32 +301,11 @@ class DefaultAudioSink private constructor(builder: Builder) :
     private var reportSkippedSilenceHandler: Handler? = null
 
     init {
-        context = builder.context?.applicationContext
-        offloadMode = AudioSink.OFFLOAD_MODE_DISABLED
-        audioOutputProvider = builder.audioOutputProvider!!
-        channelMappingAudioProcessor = ChannelMappingAudioProcessor()
-        trimmingAudioProcessor = TrimmingAudioProcessor()
-        toInt16PcmAudioProcessor = ToInt16PcmAudioProcessor()
-        toFloatPcmAudioProcessor = ToFloatPcmAudioProcessor()
-        availableAudioProcessors = listOf(trimmingAudioProcessor, channelMappingAudioProcessor)
-        volume = 1f
-        audioSessionId = C.AUDIO_SESSION_ID_UNSET
-        auxEffectInfo = AuxEffectInfo(AuxEffectInfo.NO_AUX_EFFECT_ID, 0f)
-        mediaPositionParameters =
-            MediaPositionParameters(
-                PlaybackParameters.DEFAULT, 0, 0
-            )
-        _playbackParameters = PlaybackParameters.DEFAULT
-        skipSilenceEnabled = DEFAULT_SKIP_SILENCE
-        mediaPositionParametersCheckpoints = ArrayDeque<MediaPositionParameters>()
-        initializationExceptionPendingExceptionHolder = PendingExceptionHolder()
-        writeExceptionPendingExceptionHolder = PendingExceptionHolder()
-        audioOffloadListener = builder.audioOffloadListener
         virtualDeviceId =
-            if (Build.VERSION.SDK_INT < 34 || builder.context == null)
+            if (Build.VERSION.SDK_INT < 34 || context == null)
                 C.INDEX_UNSET
             else
-                getDeviceIdFromContext(builder.context)
+                getDeviceIdFromContext(context)
     }
 
     // AudioSink implementation.

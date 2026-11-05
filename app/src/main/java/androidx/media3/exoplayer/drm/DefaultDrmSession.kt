@@ -89,7 +89,7 @@ internal class DefaultDrmSession(
     private var currentKeyRequest: ExoMediaDrm.KeyRequest? = null
 
     @GuardedBy("keyRequestInfoLock")
-    private var currentKeyRequestInfo: KeyRequestInfo.Builder? = null
+    private var currentKeyRequestInfo: KeyRequestInfo? = null
     private var currentProvisionRequest: ExoMediaDrm.ProvisionRequest? = null
 
     init {
@@ -367,8 +367,8 @@ internal class DefaultDrmSession(
     private fun postKeyRequest(scope: ByteArray, type: Int, allowRetry: Boolean) {
         try {
             synchronized(keyRequestInfoLock) {
-                currentKeyRequestInfo = KeyRequestInfo.Builder()
-                schemeDatas?.also { currentKeyRequestInfo!!.setSchemeDatas(it) }
+                currentKeyRequestInfo = KeyRequestInfo()
+                schemeDatas?.also { currentKeyRequestInfo!!.schemeDatas = it }
             }
             currentKeyRequest =
                 mediaDrm.getKeyRequest(scope, schemeDatas, type, keyRequestParameters)
@@ -390,7 +390,7 @@ internal class DefaultDrmSession(
         synchronized(keyRequestInfoLock) {
             // currentKeyRequest and currentKeyRequestInfo are assigned together, and nulled-out together,
             // so it must be non-null here.
-            keyRequestInfo = currentKeyRequestInfo!!.build()
+            keyRequestInfo = currentKeyRequestInfo
             currentKeyRequestInfo = null
         }
 

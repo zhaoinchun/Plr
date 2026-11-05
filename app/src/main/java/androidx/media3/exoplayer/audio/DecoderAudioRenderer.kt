@@ -36,6 +36,7 @@ import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.audio.AudioSink.AudioSinkConfig
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
 import androidx.media3.exoplayer.audio.AudioSink.SinkFormatSupport
+import androidx.media3.exoplayer.audio.DefaultAudioSink.DefaultAudioProcessorChain
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
@@ -105,12 +106,11 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     ) : this(
         eventHandler,
         eventListener,
-        DefaultAudioSink.Builder()
-            .setAudioCapabilities(
-                audioCapabilities ?: AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES,
-            )
-            .setAudioProcessors(audioProcessors)
-            .build()
+        DefaultAudioSink(
+            audioCapabilities = audioCapabilities ?: AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
+        ).apply {
+            setAudioProcessors(audioProcessors)
+        }
     )
 
     init {

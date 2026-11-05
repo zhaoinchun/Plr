@@ -61,12 +61,12 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
             audioOffloadSupportProvider.getAudioOffloadSupport(
                 formatConfig.format, formatConfig.audioAttributes
             )
-        return AudioOutputProvider.FormatSupport.Builder()
-            .setFormatSupportLevel(getFormatSupportLevel(formatConfig))
-            .setIsFormatSupportedForOffload(offloadSupport.isFormatSupported)
-            .setIsGaplessSupportedForOffload(offloadSupport.isGaplessSupported)
-            .setIsSpeedChangeSupportedForOffload(offloadSupport.isSpeedChangeSupported)
-            .build()
+        return AudioOutputProvider.FormatSupport(
+            supportLevel = getFormatSupportLevel(formatConfig),
+            isFormatSupportedForOffload = offloadSupport.isFormatSupported,
+            isGaplessSupportedForOffload = offloadSupport.isGaplessSupported,
+            isSpeedChangeSupportedForOffload = offloadSupport.isSpeedChangeSupported
+        )
     }
 
     @Throws(AudioOutputProvider.ConfigurationException::class)
