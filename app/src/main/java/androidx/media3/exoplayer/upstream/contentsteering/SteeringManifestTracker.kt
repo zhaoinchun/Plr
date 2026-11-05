@@ -52,7 +52,7 @@ class SteeringManifestTracker internal constructor(
 
     init {
         this.steeringManifestLoaderCallback = SteeringManifestLoaderCallback()
-        this.handler = clock.createHandler(currentOrMainLooper!!,  null)
+        this.handler = clock.createHandler(currentOrMainLooper!!, null)
     }
 
     fun start(
@@ -64,7 +64,7 @@ class SteeringManifestTracker internal constructor(
         this.callback = callback
         this.eventDispatcher = eventDispatcher
         this.steeringManifestReloadHandler =
-            clock.createHandler(currentOrMainLooper!!,  null)
+            clock.createHandler(currentOrMainLooper!!, null)
         this.steeringManifestLoader =
             if (downloadExecutorSupplier != null)
                 Loader(downloadExecutorSupplier.get()!!)
@@ -80,7 +80,7 @@ class SteeringManifestTracker internal constructor(
             steeringManifestLoader = null
         }
         if (steeringManifestReloadHandler != null) {
-            steeringManifestReloadHandler!!.removeCallbacksAndMessages( null)
+            steeringManifestReloadHandler!!.removeCallbacksAndMessages(null)
             steeringManifestReloadHandler = null
         }
         callback = null
@@ -91,8 +91,8 @@ class SteeringManifestTracker internal constructor(
 
     private fun loadSteeringManifestImmediately() {
         Preconditions.checkState(hasStarted)
-        val steeringManifestUrlBuilder =steeringManifestUrl!!.buildUpon()
-        val steeringQueryParameters =callback!!.steeringQueryParameters
+        val steeringManifestUrlBuilder = steeringManifestUrl!!.buildUpon()
+        val steeringQueryParameters = callback!!.steeringQueryParameters
         val sortedQueryParameters = TreeMap<String?, String?>(steeringQueryParameters)
         for (entry in sortedQueryParameters.entries) {
             steeringManifestUrlBuilder.appendQueryParameter(entry.key, entry.value)
@@ -109,13 +109,14 @@ class SteeringManifestTracker internal constructor(
                 SteeringManifestParser()
             )
         steeringManifestLoader!!.startLoading<ParsingLoadable<SteeringManifest>>(
-                steeringManifestLoadable,  
-                steeringManifestLoaderCallback,  
-                0
-            )
+            steeringManifestLoadable,
+            steeringManifestLoaderCallback,
+            0
+        )
     }
 
-    private inner class SteeringManifestLoaderCallback : Loader.Callback<ParsingLoadable<SteeringManifest>> {
+    private inner class SteeringManifestLoaderCallback :
+        Loader.Callback<ParsingLoadable<SteeringManifest>> {
         override fun onLoadStarted(
             loadable: ParsingLoadable<SteeringManifest>,
             elapsedRealtimeMs: Long,
@@ -154,9 +155,9 @@ class SteeringManifestTracker internal constructor(
                 else
                     FALLBACK_DELAY_UNTIL_NEXT_LOAD_MS
             steeringManifestReloadHandler!!.postDelayed(
-                    Runnable { this@SteeringManifestTracker.loadSteeringManifestImmediately() },
-                    delayUntilNextLoadMs
-                )
+                Runnable { this@SteeringManifestTracker.loadSteeringManifestImmediately() },
+                delayUntilNextLoadMs
+            )
             val loadEventInfo: LoadEventInfo =
                 buildLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
             eventDispatcher!!.loadCompleted(loadEventInfo, C.DATA_TYPE_STEERING_MANIFEST)
@@ -198,7 +199,7 @@ class SteeringManifestTracker internal constructor(
                 // If HTTP 410 Gone is in response, we will not reload for the remainder of the session.
                 delayUntilNextLoadMs = C.TIME_UNSET
                 steeringManifestLoader!!.release()
-                steeringManifestReloadHandler!!.removeCallbacksAndMessages( null)
+                steeringManifestReloadHandler!!.removeCallbacksAndMessages(null)
             } else if (responseCode == 429) {
                 // If HTTP 429 Too Many Requests with a Retry-After header is in response, we will wait
                 // for the specified time until reload.
@@ -217,9 +218,9 @@ class SteeringManifestTracker internal constructor(
             }
             if (delayUntilNextLoadMs != C.TIME_UNSET) {
                 steeringManifestReloadHandler!!.postDelayed(
-                        Runnable { this@SteeringManifestTracker.loadSteeringManifestImmediately() },
-                        delayUntilNextLoadMs
-                    )
+                    Runnable { this@SteeringManifestTracker.loadSteeringManifestImmediately() },
+                    delayUntilNextLoadMs
+                )
             }
             val canceled = delayUntilNextLoadMs == C.TIME_UNSET
             handler!!.post(Runnable {
@@ -227,7 +228,12 @@ class SteeringManifestTracker internal constructor(
             })
             val loadEventInfo: LoadEventInfo =
                 buildLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
-            eventDispatcher!!.loadError(loadEventInfo, C.DATA_TYPE_STEERING_MANIFEST, error, canceled)
+            eventDispatcher!!.loadError(
+                loadEventInfo,
+                C.DATA_TYPE_STEERING_MANIFEST,
+                error,
+                canceled
+            )
             // We do not retry here but will still reload with the latest parameters after the delay.
             return Loader.DONT_RETRY
         }
@@ -235,7 +241,7 @@ class SteeringManifestTracker internal constructor(
 
     companion object {
         @VisibleForTesting
-        
+
         const val FALLBACK_DELAY_UNTIL_NEXT_LOAD_MS: Long = 300000 // 5 mins.
 
         private const val TAG = "SteeringManifestTracker"
@@ -265,12 +271,13 @@ class SteeringManifestTracker internal constructor(
             elapsedRealtimeMs: Long,
             loadDurationMs: Long
         ): LoadEventInfo {
-            return LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(loadable.uri)
-                .setResponseHeaders(loadable.responseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(loadable.bytesLoaded())
-                .build()
+            return LoadEventInfo(
+                loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs,
+                uri = loadable.uri,
+                responseHeaders = loadable.responseHeaders,
+                loadDurationMs = loadDurationMs,
+                bytesLoaded = loadable.bytesLoaded()
+            )
         }
     }
 }

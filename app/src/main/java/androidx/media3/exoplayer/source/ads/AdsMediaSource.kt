@@ -410,12 +410,11 @@ class AdsMediaSource(
             }
             createEventDispatcher(null)
                 .loadError(
-                    LoadEventInfo.Builder(
+                    LoadEventInfo(
                         LoadEventInfo.newId,
                         dataSpec,
                         SystemClock.elapsedRealtime()
-                    )
-                        .build(),
+                    ),
                     C.DATA_TYPE_AD,
                     error,
                     true
@@ -437,14 +436,13 @@ class AdsMediaSource(
         override fun onPrepareError(mediaPeriodId: MediaPeriodId, exception: IOException) {
             createEventDispatcher(mediaPeriodId)
                 .loadError(
-                    LoadEventInfo.Builder(
+                    LoadEventInfo(
                         LoadEventInfo.newId,
                         DataSpec(
                             adMediaItem.localConfiguration!!.uri
                         ),
                         SystemClock.elapsedRealtime()
-                    )
-                        .build(),
+                    ),
                     C.DATA_TYPE_AD,
                     AdLoadException.createForAd(exception),
                     true

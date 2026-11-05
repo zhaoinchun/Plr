@@ -81,7 +81,7 @@ internal class DefaultDrmSession(
         }
     private var lastException: DrmSessionException? = null
     private var sessionId: ByteArray? = null
-    override var offlineLicenseKeySetId:ByteArray? = null
+    override var offlineLicenseKeySetId: ByteArray? = null
         get() {
             verifyPlaybackThread()
             return field
@@ -548,10 +548,10 @@ internal class DefaultDrmSession(
                                 currentKeyRequestInfo!!.addLoadInfo(
                                     keyResponse
                                         .loadEventInfo
-                                        .buildUpon()
-                                        .setLoadTaskId(requestTask.taskId)
-                                        .setLoadDurationMs(SystemClock.elapsedRealtime() - requestTask.startTimeMs)
-                                        .build()
+                                        .copy(
+                                            loadTaskId = requestTask.taskId,
+                                            loadDurationMs = SystemClock.elapsedRealtime() - requestTask.startTimeMs
+                                        )
                                 )
                             }
                         }
@@ -597,14 +597,13 @@ internal class DefaultDrmSession(
                 return false
             }
             val loadEventInfo =
-                LoadEventInfo.Builder(
-                    requestTask.taskId, exception.dataSpec, SystemClock.elapsedRealtime()
+                LoadEventInfo(
+                    requestTask.taskId, exception.dataSpec, SystemClock.elapsedRealtime(),
+                    uri = exception.uriAfterRedirects,
+                    responseHeaders = exception.responseHeaders,
+                    loadDurationMs = SystemClock.elapsedRealtime() - requestTask.startTimeMs,
+                    bytesLoaded = exception.bytesLoaded
                 )
-                    .setUri(exception.uriAfterRedirects)
-                    .setResponseHeaders(exception.responseHeaders)
-                    .setLoadDurationMs(SystemClock.elapsedRealtime() - requestTask.startTimeMs)
-                    .setBytesLoaded(exception.bytesLoaded)
-                    .build()
             val mediaLoadData = MediaLoadData(C.DATA_TYPE_DRM)
             val loadErrorCause =
                 if (exception.cause is IOException)

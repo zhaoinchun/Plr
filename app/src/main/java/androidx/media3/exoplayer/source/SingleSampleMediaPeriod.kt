@@ -27,7 +27,7 @@ import androidx.media3.exoplayer.util.ReleasableExecutor
 
 import java.io.IOException
 
-internal class SingleSampleMediaPeriod(
+class SingleSampleMediaPeriod(
     private val dataSpec: DataSpec,
     private val dataSourceFactory: DataSource.Factory,
     private val transferListener: TransferListener?,
@@ -43,7 +43,7 @@ internal class SingleSampleMediaPeriod(
     val loader: Loader = downloadExecutor?.let { Loader(it) }
         ?: Loader("SingleSampleMediaPeriod")
     var loadingFinished: Boolean = false
-    var sampleData:ByteArray? = null
+    var sampleData: ByteArray? = null
     var sampleSize: Int = 0
 
     fun release() {
@@ -71,7 +71,7 @@ internal class SingleSampleMediaPeriod(
                 streams[i] = null
             }
             if (streams[i] == null && selections[i] != null) {
-                val stream =SampleStreamImpl()
+                val stream = SampleStreamImpl()
                 sampleStreams.add(stream)
                 streams[i] = stream
                 streamResetFlags[i] = true
@@ -98,7 +98,7 @@ internal class SingleSampleMediaPeriod(
         }
         val loadable = SourceLoadable(dataSpec, dataSource)
         loader.startLoading<SourceLoadable>(
-            loadable,  
+            loadable,
             this,
             loadErrorHandlingPolicy.getMinimumLoadableRetryCount(C.DATA_TYPE_MEDIA)
         )
@@ -138,21 +138,18 @@ internal class SingleSampleMediaPeriod(
     ) {
         val dataSource = loadable.dataSource
         val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-        if (retryCount != 0) {
-            loadEventInfo
-                .setUri(dataSource.lastOpenedUri)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
-        }
+            if (retryCount != 0) {
+                createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
+            } else {
+                LoadEventInfo(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
+            }
         eventDispatcher.loadStarted(
-            loadEventInfo.build(),
+            loadEventInfo,
             C.DATA_TYPE_MEDIA,
             C.TRACK_TYPE_UNKNOWN,
             format,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             0,
             durationUs,
             retryCount
@@ -165,22 +162,15 @@ internal class SingleSampleMediaPeriod(
         sampleSize = loadable.dataSource.bytesRead.toInt()
         sampleData = loadable.sampleData!!
         loadingFinished = true
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(dataSource.lastOpenedUri)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(sampleSize.toLong())
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         eventDispatcher.loadCompleted(
             loadEventInfo,
             C.DATA_TYPE_MEDIA,
             C.TRACK_TYPE_UNKNOWN,
             format,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             0,
             durationUs
         )
@@ -189,24 +179,30 @@ internal class SingleSampleMediaPeriod(
     override fun onLoadCanceled(
         loadable: SourceLoadable, elapsedRealtimeMs: Long, loadDurationMs: Long, released: Boolean
     ) {
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(dataSource.lastOpenedUri)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         eventDispatcher.loadCanceled(
             loadEventInfo,
             C.DATA_TYPE_MEDIA,
-            C.TRACK_TYPE_UNKNOWN,  
+            C.TRACK_TYPE_UNKNOWN,
             null,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             0,
             durationUs
+        )
+    }
+
+    fun createLoadEventInfo(
+        loadable: SourceLoadable, elapsedRealtimeMs: Long, loadDurationMs: Long
+    ): LoadEventInfo {
+        val dataSource = loadable.dataSource
+        return LoadEventInfo(
+            loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs,
+            uri = dataSource.lastOpenedUri,
+            responseHeaders = dataSource.lastResponseHeaders,
+            loadDurationMs = loadDurationMs,
+            bytesLoaded = dataSource.bytesRead
         )
     }
 
@@ -217,21 +213,14 @@ internal class SingleSampleMediaPeriod(
         error: IOException,
         errorCount: Int
     ): LoadErrorAction {
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(dataSource.lastOpenedUri)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         val mediaLoadData =
             MediaLoadData(
                 C.DATA_TYPE_MEDIA,
                 C.TRACK_TYPE_UNKNOWN,
                 format,
-                C.SELECTION_REASON_UNKNOWN,  
-                null,  
+                C.SELECTION_REASON_UNKNOWN,
+                null,
                 0,
                 usToMs(durationUs)
             )
@@ -252,7 +241,7 @@ internal class SingleSampleMediaPeriod(
         } else {
             action =
                 if (retryDelay != C.TIME_UNSET)
-                    Loader.createRetryAction( false, retryDelay)
+                    Loader.createRetryAction(false, retryDelay)
                 else
                     Loader.DONT_RETRY_FATAL
         }
@@ -262,8 +251,8 @@ internal class SingleSampleMediaPeriod(
             C.DATA_TYPE_MEDIA,
             C.TRACK_TYPE_UNKNOWN,
             format,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             0,
             durationUs,
             error,
@@ -345,8 +334,8 @@ internal class SingleSampleMediaPeriod(
                 eventDispatcher.downstreamFormatChanged(
                     getTrackType(format.sampleMimeType),
                     format,
-                    C.SELECTION_REASON_UNKNOWN,  
-                    null,  
+                    C.SELECTION_REASON_UNKNOWN,
+                    null,
                     0
                 )
                 notifiedDownstreamFormat = true
@@ -355,10 +344,10 @@ internal class SingleSampleMediaPeriod(
 
     }
 
-    internal class SourceLoadable(val dataSpec: DataSpec, dataSource: DataSource) : Loadable {
+    class SourceLoadable(val dataSpec: DataSpec, dataSource: DataSource) : Loadable {
         val loadTaskId: Long = LoadEventInfo.newId
         val dataSource: StatsDataSource = StatsDataSource(dataSource)
-        var sampleData: ByteArray?=null
+        var sampleData: ByteArray? = null
 
         override fun cancelLoad() {
             // Never happens.

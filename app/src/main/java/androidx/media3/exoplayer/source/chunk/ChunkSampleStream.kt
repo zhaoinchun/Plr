@@ -63,7 +63,7 @@ class ChunkSampleStream<T : ChunkSource>(
     private val embeddedSampleQueues: Array<SampleQueue>
     private val chunkOutput: BaseMediaChunkOutput
     private var loadingChunk: Chunk? = null
-    private var primaryDownstreamTrackFormat:Format? = null
+    private var primaryDownstreamTrackFormat: Format? = null
     private var releaseCallback: ReleaseCallback<T>? = null
     private var pendingResetPositionUs: Long
     private var lastSeekPositionUs: Long
@@ -338,16 +338,13 @@ class ChunkSampleStream<T : ChunkSource>(
         loadable: Chunk, elapsedRealtimeMs: Long, loadDurationMs: Long, retryCount: Int
     ) {
         val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-        if (retryCount != 0) {
-            loadEventInfo
-                .setUri(loadable.uri)
-                .setResponseHeaders(loadable.responseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(loadable.bytesLoaded())
-        }
+            if (retryCount != 0) {
+                createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
+            } else {
+                LoadEventInfo(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
+            }
         mediaSourceEventDispatcher.loadStarted(
-            loadEventInfo.build(),
+            loadEventInfo,
             loadable.type,
             primaryTrackType,
             loadable.trackFormat,
@@ -362,13 +359,7 @@ class ChunkSampleStream<T : ChunkSource>(
     override fun onLoadCompleted(loadable: Chunk, elapsedRealtimeMs: Long, loadDurationMs: Long) {
         loadingChunk = null
         chunkSource.onChunkLoadCompleted(loadable)
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(loadable.uri)
-                .setResponseHeaders(loadable.responseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(loadable.bytesLoaded())
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         mediaSourceEventDispatcher.loadCompleted(
             loadEventInfo,
@@ -383,18 +374,24 @@ class ChunkSampleStream<T : ChunkSource>(
         callback.onContinueLoadingRequested(this)
     }
 
+    fun createLoadEventInfo(
+        loadable: Chunk, elapsedRealtimeMs: Long, loadDurationMs: Long
+    ): LoadEventInfo {
+        return LoadEventInfo(
+            loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs,
+            uri = loadable.uri,
+            responseHeaders = loadable.responseHeaders,
+            loadDurationMs = loadDurationMs,
+            bytesLoaded = loadable.bytesLoaded()
+        )
+    }
+
     override fun onLoadCanceled(
         loadable: Chunk, elapsedRealtimeMs: Long, loadDurationMs: Long, released: Boolean
     ) {
         loadingChunk = null
         canceledMediaChunk = null
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(loadable.uri)
-                .setResponseHeaders(loadable.responseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(loadable.bytesLoaded())
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         mediaSourceEventDispatcher.loadCanceled(
             loadEventInfo,
@@ -431,13 +428,7 @@ class ChunkSampleStream<T : ChunkSource>(
         val lastChunkIndex = mediaChunks.size - 1
         val cancelable =
             bytesLoaded == 0L || !isMediaChunk || !haveReadFromMediaChunk(lastChunkIndex)
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(loadable.uri)
-                .setResponseHeaders(loadable.responseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(bytesLoaded)
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         val mediaLoadData =
             MediaLoadData(
                 loadable.type,

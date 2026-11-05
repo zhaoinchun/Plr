@@ -113,8 +113,8 @@ internal class ProgressiveMediaPeriod
     private var prepared = false
     private var haveAudioVideoTracks = false
     private var isSingleSample = false
-    private var trackState:TrackState? = null
-    private var seekMap:SeekMap? = null
+    private var trackState: TrackState? = null
+    private var seekMap: SeekMap? = null
     private var durationUs: Long = 0
     private var isLive = false
     private var dataType: @C.DataType Int = C.DATA_TYPE_MEDIA
@@ -149,7 +149,7 @@ internal class ProgressiveMediaPeriod
                 sampleQueue.preRelease()
             }
         }
-        loader.release( this)
+        loader.release(this)
         handler.removeCallbacksAndMessages(null)
         callback = null
         released = true
@@ -186,7 +186,7 @@ internal class ProgressiveMediaPeriod
         maybeThrowError()
         if (loadingFinished && !prepared) {
             throw ParserException.createForMalformedContainer(
-                "Loading finished before preparation is complete.",  null
+                "Loading finished before preparation is complete.", null
             )
         }
     }
@@ -306,7 +306,7 @@ internal class ProgressiveMediaPeriod
                                     MergingMetadataSampleStream(
                                         stream,
                                         SampleStreamImpl(
-                                            j,  
+                                            j,
                                             false
                                         ),
                                         selection.selectedFormat
@@ -335,7 +335,7 @@ internal class ProgressiveMediaPeriod
                     seekRequired =
                         sampleQueue.readIndex != 0
                                 && !sampleQueue.seekTo(
-                            positionUs,  
+                            positionUs,
                             true
                         )
                 }
@@ -472,7 +472,7 @@ internal class ProgressiveMediaPeriod
             }
             if (largestQueuedTimestampUs == Long.MAX_VALUE) {
                 largestQueuedTimestampUs =
-                    getLargestQueuedTimestampUs( false)
+                    getLargestQueuedTimestampUs(false)
             }
             return if (largestQueuedTimestampUs == Long.MIN_VALUE)
                 lastSeekPositionUs
@@ -618,11 +618,11 @@ internal class ProgressiveMediaPeriod
         assertPrepared()
         val trackNotifiedDownstreamFormats = trackState!!.trackNotifiedDownstreamFormats
         if (!trackNotifiedDownstreamFormats[track]) {
-            val trackFormat = trackState!!.tracks.get(track).getFormat( 0)
+            val trackFormat = trackState!!.tracks.get(track).getFormat(0)
             mediaSourceEventDispatcher.downstreamFormatChanged(
                 getTrackType(trackFormat.sampleMimeType),
                 trackFormat,
-                C.SELECTION_REASON_UNKNOWN,  
+                C.SELECTION_REASON_UNKNOWN,
                 null,
                 lastSeekPositionUs
             )
@@ -633,7 +633,7 @@ internal class ProgressiveMediaPeriod
     private fun maybeStartDeferredRetry(track: Int) {
         assertPrepared()
         if (!pendingDeferredRetry || (haveAudioVideoTracks && !trackState!!.trackIsAudioVideoFlags[track])
-            || sampleQueues[track].isReady( false)
+            || sampleQueues[track].isReady(false)
         ) {
             return
         }
@@ -656,26 +656,34 @@ internal class ProgressiveMediaPeriod
     override fun onLoadStarted(
         loadable: ExtractingLoadable, elapsedRealtimeMs: Long, loadDurationMs: Long, retryCount: Int
     ) {
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-        if (retryCount != 0) {
-            loadEventInfo
-                .setUri(dataSource.lastOpenedUri!!)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
+        val loadEventInfo = if (retryCount != 0) {
+            createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
+        } else {
+            LoadEventInfo(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
         }
         mediaSourceEventDispatcher.loadStarted(
-            loadEventInfo.build(),
+            loadEventInfo,
             C.DATA_TYPE_MEDIA,
-            C.TRACK_TYPE_UNKNOWN,  
+            C.TRACK_TYPE_UNKNOWN,
             null,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             loadable.seekTimeUs,
             durationUs,
             retryCount
+        )
+    }
+
+    private fun createLoadEventInfo(
+        loadable: ExtractingLoadable, elapsedRealtimeMs: Long, loadDurationMs: Long
+    ):LoadEventInfo {
+        val dataSource = loadable.dataSource
+       return LoadEventInfo(
+            loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs,
+            uri = dataSource.lastOpenedUri,
+            responseHeaders = dataSource.lastResponseHeaders,
+            loadDurationMs = loadDurationMs,
+            bytesLoaded = dataSource.bytesRead
         )
     }
 
@@ -685,7 +693,7 @@ internal class ProgressiveMediaPeriod
         val seekMap = seekMap
         if (durationUs == C.TIME_UNSET && seekMap != null) {
             val largestQueuedTimestampUs =
-                getLargestQueuedTimestampUs( true)
+                getLargestQueuedTimestampUs(true)
             durationUs =
                 if (largestQueuedTimestampUs == Long.MIN_VALUE)
                     0
@@ -693,22 +701,15 @@ internal class ProgressiveMediaPeriod
                     largestQueuedTimestampUs + DEFAULT_LAST_SAMPLE_DURATION_US
             listener.onSourceInfoRefreshed(durationUs, seekMap, isLive)
         }
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(dataSource.lastOpenedUri!!)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         mediaSourceEventDispatcher.loadCompleted(
             loadEventInfo,
             C.DATA_TYPE_MEDIA,
-            C.TRACK_TYPE_UNKNOWN,  
+            C.TRACK_TYPE_UNKNOWN,
             null,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             loadable.seekTimeUs,
             durationUs
         )
@@ -722,22 +723,15 @@ internal class ProgressiveMediaPeriod
         loadDurationMs: Long,
         released: Boolean
     ) {
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(dataSource.lastOpenedUri!!)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         mediaSourceEventDispatcher.loadCanceled(
             loadEventInfo,
             C.DATA_TYPE_MEDIA,
-            C.TRACK_TYPE_UNKNOWN,  
+            C.TRACK_TYPE_UNKNOWN,
             null,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             loadable.seekTimeUs,
             durationUs
         )
@@ -758,21 +752,14 @@ internal class ProgressiveMediaPeriod
         error: IOException,
         errorCount: Int
     ): LoadErrorAction {
-        val dataSource = loadable.dataSource
-        val loadEventInfo =
-            LoadEventInfo.Builder(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
-                .setUri(dataSource.lastOpenedUri!!)
-                .setResponseHeaders(dataSource.lastResponseHeaders)
-                .setLoadDurationMs(loadDurationMs)
-                .setBytesLoaded(dataSource.bytesRead)
-                .build()
+        val loadEventInfo = createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
         val mediaLoadData =
             MediaLoadData(
                 C.DATA_TYPE_MEDIA,
-                C.TRACK_TYPE_UNKNOWN,  
+                C.TRACK_TYPE_UNKNOWN,
                 null,
-                C.SELECTION_REASON_UNKNOWN,  
-                null,  
+                C.SELECTION_REASON_UNKNOWN,
+                null,
                 usToMs(loadable.seekTimeUs),
                 usToMs(durationUs)
             )
@@ -783,12 +770,12 @@ internal class ProgressiveMediaPeriod
             )
         if (retryDelayMs == C.TIME_UNSET) {
             loadErrorAction = Loader.DONT_RETRY_FATAL
-        } else   {
+        } else {
             val extractedSamplesCount = this.extractedSamplesCount
             val madeProgress = extractedSamplesCount > extractedSamplesCountAtStartOfLoad
             loadErrorAction =
                 if (configureRetry(loadable, extractedSamplesCount))
-                    Loader.createRetryAction( madeProgress, retryDelayMs)
+                    Loader.createRetryAction(madeProgress, retryDelayMs)
                 else
                     Loader.DONT_RETRY
         }
@@ -797,10 +784,10 @@ internal class ProgressiveMediaPeriod
         mediaSourceEventDispatcher.loadError(
             loadEventInfo,
             C.DATA_TYPE_MEDIA,
-            C.TRACK_TYPE_UNKNOWN,  
+            C.TRACK_TYPE_UNKNOWN,
             null,
-            C.SELECTION_REASON_UNKNOWN,  
-            null,  
+            C.SELECTION_REASON_UNKNOWN,
+            null,
             loadable.seekTimeUs,
             durationUs,
             error,
@@ -814,7 +801,7 @@ internal class ProgressiveMediaPeriod
 
     // ExtractorOutput implementation. Called by the loading thread.
     override fun track(id: Int, type: Int): TrackOutput {
-        return prepareTrackOutput(TrackId(id,  false))
+        return prepareTrackOutput(TrackId(id, false))
     }
 
     override fun endTracks() {
@@ -829,7 +816,7 @@ internal class ProgressiveMediaPeriod
     // Icy metadata. Called by the loading thread.
 
     fun icyTrack(): TrackOutput {
-        return prepareTrackOutput(TrackId(0,  true))
+        return prepareTrackOutput(TrackId(0, true))
     }
 
     // UpstreamFormatChangedListener implementation. Called by the loading thread.
@@ -874,7 +861,7 @@ internal class ProgressiveMediaPeriod
 
     private fun setSeekMap(seekMap: SeekMap) {
         this.seekMap =
-            if (icyHeaders == null) seekMap else SeekMap.Unseekable( C.TIME_UNSET)
+            if (icyHeaders == null) seekMap else SeekMap.Unseekable(C.TIME_UNSET)
         durationUs = seekMap.durationUs
         isLive = !isLengthKnown && seekMap.durationUs == C.TIME_UNSET
         dataType = if (isLive) C.DATA_TYPE_MEDIA_PROGRESSIVE_LIVE else C.DATA_TYPE_MEDIA
@@ -947,7 +934,7 @@ internal class ProgressiveMediaPeriod
                         .setPrimaryTrackGroupId(primaryTrackIndex.toString())
                         .build()
             }
-            trackArray[i] = TrackGroup( i.toString(), listOf(trackFormat))
+            trackArray[i] = TrackGroup(i.toString(), listOf(trackFormat))
             sampleQueues[i].setReadEndTimeUs(endPositionUs)
         }
         trackState =
@@ -969,7 +956,7 @@ internal class ProgressiveMediaPeriod
             ExtractingLoadable(
                 uri,
                 dataSource,
-                progressiveMediaExtractor,  
+                progressiveMediaExtractor,
                 this,
                 loadCondition
             )
@@ -1052,7 +1039,7 @@ internal class ProgressiveMediaPeriod
                 if (isSingleSample)
                     sampleQueue.seekTo(sampleQueue.firstIndex)
                 else
-                    sampleQueue.seekTo(positionUs,  loadingFinished)
+                    sampleQueue.seekTo(positionUs, loadingFinished)
             // If we have AV tracks then an in-buffer seek is successful if the seek into every AV queue
             // is successful. We ignore whether seeks within non-AV queues are successful in this case, as
             // they may be sparse or poorly interleaved. If we only have non-AV tracks then a seek is
@@ -1118,7 +1105,7 @@ internal class ProgressiveMediaPeriod
 
     }
 
-    internal inner class ExtractingLoadable(
+    inner class ExtractingLoadable(
         val uri: Uri,
         dataSource: DataSource,
         val progressiveMediaExtractor: ProgressiveMediaExtractor,
@@ -1139,7 +1126,7 @@ internal class ProgressiveMediaPeriod
         var seenIcyMetadata = false
 
         init {
-            dataSpec = buildDataSpec( 0,  null)
+            dataSpec = buildDataSpec(0, null)
         }
 
         // Loadable implementation.
@@ -1225,12 +1212,12 @@ internal class ProgressiveMediaPeriod
                 if (!seenIcyMetadata)
                     seekTimeUs
                 else
-                    max(getLargestQueuedTimestampUs( true), seekTimeUs)
+                    max(getLargestQueuedTimestampUs(true), seekTimeUs)
             val length = metadata.bytesLeft()
             val icyTrackOutput = this.icyTrackOutput!!
             icyTrackOutput.sampleData(metadata, length)
             icyTrackOutput.sampleMetadata(
-                timeUs, C.BUFFER_FLAG_KEY_FRAME, length,  0,  null
+                timeUs, C.BUFFER_FLAG_KEY_FRAME, length, 0, null
             )
             seenIcyMetadata = true
         }

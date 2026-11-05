@@ -98,15 +98,14 @@ object DrmUtil {
                 try {
                     val response = ByteStreams.toByteArray(inputStream)
                     val loadEventInfo =
-                        LoadEventInfo.Builder(
+                        LoadEventInfo(
                             -1,  // This will be replaced with the actual taskId from the request.
                             originalDataSpec,
-                            SystemClock.elapsedRealtime()
+                            SystemClock.elapsedRealtime(),
+                            uri = statsDataSource.lastOpenedUri,
+                            responseHeaders = statsDataSource.lastResponseHeaders,
+                            bytesLoaded = response.size.toLong()
                         )
-                            .setUri(statsDataSource.lastOpenedUri)
-                            .setResponseHeaders(statsDataSource.lastResponseHeaders)
-                            .setBytesLoaded(response.size.toLong())
-                            .build()
                     return MediaDrmCallback.Response(response,loadEventInfo)
                 } catch (e: InvalidResponseCodeException) {
                     val redirectUrl = getRedirectUrl(e, manualRedirectCount)
