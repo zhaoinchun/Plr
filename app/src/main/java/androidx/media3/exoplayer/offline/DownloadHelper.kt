@@ -790,7 +790,7 @@ class DownloadHelper(
                     val mediaPeriod = msg.obj as MediaPeriod
                     if (pendingMediaPeriods.contains(mediaPeriod)) {
                         mediaPeriod.continueLoading(
-                            LoadingInfo.Builder().setPlaybackPositionUs(0).build()
+                            LoadingInfo(0)
                         )
                     }
                     return true

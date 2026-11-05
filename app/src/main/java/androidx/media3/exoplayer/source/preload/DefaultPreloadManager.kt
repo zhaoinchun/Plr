@@ -37,7 +37,7 @@ import java.io.IOException
 import java.util.concurrent.Executor
 import kotlin.math.abs
 
-class DefaultPreloadManager private constructor(builder: Builder) :
+class DefaultPreloadManager(builder: Builder) :
     BasePreloadManager<Int, PreloadStatus>(
         builder.rankingDataComparator,
         builder.targetPreloadStatusControl,

@@ -1326,7 +1326,7 @@ internal class ExoPlayerImplInternal(
         var renderersEnded = true
         var renderersAllowPlayback = true
         var hasActiveVideoOrImageRenderer = false
-        Log.e(TAG, "doSomeWork: "+playingPeriodHolder.prepared, )
+        Log.e(TAG, "doSomeWork: " + playingPeriodHolder.prepared)
         if (playingPeriodHolder.prepared) {
             rendererPositionElapsedRealtimeUs = msToUs(clock.elapsedRealtime())
             playingPeriodHolder.mediaPeriod.discardBuffer(
@@ -3302,11 +3302,11 @@ internal class ExoPlayerImplInternal(
             preloading.prepare(this, preloading.info.startPositionUs)
         } else {
             preloading.continueLoading(
-                LoadingInfo.Builder()
-                    .setPlaybackPositionUs(preloading.toPeriodTime(rendererPositionUs))
-                    .setPlaybackSpeed(mediaClock.playbackParameters.speed)
-                    .setLastRebufferRealtimeMs(lastRebufferRealtimeMs)
-                    .build()
+                LoadingInfo(
+                    playbackPositionUs = preloading.toPeriodTime(rendererPositionUs),
+                    playbackSpeed = mediaClock.playbackParameters.speed,
+                    lastRebufferRealtimeMs = lastRebufferRealtimeMs
+                )
             )
         }
     }
@@ -3539,11 +3539,11 @@ internal class ExoPlayerImplInternal(
         if (shouldContinueLoading) {
             val loadingPeriod = queue.loadingPeriod!!
             loadingPeriod.continueLoading(
-                LoadingInfo.Builder()
-                    .setPlaybackPositionUs(loadingPeriod.toPeriodTime(rendererPositionUs))
-                    .setPlaybackSpeed(mediaClock.playbackParameters!!.speed)
-                    .setLastRebufferRealtimeMs(lastRebufferRealtimeMs)
-                    .build()
+                LoadingInfo(
+                    playbackPositionUs = loadingPeriod.toPeriodTime(rendererPositionUs),
+                    playbackSpeed = mediaClock.playbackParameters.speed,
+                    lastRebufferRealtimeMs = lastRebufferRealtimeMs
+                )
             )
         }
         updateisLoading()

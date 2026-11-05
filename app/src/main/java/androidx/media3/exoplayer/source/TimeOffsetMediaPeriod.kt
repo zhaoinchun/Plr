@@ -115,10 +115,7 @@ internal class TimeOffsetMediaPeriod(
 
     override fun continueLoading(loadingInfo: LoadingInfo): Boolean {
         return wrappedMediaPeriod.continueLoading(
-            loadingInfo
-                .buildUpon()
-                .setPlaybackPositionUs(loadingInfo.playbackPositionUs - timeOffsetUs)
-                .build()
+            loadingInfo.copy(playbackPositionUs = loadingInfo.playbackPositionUs - timeOffsetUs)
         )
     }
 

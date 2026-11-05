@@ -136,7 +136,7 @@ class CmcdData private constructor(
             val customData =
                 cmcdConfiguration.requestConfig.customData
             for (headerKey in customData.keys) {
-                validateCustomDataListFormat(customData[headerKey] ?:listOf())
+                validateCustomDataListFormat(customData[headerKey] ?: listOf())
             }
 
             var bitrateKbps = C.RATE_UNSET_INT
@@ -179,7 +179,9 @@ class CmcdData private constructor(
                 cmcdObject.setObjectType(objectType)
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_OBJECT)) {
-                cmcdObject.setCustomDataList(customData.get(CmcdConfiguration.KEY_CMCD_OBJECT)?:listOf())
+                cmcdObject.setCustomDataList(
+                    customData.get(CmcdConfiguration.KEY_CMCD_OBJECT) ?: listOf()
+                )
             }
 
             val cmcdRequest = CmcdRequest.Builder()
@@ -204,7 +206,9 @@ class CmcdData private constructor(
                 cmcdRequest.setNextRangeRequest(nextRangeRequest)
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_REQUEST)) {
-                cmcdRequest.setCustomDataList(customData.get(CmcdConfiguration.KEY_CMCD_REQUEST)?:listOf())
+                cmcdRequest.setCustomDataList(
+                    customData.get(CmcdConfiguration.KEY_CMCD_REQUEST) ?: listOf()
+                )
             }
 
             val cmcdSession = CmcdSession.Builder()
@@ -224,25 +228,28 @@ class CmcdData private constructor(
                 cmcdSession.setPlaybackRate(playbackRate)
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_SESSION)) {
-                cmcdSession.setCustomDataList(customData.get(CmcdConfiguration.KEY_CMCD_SESSION)?:listOf())
+                cmcdSession.setCustomDataList(
+                    customData.get(CmcdConfiguration.KEY_CMCD_SESSION) ?: listOf()
+                )
             }
 
-            val cmcdStatus = CmcdStatus.Builder()
+            val cmcdStatus = CmcdStatus()
             if (cmcdConfiguration.isMaximumRequestThroughputLoggingAllowed) {
-                cmcdStatus.setMaximumRequestedThroughputKbps(requestedMaximumThroughputKbps)
+                cmcdStatus.maximumRequestedThroughputKbps = requestedMaximumThroughputKbps
             }
             if (cmcdConfiguration.isBufferStarvationLoggingAllowed) {
-                cmcdStatus.setBufferStarvation(didRebuffer)
+                cmcdStatus.bufferStarvation = didRebuffer
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_STATUS)) {
-                cmcdStatus.setCustomDataList(customData.get(CmcdConfiguration.KEY_CMCD_STATUS)?:listOf())
+                cmcdStatus.customDataList =
+                    customData[CmcdConfiguration.KEY_CMCD_STATUS] ?: listOf()
             }
 
             return CmcdData(
                 cmcdObject.build(),
                 cmcdRequest.build(),
                 cmcdSession.build(),
-                cmcdStatus.build(),
+                cmcdStatus,
                 cmcdConfiguration.dataTransmissionMode
             )
         }
@@ -697,60 +704,13 @@ class CmcdData private constructor(
         }
     }
 
-    private class CmcdStatus(builder: Builder) {
-        class Builder {
-            var maximumRequestedThroughputKbps: Int
-            var bufferStarvation = false
-            var customDataList: List<String?>
+    private class CmcdStatus(
+        var maximumRequestedThroughputKbps: Int = C.RATE_UNSET_INT,
+        var bufferStarvation: Boolean = false,
+        var customDataList: List<String?> = listOf(),
+    ) {
 
-            init {
-                this.maximumRequestedThroughputKbps = C.RATE_UNSET_INT
-                this.customDataList = listOf()
-            }
-
-            fun setMaximumRequestedThroughputKbps(maximumRequestedThroughputKbps: Int): Builder {
-                Preconditions.checkArgument(
-                    maximumRequestedThroughputKbps >= 0
-                            || maximumRequestedThroughputKbps == C.RATE_UNSET_INT
-                )
-
-                this.maximumRequestedThroughputKbps =
-                    if (maximumRequestedThroughputKbps == C.RATE_UNSET_INT)
-                        maximumRequestedThroughputKbps
-                    else
-                        ((maximumRequestedThroughputKbps + 50) / 100) * 100
-
-                return this
-            }
-
-            fun setBufferStarvation(bufferStarvation: Boolean): Builder {
-                this.bufferStarvation = bufferStarvation
-                return this
-            }
-
-            fun setCustomDataList(customDataList: List<String>): Builder {
-                this.customDataList = customDataList.toList()
-                return this
-            }
-
-            fun build(): CmcdStatus {
-                return CmcdStatus(this)
-            }
-        }
-
-        val maximumRequestedThroughputKbps: Int
-        val bufferStarvation: Boolean
-        val customDataList: List<String?>
-
-        init {
-            this.maximumRequestedThroughputKbps = builder.maximumRequestedThroughputKbps
-            this.bufferStarvation = builder.bufferStarvation
-            this.customDataList = builder.customDataList
-        }
-
-        fun populateCmcdDataMap(
-            cmcdDataMap: ArrayListMultimap<String, String>
-        ) {
+        fun populateCmcdDataMap(cmcdDataMap: ArrayListMultimap<String, String>) {
             val keyValuePairs = ArrayList<String?>()
             if (maximumRequestedThroughputKbps != C.RATE_UNSET_INT) {
                 keyValuePairs.add(

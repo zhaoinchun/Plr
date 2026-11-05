@@ -694,7 +694,7 @@ class ServerSideAdInsertionMediaSource(
                     loadingInfo.playbackPositionUs
                 )
             return actualMediaPeriod.continueLoading(
-                loadingInfo.buildUpon().setPlaybackPositionUs(actualPlaybackPositionUs).build()
+                loadingInfo.copy(playbackPositionUs = actualPlaybackPositionUs)
             )
         }
 

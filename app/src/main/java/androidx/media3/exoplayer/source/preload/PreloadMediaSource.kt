@@ -46,6 +46,7 @@ class PreloadMediaSource private constructor(
             mediaSource: PreloadMediaSource,
             bufferedDurationUs: Long
         ): Boolean
+
         fun onUsedByPlayer(mediaSource: PreloadMediaSource)
         fun onLoadedToTheEndOfSource(mediaSource: PreloadMediaSource) {}
         fun onLoadingUnableToContinue(mediaSource: PreloadMediaSource): Boolean {
@@ -73,7 +74,7 @@ class PreloadMediaSource private constructor(
         init {
             Preconditions.checkArgument(bandwidthMeter !== BandwidthMeter.NO_OP)
             this.bandwidthMeter = bandwidthMeter
-            this.rendererCapabilities =rendererCapabilities.copyOf()
+            this.rendererCapabilities = rendererCapabilities.copyOf()
             this.loadControl = loadControl
             this.preloadLooper = preloadLooper
             this.clock = Clock.DEFAULT
@@ -132,12 +133,12 @@ class PreloadMediaSource private constructor(
     }
 
     private val allocator: Allocator = loadControl.getAllocator(PlayerId.PRELOAD)
-    private val preloadHandler: HandlerWrapper = clock.createHandler(preloadLooper,  null)
-    private val releaseHandler: HandlerWrapper = clock.createHandler(preloadLooper,  null)
+    private val preloadHandler: HandlerWrapper = clock.createHandler(preloadLooper, null)
+    private val releaseHandler: HandlerWrapper = clock.createHandler(preloadLooper, null)
     private var preloadCalled = false
     private var prepareChildSourceCalled = false
     private var releasePreloadMediaSourceCalled = false
-    private var startPositionUs= C.TIME_UNSET
+    private var startPositionUs = C.TIME_UNSET
     private var timeline: Timeline? = null
     private var preloadingMediaPeriodAndKey: Pair<PreloadMediaPeriod, MediaPeriodKey>? = null
     private var playingPreloadedMediaPeriodAndId: Pair<PreloadMediaPeriod, MediaPeriodId>? = null
@@ -200,8 +201,8 @@ class PreloadMediaSource private constructor(
                 val periodPosition =
                     newTimeline.getPeriodPositionUs(
                         Timeline.Window(),
-                        Timeline.Period(),  
-                        0,  
+                        Timeline.Period(),
+                        0,
                         startPositionUs
                     )
                 val mediaPeriodId = MediaPeriodId(periodPosition.first!!)
@@ -210,7 +211,7 @@ class PreloadMediaSource private constructor(
                         mediaPeriodId, allocator, periodPosition.second!!
                     ) as PreloadMediaPeriod?
                 mediaPeriod!!.preload(
-                    PreloadMediaPeriodCallback(periodPosition.second!!),  
+                    PreloadMediaPeriodCallback(periodPosition.second!!),
                     periodPosition.second!!
                 )
             })
@@ -223,7 +224,7 @@ class PreloadMediaSource private constructor(
     ): MediaPeriod {
         val key = MediaPeriodKey(id, startPositionUs)
         if (preloadingMediaPeriodAndKey != null && key == preloadingMediaPeriodAndKey!!.second) {
-            val mediaPeriod =preloadingMediaPeriodAndKey!!.first
+            val mediaPeriod = preloadingMediaPeriodAndKey!!.first
             if (this.isUsedByPlayer) {
                 preloadingMediaPeriodAndKey = null
                 playingPreloadedMediaPeriodAndId =
@@ -231,7 +232,8 @@ class PreloadMediaSource private constructor(
             }
             return mediaPeriod
         } else if (preloadingMediaPeriodAndKey != null) {
-            mediaSource.releasePeriod(preloadingMediaPeriodAndKey!!.first!!.mediaPeriod
+            mediaSource.releasePeriod(
+                preloadingMediaPeriodAndKey!!.first!!.mediaPeriod
             )
             preloadingMediaPeriodAndKey = null
         }
@@ -330,7 +332,7 @@ class PreloadMediaSource private constructor(
             )
         } catch (e: IOException) {
             preloadControl.onPreloadError(
-                PreloadException(this.mediaItem,  null, e), this
+                PreloadException(this.mediaItem, null, e), this
             )
             stopPreloading()
         }
@@ -349,7 +351,7 @@ class PreloadMediaSource private constructor(
     private inner class PreloadMediaPeriodCallback(private val periodStartPositionUs: Long) :
         MediaPeriod.Callback {
         private var prepared = false
-        private var continueLoadingRetryCountBeforeCallingPreloadControlAgain= C.LENGTH_UNSET
+        private var continueLoadingRetryCountBeforeCallingPreloadControlAgain = C.LENGTH_UNSET
         private var maybeContinueLoadingRunnable: Runnable? = null
         private var onLoadToTheEndOfSourceNotified = false
 
@@ -424,7 +426,7 @@ class PreloadMediaSource private constructor(
                             return@Runnable
                         }
                     }
-                    val key: MediaPeriodKey =preloadingMediaPeriodAndKey!!.second
+                    val key: MediaPeriodKey = preloadingMediaPeriodAndKey!!.second
                     continueLoadingRetryCountBeforeCallingPreloadControlAgain = C.LENGTH_UNSET
                     maybeContinueLoading(preloadMediaPeriod, key.mediaPeriodId)
                 })
@@ -450,7 +452,7 @@ class PreloadMediaSource private constructor(
             if (loadControl.shouldContinueLoading(parameters)) {
                 continueLoadingRetryCountBeforeCallingPreloadControlAgain = C.LENGTH_UNSET
                 mediaPeriod.continueLoading(
-                    LoadingInfo.Builder().setPlaybackPositionUs(periodStartPositionUs).build()
+                    LoadingInfo(playbackPositionUs = periodStartPositionUs)
                 )
                 if (prepared && mediaPeriod.bufferedPositionUs == C.TIME_END_OF_SOURCE) {
                     onLoadToTheEndOfSource()
@@ -500,13 +502,13 @@ class PreloadMediaSource private constructor(
             return LoadControl.Parameters(
                 playerId,
                 timeline,
-                mediaPeriodId,  
+                mediaPeriodId,
                 0L,
-                bufferedDurationUs,  
-                1f,  
-                false,  
-                false,  
-                C.TIME_UNSET,  
+                bufferedDurationUs,
+                1f,
+                false,
+                false,
+                C.TIME_UNSET,
                 C.TIME_UNSET
             )
         }
