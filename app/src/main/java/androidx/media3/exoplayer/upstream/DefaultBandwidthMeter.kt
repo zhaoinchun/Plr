@@ -12,107 +12,34 @@ import androidx.media3.common.util.Util.getCountryCode
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.TransferListener
-import com.google.common.base.Ascii
 import com.google.common.base.Preconditions
 import com.google.common.base.Strings
-
 import kotlin.math.sqrt
 
-class DefaultBandwidthMeter private constructor(
+class DefaultBandwidthMeter(
     context: Context?,
-    initialBitrateEstimates: MutableMap<Int, Long?>,
-    maxWeight: Int,
-    private val clock: Clock,
-    private val resetOnNetworkTypeChange: Boolean,
-    private val initialBitrateSupplier: InitialBitrateSupplier?
+    initialBitrateEstimates: MutableMap<Int, Long?>? = null,
+    maxWeight: Int = DEFAULT_SLIDING_WINDOW_MAX_WEIGHT,
+    private val clock: Clock = Clock.DEFAULT,
+    private val resetOnNetworkTypeChange: Boolean = true,
+    private val initialBitrateSupplier: InitialBitrateSupplier? = null
 ) : BandwidthMeter, TransferListener {
     interface InitialBitrateSupplier {
         fun getInitialBitrateEstimate(@C.NetworkType networkType: @C.NetworkType Int): Long
     }
 
-    class Builder(context: Context?) {
-        // Handling of null is for backward compatibility only.
-        private val context: Context? = context?.applicationContext
-        private val initialBitrateEstimates: MutableMap<Int, Long?>
-
-        private var slidingWindowMaxWeight: Int
-        private var clock: Clock
-        private var resetOnNetworkTypeChange = true
-        private var initialBitrateSupplier: InitialBitrateSupplier? = null
-
-        init {
-            slidingWindowMaxWeight = DEFAULT_SLIDING_WINDOW_MAX_WEIGHT
-            clock = Clock.DEFAULT
-            initialBitrateEstimates = HashMap<Int, Long?>(8)
-            initialBitrateEstimates[C.NETWORK_TYPE_UNKNOWN] = DEFAULT_INITIAL_BITRATE_ESTIMATE
-            initialBitrateEstimates[C.NETWORK_TYPE_WIFI] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_2G] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_3G] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_4G] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_5G_NSA] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_5G_SA] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_ETHERNET] = C.TIME_UNSET
-        }
-
-        fun setSlidingWindowMaxWeight(slidingWindowMaxWeight: Int): Builder {
-            this.slidingWindowMaxWeight = slidingWindowMaxWeight
-            return this
-        }
-
-        fun setInitialBitrateEstimate(initialBitrateEstimate: Long): Builder {
-            for (networkType in initialBitrateEstimates.keys) {
-                setInitialBitrateEstimate(networkType, initialBitrateEstimate)
-            }
-            return this
-        }
-
-        fun setInitialBitrateEstimate(
-            @C.NetworkType networkType: @C.NetworkType Int, initialBitrateEstimate: Long
-        ): Builder {
-            initialBitrateEstimates.put(networkType, initialBitrateEstimate)
-            return this
-        }
-
-        fun setInitialBitrateEstimate(countryCode: String): Builder {
-            var countryCode = countryCode
-            countryCode = Ascii.toUpperCase(countryCode)
-            for (networkType in initialBitrateEstimates.keys) {
-                setInitialBitrateEstimate(
-                    networkType, getInitialBitrateEstimatesForCountry(countryCode, networkType)
-                )
-            }
-            return this
-        }
-
-        fun setClock(clock: Clock): Builder {
-            this.clock = clock
-            return this
-        }
-
-        fun setResetOnNetworkTypeChange(resetOnNetworkTypeChange: Boolean): Builder {
-            this.resetOnNetworkTypeChange = resetOnNetworkTypeChange
-            return this
-        }
-
-        fun setInitialBitrateSupplier(initialBitrateSupplier: InitialBitrateSupplier?): Builder {
-            this.initialBitrateSupplier = initialBitrateSupplier
-            return this
-        }
-
-        fun build(): DefaultBandwidthMeter {
-            return DefaultBandwidthMeter(
-                context,
-                initialBitrateEstimates,
-                slidingWindowMaxWeight,
-                clock,
-                resetOnNetworkTypeChange,
-                initialBitrateSupplier
-            )
-        }
-    }
-
     private val context: Context? = context?.applicationContext
-    private val initialBitrateEstimates = initialBitrateEstimates.toMap()
+    private val initialBitrateEstimates =
+        initialBitrateEstimates?.toMap() ?: mutableMapOf<Int, Long?>().apply {
+            this[C.NETWORK_TYPE_UNKNOWN] = DEFAULT_INITIAL_BITRATE_ESTIMATE
+            this[C.NETWORK_TYPE_WIFI] = C.TIME_UNSET
+            this[C.NETWORK_TYPE_2G] = C.TIME_UNSET
+            this[C.NETWORK_TYPE_3G] = C.TIME_UNSET
+            this[C.NETWORK_TYPE_4G] = C.TIME_UNSET
+            this[C.NETWORK_TYPE_5G_NSA] = C.TIME_UNSET
+            this[C.NETWORK_TYPE_5G_SA] = C.TIME_UNSET
+            this[C.NETWORK_TYPE_ETHERNET] = C.TIME_UNSET
+        }
     private val eventDispatcher = BandwidthMeter.EventListener.EventDispatcher()
 
     @GuardedBy("this") // Used in TransferListener methods that are called on a background thread.
@@ -147,7 +74,7 @@ class DefaultBandwidthMeter private constructor(
 
     @C.NetworkType
     private var networkTypeOverride: @C.NetworkType Int = 0
-    private var countryCode:String? = null
+    private var countryCode: String? = null
 
     init {
         if (context != null) {
@@ -347,7 +274,7 @@ class DefaultBandwidthMeter private constructor(
         @Synchronized
         fun getSingletonInstance(context: Context?): DefaultBandwidthMeter {
             if (singletonInstance == null) {
-                singletonInstance = Builder(context).build()
+                singletonInstance = DefaultBandwidthMeter(context)
             }
             return singletonInstance!!
         }

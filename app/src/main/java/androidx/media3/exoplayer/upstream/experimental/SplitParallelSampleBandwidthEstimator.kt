@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.upstream.experimental
 
 import android.os.Handler
@@ -10,45 +9,11 @@ import androidx.media3.exoplayer.upstream.BandwidthMeter
 import com.google.common.base.Preconditions
 import com.google.errorprone.annotations.CanIgnoreReturnValue
 
-class SplitParallelSampleBandwidthEstimator private constructor(builder: Builder) :
-    BandwidthEstimator {
-    class Builder {
-         var bandwidthStatistic: BandwidthStatistic = SlidingWeightedAverageBandwidthStatistic()
-         var minSamples = 0
-         var minBytesTransferred: Long = 0
-         var clock: Clock = Clock.DEFAULT
-
-        fun setBandwidthStatistic(bandwidthStatistic: BandwidthStatistic): Builder {
-            this.bandwidthStatistic = bandwidthStatistic
-            return this
-        }
-
-        fun setMinSamples(minSamples: Int): Builder {
-            Preconditions.checkArgument(minSamples >= 0)
-            this.minSamples = minSamples
-            return this
-        }
-
-        fun setMinBytesTransferred(minBytesTransferred: Long): Builder {
-            Preconditions.checkArgument(minBytesTransferred >= 0)
-            this.minBytesTransferred = minBytesTransferred
-            return this
-        }
-
-        fun setClock(clock: Clock): Builder {
-            this.clock = clock
-            return this
-        }
-
-        fun build(): SplitParallelSampleBandwidthEstimator {
-            return SplitParallelSampleBandwidthEstimator(this)
-        }
-    }
-
-    private val bandwidthStatistic: BandwidthStatistic = builder.bandwidthStatistic
-    private val minSamples: Int = builder.minSamples
-    private val minBytesTransferred: Long = builder.minBytesTransferred
-    private val clock: Clock = builder.clock
+class SplitParallelSampleBandwidthEstimator() : BandwidthEstimator {
+    private val bandwidthStatistic: BandwidthStatistic = SlidingWeightedAverageBandwidthStatistic()
+    private val minSamples: Int = 0
+    private val minBytesTransferred: Long = 0
+    private val clock: Clock = Clock.DEFAULT
     private val eventDispatcher = BandwidthMeter.EventListener.EventDispatcher()
     private var streamCount = 0
     private var sampleStartTimeMs: Long = 0

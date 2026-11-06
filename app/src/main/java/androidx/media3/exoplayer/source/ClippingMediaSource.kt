@@ -15,74 +15,11 @@ import java.io.IOException
 import kotlin.math.max
 import kotlin.math.min
 
-class ClippingMediaSource private constructor(builder: Builder) :
-    WrappingMediaSource(builder.mediaSource) {
-    class Builder(val mediaSource: MediaSource) {
-        var config = MediaItem.ClippingConfiguration.Builder()
-        var enableClippingInMediaPeriod = false
-        var buildCalled = false
-
-        fun setClippingConfiguration(clippingConfiguration: MediaItem.ClippingConfiguration): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.config = clippingConfiguration.buildUpon()
-            return this
-        }
-
-        fun setStartPositionMs(startPositionMs: Long): Builder {
-            return setStartPositionUs(msToUs(startPositionMs))
-        }
-
-        fun setStartPositionUs(startPositionUs: Long): Builder {
-            Preconditions.checkState(!buildCalled)
-            config.setStartPositionUs(startPositionUs)
-            return this
-        }
-
-        fun setEndPositionMs(endPositionMs: Long): Builder {
-            return setEndPositionUs(msToUs(endPositionMs))
-        }
-
-        fun setEndPositionUs(endPositionUs: Long): Builder {
-            Preconditions.checkState(!buildCalled)
-            config.setEndPositionUs(endPositionUs)
-            return this
-        }
-
-        fun setEnableInitialDiscontinuity(enableInitialDiscontinuity: Boolean): Builder {
-            Preconditions.checkState(!buildCalled)
-            config.setStartsAtKeyFrame(!enableInitialDiscontinuity)
-            return this
-        }
-
-        fun setAllowDynamicClippingUpdates(allowDynamicClippingUpdates: Boolean): Builder {
-            Preconditions.checkState(!buildCalled)
-            config.setRelativeToLiveWindow(allowDynamicClippingUpdates)
-            return this
-        }
-
-        fun setRelativeToDefaultPosition(relativeToDefaultPosition: Boolean): Builder {
-            Preconditions.checkState(!buildCalled)
-            config.setRelativeToDefaultPosition(relativeToDefaultPosition)
-            return this
-        }
-
-        fun setAllowUnseekableMedia(allowUnseekableMedia: Boolean): Builder {
-            Preconditions.checkState(!buildCalled)
-            config.setAllowUnseekableMedia(allowUnseekableMedia)
-            return this
-        }
-
-        fun setEnableClippingInMediaPeriod(enableClippingInMediaPeriod: Boolean): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.enableClippingInMediaPeriod = enableClippingInMediaPeriod
-            return this
-        }
-
-        fun build(): ClippingMediaSource {
-            buildCalled = true
-            return ClippingMediaSource(this)
-        }
-    }
+class ClippingMediaSource(
+    mediaSource: MediaSource,
+    private val enableClippingInMediaPeriod: Boolean = false
+) :
+    WrappingMediaSource(mediaSource) {
 
     class IllegalClippingException(
         val reason: @Reason Int, startUs: Long = C.TIME_UNSET, endUs: Long = C.TIME_UNSET
@@ -119,10 +56,10 @@ class ClippingMediaSource private constructor(builder: Builder) :
         }
     }
 
-    private val enableClippingInMediaPeriod = builder.enableClippingInMediaPeriod
     private val mediaPeriods = mutableListOf<ClippingMediaPeriod>()
     private val window: Timeline.Window = Timeline.Window()
-    private var config: MediaItem.ClippingConfiguration = builder.config.build()
+    var config: MediaItem.ClippingConfiguration =
+        MediaItem.ClippingConfiguration.Builder().build()
     private var clippingTimeline: ClippingTimeline? = null
     private var clippingError: IllegalClippingException? = null
     private var periodStartUs: Long = 0
@@ -159,7 +96,7 @@ class ClippingMediaSource private constructor(builder: Builder) :
 
     @Throws(IOException::class)
     override fun maybeThrowSourceInfoRefreshError() {
-        clippingError?.also { throw  it }
+        clippingError?.also { throw it }
         super.maybeThrowSourceInfoRefreshError()
     }
 
@@ -208,7 +145,7 @@ class ClippingMediaSource private constructor(builder: Builder) :
     private fun refreshClippedTimeline(timeline: Timeline) {
         var windowStartUs: Long
         var windowEndUs: Long
-        timeline.getWindow( 0, window)
+        timeline.getWindow(0, window)
         val windowPositionInPeriodUs = window.positionInFirstPeriodUs
         if (!shouldKeepWindowFixed()) {
             windowStartUs = config.startPositionUs
@@ -329,7 +266,7 @@ class ClippingMediaSource private constructor(builder: Builder) :
             window: Window,
             defaultPositionProjectionUs: Long
         ): Window {
-            timeline.getWindow( 0, window,  0)
+            timeline.getWindow(0, window, 0)
             window.positionInFirstPeriodUs += startUs
             window.durationUs = durationUs
             window.isDynamic = isDynamic
@@ -353,13 +290,13 @@ class ClippingMediaSource private constructor(builder: Builder) :
         }
 
         override fun getPeriod(periodIndex: Int, period: Period, setIds: Boolean): Period {
-            timeline.getPeriod( 0, period, setIds)
+            timeline.getPeriod(0, period, setIds)
             val positionInClippedWindowUs = period.positionInWindowUs - startUs
             val periodDurationUs =
                 if (durationUs == C.TIME_UNSET) C.TIME_UNSET else durationUs - positionInClippedWindowUs
             return period.set(
                 period.id,
-                period.uid,  
+                period.uid,
                 0,
                 periodDurationUs,
                 positionInClippedWindowUs,

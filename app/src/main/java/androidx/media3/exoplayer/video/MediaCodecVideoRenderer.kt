@@ -371,16 +371,14 @@ class MediaCodecVideoRenderer(
         context: Context, videoFrameReleaseControl: VideoFrameReleaseControl
     ): PlaybackVideoGraphWrapper {
         // TODO: b/391109644 - Add a more explicit API to enable replaying.
-        return PlaybackVideoGraphWrapper.Builder(context, videoFrameReleaseControl)
-            .setEnablePlaylistMode(true)
-            .experimentalSetLateThresholdToDropInputUs(
-                if (minEarlyUsToDropDecoderInput != C.TIME_UNSET)
-                    -minEarlyUsToDropDecoderInput
-                else
-                    C.TIME_UNSET
-            )
-            .setClock(getClock())
-            .build()
+        return PlaybackVideoGraphWrapper(context, videoFrameReleaseControl).apply {
+            enablePlaylistMode = true
+            lateThresholdToDropInputUs = if (minEarlyUsToDropDecoderInput != C.TIME_UNSET)
+                -minEarlyUsToDropDecoderInput
+            else
+                C.TIME_UNSET
+            clock = getClock()
+        }
     }
 
     override fun enableMayRenderStartOfStream() {

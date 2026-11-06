@@ -28,7 +28,7 @@ class ExperimentalBandwidthMeter private constructor(
 
     // Used in TransferListener methods that are called on a background thread.
     @field:GuardedBy("this") private val bandwidthEstimator: BandwidthEstimator
-    = SplitParallelSampleBandwidthEstimator.Builder().build(),
+    = SplitParallelSampleBandwidthEstimator(),
     private val resetOnNetworkTypeChange: Boolean = true
 ) : BandwidthMeter, TransferListener {
 

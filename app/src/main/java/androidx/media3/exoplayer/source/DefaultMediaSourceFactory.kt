@@ -279,7 +279,7 @@ class DefaultMediaSourceFactory(
                             arrayOf(
                                 if (subtitleParserFactory.supportsFormat(format))
                                     SubtitleExtractor(
-                                        subtitleParserFactory.create(format)!!,  null
+                                        subtitleParserFactory.create(format)!!, null
                                     )
                                 else
                                     UnknownSubtitlesExtractor(format)
@@ -319,7 +319,7 @@ class DefaultMediaSourceFactory(
                     }
                     mediaSources[i + 1] =
                         singleSampleMediaSourceFactory.createMediaSource(
-                            subtitleConfigurations[i],  C.TIME_UNSET
+                            subtitleConfigurations[i], C.TIME_UNSET
                         )
                 }
             }
@@ -357,17 +357,17 @@ class DefaultMediaSourceFactory(
         }
         return AdsMediaSource(
             mediaSource,
-            DataSpec(adsConfiguration.adTagUri),  
+            DataSpec(adsConfiguration.adTagUri),
             adsConfiguration.adsId
                 ?: listOf(
                     mediaItem.mediaId,
                     mediaItem.localConfiguration.uri,
                     adsConfiguration.adTagUri
-                ),  
+                ),
             this,
             adsLoader,
-            adViewProvider,  
-            true,  
+            adViewProvider,
+            true,
             false
         )
     }
@@ -380,7 +380,7 @@ class DefaultMediaSourceFactory(
             mutableMapOf()
         private val mediaSourceFactories: MutableMap<Int, MediaSource.Factory> = mutableMapOf()
 
-        private var dataSourceFactory:DataSource.Factory? = null
+        private var dataSourceFactory: DataSource.Factory? = null
         private var parseSubtitlesDuringExtraction = true
         private var codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int =
             C.VIDEO_CODEC_FLAG_H264 or C.VIDEO_CODEC_FLAG_H265
@@ -533,7 +533,7 @@ class DefaultMediaSourceFactory(
             }
 
             // LINT.IfChange
-            val dataSourceFactory =this.dataSourceFactory!!
+            val dataSourceFactory = this.dataSourceFactory!!
             val clazz: Class<out MediaSource.Factory>?
             when (contentType) {
                 C.CONTENT_TYPE_DASH -> {
@@ -621,10 +621,12 @@ class DefaultMediaSourceFactory(
             if (mediaItem.clippingConfiguration.startPositionUs == 0L && mediaItem.clippingConfiguration.endPositionUs == C.TIME_END_OF_SOURCE && !mediaItem.clippingConfiguration.relativeToDefaultPosition) {
                 return mediaSource
             }
-            return ClippingMediaSource.Builder(mediaSource)
-                .setClippingConfiguration(mediaItem.clippingConfiguration)
-                .setEnableClippingInMediaPeriod(enableClippingInMediaPeriod)
-                .build()
+            return ClippingMediaSource(
+                mediaSource,
+                enableClippingInMediaPeriod = enableClippingInMediaPeriod
+            ).apply {
+                config = mediaItem.clippingConfiguration.buildUpon().build()
+            }
         }
 
         private fun newInstance(

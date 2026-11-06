@@ -43,8 +43,17 @@ import java.util.concurrent.CopyOnWriteArraySet
 import java.util.concurrent.Executor
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGraph.Listener {
-    
+class PlaybackVideoGraphWrapper(
+    val context: Context,
+    val videoFrameReleaseControl: VideoFrameReleaseControl,
+    var lateThresholdToDropInputUs: Long = LATE_US_TO_DROP_INPUT_FRAME,
+    var videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster =
+        VideoFrameReleaseEarlyTimeForecaster(1f),
+    private var videoGraph: VideoGraph? = null,
+    videoGraphFactory: VideoGraph.Factory? = null,
+    var enableReplayableCache: Boolean = false,
+) : VideoGraph.Listener {
+
     interface Listener {
         fun onFrameAvailableForRendering() {}
         fun onFirstFrameRendered() {}
@@ -54,73 +63,9 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
         fun onEnded(finalFramePresentationTimeUs: Long) {}
     }
 
-    class Builder(
-        context: Context,
-         val videoFrameReleaseControl: VideoFrameReleaseControl
-    ) {
-         val context: Context
-         var videoGraphFactory:VideoGraph.Factory? = null
-         var enablePlaylistMode = false
-         var clock: Clock
-         var built = false
-         var enableReplayableCache = false
-         var lateThresholdToDropInputUs: Long
-         var videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster
-
-        init {
-            this.context = context.getApplicationContext()
-            this.lateThresholdToDropInputUs = LATE_US_TO_DROP_INPUT_FRAME
-            videoFrameReleaseEarlyTimeForecaster =
-                VideoFrameReleaseEarlyTimeForecaster( 1f)
-            clock = Clock.DEFAULT
-        }
-
-        fun setVideoGraphFactory(videoGraphFactory: VideoGraph.Factory?): Builder {
-            this.videoGraphFactory = videoGraphFactory
-            return this
-        }
-
-        fun setEnablePlaylistMode(enablePlaylistMode: Boolean): Builder {
-            // This is set to true for ExoPlayer.setVideoEffects(). It's always false in
-            // CompositionPlayer, even if the Composition has a single sequence, because CompositionPlayer
-            // shouldn't behave differently for single and multi-sequence.
-            this.enablePlaylistMode = enablePlaylistMode
-            return this
-        }
-
-        fun setClock(clock: Clock): Builder {
-            this.clock = clock
-            return this
-        }
-
-        fun setEnableReplayableCache(enableReplayableCache: Boolean): Builder {
-            this.enableReplayableCache = enableReplayableCache
-            return this
-        }
-
-        fun experimentalSetLateThresholdToDropInputUs(lateThresholdToDropInputUs: Long): Builder {
-            this.lateThresholdToDropInputUs = lateThresholdToDropInputUs
-            return this
-        }
-
-        fun build(): PlaybackVideoGraphWrapper {
-            Preconditions.checkState(!built)
-
-            if (videoGraphFactory == null) {
-                videoGraphFactory = ReflectiveSingleInputVideoGraphFactory(enableReplayableCache)
-            }
-            val playbackVideoGraphWrapper = PlaybackVideoGraphWrapper(this)
-            built = true
-            return playbackVideoGraphWrapper
-        }
-
-        fun setVideoFrameReleaseEarlyTimeForecaster(
-            videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster
-        ): Builder {
-            this.videoFrameReleaseEarlyTimeForecaster = videoFrameReleaseEarlyTimeForecaster
-            return this
-        }
-    }
+    var enablePlaylistMode = false
+    var clock: Clock = Clock.DEFAULT
+    var built = false
 
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
@@ -128,74 +73,45 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
     @IntDef(value = [STATE_CREATED, STATE_INITIALIZED, STATE_RELEASED])
     private annotation class State
 
-    private val context: Context
+    private val inputVideoSinks: SparseArray<InputVideoSink?> = SparseArray<InputVideoSink?>()
+    private val defaultVideoSink: VideoSink = DefaultVideoSink(
+        videoFrameReleaseControl, videoFrameReleaseEarlyTimeForecaster, clock
+    )
+    private val videoFrameHandler: VideoFrameHandler =
+        object : VideoFrameHandler {
+            override fun render(renderTimestampNs: Long) {
+                videoGraph!!.renderOutputFrame(renderTimestampNs)
+            }
 
-    private val videoGraphFactory: VideoGraph.Factory
-    private val inputVideoSinks: SparseArray<InputVideoSink?>
-    private val enablePlaylistMode: Boolean
-    private val defaultVideoSink: VideoSink
-    private val videoFrameHandler: VideoFrameHandler
-    private val clock: Clock
-    private val listeners: CopyOnWriteArraySet<Listener>
-    private val earlyThresholdToDropInputUs: Long
-    private val videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster
-    private var pendingStreamChanges: TimedValueQueue<StreamChangeInfo?>
-    private var videoGraphOutputFormat: Format
-    private var compositorSettings: VideoCompositorSettings
-    private var compositionEffects: List<Effect>
-    private var handler:HandlerWrapper? = null
-    private var videoGraph:VideoGraph? = null
-    private var videoFrameMetadataListener:VideoFrameMetadataListener? = null
+            override fun skip() {
+                videoGraph!!.renderOutputFrame(VideoFrameProcessor.DROP_OUTPUT_FRAME)
+            }
+        }
+    private val listeners: CopyOnWriteArraySet<Listener> = CopyOnWriteArraySet<Listener>()
+    private val earlyThresholdToDropInputUs: Long = if (lateThresholdToDropInputUs != C.TIME_UNSET)
+        -lateThresholdToDropInputUs
+    else
+        C.TIME_UNSET
+    private var pendingStreamChanges: TimedValueQueue<StreamChangeInfo?> =
+        TimedValueQueue<StreamChangeInfo?>()
+    private var videoGraphOutputFormat: Format = Format.Builder().build()
+    private var compositorSettings: VideoCompositorSettings = VideoCompositorSettings.DEFAULT
+    private var compositionEffects: List<Effect> = listOf<Effect>()
+    private var handler: HandlerWrapper? = null
+    private var videoFrameMetadataListener: VideoFrameMetadataListener? = null
     private var requestOpenGlToneMapping = false
     private var isInputSdrToneMapped = false
-    private var outputStreamStartPositionUs: Long
+    private var outputStreamStartPositionUs: Long = C.TIME_UNSET
     private var outputStreamFirstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int = 0
     private var currentSurfaceAndSize: Pair<Surface?, Size>? = null
     private var pendingFlushCount = 0
-    private var state: @State Int
-    private var lastOutputFramePresentationTimeUs: Long
-    private var finalFramePresentationTimeUs: Long
+    private var state: @State Int = STATE_CREATED
+    private var lastOutputFramePresentationTimeUs: Long = C.TIME_UNSET
+    private var finalFramePresentationTimeUs: Long = C.TIME_UNSET
     private var hasSignaledEndOfVideoGraphOutputStream = false
-    private var totalVideoInputCount: Int
+    private var totalVideoInputCount: Int = C.LENGTH_UNSET
     private var registeredVideoInputCount = 0
-
-    init {
-        context = builder.context
-        pendingStreamChanges = TimedValueQueue<StreamChangeInfo?>()
-        videoGraphFactory =builder.videoGraphFactory!!
-        inputVideoSinks = SparseArray<InputVideoSink?>()
-        compositionEffects = listOf<Effect>()
-        compositorSettings = VideoCompositorSettings.DEFAULT
-        enablePlaylistMode = builder.enablePlaylistMode
-        clock = builder.clock
-        earlyThresholdToDropInputUs =
-            if (builder.lateThresholdToDropInputUs != C.TIME_UNSET)
-                -builder.lateThresholdToDropInputUs
-            else
-                C.TIME_UNSET
-        videoFrameReleaseEarlyTimeForecaster = builder.videoFrameReleaseEarlyTimeForecaster
-        defaultVideoSink =
-            DefaultVideoSink(
-                builder.videoFrameReleaseControl, videoFrameReleaseEarlyTimeForecaster, clock
-            )
-        videoFrameHandler =
-            object : VideoFrameHandler {
-                override fun render(renderTimestampNs: Long) {
-                    videoGraph!!.renderOutputFrame(renderTimestampNs)
-                }
-
-                override fun skip() {
-                    videoGraph!!.renderOutputFrame(VideoFrameProcessor.DROP_OUTPUT_FRAME)
-                }
-            }
-        listeners = CopyOnWriteArraySet<Listener>()
-        videoGraphOutputFormat = Format.Builder().build()
-        outputStreamStartPositionUs = C.TIME_UNSET
-        lastOutputFramePresentationTimeUs = C.TIME_UNSET
-        finalFramePresentationTimeUs = C.TIME_UNSET
-        totalVideoInputCount = C.LENGTH_UNSET
-        state = STATE_CREATED
-    }
+    var videoGraphFactory: VideoGraph.Factory = videoGraphFactory?:ReflectiveSingleInputVideoGraphFactory(enableReplayableCache)
 
     fun addListener(listener: Listener?) {
         listeners.add(listener)
@@ -240,9 +156,9 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
     }
 
     fun clearOutputSurfaceInfo() {
-        maybeSetOutputSurfaceInfo( 
-            null,  
-            Size.UNKNOWN.width,  
+        maybeSetOutputSurfaceInfo(
+            null,
+            Size.UNKNOWN.width,
             Size.UNKNOWN.height
         )
         currentSurfaceAndSize = null
@@ -283,7 +199,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             return
         }
         if (handler != null) {
-            handler!!.removeCallbacksAndMessages( null)
+            handler!!.removeCallbacksAndMessages(null)
         }
         if (videoGraph != null) {
             videoGraph!!.release()
@@ -320,10 +236,10 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
         if (isRedrawnFrame) {
             // Redrawn frames are rendered directly in the processing pipeline.
             if (videoFrameMetadataListener != null) {
-                videoFrameMetadataListener!!.onVideoFrameAboutToBeRendered( 
-                    framePresentationTimeUs,  
+                videoFrameMetadataListener!!.onVideoFrameAboutToBeRendered(
+                    framePresentationTimeUs,
                     C.TIME_UNSET,
-                    videoGraphOutputFormat,  
+                    videoGraphOutputFormat,
                     null
                 )
             }
@@ -399,7 +315,8 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             } catch (e: GlException) {
                 throw VideoSinkException(e, sourceFormat)
             }
-            handler = clock.createHandler(Looper.myLooper()!!,
+            handler = clock.createHandler(
+                Looper.myLooper()!!,
                 null
             )
             try {
@@ -408,10 +325,10 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
                     videoGraphFactory.create(
                         context,
                         outputColorInfo,
-                        DebugViewProvider.NONE,  
-                        this,  
-                        Executor { runnable: Runnable? -> handler!!.post(runnable!!) },  
-                        0,  
+                        DebugViewProvider.NONE,
+                        this,
+                        Executor { runnable: Runnable? -> handler!!.post(runnable!!) },
+                        0,
                         false
                     )
                 videoGraph!!.setCompositionEffects(compositionEffects)
@@ -427,7 +344,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             }
             defaultVideoSink.initialize(sourceFormat)
             defaultVideoSink.setListener(
-                DefaultVideoSinkListener(),  
+                DefaultVideoSinkListener(),
                 Executor { runnable: Runnable? -> handler!!.post(runnable!!) })
             state = STATE_INITIALIZED
         } else {
@@ -458,13 +375,13 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             videoGraph!!.setOutputSurfaceInfo(SurfaceInfo(surface, width, height))
             defaultVideoSink.setOutputSurfaceInfo(surface, Size(width, height))
         } else {
-            videoGraph!!.setOutputSurfaceInfo( null)
+            videoGraph!!.setOutputSurfaceInfo(null)
             defaultVideoSink.clearOutputSurfaceInfo()
         }
     }
 
     private fun isReady(otherwiseReady: Boolean): Boolean {
-        return defaultVideoSink.isReady( otherwiseReady && pendingFlushCount == 0)
+        return defaultVideoSink.isReady(otherwiseReady && pendingFlushCount == 0)
     }
 
     private fun signalEndOfVideoGraphOutputStream() {
@@ -493,7 +410,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
         }
         if (pendingStreamChanges.size() == 1) {
             // Use the latest stream change info if none is passed after flushing.
-            val streamChangeInfo: StreamChangeInfo =pendingStreamChanges.pollFirst()!!
+            val streamChangeInfo: StreamChangeInfo = pendingStreamChanges.pollFirst()!!
             outputStreamStartPositionUs = streamChangeInfo.startPositionUs
             outputStreamFirstFrameReleaseInstruction = streamChangeInfo.firstFrameReleaseInstruction
             onOutputStreamChanged()
@@ -554,7 +471,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             VideoSink.INPUT_TYPE_SURFACE,
             videoGraphOutputFormat,
             outputStreamStartPositionUs,
-            outputStreamFirstFrameReleaseInstruction,  
+            outputStreamFirstFrameReleaseInstruction,
             listOf()
         )
     }
@@ -618,7 +535,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             // Resignal EOS only for the last item.
             val needsResignalEndOfCurrentInputStream = signaledEndOfStream
             val replayedPresentationTimeUs = lastOutputFramePresentationTimeUs
-            this@PlaybackVideoGraphWrapper.flush( false)
+            this@PlaybackVideoGraphWrapper.flush(false)
             videoGraph!!.redraw()
             lastOutputFramePresentationTimeUs = replayedPresentationTimeUs
             if (needsResignalEndOfCurrentInputStream) {
@@ -640,7 +557,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
         }
 
         override fun isReady(otherwiseReady: Boolean): Boolean {
-            return this@PlaybackVideoGraphWrapper.isReady( 
+            return this@PlaybackVideoGraphWrapper.isReady(
                 otherwiseReady && isInitialized
             )
         }
@@ -663,7 +580,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
         }
 
         override val isEnded: Boolean
-            get() =  isInitialized && this@PlaybackVideoGraphWrapper.isEnded
+            get() = isInitialized && this@PlaybackVideoGraphWrapper.isEnded
 
         override fun onInputStreamChanged(
             inputType: @VideoSink.InputType Int,
@@ -691,7 +608,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
                 }
                 pendingStreamChanges.add(
                     fromTimestampUs,
-                    StreamChangeInfo( 
+                    StreamChangeInfo(
                         startPositionUs + inputBufferTimestampAdjustmentUs,
                         firstFrameReleaseInstruction,
                         fromTimestampUs
@@ -720,7 +637,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
                 TimedValueQueue<StreamChangeInfo?>()
             var isFirstStreamChange = true
             while (pendingStreamChanges.size() > 0) {
-                var streamChangeInfo: StreamChangeInfo =pendingStreamChanges.pollFirst()!!
+                var streamChangeInfo: StreamChangeInfo = pendingStreamChanges.pollFirst()!!
                 if (isFirstStreamChange) {
                     if (streamChangeInfo.firstFrameReleaseInstruction == VideoSink.RELEASE_FIRST_FRAME_IMMEDIATELY
                         || (streamChangeInfo.firstFrameReleaseInstruction
@@ -837,7 +754,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
             // Use the frame presentation time as render time so that the SurfaceTexture is accompanied
             // by this timestamp. Setting a realtime based release time is only relevant when rendering to
             // a SurfaceView, but we render to a surface in this case.
-            videoFrameHandler.render( framePresentationTimeUs * 1000)
+            videoFrameHandler.render(framePresentationTimeUs * 1000)
             consecutiveDroppedFrames = 0
             return true
         }
@@ -864,7 +781,7 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
 
         @Throws(VideoSinkException::class)
         override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
-            this@PlaybackVideoGraphWrapper.render( 
+            this@PlaybackVideoGraphWrapper.render(
                 positionUs + inputBufferTimestampAdjustmentUs, elapsedRealtimeUs
             )
         }
@@ -926,12 +843,12 @@ class PlaybackVideoGraphWrapper private constructor(builder: Builder) : VideoGra
                 else
                     VideoFrameProcessor.INPUT_TYPE_BITMAP
             videoGraph!!.registerInputStream(
-                    inputIndex,
-                    videoGraphInputType,
-                    adjustedInputFormat,
-                    videoEffects,  
-                    0
-                )
+                inputIndex,
+                videoGraphInputType,
+                adjustedInputFormat,
+                videoEffects,
+                0
+            )
         }
 
     }
