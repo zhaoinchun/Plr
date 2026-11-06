@@ -32,7 +32,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class DefaultLoadControl protected constructor(
-    allocator: DefaultAllocator,
+    val allocator: DefaultAllocator,
     minBufferMs: Int,
     minBufferForLocalPlaybackMs: Int,
     maxBufferMs: Int,
@@ -48,251 +48,8 @@ class DefaultLoadControl protected constructor(
     retainBackBufferFromKeyframe: Boolean,
     playerTargetBufferBytes: Map<String?, Int?> = mapOf()
 ) : LoadControl {
-    class Builder {
-        private val playerTargetBufferBytes: HashMap<String?, Int?>
-
-        private var allocator: DefaultAllocator? = null
-        private var minBufferMs: Int
-        private var minBufferForLocalPlaybackMs: Int
-        private var maxBufferMs: Int
-        private var maxBufferForLocalPlaybackMs: Int
-        private var bufferForPlaybackMs: Int
-        private var bufferForPlaybackForLocalPlaybackMs: Int
-        private var bufferForPlaybackAfterRebufferMs: Int
-        private var bufferForPlaybackAfterRebufferForLocalPlaybackMs: Int
-        private var targetBufferBytes: Int
-        private var prioritizeTimeOverSizeThresholds: Boolean
-        private var prioritizeTimeOverSizeThresholdsForLocalPlayback: Boolean
-        private var backBufferDurationMs: Int
-        private var retainBackBufferFromKeyframe: Boolean
-        private var buildCalled = false
-
-        // For backwards-compatibility, calling only one of the generic setBufferDurationsMs or
-        // setPrioritizeTimeOverSizeThresholds methods should not use local playback specific defaults
-        // for the other setter to avoid unintended side effects of changing one default but keeping the
-        // manual override for the other.
-        private var onlyGenericConfigurationMethodsCalled = false
-
-        init {
-            playerTargetBufferBytes = HashMap<String?, Int?>()
-            playerTargetBufferBytes.put(
-                PlayerId.PRELOAD.name,
-                DEFAULT_TARGET_BUFFER_BYTES_FOR_PRELOAD
-            )
-            minBufferMs = DEFAULT_MIN_BUFFER_MS
-            minBufferForLocalPlaybackMs = DEFAULT_MIN_BUFFER_FOR_LOCAL_PLAYBACK_MS
-            maxBufferMs = DEFAULT_MAX_BUFFER_MS
-            maxBufferForLocalPlaybackMs = DEFAULT_MAX_BUFFER_FOR_LOCAL_PLAYBACK_MS
-            bufferForPlaybackMs = DEFAULT_BUFFER_FOR_PLAYBACK_MS
-            bufferForPlaybackForLocalPlaybackMs = DEFAULT_BUFFER_FOR_PLAYBACK_FOR_LOCAL_PLAYBACK_MS
-            bufferForPlaybackAfterRebufferMs = DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
-            bufferForPlaybackAfterRebufferForLocalPlaybackMs =
-                DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_FOR_LOCAL_PLAYBACK_MS
-            targetBufferBytes = DEFAULT_TARGET_BUFFER_BYTES
-            prioritizeTimeOverSizeThresholds = DEFAULT_PRIORITIZE_TIME_OVER_SIZE_THRESHOLDS
-            prioritizeTimeOverSizeThresholdsForLocalPlayback =
-                DEFAULT_PRIORITIZE_TIME_OVER_SIZE_THRESHOLDS_FOR_LOCAL_PLAYBACK
-            backBufferDurationMs = DEFAULT_BACK_BUFFER_DURATION_MS
-            retainBackBufferFromKeyframe = DEFAULT_RETAIN_BACK_BUFFER_FROM_KEYFRAME
-        }
-
-        fun setAllocator(allocator: DefaultAllocator?): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.allocator = allocator
-            return this
-        }
-
-        fun setBufferDurationsMs(
-            minBufferMs: Int,
-            maxBufferMs: Int,
-            bufferForPlaybackMs: Int,
-            bufferForPlaybackAfterRebufferMs: Int
-        ): Builder {
-            Preconditions.checkState(!buildCalled)
-            assertGreaterOrEqual(bufferForPlaybackMs, 0, "bufferForPlaybackMs", "0")
-            assertGreaterOrEqual(
-                bufferForPlaybackAfterRebufferMs, 0, "bufferForPlaybackAfterRebufferMs", "0"
-            )
-            assertGreaterOrEqual(
-                minBufferMs,
-                bufferForPlaybackMs,
-                "minBufferMs",
-                "bufferForPlaybackMs"
-            )
-            assertGreaterOrEqual(
-                minBufferMs,
-                bufferForPlaybackAfterRebufferMs,
-                "minBufferMs",
-                "bufferForPlaybackAfterRebufferMs"
-            )
-            assertGreaterOrEqual(maxBufferMs, minBufferMs, "maxBufferMs", "minBufferMs")
-            this.minBufferMs = minBufferMs
-            this.maxBufferMs = maxBufferMs
-            this.bufferForPlaybackMs = bufferForPlaybackMs
-            this.bufferForPlaybackAfterRebufferMs = bufferForPlaybackAfterRebufferMs
-            this.minBufferForLocalPlaybackMs = minBufferMs
-            this.maxBufferForLocalPlaybackMs = maxBufferMs
-            this.bufferForPlaybackForLocalPlaybackMs = bufferForPlaybackMs
-            this.bufferForPlaybackAfterRebufferForLocalPlaybackMs = bufferForPlaybackAfterRebufferMs
-            if (onlyGenericConfigurationMethodsCalled == null) {
-                onlyGenericConfigurationMethodsCalled = true
-            }
-            return this
-        }
-
-        fun setBufferDurationsMsForStreaming(
-            minBufferMs: Int,
-            maxBufferMs: Int,
-            bufferForPlaybackMs: Int,
-            bufferForPlaybackAfterRebufferMs: Int
-        ): Builder {
-            Preconditions.checkState(!buildCalled)
-            assertGreaterOrEqual(bufferForPlaybackMs, 0, "bufferForPlaybackMs", "0")
-            assertGreaterOrEqual(
-                bufferForPlaybackAfterRebufferMs, 0, "bufferForPlaybackAfterRebufferMs", "0"
-            )
-            assertGreaterOrEqual(
-                minBufferMs,
-                bufferForPlaybackMs,
-                "minBufferMs",
-                "bufferForPlaybackMs"
-            )
-            assertGreaterOrEqual(
-                minBufferMs,
-                bufferForPlaybackAfterRebufferMs,
-                "minBufferMs",
-                "bufferForPlaybackAfterRebufferMs"
-            )
-            assertGreaterOrEqual(maxBufferMs, minBufferMs, "maxBufferMs", "minBufferMs")
-            this.minBufferMs = minBufferMs
-            this.maxBufferMs = maxBufferMs
-            this.bufferForPlaybackMs = bufferForPlaybackMs
-            this.bufferForPlaybackAfterRebufferMs = bufferForPlaybackAfterRebufferMs
-            onlyGenericConfigurationMethodsCalled = false
-            return this
-        }
-
-        fun setBufferDurationsMsForLocalPlayback(
-            minBufferMs: Int,
-            maxBufferMs: Int,
-            bufferForPlaybackMs: Int,
-            bufferForPlaybackAfterRebufferMs: Int
-        ): Builder {
-            Preconditions.checkState(!buildCalled)
-            assertGreaterOrEqual(bufferForPlaybackMs, 0, "bufferForPlaybackMs", "0")
-            assertGreaterOrEqual(
-                bufferForPlaybackAfterRebufferMs, 0, "bufferForPlaybackAfterRebufferMs", "0"
-            )
-            assertGreaterOrEqual(
-                minBufferMs,
-                bufferForPlaybackMs,
-                "minBufferMs",
-                "bufferForPlaybackMs"
-            )
-            assertGreaterOrEqual(
-                minBufferMs,
-                bufferForPlaybackAfterRebufferMs,
-                "minBufferMs",
-                "bufferForPlaybackAfterRebufferMs"
-            )
-            assertGreaterOrEqual(maxBufferMs, minBufferMs, "maxBufferMs", "minBufferMs")
-            this.minBufferForLocalPlaybackMs = minBufferMs
-            this.maxBufferForLocalPlaybackMs = maxBufferMs
-            this.bufferForPlaybackForLocalPlaybackMs = bufferForPlaybackMs
-            this.bufferForPlaybackAfterRebufferForLocalPlaybackMs = bufferForPlaybackAfterRebufferMs
-            onlyGenericConfigurationMethodsCalled = false
-            return this
-        }
-
-        fun setTargetBufferBytes(targetBufferBytes: Int): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.targetBufferBytes = targetBufferBytes
-            return this
-        }
-
-        fun setPlayerTargetBufferBytes(playerName: String?, playerTargetBufferBytes: Int): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.playerTargetBufferBytes.put(playerName, playerTargetBufferBytes)
-            return this
-        }
-
-        fun setPrioritizeTimeOverSizeThresholds(prioritizeTimeOverSizeThresholds: Boolean): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.prioritizeTimeOverSizeThresholds = prioritizeTimeOverSizeThresholds
-            this.prioritizeTimeOverSizeThresholdsForLocalPlayback = prioritizeTimeOverSizeThresholds
-            if (onlyGenericConfigurationMethodsCalled == null) {
-                onlyGenericConfigurationMethodsCalled = true
-            }
-            return this
-        }
-
-        fun setPrioritizeTimeOverSizeThresholdsForStreaming(
-            prioritizeTimeOverSizeThresholds: Boolean
-        ): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.prioritizeTimeOverSizeThresholds = prioritizeTimeOverSizeThresholds
-            onlyGenericConfigurationMethodsCalled = false
-            return this
-        }
-
-        fun setPrioritizeTimeOverSizeThresholdsForLocalPlayback(
-            prioritizeTimeOverSizeThresholds: Boolean
-        ): Builder {
-            Preconditions.checkState(!buildCalled)
-            this.prioritizeTimeOverSizeThresholdsForLocalPlayback = prioritizeTimeOverSizeThresholds
-            onlyGenericConfigurationMethodsCalled = false
-            return this
-        }
-
-        fun setBackBuffer(
-            backBufferDurationMs: Int,
-            retainBackBufferFromKeyframe: Boolean
-        ): Builder {
-            Preconditions.checkState(!buildCalled)
-            assertGreaterOrEqual(backBufferDurationMs, 0, "backBufferDurationMs", "0")
-            this.backBufferDurationMs = backBufferDurationMs
-            this.retainBackBufferFromKeyframe = retainBackBufferFromKeyframe
-            return this
-        }
-
-        fun build(): DefaultLoadControl {
-            Preconditions.checkState(!buildCalled)
-            buildCalled = true
-            if (allocator == null) {
-                allocator = DefaultAllocator( true, C.DEFAULT_BUFFER_SEGMENT_SIZE)
-            }
-            if (onlyGenericConfigurationMethodsCalled) {
-                // For backwards-compatibility, if only generic setters were called, ensure the local
-                // playback values are equivalent to the streaming ones even if not explicitly specified.
-                minBufferForLocalPlaybackMs = minBufferMs
-                maxBufferForLocalPlaybackMs = maxBufferMs
-                bufferForPlaybackForLocalPlaybackMs = bufferForPlaybackMs
-                bufferForPlaybackAfterRebufferForLocalPlaybackMs = bufferForPlaybackAfterRebufferMs
-                prioritizeTimeOverSizeThresholdsForLocalPlayback = prioritizeTimeOverSizeThresholds
-            }
-            return DefaultLoadControl(
-                allocator!!,
-                minBufferMs,
-                minBufferForLocalPlaybackMs,
-                maxBufferMs,
-                maxBufferForLocalPlaybackMs,
-                bufferForPlaybackMs,
-                bufferForPlaybackForLocalPlaybackMs,
-                bufferForPlaybackAfterRebufferMs,
-                bufferForPlaybackAfterRebufferForLocalPlaybackMs,
-                targetBufferBytes,
-                prioritizeTimeOverSizeThresholds,
-                prioritizeTimeOverSizeThresholdsForLocalPlayback,
-                backBufferDurationMs,
-                retainBackBufferFromKeyframe,
-                playerTargetBufferBytes
-            )
-        }
-    }
-
     private val window: Timeline.Window
     private val period: Timeline.Period
-    private val allocator: DefaultAllocator
     private val minBufferUs: Long
     private val minBufferForLocalPlaybackUs: Long
     private val maxBufferUs: Long
@@ -302,12 +59,38 @@ class DefaultLoadControl protected constructor(
     private val bufferForPlaybackAfterRebufferUs: Long
     private val bufferForPlaybackAfterRebufferForLocalPlaybackUs: Long
     private val targetBufferBytesOverwrite: Int
-    private val prioritizeTimeOverSizeThresholds: Boolean
-    private val prioritizeTimeOverSizeThresholdsForLocalPlayback: Boolean
     override val backBufferDurationUs: Long
-    private val retainBackBufferFromKeyframe: Boolean
     private val playerTargetBufferBytesOverwrites: Map<String?, Int?>
     private val loadingStates: ConcurrentHashMap<PlayerId?, PlayerLoadingState>
+
+    private val playerTargetBufferBytes: HashMap<String?, Int?> =
+        HashMap<String?, Int?>().apply {
+            put(PlayerId.PRELOAD.name, DEFAULT_TARGET_BUFFER_BYTES_FOR_PRELOAD)
+        }
+    private var minBufferMs: Int = DEFAULT_MIN_BUFFER_MS
+    private var minBufferForLocalPlaybackMs: Int = DEFAULT_MIN_BUFFER_FOR_LOCAL_PLAYBACK_MS
+    private var maxBufferMs: Int = DEFAULT_MAX_BUFFER_MS
+    private var maxBufferForLocalPlaybackMs: Int = DEFAULT_MAX_BUFFER_FOR_LOCAL_PLAYBACK_MS
+    private var bufferForPlaybackMs: Int = DEFAULT_BUFFER_FOR_PLAYBACK_MS
+    private var bufferForPlaybackForLocalPlaybackMs: Int =
+        DEFAULT_BUFFER_FOR_PLAYBACK_FOR_LOCAL_PLAYBACK_MS
+    private var bufferForPlaybackAfterRebufferMs: Int =
+        DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
+    private var bufferForPlaybackAfterRebufferForLocalPlaybackMs: Int =
+        DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_FOR_LOCAL_PLAYBACK_MS
+    private var targetBufferBytes: Int = DEFAULT_TARGET_BUFFER_BYTES
+    private var prioritizeTimeOverSizeThresholds: Boolean =
+        DEFAULT_PRIORITIZE_TIME_OVER_SIZE_THRESHOLDS
+    private var prioritizeTimeOverSizeThresholdsForLocalPlayback: Boolean =
+        DEFAULT_PRIORITIZE_TIME_OVER_SIZE_THRESHOLDS_FOR_LOCAL_PLAYBACK
+    private var backBufferDurationMs: Int = DEFAULT_BACK_BUFFER_DURATION_MS
+    private var retainBackBufferFromKeyframe: Boolean = DEFAULT_RETAIN_BACK_BUFFER_FROM_KEYFRAME
+
+    // For backwards-compatibility, calling only one of the generic setBufferDurationsMs or
+    // setPrioritizeTimeOverSizeThresholds methods should not use local playback specific defaults
+    // for the other setter to avoid unintended side effects of changing one default but keeping the
+    // manual override for the other.
+    private var onlyGenericConfigurationMethodsCalled = false
 
     private var threadId: Long = 0
 
@@ -372,7 +155,6 @@ class DefaultLoadControl protected constructor(
 
         this.window = Timeline.Window()
         this.period = Timeline.Period()
-        this.allocator = allocator
         this.minBufferUs = msToUs(minBufferMs)
         this.minBufferForLocalPlaybackUs = msToUs(minBufferForLocalPlaybackMs)
         this.maxBufferUs = msToUs(maxBufferMs)
@@ -393,6 +175,42 @@ class DefaultLoadControl protected constructor(
         threadId = C.INDEX_UNSET.toLong()
     }
 
+    fun setBufferDurationsMs(
+        minBufferMs: Int,
+        maxBufferMs: Int,
+        bufferForPlaybackMs: Int,
+        bufferForPlaybackAfterRebufferMs: Int
+    ) {
+        assertGreaterOrEqual(bufferForPlaybackMs, 0, "bufferForPlaybackMs", "0")
+        assertGreaterOrEqual(
+            bufferForPlaybackAfterRebufferMs, 0, "bufferForPlaybackAfterRebufferMs", "0"
+        )
+        assertGreaterOrEqual(
+            minBufferMs,
+            bufferForPlaybackMs,
+            "minBufferMs",
+            "bufferForPlaybackMs"
+        )
+        assertGreaterOrEqual(
+            minBufferMs,
+            bufferForPlaybackAfterRebufferMs,
+            "minBufferMs",
+            "bufferForPlaybackAfterRebufferMs"
+        )
+        assertGreaterOrEqual(maxBufferMs, minBufferMs, "maxBufferMs", "minBufferMs")
+        this.minBufferMs = minBufferMs
+        this.maxBufferMs = maxBufferMs
+        this.bufferForPlaybackMs = bufferForPlaybackMs
+        this.bufferForPlaybackAfterRebufferMs = bufferForPlaybackAfterRebufferMs
+        this.minBufferForLocalPlaybackMs = minBufferMs
+        this.maxBufferForLocalPlaybackMs = maxBufferMs
+        this.bufferForPlaybackForLocalPlaybackMs = bufferForPlaybackMs
+        this.bufferForPlaybackAfterRebufferForLocalPlaybackMs = bufferForPlaybackAfterRebufferMs
+    }
+    fun setPrioritizeTimeOverSizeThresholds(prioritizeTimeOverSizeThresholds: Boolean){
+        this.prioritizeTimeOverSizeThresholds = prioritizeTimeOverSizeThresholds
+        this.prioritizeTimeOverSizeThresholdsForLocalPlayback = prioritizeTimeOverSizeThresholds
+    }
     override fun onPrepared(playerId: PlayerId) {
         val currentThreadId = Thread.currentThread().getId()
         Preconditions.checkState(

@@ -66,10 +66,10 @@ class ExoVideoSwitchActivity : AppCompatActivity(), CoroutineScope by MainScope(
 
     fun f() {
         MainScope().launch {
-            DefaultLoadControl.Builder()
-                .setBufferDurationsMs(1_500, 5_000, 300, 800)
-                .setPrioritizeTimeOverSizeThresholds(true)
-                .build()
+            DefaultLoadControl().apply {
+                setBufferDurationsMs(1_500, 5_000, 300, 800)
+                setPrioritizeTimeOverSizeThresholds(true)
+            }
             player = withContext(Dispatchers.Default) {
                 ExoPlayerImpl(this@ExoVideoSwitchActivity).apply {
                     init()
