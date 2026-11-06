@@ -1188,12 +1188,11 @@ class MediaCodecVideoRenderer(
             changeVideoSinkInputStream(
                 videoSink!!,
                 VideoSink.INPUT_TYPE_SURFACE,
-                format
-                    .buildUpon()
-                    .setWidth(width)
-                    .setHeight(height)
-                    .setPixelWidthHeightRatio(pixelWidthHeightRatio)
-                    .build(),
+                format.copy(
+                    width = width,
+                    height = height,
+                    pixelWidthHeightRatio = pixelWidthHeightRatio
+                ),
                 nextVideoSinkFirstFrameReleaseInstruction
             )
             nextVideoSinkFirstFrameReleaseInstruction =
@@ -1873,7 +1872,7 @@ class MediaCodecVideoRenderer(
             if (format.colorInfo != null && streamFormat.colorInfo == null) {
                 // streamFormat likely has incomplete color information. Copy the complete color information
                 // from format to avoid codec re-use being ruled out for only this reason.
-                streamFormat = streamFormat.buildUpon().setColorInfo(format.colorInfo).build()
+                streamFormat = streamFormat.copy(colorInfo = format.colorInfo)
             }
             if (codecInfo.canReuseCodec(
                     format,
@@ -1898,7 +1897,7 @@ class MediaCodecVideoRenderer(
                         maxInputSize,
                         getCodecMaxInputSize(
                             codecInfo,
-                            format.buildUpon().setWidth(maxWidth).setHeight(maxHeight).build()
+                            format.copy(width = maxWidth, height = maxHeight)
                         )
                     )
                 w(TAG, "Codec max resolution adjusted to: " + maxWidth + "x" + maxHeight)

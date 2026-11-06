@@ -332,11 +332,11 @@ class DefaultAudioSink(
         if (isEncodingLinearPcm(format.pcmEncoding)) {
             val usesFloatPcm = shouldUseFloatOutput(format.pcmEncoding)
             if (usesFloatPcm && format.pcmEncoding != C.ENCODING_PCM_FLOAT) {
-                format = format.buildUpon().setPcmEncoding(C.ENCODING_PCM_FLOAT).build()
+                format = format.copy(pcmEncoding = C.ENCODING_PCM_FLOAT)
                 transcodingViaAudioProcessors = true
             }
             if (!usesFloatPcm && format.pcmEncoding != C.ENCODING_PCM_16BIT) {
-                format = format.buildUpon().setPcmEncoding(C.ENCODING_PCM_16BIT).build()
+                format = format.copy(pcmEncoding = C.ENCODING_PCM_16BIT)
                 transcodingViaAudioProcessors = true
             }
         }
@@ -416,18 +416,15 @@ class DefaultAudioSink(
             }
 
             afterProcessingFormat =
-                inputFormat
-                    .buildUpon()
-                    .setPcmEncoding(outputFormat.encoding)
-                    .setSampleRate(outputFormat.sampleRate)
-                    .setChannelCount(outputFormat.channelCount)
-                    .setChannelMask(
-                        if (outputFormat.channelCount == inputFormat.channelCount)
-                            inputFormat.channelMask
-                        else
-                            Format.NO_VALUE
-                    )
-                    .build()
+                inputFormat.copy(
+                    pcmEncoding = outputFormat.encoding,
+                    sampleRate = outputFormat.sampleRate,
+                    channelCount = outputFormat.channelCount,
+                    channelMask = if (outputFormat.channelCount == inputFormat.channelCount)
+                        inputFormat.channelMask
+                    else
+                        Format.NO_VALUE
+                )
             outputPcmFrameSize = getPcmFrameSize(outputFormat.encoding, outputFormat.channelCount)
         } else {
             // Audio processing is not supported in offload or passthrough mode.

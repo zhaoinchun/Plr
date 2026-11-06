@@ -204,10 +204,10 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
             val formatWithHeightAndWidth =
                 pendingVideoFormat
                     .format
-                    .buildUpon()
-                    .setWidth(videoSize.width)
-                    .setHeight(videoSize.height)
-                    .build()
+                    .copy(
+                        width = videoSize.width,
+                        height = videoSize.height
+                    )
             this.pendingVideoFormat =
                 PendingFormatUpdate(
                     formatWithHeightAndWidth,
@@ -321,21 +321,21 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
                 // Ignore updates with insufficient information where no tracks are selected.
                 if (!isVideoSelected) {
                     maybeUpdateVideoFormat(
-                        realtimeMs,  
+                        realtimeMs,
                         null,
                         C.SELECTION_REASON_UNKNOWN
                     )
                 }
                 if (!isAudioSelected) {
                     maybeUpdateAudioFormat(
-                        realtimeMs,  
+                        realtimeMs,
                         null,
                         C.SELECTION_REASON_UNKNOWN
                     )
                 }
                 if (!isTextSelected) {
                     maybeUpdateTextFormat(
-                        realtimeMs,  
+                        realtimeMs,
                         null,
                         C.SELECTION_REASON_UNKNOWN
                     )
@@ -535,7 +535,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
             }
             if (format.language != null) {
                 val languageAndRegion: Pair<String?, String?> =
-                    getLanguageAndRegion(format.language)
+                    getLanguageAndRegion(format.language!!)
                 builder.setLanguage(languageAndRegion.first!!)
                 if (languageAndRegion.second != null) {
                     builder.setLanguageRegion(languageAndRegion.second!!)

@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor
 
 import androidx.annotation.IntDef
@@ -42,22 +41,23 @@ object Ac4Util {
     private const val CHANNEL_COUNT_2 = 2
     const val SAMPLE_HEADER_SIZE: Int = 7
     const val HEADER_SIZE_FOR_PARSER: Int = 16
-    private val SAMPLE_COUNT = intArrayOf( 2002,  
-        2000,  
-        1920,  
+    private val SAMPLE_COUNT = intArrayOf(
+        2002,
+        2000,
+        1920,
         1601,  // 1601 | 1602 | 1601 | 1602 | 1602
-        
-        1600,  
-        1001,  
-        1000,  
-        960,  
+
+        1600,
+        1001,
+        1000,
+        960,
         800,  //  800 |  801 |  801 |  801 |  801
-        
-        800,  
-        480,  
+
+        800,
+        480,
         400,  //  400 |  400 |  401 |  400 |  401
-        
-        400,  
+
+        400,
         2048
     )
 
@@ -370,15 +370,15 @@ object Ac4Util {
         val codecString =
             createCodecsString(bitstreamVersion, ac4Presentation.version, ac4Presentation.level)
 
-        return Format.Builder()
-            .setId(trackId)
-            .setSampleMimeType(MimeTypes.AUDIO_AC4)
-            .setChannelCount(channelCount)
-            .setSampleRate(sampleRate)
-            .setDrmInitData(drmInitData)
-            .setLanguage(language)
-            .setCodecs(codecString)
-            .build()
+        return Format(
+            id = trackId,
+            sampleMimeType = MimeTypes.AUDIO_AC4,
+            channelCount = channelCount,
+            sampleRate = sampleRate,
+            drmInitData = drmInitData,
+            language = language,
+            codecs = codecString
+        )
     }
 
     @Throws(ParserException::class)
@@ -511,7 +511,7 @@ object Ac4Util {
         )
     }
 
-        fun parseAc4SyncframeInfo(data: ParsableBitArray): SyncFrameInfo {
+    fun parseAc4SyncframeInfo(data: ParsableBitArray): SyncFrameInfo {
         var headerSize = 0
         val syncWord = data.readBits(16)
         headerSize += 2
@@ -527,7 +527,7 @@ object Ac4Util {
         }
         var bitstreamVersion = data.readBits(2)
         if (bitstreamVersion == 3) {
-            bitstreamVersion += readVariableBits(data,  2)
+            bitstreamVersion += readVariableBits(data, 2)
         }
         val sequenceCounter = data.readBits(10)
         if (data.readBit()) { // b_wait_frames
@@ -567,7 +567,7 @@ object Ac4Util {
         )
     }
 
-        fun parseAc4SyncframeSize(data: ByteArray, syncword: Int): Int {
+    fun parseAc4SyncframeSize(data: ByteArray, syncword: Int): Int {
         if (data.size < 7) {
             return C.LENGTH_UNSET
         }
@@ -594,7 +594,7 @@ object Ac4Util {
         return parseAc4SyncframeInfo(ParsableBitArray(bufferBytes)).sampleCount
     }
 
-        fun getAc4SampleHeader(size: Int, buffer: ParsableByteArray) {
+    fun getAc4SampleHeader(size: Int, buffer: ParsableByteArray) {
         // See ETSI TS 103 190-1 V1.3.1, Annex G.
         buffer.reset(SAMPLE_HEADER_SIZE)
         val data = buffer.data
@@ -620,12 +620,12 @@ object Ac4Util {
         return value
     }
 
-    class SyncFrameInfo  constructor(
+    class SyncFrameInfo constructor(
         val bitstreamVersion: Int,
-       val channelCount: Int,
-       val sampleRate: Int,
-       val frameSize: Int,
-       val sampleCount: Int
+        val channelCount: Int,
+        val sampleRate: Int,
+        val frameSize: Int,
+        val sampleCount: Int
     )
 
     @MustBeDocumented

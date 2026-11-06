@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -45,8 +44,8 @@ class DtsReader(
     private val roleFlags: @RoleFlags Int
     private val containerMimeType: String?
 
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
 
     private var state: Int
     private var bytesRead = 0
@@ -56,7 +55,7 @@ class DtsReader(
 
     // Used when parsing the header.
     private var sampleDurationUs: Long = 0
-    private var format:Format? = null
+    private var format: Format? = null
     private var sampleSize = 0
     private var coreSampleSize = 0
     private var frameType: @FrameType Int = 0
@@ -151,7 +150,7 @@ class DtsReader(
                 }
 
                 STATE_FINDING_EXTSS_HEADER_SIZE ->           // Read enough bytes to parse the header size information.
-                    if (continueRead(data, headerScratchBytes.data,  7)) {
+                    if (continueRead(data, headerScratchBytes.data, 7)) {
                         extensionSubstreamHeaderSize =
                             parseDtsHdHeaderSize(headerScratchBytes.data)
                         state = STATE_READING_EXTSS_HEADER
@@ -170,7 +169,7 @@ class DtsReader(
                 }
 
                 STATE_FINDING_UHD_HEADER_SIZE ->           // Read enough bytes to parse the header size information.
-                    if (continueRead(data, headerScratchBytes.data,  6)) {
+                    if (continueRead(data, headerScratchBytes.data, 6)) {
                         uhdHeaderSize = parseDtsUhdHeaderSize(headerScratchBytes.data)
                         // Adjust the array read position if data read is more than the actual header size.
                         if (bytesRead > uhdHeaderSize) {
@@ -244,7 +243,7 @@ class DtsReader(
                             state = STATE_FINDING_EXTSS_HEADER_SIZE
                         } else {
                             if (coreFormatPendingEmit) {
-                                output!!.format(format!! )
+                                output!!.format(format!!)
                                 coreFormatPendingEmit = false
                             }
                             Preconditions.checkState(timeUs != C.TIME_UNSET)
@@ -402,17 +401,17 @@ class DtsReader(
         if (format == null || coreFormatPendingEmit
             || dtsHeader.channelCount != format!!.channelCount || dtsHeader.sampleRate != format!!.sampleRate || (sampleMimeType != format!!.sampleMimeType)
         ) {
-            val formatBuilder = if (format == null) Format.Builder() else format!!.buildUpon()
+            val formatBuilder = format?.copy() ?: Format()
             format =
-                formatBuilder
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(sampleMimeType)
-                    .setChannelCount(dtsHeader.channelCount)
-                    .setSampleRate(dtsHeader.sampleRate)
-                    .setLanguage(language)
-                    .setRoleFlags(roleFlags)
-                    .build()
+                formatBuilder.copy(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = sampleMimeType,
+                    channelCount = dtsHeader.channelCount,
+                    sampleRate = dtsHeader.sampleRate,
+                    language = language,
+                    roleFlags = roleFlags
+                )
             output!!.format(format!!)
             coreFormatPendingEmit = false
         }

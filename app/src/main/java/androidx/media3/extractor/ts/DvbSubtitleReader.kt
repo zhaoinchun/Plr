@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -24,7 +23,7 @@ class DvbSubtitleReader(
     private var sampleTimeUs: Long
 
     init {
-        outputs = Array<TrackOutput?>(subtitleInfos.size){null}
+        outputs = Array<TrackOutput?>(subtitleInfos.size) { null }
         sampleTimeUs = C.TIME_UNSET
     }
 
@@ -38,14 +37,14 @@ class DvbSubtitleReader(
             val subtitleInfo = subtitleInfos[i]
             idGenerator.generateNewId()
             val output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_TEXT)
-            output!!.format(
-                Format.Builder()
-                    .setId(idGenerator.getFormatId())
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(MimeTypes.APPLICATION_DVBSUBS)
-                    .setInitializationData(mutableListOf<ByteArray>(subtitleInfo.initializationData))
-                    .setLanguage(subtitleInfo.language)
-                    .build()
+            output.format(
+                Format(
+                    id = idGenerator.getFormatId(),
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = MimeTypes.APPLICATION_DVBSUBS,
+                    initializationData = mutableListOf<ByteArray>(subtitleInfo.initializationData),
+                    language = subtitleInfo.language
+                )
             )
             outputs[i] = output
         }

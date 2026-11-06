@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import android.util.Pair
@@ -22,8 +21,8 @@ class H262Reader internal constructor(
     private val userDataReader: UserDataReader?,
     private val containerMimeType: String?
 ) : ElementaryStreamReader {
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
 
     private val userDataParsable: ParsableByteArray?
 
@@ -207,8 +206,8 @@ class H262Reader internal constructor(
             output!!.sampleMetadata(
                 sampleTimeUs,
                 flags,
-                size,  
-                0,  
+                size,
+                0,
                 null
             )
         }
@@ -304,15 +303,15 @@ class H262Reader internal constructor(
             }
 
             val format =
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(MimeTypes.VIDEO_MPEG2)
-                    .setWidth(width)
-                    .setHeight(height)
-                    .setPixelWidthHeightRatio(pixelWidthHeightRatio)
-                    .setInitializationData(mutableListOf<ByteArray>(csdData))
-                    .build()
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = MimeTypes.VIDEO_MPEG2,
+                    width = width,
+                    height = height,
+                    pixelWidthHeightRatio = pixelWidthHeightRatio,
+                    initializationData = mutableListOf(csdData)
+                )
 
             var frameDurationUs: Long = 0
             val frameRateCodeMinusOne = (csdData[7].toInt() and 0x0F) - 1

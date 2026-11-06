@@ -251,7 +251,7 @@ class OfflineLicenseHelper(
 
     companion object {
         private val FORMAT_WITH_EMPTY_DRM_INIT_DATA =
-            Format.Builder().setDrmInitData(DrmInitData(listOf())).build()
+            Format(drmInitData = DrmInitData(listOf()))
 
         fun newWidevineInstance(
             drmConfiguration: MediaItem.DrmConfiguration,

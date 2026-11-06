@@ -50,7 +50,7 @@ class AviExtractor(
 
     private var state: @State Int = 0
     private var extractorOutput: ExtractorOutput
-    private var aviHeader:AviMainHeaderChunk? = null
+    private var aviHeader: AviMainHeaderChunk? = null
     private var durationUs: Long
     private var chunkReaders: Array<ChunkReader>
 
@@ -67,7 +67,7 @@ class AviExtractor(
 
     init {
         parseSubtitlesDuringExtraction = (extractorFlags and FLAG_EMIT_RAW_SUBTITLE_DATA) == 0
-        scratch = ParsableByteArray( 12)
+        scratch = ParsableByteArray(12)
         chunkHeaderHolder = ChunkHeaderHolder()
         extractorOutput = NoOpExtractorOutput()
         chunkReaders = emptyArray()
@@ -90,7 +90,7 @@ class AviExtractor(
 
     @Throws(IOException::class)
     override fun sniff(input: ExtractorInput): Boolean {
-        input.peekFully(scratch.data,  0,  12)
+        input.peekFully(scratch.data, 0, 12)
         scratch.setPosition(0)
         if (scratch.readLittleEndianInt() != FOURCC_RIFF) {
             return false
@@ -109,10 +109,10 @@ class AviExtractor(
                 // Check for RIFF and AVI fourcc's just in case the caller did not sniff, in order to
                 // provide a meaningful error if the input is not an AVI file.
                 if (sniff(input)) {
-                    input.skipFully( 12)
+                    input.skipFully(12)
                 } else {
-                    throw ParserException.createForMalformedContainer( 
-                        "AVI Header List not found",  null
+                    throw ParserException.createForMalformedContainer(
+                        "AVI Header List not found", null
                     )
                 }
                 state = STATE_READING_HDRL_HEADER
@@ -120,12 +120,12 @@ class AviExtractor(
             }
 
             STATE_READING_HDRL_HEADER -> {
-                input.readFully(scratch.data,  0,  12)
+                input.readFully(scratch.data, 0, 12)
                 scratch.setPosition(0)
                 chunkHeaderHolder.populateWithListHeaderFrom(scratch)
                 if (chunkHeaderHolder.listType != FOURCC_hdrl) {
-                    throw ParserException.createForMalformedContainer( 
-                        "hdrl expected, found: " + chunkHeaderHolder.listType,  
+                    throw ParserException.createForMalformedContainer(
+                        "hdrl expected, found: " + chunkHeaderHolder.listType,
                         null
                     )
                 }
@@ -138,7 +138,7 @@ class AviExtractor(
                 // hdrlSize includes the LIST type (hdrl), so we subtract 4 to the size.
                 val bytesToRead = hdrlSize - 4
                 val hdrlBody = ParsableByteArray(bytesToRead)
-                input.readFully(hdrlBody.data,  0, bytesToRead)
+                input.readFully(hdrlBody.data, 0, bytesToRead)
                 parseHdrlBody(hdrlBody)
                 state = STATE_FINDING_MOVI_HEADER
                 return Extractor.RESULT_CONTINUE
@@ -149,7 +149,7 @@ class AviExtractor(
                     pendingReposition = moviStart
                     return Extractor.RESULT_CONTINUE
                 }
-                input.peekFully(scratch.data,  0,  12)
+                input.peekFully(scratch.data, 0, 12)
                 input.resetPeekPosition()
                 scratch.setPosition(0)
                 chunkHeaderHolder.populateFrom(scratch)
@@ -186,7 +186,7 @@ class AviExtractor(
             }
 
             STATE_FINDING_IDX1_HEADER -> {
-                input.readFully(scratch.data,  0,  8)
+                input.readFully(scratch.data, 0, 8)
                 scratch.setPosition(0)
                 val idx1Fourcc = scratch.readLittleEndianInt()
                 val boxSize = scratch.readLittleEndianInt()
@@ -202,7 +202,7 @@ class AviExtractor(
 
             STATE_READING_IDX1_BODY -> {
                 val idx1Body = ParsableByteArray(idx1BodySize)
-                input.readFully(idx1Body.data,  0,  idx1BodySize)
+                input.readFully(idx1Body.data, 0, idx1BodySize)
                 parseIdx1Body(idx1Body)
                 state = STATE_READING_SAMPLES
                 pendingReposition = moviStart
@@ -238,7 +238,7 @@ class AviExtractor(
     }
 
     // Internal methods.
-    
+
     @Throws(IOException::class)
     private fun resolvePendingReposition(
         input: ExtractorInput,
@@ -266,14 +266,14 @@ class AviExtractor(
     private fun parseHdrlBody(hrdlBody: ParsableByteArray) {
         val headerList: ListChunk = ListChunk.parseFrom(FOURCC_hdrl, hrdlBody)
         if (headerList.type != FOURCC_hdrl) {
-            throw ParserException.createForMalformedContainer( 
-                "Unexpected header list type " + headerList.type,  null
+            throw ParserException.createForMalformedContainer(
+                "Unexpected header list type " + headerList.type, null
             )
         }
         val aviHeader = headerList.getChild<AviMainHeaderChunk>(AviMainHeaderChunk::class.java)
         if (aviHeader == null) {
-            throw ParserException.createForMalformedContainer( 
-                "AviHeader not found",  null
+            throw ParserException.createForMalformedContainer(
+                "AviHeader not found", null
             )
         }
         this.aviHeader = aviHeader
@@ -310,7 +310,7 @@ class AviExtractor(
                 continue
             }
             chunkReader.appendIndexChunk(
-                offset,  (flags and AVIIF_KEYFRAME) == AVIIF_KEYFRAME
+                offset, (flags and AVIIF_KEYFRAME) == AVIIF_KEYFRAME
             )
         }
         for (chunkReader in chunkReaders) {
@@ -363,7 +363,7 @@ class AviExtractor(
             }
         } else {
             alignInputToEvenPosition(input)
-            input.peekFully(scratch.data,  0, 12)
+            input.peekFully(scratch.data, 0, 12)
             scratch.setPosition(0)
             val chunkType = scratch.readLittleEndianInt()
             if (chunkType == FOURCC_LIST) {
@@ -408,20 +408,26 @@ class AviExtractor(
         }
         val durationUs = aviStreamHeaderChunk.durationUs
         val streamFormat = streamFormatChunk.format
-        val builder = streamFormat.buildUpon()
-        builder.setId(streamId)
         val suggestedBufferSize = aviStreamHeaderChunk.suggestedBufferSize
-        if (suggestedBufferSize != 0) {
-            builder.setMaxInputSize(suggestedBufferSize)
+        val bufSize = if (suggestedBufferSize != 0) {
+            suggestedBufferSize
+        } else {
+            streamFormat.maxInputSize
         }
         val streamName = streamList.getChild<StreamNameChunk>(StreamNameChunk::class.java)
-        if (streamName != null) {
-            builder.setLabel(streamName.name)
+        val name = if (streamName != null) {
+            streamName.name
+        } else {
+            streamFormat.label
         }
         val trackType = getTrackType(streamFormat.sampleMimeType)
         if (trackType == C.TRACK_TYPE_AUDIO || trackType == C.TRACK_TYPE_VIDEO) {
             val trackOutput = extractorOutput.track(streamId, trackType)
-            val format = builder.build()
+            val format = streamFormat.copy(
+                id = streamId.toString(),
+                maxInputSize = bufSize,
+                label = name,
+            )
             trackOutput!!.format(format)
             trackOutput.durationUs(durationUs)
             this.durationUs = max(this.durationUs, durationUs)
@@ -463,8 +469,8 @@ class AviExtractor(
         fun populateWithListHeaderFrom(headerBytes: ParsableByteArray) {
             populateFrom(headerBytes)
             if (chunkType != FOURCC_LIST) {
-                throw ParserException.createForMalformedContainer( 
-                    "LIST expected, found: " + chunkType,  null
+                throw ParserException.createForMalformedContainer(
+                    "LIST expected, found: " + chunkType, null
                 )
             }
             listType = headerBytes.readLittleEndianInt()

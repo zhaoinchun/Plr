@@ -397,10 +397,10 @@ class ClippingMediaPeriod(
                 // Clear gapless playback metadata if the start/end points don't match the media.
                 val encoderDelay = if (startUs != 0L) 0 else format.encoderDelay
                 val encoderPadding = if (endUs != C.TIME_END_OF_SOURCE) 0 else format.encoderPadding
-                formatHolder.format = format.buildUpon()
-                    .setEncoderDelay(encoderDelay)
-                    .setEncoderPadding(encoderPadding)
-                    .build()
+                formatHolder.format = format.copy(
+                    encoderDelay = encoderDelay,
+                    encoderPadding = encoderPadding
+                )
             }
         }
     }

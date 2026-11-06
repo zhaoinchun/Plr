@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor
 
 import androidx.annotation.IntDef
@@ -26,14 +25,14 @@ class SingleSampleExtractor(
 
     private var size = 0
     private var state: @State Int = 0
-    private var extractorOutput:ExtractorOutput? = null
-    private var trackOutput:TrackOutput? = null
+    private var extractorOutput: ExtractorOutput? = null
+    private var trackOutput: TrackOutput? = null
 
     @Throws(IOException::class)
     override fun sniff(input: ExtractorInput): Boolean {
         Preconditions.checkState(fileSignature != C.INDEX_UNSET && fileSignatureLength != C.LENGTH_UNSET)
         val scratch = ParsableByteArray(fileSignatureLength)
-        input.peekFully(scratch.data,  0, fileSignatureLength)
+        input.peekFully(scratch.data, 0, fileSignatureLength)
         return scratch.readUnsignedShort() == fileSignature
     }
 
@@ -71,12 +70,12 @@ class SingleSampleExtractor(
 
     @Throws(IOException::class)
     private fun readSegment(input: ExtractorInput) {
-        val result = trackOutput!!.sampleData(input, FIXED_READ_LENGTH,  true)
+        val result = trackOutput!!.sampleData(input, FIXED_READ_LENGTH, true)
         if (result == C.RESULT_END_OF_INPUT) {
             state = STATE_ENDED
             val flags: @BufferFlags Int = C.BUFFER_FLAG_KEY_FRAME
-            trackOutput!!.sampleMetadata( 
-                0, flags, size,  0,  null
+            trackOutput!!.sampleMetadata(
+                0, flags, size, 0, null
             )
             size = 0
         } else {
@@ -88,13 +87,13 @@ class SingleSampleExtractor(
     private fun outputImageTrackAndSeekMap(sampleMimeType: String?) {
         trackOutput = extractorOutput!!.track(IMAGE_TRACK_ID, C.TRACK_TYPE_IMAGE)
         trackOutput!!.format(
-            Format.Builder()
-                .setContainerMimeType(sampleMimeType)
-                .setSampleMimeType(sampleMimeType)
-                .build()
+            Format(
+                containerMimeType = sampleMimeType,
+                sampleMimeType = sampleMimeType
+            )
         )
         extractorOutput!!.endTracks()
-        extractorOutput!!.seekMap(SingleSampleSeekMap( C.TIME_UNSET))
+        extractorOutput!!.seekMap(SingleSampleSeekMap(C.TIME_UNSET))
         state = STATE_READING
     }
 

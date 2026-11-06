@@ -197,26 +197,22 @@ class H264Reader(
                             spsData.levelIdc
                         )
                     output!!.format(
-                        Format.Builder()
-                            .setId(formatId)
-                            .setContainerMimeType(containerMimeType)
-                            .setSampleMimeType(MimeTypes.VIDEO_H264)
-                            .setCodecs(codecs)
-                            .setWidth(spsData.width)
-                            .setHeight(spsData.height)
-                            .setColorInfo(
-                                ColorInfo.Builder()
-                                    .setColorSpace(spsData.colorSpace)
-                                    .setColorRange(spsData.colorRange)
-                                    .setColorTransfer(spsData.colorTransfer)
-                                    .setLumaBitdepth(spsData.bitDepthLumaMinus8 + 8)
-                                    .setChromaBitdepth(spsData.bitDepthChromaMinus8 + 8)
-                                    .build()
-                            )
-                            .setPixelWidthHeightRatio(spsData.pixelWidthHeightRatio)
-                            .setInitializationData(initializationData)
-                            .setMaxNumReorderSamples(spsData.maxNumReorderFrames)
-                            .build()
+                        Format(id=formatId,
+                            containerMimeType=containerMimeType,
+                            sampleMimeType =MimeTypes.VIDEO_H264,
+                            codecs = codecs,
+                            width = spsData.width,
+                            height = spsData.height,
+                            colorInfo = ColorInfo.Builder()
+                                .setColorSpace(spsData.colorSpace)
+                                .setColorRange(spsData.colorRange)
+                                .setColorTransfer(spsData.colorTransfer)
+                                .setLumaBitdepth(spsData.bitDepthLumaMinus8 + 8)
+                                .setChromaBitdepth(spsData.bitDepthChromaMinus8 + 8)
+                                .build(),
+                            pixelWidthHeightRatio = spsData.pixelWidthHeightRatio,
+                            initializationData = initializationData,
+                            maxNumReorderSamples = spsData.maxNumReorderFrames)
                     )
                     hasOutputFormat = true
                     seiReader.setReorderingQueueSize(spsData.maxNumReorderFrames)

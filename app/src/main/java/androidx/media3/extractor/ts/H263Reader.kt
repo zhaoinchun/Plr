@@ -433,15 +433,13 @@ class H263Reader internal constructor(
             val videoObjectLayerHeight = buffer.readBits(13)
             buffer.skipBit() // marker_bit
             buffer.skipBit() // interlaced
-            return Format.Builder()
-                .setId(formatId)
-                .setContainerMimeType(containerMimeType)
-                .setSampleMimeType(MimeTypes.VIDEO_MP4V)
-                .setWidth(videoObjectLayerWidth)
-                .setHeight(videoObjectLayerHeight)
-                .setPixelWidthHeightRatio(pixelWidthHeightRatio)
-                .setInitializationData(mutableListOf<ByteArray>(csdData))
-                .build()
+            return Format(id=formatId,
+                containerMimeType=containerMimeType,
+                sampleMimeType = MimeTypes.VIDEO_MP4V,
+                width = videoObjectLayerWidth,
+                height = videoObjectLayerHeight,
+                pixelWidthHeightRatio = pixelWidthHeightRatio,
+                initializationData = mutableListOf(csdData))
         }
     }
 }

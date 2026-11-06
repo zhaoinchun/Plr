@@ -337,20 +337,21 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         nextBufferToWritePresentationTimeUs = C.TIME_UNSET
 
         if (audioTrackNeedsConfigure) {
+            val inputFormat = inputFormat!!
             val outputFormat =
                 getOutputFormat(decoder)!!
-                    .buildUpon()
-                    .setEncoderDelay(encoderDelay)
-                    .setEncoderPadding(encoderPadding)
-                    .setMetadata(inputFormat!!.metadata)
-                    .setCustomData(inputFormat!!.customData)
-                    .setId(inputFormat!!.id)
-                    .setLabel(inputFormat!!.label)
-                    .setLabels(inputFormat!!.labels)
-                    .setLanguage(inputFormat!!.language)
-                    .setSelectionFlags(inputFormat!!.selectionFlags)
-                    .setRoleFlags(inputFormat!!.roleFlags)
-                    .build()
+                    .copy(
+                        encoderDelay = encoderDelay,
+                        encoderPadding = encoderPadding,
+                        metadata = inputFormat.metadata,
+                        customData = inputFormat.customData,
+                        id = inputFormat.id,
+                        label = inputFormat.label,
+                        labels = inputFormat.labels,
+                        language = inputFormat.language,
+                        selectionFlags = inputFormat.selectionFlags,
+                        roleFlags = inputFormat.roleFlags,
+                    )
             audioSink.configure(
                 AudioSinkConfig(
                     outputFormat,

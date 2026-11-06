@@ -480,23 +480,23 @@ class MediaCodecAudioRenderer constructor(
                 }
             }
             audioSinkInputFormat =
-                Format.Builder()
-                    .setSampleMimeType(MimeTypes.AUDIO_RAW)
-                    .setPcmEncoding(pcmEncoding)
-                    .setEncoderDelay(format.encoderDelay)
-                    .setEncoderPadding(format.encoderPadding)
-                    .setMetadata(format.metadata)
-                    .setCustomData(format.customData)
-                    .setId(format.id)
-                    .setLabel(format.label)
-                    .setLabels(format.labels)
-                    .setLanguage(format.language)
-                    .setSelectionFlags(format.selectionFlags)
-                    .setRoleFlags(format.roleFlags)
-                    .setChannelCount(channelCount)
-                    .setChannelMask(channelMask)
-                    .setSampleRate(mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE))
-                    .build()
+                Format(
+                    sampleMimeType = MimeTypes.AUDIO_RAW,
+                    pcmEncoding = pcmEncoding,
+                    encoderDelay = format.encoderDelay,
+                    encoderPadding = format.encoderPadding,
+                    metadata = format.metadata,
+                    customData = format.customData,
+                    id = format.id,
+                    label = format.label,
+                    labels = format.labels,
+                    language = format.language,
+                    selectionFlags = format.selectionFlags,
+                    roleFlags = format.roleFlags,
+                    channelCount = channelCount,
+                    channelMask = channelMask,
+                    sampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
+                )
             if (codecNeedsDiscardChannelsWorkaround
                 && audioSinkInputFormat.channelCount == 6 && format.channelCount < 6
             ) {

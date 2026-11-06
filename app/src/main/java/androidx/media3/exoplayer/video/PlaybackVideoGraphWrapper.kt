@@ -94,7 +94,7 @@ class PlaybackVideoGraphWrapper(
         C.TIME_UNSET
     private var pendingStreamChanges: TimedValueQueue<StreamChangeInfo?> =
         TimedValueQueue<StreamChangeInfo?>()
-    private var videoGraphOutputFormat: Format = Format.Builder().build()
+    private var videoGraphOutputFormat: Format = Format()
     private var compositorSettings: VideoCompositorSettings = VideoCompositorSettings.DEFAULT
     private var compositionEffects: List<Effect> = listOf<Effect>()
     private var handler: HandlerWrapper? = null
@@ -111,7 +111,8 @@ class PlaybackVideoGraphWrapper(
     private var hasSignaledEndOfVideoGraphOutputStream = false
     private var totalVideoInputCount: Int = C.LENGTH_UNSET
     private var registeredVideoInputCount = 0
-    var videoGraphFactory: VideoGraph.Factory = videoGraphFactory?:ReflectiveSingleInputVideoGraphFactory(enableReplayableCache)
+    var videoGraphFactory: VideoGraph.Factory =
+        videoGraphFactory ?: ReflectiveSingleInputVideoGraphFactory(enableReplayableCache)
 
     fun addListener(listener: Listener?) {
         listeners.add(listener)
@@ -212,12 +213,12 @@ class PlaybackVideoGraphWrapper(
     override fun onOutputSizeChanged(width: Int, height: Int) {
         // We forward output size changes to the sink even if we are still flushing.
         videoGraphOutputFormat =
-            videoGraphOutputFormat.buildUpon().setWidth(width).setHeight(height).build()
+            videoGraphOutputFormat.copy(width = width, height = height)
         onOutputStreamChanged()
     }
 
     override fun onOutputFrameRateChanged(frameRate: Float) {
-        videoGraphOutputFormat = videoGraphOutputFormat.buildUpon().setFrameRate(frameRate).build()
+        videoGraphOutputFormat = videoGraphOutputFormat.copy(frameRate = frameRate)
         onOutputStreamChanged()
     }
 
@@ -833,10 +834,7 @@ class PlaybackVideoGraphWrapper(
         // Private methods
         fun registerInputStream(inputFormat: Format) {
             val adjustedInputFormat =
-                inputFormat
-                    .buildUpon()
-                    .setColorInfo(getAdjustedInputColorInfo(inputFormat.colorInfo))
-                    .build()
+                inputFormat.copy(colorInfo = getAdjustedInputColorInfo(inputFormat.colorInfo))
             val videoGraphInputType: @VideoFrameProcessor.InputType Int =
                 if (inputType == VideoSink.INPUT_TYPE_SURFACE)
                     VideoFrameProcessor.INPUT_TYPE_SURFACE

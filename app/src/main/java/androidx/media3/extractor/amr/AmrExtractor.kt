@@ -25,7 +25,7 @@ import java.io.EOFException
 import java.io.IOException
 import kotlin.math.abs
 
-class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
+class AmrExtractor constructor(flags: @Flags Int = 0) : Extractor {
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
@@ -48,10 +48,10 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
     private var numSamplesWithSameSize = 0
     private var timeOffsetUs: Long = 0
 
-    private var extractorOutput:ExtractorOutput? = null
-    private var realTrackOutput:TrackOutput? = null
+    private var extractorOutput: ExtractorOutput? = null
+    private var realTrackOutput: TrackOutput? = null
     private var currentTrackOutput: TrackOutput // skippingTrackOutput or realTrackOutput.
-    private var seekMap:SeekMap? = null
+    private var seekMap: SeekMap? = null
     private var isSeekInProgress = false
     private var seekTimeUs: Long = 0
     private var hasOutputFormat = false
@@ -76,7 +76,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
 
     override fun init(output: ExtractorOutput) {
         extractorOutput = output
-        realTrackOutput = output.track( 0, C.TRACK_TYPE_AUDIO)
+        realTrackOutput = output.track(0, C.TRACK_TYPE_AUDIO)
         currentTrackOutput = realTrackOutput!!
         output.endTracks()
     }
@@ -87,7 +87,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
         if (input.position == 0L) {
             if (!readAmrHeader(input)) {
                 throw ParserException.createForMalformedContainer(
-                    "Could not find AMR header.",  null
+                    "Could not find AMR header.", null
                 )
             }
         }
@@ -152,13 +152,13 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
             val maxInputSize: Int =
                 if (isWideBand) frameSizeBytesByTypeWb[8] else frameSizeBytesByTypeNb[7]
             realTrackOutput!!.format(
-                Format.Builder()
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(sampleMimeType)
-                    .setMaxInputSize(maxInputSize)
-                    .setChannelCount(1)
-                    .setSampleRate(sampleRate)
-                    .build()
+                Format(
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = sampleMimeType,
+                    maxInputSize = maxInputSize,
+                    channelCount = 1,
+                    sampleRate = sampleRate
+                )
             )
         }
     }
@@ -188,7 +188,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
                     timeOffsetUs + currentSampleTimeUs + SAMPLE_TIME_PER_FRAME_US
                 val nextSamplePosition = extractorInput.position + currentSampleSize
                 if (!indexSeekMap.isTimeUsInIndex(
-                        nextSampleTimeUs,  C.MICROS_PER_SECOND / 10
+                        nextSampleTimeUs, C.MICROS_PER_SECOND / 10
                     )
                 ) {
                     indexSeekMap.addSeekPoint(nextSampleTimeUs, nextSamplePosition)
@@ -202,7 +202,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
 
         val bytesAppended =
             currentTrackOutput.sampleData(
-                extractorInput, currentSampleBytesRemaining,  true
+                extractorInput, currentSampleBytesRemaining, true
             )
         if (bytesAppended == C.RESULT_END_OF_INPUT) {
             return Extractor.RESULT_END_OF_INPUT
@@ -215,8 +215,8 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
         currentTrackOutput.sampleMetadata(
             timeOffsetUs + currentSampleTimeUs,
             C.BUFFER_FLAG_KEY_FRAME,
-            currentSampleSize,  
-            0,  
+            currentSampleSize,
+            0,
             null
         )
         currentSampleTimeUs += SAMPLE_TIME_PER_FRAME_US.toLong()
@@ -226,14 +226,14 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
     @Throws(IOException::class)
     private fun peekNextSampleSize(extractorInput: ExtractorInput): Int {
         extractorInput.resetPeekPosition()
-        extractorInput.peekFully(scratch,  0,  1)
+        extractorInput.peekFully(scratch, 0, 1)
 
         val frameHeader = scratch[0]
         if ((frameHeader.toInt() and 0x83) > 0) {
             // The padding bits are at bit-1 positions in the following pattern: 1000 0011
             // Padding bits must be 0.
             throw ParserException.createForMalformedContainer(
-                "Invalid padding bits for frame header " + frameHeader,  null
+                "Invalid padding bits for frame header " + frameHeader, null
             )
         }
 
@@ -245,7 +245,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
     private fun getFrameSizeInBytes(frameType: Int): Int {
         if (!isValidFrameType(frameType)) {
             throw ParserException.createForMalformedContainer(
-                "Illegal AMR " + (if (isWideBand) "WB" else "NB") + " frame type " + frameType,  
+                "Illegal AMR " + (if (isWideBand) "WB" else "NB") + " frame type " + frameType,
                 null
             )
         }
@@ -322,7 +322,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
     }
 
     companion object {
-        val FACTORY: ExtractorsFactory = object :ExtractorsFactory {
+        val FACTORY: ExtractorsFactory = object : ExtractorsFactory {
             override fun createExtractors(): Array<Extractor> {
                 return arrayOf<Extractor>(AmrExtractor())
             }
@@ -330,7 +330,7 @@ class AmrExtractor  constructor(flags: @Flags Int = 0) : Extractor {
 
         const val FLAG_ENABLE_CONSTANT_BITRATE_SEEKING: Int = 1
 
-        const  val FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS: Int = 1 shl 1
+        const val FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS: Int = 1 shl 1
         const val FLAG_ENABLE_INDEX_SEEKING: Int = 1 shl 2
         private val frameSizeBytesByTypeNb = intArrayOf(
             13,

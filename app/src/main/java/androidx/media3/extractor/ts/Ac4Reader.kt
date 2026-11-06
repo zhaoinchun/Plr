@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.annotation.IntDef
@@ -38,8 +37,8 @@ class Ac4Reader(
     private val roleFlags: @RoleFlags Int
     private val containerMimeType: String?
 
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
 
     private var state: @State Int
     private var bytesRead: Int
@@ -50,13 +49,13 @@ class Ac4Reader(
 
     // Used when parsing the header.
     private var sampleDurationUs: Long = 0
-    private var format:Format? = null
+    private var format: Format? = null
     private var sampleSize = 0
 
     // Used when reading the samples.
     private var timeUs: Long
 
-    constructor(containerMimeType: String?) : this(null,  0, containerMimeType)
+    constructor(containerMimeType: String?) : this(null, 0, containerMimeType)
 
     init {
         headerScratchBits = ParsableBitArray(ByteArray(Ac4Util.HEADER_SIZE_FOR_PARSER))
@@ -91,7 +90,7 @@ class Ac4Reader(
 
     override fun consume(data: ParsableByteArray) {
         // Asserts that createTracks has been called.
-       val output= output!!
+        val output = output!!
         while (data.bytesLeft() > 0) {
             when (state) {
                 STATE_FINDING_SYNC -> if (skipToNextSync(data)) {
@@ -166,19 +165,18 @@ class Ac4Reader(
 
     @RequiresNonNull("output")
     private fun parseHeader() {
-        headerScratchBits.position=(0)
+        headerScratchBits.position = (0)
         val frameInfo = parseAc4SyncframeInfo(headerScratchBits)
         if (format == null || frameInfo.channelCount != format!!.channelCount || frameInfo.sampleRate != format!!.sampleRate || (MimeTypes.AUDIO_AC4 != format!!.sampleMimeType)) {
             format =
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(MimeTypes.AUDIO_AC4)
-                    .setChannelCount(frameInfo.channelCount)
-                    .setSampleRate(frameInfo.sampleRate)
-                    .setLanguage(language)
-                    .setRoleFlags(roleFlags)
-                    .build()
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = MimeTypes.AUDIO_AC4,
+                    channelCount = frameInfo.sampleRate,
+                    language = language,
+                    roleFlags = roleFlags
+                )
             output!!.format(format!!)
         }
         sampleSize = frameInfo.frameSize

@@ -55,17 +55,15 @@ class MediaParserChunkExtractor @SuppressLint("WrongConstant") constructor(
         override fun getOutputTextFormat(sourceFormat: Format): Format {
             if (parseSubtitlesDuringExtraction && subtitleParserFactory.supportsFormat(sourceFormat)) {
                 return sourceFormat
-                    .buildUpon()
-                    .setSampleMimeType(MimeTypes.APPLICATION_MEDIA3_CUES)
-                    .setCueReplacementBehavior(
-                        subtitleParserFactory.getCueReplacementBehavior(sourceFormat)
+                    .copy(
+                        sampleMimeType = MimeTypes.APPLICATION_MEDIA3_CUES,
+                        cueReplacementBehavior = subtitleParserFactory.getCueReplacementBehavior(
+                            sourceFormat
+                        ),
+                        codecs = sourceFormat.sampleMimeType
+                                + (if (sourceFormat.codecs != null) " " + sourceFormat.codecs else ""),
+                        subsampleOffsetUs = Format.OFFSET_SAMPLE_RELATIVE
                     )
-                    .setCodecs(
-                        sourceFormat.sampleMimeType
-                                + (if (sourceFormat.codecs != null) " " + sourceFormat.codecs else "")
-                    )
-                    .setSubsampleOffsetUs(Format.OFFSET_SAMPLE_RELATIVE)
-                    .build()
             } else {
                 return sourceFormat
             }

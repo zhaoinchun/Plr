@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -37,9 +36,9 @@ class AdtsReader(
     private val roleFlags: @RoleFlags Int
     private val containerMimeType: String?
 
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
-    private var id3Output:TrackOutput? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
+    private var id3Output: TrackOutput? = null
 
     private var state = 0
     private var bytesRead = 0
@@ -65,12 +64,12 @@ class AdtsReader(
     // Used when reading the samples.
     private var timeUs: Long
 
-    private var currentOutput:TrackOutput? = null
+    private var currentOutput: TrackOutput? = null
     private var currentSampleDuration: Long = 0
 
     constructor(exposeId3: Boolean, containerMimeType: String?) : this(
         exposeId3,
-        null,  
+        null,
         0,
         containerMimeType
     )
@@ -103,11 +102,11 @@ class AdtsReader(
             idGenerator.generateNewId()
             id3Output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_METADATA)
             id3Output!!.format(
-                Format.Builder()
-                    .setId(idGenerator.getFormatId())
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(MimeTypes.APPLICATION_ID3)
-                    .build()
+                Format(
+                    id = idGenerator.getFormatId(),
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = MimeTypes.APPLICATION_ID3
+                )
             )
         } else {
             id3Output = DiscardingTrackOutput()
@@ -204,7 +203,7 @@ class AdtsReader(
             val data = adtsData[position++].toInt() and 0xFF
             if (matchState == MATCH_STATE_FF && isAdtsSyncBytes(0xFF.toByte(), data.toByte())) {
                 if (foundFirstFrame
-                    || checkSyncPositionValid(pesBuffer,  position - 2)
+                    || checkSyncPositionValid(pesBuffer, position - 2)
                 ) {
                     currentFrameVersion = (data and 0x8) shr 3
                     hasCrc = (data and 0x1) == 0
@@ -247,7 +246,7 @@ class AdtsReader(
         // Peek the next byte of buffer into scratch array.
         adtsScratch.data[0] = buffer.data[buffer.getPosition()]
 
-        adtsScratch.position=(2)
+        adtsScratch.position = (2)
         val currentFrameSampleRateIndex = adtsScratch.readBits(4)
         if (firstFrameSampleRateIndex != C.INDEX_UNSET
             && currentFrameSampleRateIndex != firstFrameSampleRateIndex
@@ -275,7 +274,7 @@ class AdtsReader(
         }
 
         // The MPEG version of this frame must match the previously detected version.
-        adtsScratch.position=(4)
+        adtsScratch.position = (4)
         val currentFrameVersion = adtsScratch.readBits(1)
         if (firstFrameVersion != VERSION_UNSET && currentFrameVersion != firstFrameVersion) {
             return false
@@ -287,7 +286,7 @@ class AdtsReader(
                 // Insufficient data for further checks.
                 return true
             }
-            adtsScratch.position=(2)
+            adtsScratch.position = (2)
             val currentFrameSampleRateIndex = adtsScratch.readBits(4)
             if (currentFrameSampleRateIndex != firstFrameSampleRateIndex) {
                 return false
@@ -300,7 +299,7 @@ class AdtsReader(
             // Insufficient data for further checks.
             return true
         }
-        adtsScratch.position=(14)
+        adtsScratch.position = (14)
         val frameSize = adtsScratch.readBits(13)
         if (frameSize < 7) {
             return false
@@ -350,7 +349,7 @@ class AdtsReader(
         if (source.bytesLeft() < targetLength) {
             return false
         }
-        source.readBytes(target,  0, targetLength)
+        source.readBytes(target, 0, targetLength)
         return true
     }
 
@@ -366,7 +365,7 @@ class AdtsReader(
     @RequiresNonNull("output")
     @Throws(ParserException::class)
     private fun parseAdtsHeader() {
-        adtsScratch.position=(0)
+        adtsScratch.position = (0)
 
         if (!hasOutputFormat) {
             var audioObjectType = adtsScratch.readBits(2) + 1
@@ -393,17 +392,17 @@ class AdtsReader(
                 )
             val aacConfig = parseAudioSpecificConfig(audioSpecificConfig)
             val format =
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(MimeTypes.AUDIO_AAC)
-                    .setCodecs(aacConfig.codecs)
-                    .setChannelCount(aacConfig.channelCount)
-                    .setSampleRate(aacConfig.sampleRateHz)
-                    .setInitializationData(mutableListOf<ByteArray>(audioSpecificConfig))
-                    .setLanguage(language)
-                    .setRoleFlags(roleFlags)
-                    .build()
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = MimeTypes.AUDIO_AAC,
+                    codecs = aacConfig.codecs,
+                    channelCount = aacConfig.channelCount,
+                    sampleRate = aacConfig.sampleRateHz,
+                    initializationData = mutableListOf<ByteArray>(audioSpecificConfig),
+                    language = language,
+                    roleFlags = roleFlags
+                )
             // In this class a sample is an access unit, but the MediaFormat sample rate specifies the
             // number of PCM audio samples per second.
             sampleDurationUs = (C.MICROS_PER_SECOND * 1024) / format.sampleRate
@@ -414,7 +413,7 @@ class AdtsReader(
         }
 
         adtsScratch.skipBits(4)
-        var sampleSize: Int = adtsScratch.readBits(13) - 2  - HEADER_SIZE
+        var sampleSize: Int = adtsScratch.readBits(13) - 2 - HEADER_SIZE
         if (hasCrc) {
             sampleSize -= CRC_SIZE
         }

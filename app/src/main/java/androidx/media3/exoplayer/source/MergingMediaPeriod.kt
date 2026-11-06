@@ -21,10 +21,12 @@ internal class MergingMediaPeriod(
     private val periods: Array<MediaPeriod>
 ) : MediaPeriod, MediaPeriod.Callback {
     private val periodsWithTimeOffsets: BooleanArray = BooleanArray(periods.size)
-    private val streamPeriodIndices: IdentityHashMap<SampleStream, Int> = IdentityHashMap<SampleStream, Int>()
+    private val streamPeriodIndices: IdentityHashMap<SampleStream, Int> =
+        IdentityHashMap<SampleStream, Int>()
     private val childrenPendingPreparation: ArrayList<MediaPeriod> = ArrayList()
     private val childTrackGroupByMergedTrackGroup: HashMap<TrackGroup, TrackGroup> = HashMap()
-    private var compositeSequenceableLoader: SequenceableLoader=compositeSequenceableLoaderFactory.empty()
+    private var compositeSequenceableLoader: SequenceableLoader =
+        compositeSequenceableLoaderFactory.empty()
 
     private var callback: MediaPeriod.Callback? = null
     private var _trackGroups: TrackGroupArray? = null
@@ -102,9 +104,9 @@ internal class MergingMediaPeriod(
             for (j in selections.indices) {
                 childStreams[j] = if (streamChildIndices[j] == i) streams[j] else null
                 if (selectionChildIndices[j] == i) {
-                    val mergedTrackSelection =selections[j]!!
+                    val mergedTrackSelection = selections[j]!!
                     val mergedTrackGroup = mergedTrackSelection.trackGroup
-                    val childTrackGroup =childTrackGroupByMergedTrackGroup[mergedTrackGroup]!!
+                    val childTrackGroup = childTrackGroupByMergedTrackGroup[mergedTrackGroup]!!
                     childSelections[j] =
                         MergingMediaPeriodTrackSelection(mergedTrackSelection, childTrackGroup)
                 } else {
@@ -126,7 +128,7 @@ internal class MergingMediaPeriod(
             for (j in selections.indices) {
                 if (selectionChildIndices[j] == i) {
                     // Assert that the child provided a stream for the selection.
-                    val childStream =childStreams[j]!!
+                    val childStream = childStreams[j]!!
                     newStreams[j] = childStreams[j]
                     periodEnabled = true
                     streamPeriodIndices[childStream] = i
@@ -260,17 +262,14 @@ internal class MergingMediaPeriod(
                 val childTrackGroup = periodTrackGroups.get(j)
                 val mergedFormats = Array(childTrackGroup.length) {
                     val originalFormat = childTrackGroup.getFormat(it)
-                    val mergedFormatBuilder = originalFormat.buildUpon()
-                    mergedFormatBuilder.setId(i.toString() + ":" + (originalFormat.id ?: ""))
-                    if (originalFormat.primaryTrackGroupId != null) {
-                        mergedFormatBuilder.setPrimaryTrackGroupId(
-                            i.toString() + ":" + originalFormat.primaryTrackGroupId
-                        )
-                    }
-                    mergedFormatBuilder.build()
+                    originalFormat.copy(
+                        id = i.toString() + ":" + (originalFormat.id ?: ""),
+                        primaryTrackGroupId = originalFormat.primaryTrackGroupId?.let { "$i:$it" }
+                    )
                 }
                 val mergedTrackGroup =
-                    TrackGroup( i.toString() + ":" + childTrackGroup.id,
+                    TrackGroup(
+                        i.toString() + ":" + childTrackGroup.id,
                         mergedFormats.toList()
                     )
                 childTrackGroupByMergedTrackGroup[mergedTrackGroup] = childTrackGroup

@@ -360,29 +360,25 @@ class H265Reader(private val seiReader: SeiReader, private val containerMimeType
                         spsData.profileTierLevel.generalLevelIdc
                     )
             }
-            return Format.Builder()
-                .setId(formatId)
-                .setContainerMimeType(containerMimeType)
-                .setSampleMimeType(MimeTypes.VIDEO_H265)
-                .setCodecs(codecs)
-                .setWidth(spsData.width)
-                .setHeight(spsData.height)
-                .setDecodedWidth(spsData.decodedWidth)
-                .setDecodedHeight(spsData.decodedHeight)
-                .setColorInfo(
-                    ColorInfo.Builder()
-                        .setColorSpace(spsData.colorSpace)
-                        .setColorRange(spsData.colorRange)
-                        .setColorTransfer(spsData.colorTransfer)
-                        .setLumaBitdepth(spsData.bitDepthLumaMinus8 + 8)
-                        .setChromaBitdepth(spsData.bitDepthChromaMinus8 + 8)
-                        .build()
-                )
-                .setPixelWidthHeightRatio(spsData.pixelWidthHeightRatio)
-                .setMaxNumReorderSamples(spsData.maxNumReorderPics)
-                .setMaxSubLayers(spsData.maxSubLayersMinus1 + 1)
-                .setInitializationData(mutableListOf(csdData))
-                .build()
+            return Format(id=formatId,
+                containerMimeType=containerMimeType,
+                sampleMimeType =MimeTypes.VIDEO_H265,
+                codecs = codecs,
+                width = spsData.width,
+                height = spsData.height,
+                decodedWidth = spsData.decodedWidth,
+                decodedHeight = spsData.decodedHeight,
+                colorInfo =         ColorInfo.Builder()
+                    .setColorSpace(spsData.colorSpace)
+                    .setColorRange(spsData.colorRange)
+                    .setColorTransfer(spsData.colorTransfer)
+                    .setLumaBitdepth(spsData.bitDepthLumaMinus8 + 8)
+                    .setChromaBitdepth(spsData.bitDepthChromaMinus8 + 8)
+                    .build(),
+                pixelWidthHeightRatio = spsData.pixelWidthHeightRatio,
+                maxNumReorderSamples = spsData.maxNumReorderPics,
+                maxSubLayers = spsData.maxSubLayersMinus1+1,
+                initializationData = mutableListOf(csdData))
         }
     }
 }

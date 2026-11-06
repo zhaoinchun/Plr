@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import android.util.SparseArray
@@ -14,7 +13,7 @@ class DefaultTsPayloadReaderFactory(
     private val flags: @Flags Int = 0,
     private val closedCaptionFormats: List<Format> = mutableListOf()
 ) : TsPayloadReader.Factory {
-  
+
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
@@ -128,8 +127,8 @@ class DefaultTsPayloadReaderFactory(
                 null
             else
                 SectionReader(
-                    PassthroughSectionPayloadReader( 
-                        MimeTypes.APPLICATION_SCTE35,  
+                    PassthroughSectionPayloadReader(
+                        MimeTypes.APPLICATION_SCTE35,
                         MimeTypes.VIDEO_MP2T
                     )
                 )
@@ -143,8 +142,8 @@ class DefaultTsPayloadReaderFactory(
             )
 
             TsExtractor.TS_STREAM_TYPE_AIT -> return SectionReader(
-                PassthroughSectionPayloadReader( 
-                    MimeTypes.APPLICATION_AIT,  
+                PassthroughSectionPayloadReader(
+                    MimeTypes.APPLICATION_AIT,
                     MimeTypes.VIDEO_MP2T
                 )
             )
@@ -153,6 +152,7 @@ class DefaultTsPayloadReaderFactory(
             else -> return null
         }
     }
+
     private fun buildSeiReader(esInfo: EsInfo): SeiReader {
         return SeiReader(getClosedCaptionFormats(esInfo), MimeTypes.VIDEO_MP2T)
     }
@@ -203,12 +203,12 @@ class DefaultTsPayloadReaderFactory(
                     }
 
                     closedCaptionFormats.add(
-                        Format.Builder()
-                            .setSampleMimeType(mimeType)
-                            .setLanguage(language)
-                            .setAccessibilityChannel(accessibilityChannel)
-                            .setInitializationData(initializationData)
-                            .build()
+                        Format(
+                            sampleMimeType = mimeType,
+                            language = language,
+                            accessibilityChannel = accessibilityChannel,
+                            initializationData = initializationData ?: listOf()
+                        )
                     )
                 }
             } else {
@@ -226,12 +226,12 @@ class DefaultTsPayloadReaderFactory(
 
     companion object {
         const val FLAG_ALLOW_NON_IDR_KEYFRAMES: Int = 1
-        const  val FLAG_IGNORE_AAC_STREAM: Int = 1 shl 1
-        const  val FLAG_IGNORE_H264_STREAM: Int = 1 shl 2
-        const  val FLAG_DETECT_ACCESS_UNITS: Int = 1 shl 3
-        const  val FLAG_IGNORE_SPLICE_INFO_STREAM: Int = 1 shl 4
-        const  val FLAG_OVERRIDE_CAPTION_DESCRIPTORS: Int = 1 shl 5
-        const  val FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS: Int = 1 shl 6
+        const val FLAG_IGNORE_AAC_STREAM: Int = 1 shl 1
+        const val FLAG_IGNORE_H264_STREAM: Int = 1 shl 2
+        const val FLAG_DETECT_ACCESS_UNITS: Int = 1 shl 3
+        const val FLAG_IGNORE_SPLICE_INFO_STREAM: Int = 1 shl 4
+        const val FLAG_OVERRIDE_CAPTION_DESCRIPTORS: Int = 1 shl 5
+        const val FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS: Int = 1 shl 6
 
         private const val DESCRIPTOR_TAG_CAPTION_SERVICE = 0x86
     }

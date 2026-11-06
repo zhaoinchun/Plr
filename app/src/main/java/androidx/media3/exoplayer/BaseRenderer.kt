@@ -337,11 +337,7 @@ abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer
         } else if (result == C.RESULT_FORMAT_READ) {
             var format = formatHolder.format!!
             if (format.subsampleOffsetUs != Format.OFFSET_SAMPLE_RELATIVE) {
-                format =
-                    format
-                        .buildUpon()
-                        .setSubsampleOffsetUs(format.subsampleOffsetUs + streamOffsetUs)
-                        .build()
+                format = format.copy(subsampleOffsetUs = format.subsampleOffsetUs + streamOffsetUs)
                 formatHolder.format = format
             }
         }

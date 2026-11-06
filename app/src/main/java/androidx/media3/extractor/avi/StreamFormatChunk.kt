@@ -39,9 +39,11 @@ internal class StreamFormatChunk(val format: Format) : AviChunk {
                 w(TAG, "Ignoring track with unsupported compression " + compression)
                 return null
             }
-            val formatBuilder = Format.Builder()
-            formatBuilder.setWidth(width).setHeight(height).setSampleMimeType(mimeType)
-            return StreamFormatChunk(formatBuilder.build())
+            val formatBuilder = Format(
+                width = width, height = height,
+                sampleMimeType = mimeType
+            )
+            return StreamFormatChunk(formatBuilder)
         }
 
         // Syntax defined by the WAVEFORMATEX structure. See
@@ -59,20 +61,26 @@ internal class StreamFormatChunk(val format: Format) : AviChunk {
             val bitsPerSample = body.readLittleEndianUnsignedShort()
             val pcmEncoding = getPcmEncoding(bitsPerSample)
             val cbSize = if (body.bytesLeft() > 0) body.readLittleEndianUnsignedShort() else 0
-            val formatBuilder = Format.Builder()
-            formatBuilder
-                .setSampleMimeType(mimeType)
-                .setChannelCount(channelCount)
-                .setSampleRate(samplesPerSecond)
-            if (mimeType == MimeTypes.AUDIO_RAW && pcmEncoding != C.ENCODING_INVALID) {
-                formatBuilder.setPcmEncoding(pcmEncoding)
-            }
-            if (mimeType == MimeTypes.AUDIO_AAC && cbSize > 0) {
+
+            val pcm = if (mimeType == MimeTypes.AUDIO_RAW && pcmEncoding != C.ENCODING_INVALID) {
+                pcmEncoding
+            } else Format.NO_VALUE
+
+            val initData = if (mimeType == MimeTypes.AUDIO_AAC && cbSize > 0) {
                 val codecData = ByteArray(cbSize)
-                body.readBytes(codecData,  0, codecData.size)
-                formatBuilder.setInitializationData(listOf(codecData))
+                body.readBytes(codecData, 0, codecData.size)
+                listOf(codecData)
+            } else {
+                listOf()
             }
-            return StreamFormatChunk(formatBuilder.build())
+            val formatBuilder = Format(
+                sampleMimeType = mimeType,
+                channelCount = channelCount,
+                sampleRate = samplesPerSecond,
+                pcmEncoding = pcm,
+                initializationData = initData
+            )
+            return StreamFormatChunk(formatBuilder)
         }
 
         private fun getMimeTypeFromTag(tag: Int): String? {

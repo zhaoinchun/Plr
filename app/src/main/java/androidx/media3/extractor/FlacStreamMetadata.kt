@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor
 
 import androidx.annotation.VisibleForTesting
@@ -13,11 +12,11 @@ import androidx.media3.common.util.Util.getPcmEncoding
 import androidx.media3.extractor.metadata.flac.PictureFrame
 
 class FlacStreamMetadata {
-    
+
     class SeekTable(
-      
-       val pointSampleNumbers: LongArray?,
-      
+
+        val pointSampleNumbers: LongArray?,
+
         val pointOffsets: LongArray?
     )
 
@@ -47,7 +46,7 @@ class FlacStreamMetadata {
 
     constructor(data: ByteArray, offset: Int) {
         val scratch = ParsableBitArray(data)
-        scratch.position=(offset * 8)
+        scratch.position = (offset * 8)
         minBlockSizeSamples = scratch.readBits(16)
         maxBlockSizeSamples = scratch.readBits(16)
         minFrameSize = scratch.readBits(24)
@@ -82,7 +81,7 @@ class FlacStreamMetadata {
         sampleRate,
         channels,
         bitsPerSample,
-        totalSamples,  
+        totalSamples,
         null,
         concatenateVorbisMetadata(vorbisComments, pictureFrames)
     )
@@ -115,24 +114,20 @@ class FlacStreamMetadata {
     }
 
     val maxDecodedFrameSize: Int
-        
         get() = maxBlockSizeSamples * channels * (bitsPerSample / 8)
 
     val decodedBitrate: Int
-        
         get() = bitsPerSample * sampleRate * channels
 
     val durationUs: Long
-        
         get() = if (totalSamples == 0L) C.TIME_UNSET else totalSamples * C.MICROS_PER_SECOND / sampleRate
 
     fun getSampleNumber(timeUs: Long): Long {
         val sampleNumber = (timeUs * sampleRate) / C.MICROS_PER_SECOND
-        return constrainValue(sampleNumber,  0, totalSamples - 1)
+        return constrainValue(sampleNumber, 0, totalSamples - 1)
     }
 
     val approxBytesPerFrame: Long
-        
         get() {
             val approxBytesPerFrame: Long
             if (maxFrameSize > 0) {
@@ -156,15 +151,15 @@ class FlacStreamMetadata {
         streamMarkerAndInfoBlock[4] = 0x80.toByte()
         val maxInputSize = if (maxFrameSize > 0) maxFrameSize else Format.NO_VALUE
         val metadataWithId3 = getMetadataCopyWithAppendedEntriesFrom(id3Metadata)
-        return Format.Builder()
-            .setSampleMimeType(MimeTypes.AUDIO_FLAC)
-            .setMaxInputSize(maxInputSize)
-            .setChannelCount(channels)
-            .setSampleRate(sampleRate)
-            .setPcmEncoding(getPcmEncoding(bitsPerSample))
-            .setInitializationData(mutableListOf<ByteArray>(streamMarkerAndInfoBlock))
-            .setMetadata(metadataWithId3)
-            .build()
+        return Format(
+            sampleMimeType = MimeTypes.AUDIO_FLAC,
+            maxInputSize = maxInputSize,
+            channelCount = channels,
+            sampleRate = sampleRate,
+            pcmEncoding = getPcmEncoding(bitsPerSample),
+            initializationData = mutableListOf(streamMarkerAndInfoBlock),
+            metadata = metadataWithId3
+        )
     }
 
     fun getMetadataCopyWithAppendedEntriesFrom(other: Metadata?): Metadata? {

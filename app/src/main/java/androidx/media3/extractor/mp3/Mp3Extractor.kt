@@ -1,6 +1,7 @@
 package androidx.media3.extractor.mp3
 
 import androidx.annotation.IntDef
+import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.extractor.DiscardingTrackOutput
@@ -55,8 +56,8 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
     private val id3Peeker: Id3Peeker
     private val skippingTrackOutput: TrackOutput
 
-    private lateinit var extractorOutput:ExtractorOutput
-    private lateinit var realTrackOutput:TrackOutput
+    private lateinit var extractorOutput: ExtractorOutput
+    private lateinit var realTrackOutput: TrackOutput
     private var currentTrackOutput: TrackOutput// skippingTrackOutput or realTrackOutput.
 
     private var synchronizedHeaderData = 0
@@ -69,7 +70,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
     private var endPositionOfLastSampleRead: kotlin.Long
     private var sampleBytesRemaining = 0
 
-    private var seeker:Seeker? = null
+    private var seeker: Seeker? = null
     private var disableSeeking = false
     private var isSeekInProgress = false
     private var seekTimeUs: kotlin.Long = 0
@@ -170,19 +171,22 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
                 metadata = xingMetadata
             }
             val format =
-                androidx.media3.common.Format.Builder()
-                    .setContainerMimeType(MimeTypes.AUDIO_MPEG)
-                    .setSampleMimeType(synchronizedHeader.mimeType)
-                    .setMaxInputSize(MpegAudioUtil.MAX_FRAME_SIZE_BYTES)
-                    .setChannelCount(synchronizedHeader.channels)
-                    .setSampleRate(synchronizedHeader.sampleRate)
-                    .setEncoderDelay(gaplessInfoHolder.encoderDelay)
-                    .setEncoderPadding(gaplessInfoHolder.encoderPadding)
-                    .setMetadata(metadata)
-            if (seeker!!.averageBitrate != androidx.media3.common.C.RATE_UNSET_INT) {
-                format.setAverageBitrate(seeker!!.averageBitrate)
-            }
-            currentTrackOutput.format(format.build())
+                Format(
+                    containerMimeType = MimeTypes.AUDIO_MPEG,
+                    sampleMimeType = synchronizedHeader.mimeType,
+                    maxInputSize = MpegAudioUtil.MAX_FRAME_SIZE_BYTES,
+                    channelCount = synchronizedHeader.channels,
+                    sampleRate = synchronizedHeader.sampleRate,
+                    encoderDelay = gaplessInfoHolder.encoderDelay,
+                    encoderPadding = gaplessInfoHolder.encoderPadding,
+                    metadata = metadata,
+                    averageBitrate =
+                        if (seeker!!.averageBitrate != androidx.media3.common.C.RATE_UNSET_INT) {
+                            seeker!!.averageBitrate
+                        } else Format.NO_VALUE,
+
+                )
+            currentTrackOutput.format(format)
             firstSamplePosition = input.position
         } else if (firstSamplePosition != 0L) {
             val inputPosition: kotlin.Long = input.position
@@ -374,7 +378,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
         }
         try {
             return !extractorInput.peekFully(
-                scratch.data,  0,  4,  true
+                scratch.data, 0, 4, true
             )
         } catch (e: java.io.EOFException) {
             return true
@@ -404,7 +408,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
 
         if ((flags and FLAG_ENABLE_INDEX_SEEKING) != 0 && !resultSeeker.isSeekable) {
             return IndexSeeker(
-                resultSeeker.durationUs,  
+                resultSeeker.durationUs,
                 input.position,
                 resultSeeker.dataEndPosition
             )
@@ -447,8 +451,8 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
         return ConstantBitrateSeeker(
             inputLength,
             dataStart,
-            averageBitrate,  
-            androidx.media3.common.C.LENGTH_UNSET,  
+            averageBitrate,
+            androidx.media3.common.C.LENGTH_UNSET,
             false,
             durationUs
         )
@@ -524,7 +528,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
         return ConstantBitrateSeeker(
             input.length,
             input.position,
-            synchronizedHeader,  
+            synchronizedHeader,
             (flags and FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS)
                     != 0
         )
@@ -573,10 +577,10 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
         // streams have variable frame sizes due to padding), to avoid the need to re-synchronize for
         // constant frame size streams.
         return ConstantBitrateSeeker(
-            streamLength,  
+            streamLength,
             infoFramePosition + infoFrame.header.frameSize,
             averageBitrate,
-            frameSize,  
+            frameSize,
             false,
             durationUs
         )
@@ -603,25 +607,25 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
 
     companion object {
         val FACTORY: ExtractorsFactory =
-           object :ExtractorsFactory {
-               override fun createExtractors(): Array<Extractor> {
-                   return  kotlin.arrayOf(Mp3Extractor())
-               }
-           }
+            object : ExtractorsFactory {
+                override fun createExtractors(): Array<Extractor> {
+                    return kotlin.arrayOf(Mp3Extractor())
+                }
+            }
 
         const val FLAG_ENABLE_CONSTANT_BITRATE_SEEKING: kotlin.Int = 1
 
-        const  val FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS: kotlin.Int = 1 shl 1
+        const val FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS: kotlin.Int = 1 shl 1
 
-        const  val FLAG_ENABLE_INDEX_SEEKING: kotlin.Int = 1 shl 2
+        const val FLAG_ENABLE_INDEX_SEEKING: kotlin.Int = 1 shl 2
 
-        const  val FLAG_DISABLE_ID3_METADATA: kotlin.Int = 1 shl 3
-        const  val FLAG_DISABLE_ARTWORK_METADATA: kotlin.Int = 1 shl 4
+        const val FLAG_DISABLE_ID3_METADATA: kotlin.Int = 1 shl 3
+        const val FLAG_DISABLE_ARTWORK_METADATA: kotlin.Int = 1 shl 4
 
         private const val TAG = "Mp3Extractor"
 
         private val REQUIRED_ID3_FRAME_PREDICATE: Id3Decoder.FramePredicate =
-            object :Id3Decoder.FramePredicate {
+            object : Id3Decoder.FramePredicate {
                 override fun evaluate(
                     majorVersion: Int,
                     id0: Int,
@@ -629,7 +633,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
                     id2: Int,
                     id3: Int
                 ): Boolean {
-                    return  ((id0 == 'C'.code && id1 == 'O'.code && id2 == 'M'.code && (id3 == 'M'.code || majorVersion == 2))
+                    return ((id0 == 'C'.code && id1 == 'O'.code && id2 == 'M'.code && (id3 == 'M'.code || majorVersion == 2))
                             || (id0 == 'M'.code && id1 == 'L'.code && id2 == 'L'.code && (id3 == 'T'.code || majorVersion == 2)))
                 }
 

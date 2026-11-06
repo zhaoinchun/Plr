@@ -90,7 +90,7 @@ internal object MediaCodecPerformancePointCoverageProvider {
             requiresSecureDecoder: Boolean
         ): @PerformancePointCoverageResult Int {
             try {
-                val formatH264 = Format.Builder().setSampleMimeType(MimeTypes.VIDEO_H264).build()
+                val formatH264 = Format(sampleMimeType = MimeTypes.VIDEO_H264)
                 // Null check required to pass RequiresNonNull annotation on getDecoderInfosSoftMatch.
                 if (formatH264.sampleMimeType != null) {
                     val decoderInfos =

@@ -6,16 +6,16 @@ import androidx.media3.common.Metadata
 import androidx.media3.common.MimeTypes
 
 class EventMessage
-(
-    
+    (
+
     val schemeIdUri: String?,
-    
+
     val value: String?,
-    
+
     val durationMs: Long,
-    
+
     val id: Long,
-    
+
     val messageData: ByteArray?
 ) : Metadata.Entry {
     // Lazily initialized hashcode.
@@ -71,7 +71,7 @@ class EventMessage
     }
 
     companion object {
-        
+
         @VisibleForTesting
         const val ID3_SCHEME_ID_AOM: String = "https://aomedia.org/emsg/ID3"
 
@@ -81,8 +81,8 @@ class EventMessage
         const val SCTE35_SCHEME_ID: String = "urn:scte:scte35:2014:bin"
 
         private val ID3_FORMAT =
-            Format.Builder().setSampleMimeType(MimeTypes.APPLICATION_ID3).build()
+            Format(sampleMimeType = MimeTypes.APPLICATION_ID3)
         private val SCTE35_FORMAT =
-            Format.Builder().setSampleMimeType(MimeTypes.APPLICATION_SCTE35).build()
+            Format(sampleMimeType = MimeTypes.APPLICATION_SCTE35)
     }
 }

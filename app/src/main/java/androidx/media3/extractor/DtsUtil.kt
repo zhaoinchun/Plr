@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor
 
 import androidx.annotation.IntDef
@@ -20,7 +19,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 
 object DtsUtil {
-    
+
     const val FRAME_TYPE_UNKNOWN: Int = 0
 
     const val FRAME_TYPE_CORE: Int = 1
@@ -91,12 +90,12 @@ object DtsUtil {
 
     private val UHD_HEADER_SIZE_LENGTH_TABLE = intArrayOf(5, 8, 10, 12)
 
-        fun isDtsBaseAudioMimeType(mimeType: String?): Boolean {
+    fun isDtsBaseAudioMimeType(mimeType: String?): Boolean {
         return mimeType == MimeTypes.AUDIO_DTS
                 || mimeType == MimeTypes.AUDIO_DTS_HD
     }
 
-        fun getFrameType(word: Int): @FrameType Int {
+    fun getFrameType(word: Int): @FrameType Int {
         if (word == SYNC_VALUE_BE || word == SYNC_VALUE_LE || word == SYNC_VALUE_14B_BE || word == SYNC_VALUE_14B_LE) {
             return FRAME_TYPE_CORE
         } else if (word == SYNC_VALUE_EXTSS_BE || word == SYNC_VALUE_EXTSS_LE) {
@@ -109,7 +108,7 @@ object DtsUtil {
         return FRAME_TYPE_UNKNOWN
     }
 
-        fun parseDtsFormat(
+    fun parseDtsFormat(
         frame: ByteArray,
         trackId: String?,
         language: String?,
@@ -131,20 +130,20 @@ object DtsUtil {
                 TWICE_BITRATE_KBPS_BY_RATE[rate] * 1000 / 2
         frameBits.skipBits(10) // MIX, DYNF, TIMEF, AUXF, HDCD, EXT_AUDIO_ID, EXT_AUDIO, ASPF
         channelCount += if (frameBits.readBits(2) > 0) 1 else 0 // LFF
-        return Format.Builder()
-            .setId(trackId)
-            .setContainerMimeType(containerMimeType)
-            .setSampleMimeType(MimeTypes.AUDIO_DTS)
-            .setAverageBitrate(bitrate)
-            .setChannelCount(channelCount)
-            .setSampleRate(sampleRate)
-            .setDrmInitData(drmInitData)
-            .setLanguage(language)
-            .setRoleFlags(roleFlags)
-            .build()
+        return Format(
+            id = trackId,
+            containerMimeType = containerMimeType,
+            sampleMimeType = MimeTypes.AUDIO_DTS,
+            averageBitrate = bitrate,
+            channelCount = channelCount,
+            sampleRate = sampleRate,
+            drmInitData = drmInitData,
+            language = language,
+            roleFlags = roleFlags
+        )
     }
 
-        fun parseDtsAudioSampleCount(data: ByteArray): Int {
+    fun parseDtsAudioSampleCount(data: ByteArray): Int {
         val nblks: Int
         when (data[0]) {
             FIRST_BYTE_LE -> nblks =
@@ -198,7 +197,7 @@ object DtsUtil {
         return (nblks + 1) * 32
     }
 
-        fun getDtsFrameSize(data: ByteArray): Int {
+    fun getDtsFrameSize(data: ByteArray): Int {
         val fsize: Int
         var uses14BitPerWord = false
         when (data[0]) {
@@ -226,7 +225,7 @@ object DtsUtil {
         return if (uses14BitPerWord) fsize * 16 / 14 else fsize
     }
 
-        @Throws(ParserException::class)
+    @Throws(ParserException::class)
     fun parseDtsHdHeader(header: ByteArray): DtsHeader {
         val headerBits = getNormalizedFrame(header)
         headerBits.skipBits(32 + 8) // SYNCEXTSSH, UserDefinedBits
@@ -263,7 +262,7 @@ object DtsUtil {
             val audioPresentationsCount = headerBits.readBits(3) + 1 // nuNumAudioPresnt
             assetsCount = headerBits.readBits(3) + 1
             if (audioPresentationsCount != 1 || assetsCount != 1) {
-                throw ParserException.createForUnsupportedContainerFeature( 
+                throw ParserException.createForUnsupportedContainerFeature(
                     "Multiple audio presentations or assets not supported"
                 )
             }
@@ -375,9 +374,9 @@ object DtsUtil {
                 0 -> referenceClockFrequency = 32000
                 1 -> referenceClockFrequency = 44100
                 2 -> referenceClockFrequency = 48000
-                else -> throw ParserException.createForMalformedContainer( 
+                else -> throw ParserException.createForMalformedContainer(
                     "Unsupported reference clock code in DTS HD header: "
-                            + referenceClockCode,  
+                            + referenceClockCode,
                     null
                 )
             }
@@ -393,7 +392,7 @@ object DtsUtil {
             channelCount,
             sampleRate,
             extensionSubstreamFrameSize,
-            frameDurationUs,  
+            frameDurationUs,
             0
         )
     }
@@ -473,8 +472,8 @@ object DtsUtil {
 
             1 -> return MimeTypes.AUDIO_DTS_HD
             2 -> return MimeTypes.AUDIO_DTS_EXPRESS
-            3 -> throw ParserException.createForMalformedContainer( 
-                "Unsupported coding mode in DTS HD header: " + codingMode,  
+            3 -> throw ParserException.createForMalformedContainer(
+                "Unsupported coding mode in DTS HD header: " + codingMode,
                 null
             )
 
@@ -539,7 +538,7 @@ object DtsUtil {
         return remapChannelCount
     }
 
-        fun parseDtsHdHeaderSize(headerPrefix: ByteArray): Int {
+    fun parseDtsHdHeaderSize(headerPrefix: ByteArray): Int {
         val headerPrefixBits = getNormalizedFrame(headerPrefix)
         headerPrefixBits.skipBits(32 + 8 + 2) // SYNCEXTSSH, UserDefinedBits, nExtSSIndex
         // Unpack the num of bits to be used to read header size
@@ -548,7 +547,7 @@ object DtsUtil {
         return headerPrefixBits.readBits(headerBits) + 1 // nuExtSSHeaderSize
     }
 
-        @Throws(ParserException::class)
+    @Throws(ParserException::class)
     fun parseDtsUhdHeader(header: ByteArray, uhdAudioChunkId: AtomicInteger): DtsHeader {
         val headerBits = getNormalizedFrame(header)
         val syncWord = headerBits.readBits(32)
@@ -556,7 +555,7 @@ object DtsUtil {
 
         val ftocPayloadInBytes =
             (parseUnsignedVarInt(
-                headerBits, UHD_FTOC_PAYLOAD_LENGTH_TABLE,  true
+                headerBits, UHD_FTOC_PAYLOAD_LENGTH_TABLE, true
             )
                     + 1)
 
@@ -566,7 +565,7 @@ object DtsUtil {
         if (syncFrameFlag) {
             // ETSI TS 103 491 V1.2.1, Section 6.4.6.1.
             if (!headerBits.readBit()) { // m_bFullChannelBasedMixFlag
-                throw ParserException.createForUnsupportedContainerFeature( 
+                throw ParserException.createForUnsupportedContainerFeature(
                     "Only supports full channel mask-based audio presentation"
                 )
             }
@@ -581,9 +580,9 @@ object DtsUtil {
                 0 -> baseDuration = 512
                 1 -> baseDuration = 480
                 2 -> baseDuration = 384
-                else -> throw ParserException.createForMalformedContainer( 
+                else -> throw ParserException.createForMalformedContainer(
                     "Unsupported base duration index in DTS UHD header: "
-                            + baseDurationIndex,  
+                            + baseDurationIndex,
                     null
                 )
             }
@@ -595,8 +594,8 @@ object DtsUtil {
                 0 -> clockRateHertz = 32000
                 1 -> clockRateHertz = 44100
                 2 -> clockRateHertz = 48000
-                else -> throw ParserException.createForMalformedContainer( 
-                    "Unsupported clock rate index in DTS UHD header: " + clockRateIndex,  
+                else -> throw ParserException.createForMalformedContainer(
+                    "Unsupported clock rate index in DTS UHD header: " + clockRateIndex,
                     null
                 )
             }
@@ -622,7 +621,7 @@ object DtsUtil {
         for (i in 0..<numOfMetadataChunks) {
             val metadataChunkSize =
                 parseUnsignedVarInt(
-                    headerBits, UHD_METADATA_CHUNK_SIZE_LENGTH_TABLE,  true
+                    headerBits, UHD_METADATA_CHUNK_SIZE_LENGTH_TABLE, true
                 )
             chunkPayloadBytes += metadataChunkSize
         }
@@ -635,14 +634,14 @@ object DtsUtil {
             if (syncFrameFlag) {
                 uhdAudioChunkId.set(
                     parseUnsignedVarInt(
-                        headerBits, UHD_AUDIO_CHUNK_ID_LENGTH_TABLE,  true
+                        headerBits, UHD_AUDIO_CHUNK_ID_LENGTH_TABLE, true
                     )
                 )
             }
             val audioChunkSize =
                 if (uhdAudioChunkId.get() != 0)
                     parseUnsignedVarInt(
-                        headerBits, UHD_AUDIO_CHUNK_SIZE_LENGTH_TABLE,  true
+                        headerBits, UHD_AUDIO_CHUNK_SIZE_LENGTH_TABLE, true
                     )
                 else
                     0
@@ -655,31 +654,31 @@ object DtsUtil {
             // metadata chunk bytes. If defining a constant channel count causes problems, we can
             // consider adding additional parsing logic for UHD frames.
             // For now, using the estimated number of channels for DTS UHD bitstreams as 2.
-            
+
             2,
             sampleRate,
             frameSize,
-            frameDurationUs,  
+            frameDurationUs,
             0
         )
     }
 
-        fun parseDtsUhdHeaderSize(headerPrefix: ByteArray): Int {
+    fun parseDtsUhdHeaderSize(headerPrefix: ByteArray): Int {
         val headerPrefixBits = getNormalizedFrame(headerPrefix)
         headerPrefixBits.skipBits(32) // SYNC
         return (parseUnsignedVarInt(
-            headerPrefixBits, UHD_HEADER_SIZE_LENGTH_TABLE,  true
+            headerPrefixBits, UHD_HEADER_SIZE_LENGTH_TABLE, true
         )
                 + 1)
     }
 
-        @Throws(IOException::class)
+    @Throws(IOException::class)
     fun updateFormatWithDtsHdInfo(
         input: ExtractorInput, sampleSize: Int, format: Format
     ): Format {
         val sampleData = ParsableByteArray(sampleSize)
         if (!input.peekFully(
-                sampleData.data,  0, sampleSize,  true
+                sampleData.data, 0, sampleSize, true
             )
         ) {
             return format
@@ -692,7 +691,7 @@ object DtsUtil {
                 return format
             }
             val header = ByteArray(10)
-            sampleData.readBytes(header,  0,  10)
+            sampleData.readBytes(header, 0, 10)
             val frameSize = getDtsFrameSize(header)
             if (frameSize <= 0 || sampleData.limit() < frameSize + 4) {
                 return format
@@ -708,23 +707,22 @@ object DtsUtil {
         }
         val extHeaderOffset = sampleData.getPosition()
         val headerPrefix = ByteArray(7)
-        sampleData.readBytes(headerPrefix,  0,  7)
+        sampleData.readBytes(headerPrefix, 0, 7)
         sampleData.setPosition(extHeaderOffset)
         val frameSize = parseDtsHdHeaderSize(headerPrefix)
         if (frameSize <= 0 || sampleData.bytesLeft() < frameSize) {
             return format
         }
         val header = ByteArray(frameSize)
-        sampleData.readBytes(header,  0,  frameSize)
+        sampleData.readBytes(header, 0, frameSize)
         val dtsHeader = parseDtsHdHeader(header)
         // If the MIME type was parsed successfully, use it. If it is null (e.g. because static
         // fields were missing), there's nothing we can do other than assume it is DTS-HD.
-        val mimeType =
-            if (dtsHeader.mimeType != null) dtsHeader.mimeType else MimeTypes.AUDIO_DTS_HD
+        val mimeType = dtsHeader.mimeType ?: MimeTypes.AUDIO_DTS_HD
         if (format.sampleMimeType == mimeType) {
             return format
         }
-        return format.buildUpon().setSampleMimeType(mimeType).build()
+        return format.copy(sampleMimeType = mimeType)
     }
 
     @Throws(ParserException::class)
@@ -732,10 +730,10 @@ object DtsUtil {
         val initialValue = 0xFFFF
         val extractedCrc =
             (((frame[sizeInBytes - 2].toInt() shl 8) and initialValue) or (frame[sizeInBytes - 1].toInt() and 0xFF))
-        val calculatedCrc = crc16(frame,  0,  sizeInBytes - 2, initialValue)
+        val calculatedCrc = crc16(frame, 0, sizeInBytes - 2, initialValue)
         if (extractedCrc != calculatedCrc) {
-            throw ParserException.createForMalformedContainer( 
-                "CRC check failed",  null
+            throw ParserException.createForMalformedContainer(
+                "CRC check failed", null
             )
         }
     }
@@ -796,12 +794,12 @@ object DtsUtil {
         return frameHeader[0] == FIRST_BYTE_LE || frameHeader[0] == FIRST_BYTE_14B_LE || frameHeader[0] == FIRST_BYTE_EXTSS_LE || frameHeader[0] == FIRST_BYTE_UHD_FTOC_SYNC_LE || frameHeader[0] == FIRST_BYTE_UHD_FTOC_NONSYNC_LE
     }
 
-    class DtsHeader  constructor(
-       val mimeType: @DtsAudioMimeType String?,
-       val channelCount: Int,
-       val sampleRate: Int,
-       val frameSize: Int,
-       val frameDurationUs: Long,
+    class DtsHeader constructor(
+        val mimeType: @DtsAudioMimeType String?,
+        val channelCount: Int,
+        val sampleRate: Int,
+        val frameSize: Int,
+        val frameDurationUs: Long,
         val bitrate: Int
     )
 

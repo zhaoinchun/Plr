@@ -35,36 +35,18 @@ class MediaItem private constructor(
         private var mediaId: String? = null
         private var uri: Uri? = null
         private var mimeType: String? = null
-
-        // TODO: Change this to ClippingProperties once all the deprecated individual setters are
-        // removed.
         private var clippingConfiguration: ClippingConfiguration.Builder
-
-        // TODO: Change this to @Nullable DrmConfiguration once all the deprecated individual setters
-        // are removed.
-        private var drmConfiguration: DrmConfiguration.Builder
-        private var streamKeys: List<StreamKey>
+                = ClippingConfiguration.Builder()
+        private var drmConfiguration: DrmConfiguration.Builder= DrmConfiguration.Builder()
+        private var streamKeys: List<StreamKey>  = mutableListOf()
         private var customCacheKey: String? = null
-        private var subtitleConfigurations: List<SubtitleConfiguration>
+        private var subtitleConfigurations: List<SubtitleConfiguration> = listOf()
         private var adsConfiguration: AdsConfiguration? = null
         private var tag: Any? = null
-        private var imageDurationMs: Long
+        private var imageDurationMs: Long = C.TIME_UNSET
         private var mediaMetadata: MediaMetadata? = null
-
-        // TODO: Change this to LiveConfiguration once all the deprecated individual setters
-        // are removed.
-        private var liveConfiguration: LiveConfiguration.Builder
-        private var requestMetadata: RequestMetadata
-
-        init {
-            clippingConfiguration = ClippingConfiguration.Builder()
-            drmConfiguration = DrmConfiguration.Builder()
-            streamKeys = mutableListOf()
-            subtitleConfigurations = listOf()
-            liveConfiguration = LiveConfiguration.Builder()
-            requestMetadata = RequestMetadata.EMPTY
-            imageDurationMs = C.TIME_UNSET
-        }
+        private var liveConfiguration: LiveConfiguration.Builder = LiveConfiguration.Builder()
+        private var requestMetadata: RequestMetadata= RequestMetadata.EMPTY
 
         internal constructor(mediaItem: MediaItem) : this() {
             clippingConfiguration = mediaItem.clippingConfiguration.buildUpon()

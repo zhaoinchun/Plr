@@ -34,7 +34,7 @@ internal class ExternallyLoadedMediaPeriod(
     private var loadingFuture: ListenableFuture<*>? = null
 
     init {
-        val format = Format.Builder().setSampleMimeType(mimeType).build()
+        val format = Format(sampleMimeType = mimeType)
         tracks = TrackGroupArray(arrayOf(TrackGroup(listOf(format))))
     }
 

@@ -311,7 +311,7 @@ object Util {
             }
             val filePath = File(uriPath).getCanonicalPath()
             val internalAppDirectoryPath = activity.getFilesDir().getCanonicalPath()
-            val externalAppDirectory = activity.getExternalFilesDir( null)
+            val externalAppDirectory = activity.getExternalFilesDir(null)
             val externalAppDirectoryPath =
                 if (externalAppDirectory == null) null else externalAppDirectory.getCanonicalPath()
             return filePath.startsWith(internalAppDirectoryPath)
@@ -462,11 +462,11 @@ object Util {
 
     fun <T> nullSafeArrayConcatenation(first: Array<T?>, second: Array<T?>): Array<T?> {
         val concatenation = first.copyOf<T?>(first.size + second.size)
-        System.arraycopy( 
-            second,  
-            0,  
-            concatenation,  
-            first.size,  
+        System.arraycopy(
+            second,
+            0,
+            concatenation,
+            first.size,
             second.size
         )
         return concatenation
@@ -544,7 +544,7 @@ object Util {
         outputFuture.addListener(
             Runnable {
                 if (outputFuture.isCancelled()) {
-                    future.cancel( false)
+                    future.cancel(false)
                 }
             },
             MoreExecutors.directExecutor()
@@ -555,7 +555,7 @@ object Util {
                 try {
                     inputFutureResult = Futures.getDone<U?>(future)
                 } catch (cancellationException: CancellationException) {
-                    outputFuture.cancel( false)
+                    outputFuture.cancel(false)
                     return@Runnable
                 } catch (exception: ExecutionException) {
                     val cause = exception.cause
@@ -641,7 +641,7 @@ object Util {
         val replacedLanguage = languageTagReplacementMap!!.get(mainLanguage)
         if (replacedLanguage != null) {
             normalizedTag =
-                replacedLanguage + normalizedTag.substring( mainLanguage!!.length)
+                replacedLanguage + normalizedTag.substring(mainLanguage!!.length)
             mainLanguage = replacedLanguage
         }
         if ("no" == mainLanguage || "i" == mainLanguage || "zh" == mainLanguage) {
@@ -1011,7 +1011,7 @@ object Util {
         val matcher = XS_DATE_TIME_PATTERN.matcher(value)
         if (!matcher.matches()) {
             throw ParserException.createForMalformedContainer(
-                "Invalid date/time format: " + value,  null
+                "Invalid date/time format: " + value, null
             )
         }
 
@@ -1396,12 +1396,12 @@ object Util {
     }
 
     fun getPcmFormat(pcmEncoding: @PcmEncoding Int, channels: Int, sampleRate: Int): Format {
-        return Format.Builder()
-            .setSampleMimeType(MimeTypes.AUDIO_RAW)
-            .setChannelCount(channels)
-            .setSampleRate(sampleRate)
-            .setPcmEncoding(pcmEncoding)
-            .build()
+        return Format(
+            sampleMimeType = MimeTypes.AUDIO_RAW,
+            channelCount = channels,
+            sampleRate = sampleRate,
+            pcmEncoding = pcmEncoding
+        )
     }
 
     fun getPcmFormat(audioFormat: AudioProcessor.AudioFormat): Format {
@@ -2426,7 +2426,7 @@ object Util {
     }
 
     fun shouldShowPlayButton(player: Player?): Boolean {
-        return shouldShowPlayButton(player,  true)
+        return shouldShowPlayButton(player, true)
     }
 
     fun shouldShowPlayButton(
@@ -2532,7 +2532,7 @@ object Util {
     private fun createIsoLanguageReplacementMap(): HashMap<String?, String?> {
         val iso2Languages = Locale.getISOLanguages()
         val replacedLanguages =
-            HashMap<String?, String?>( 
+            HashMap<String?, String?>(
                 iso2Languages.size + additionalIsoLanguageReplacements.size
             )
         for (iso2 in iso2Languages) {
@@ -2562,7 +2562,7 @@ object Util {
             != PackageManager.PERMISSION_GRANTED
         ) {
             activity.requestPermissions(
-                arrayOf<String>(permission.READ_EXTERNAL_STORAGE),  0
+                arrayOf<String>(permission.READ_EXTERNAL_STORAGE), 0
             )
             return true
         }
@@ -2585,7 +2585,7 @@ object Util {
                     permission.READ_MEDIA_AUDIO,
                     permission.READ_MEDIA_IMAGES,
                     permission.READ_MEDIA_VIDEO
-                ),  
+                ),
                 0
             )
             return true
@@ -2605,7 +2605,7 @@ object Util {
         while (i < isoLegacyTagReplacements.size) {
             if (languageTag.startsWith(isoLegacyTagReplacements[i])) {
                 return (isoLegacyTagReplacements[i + 1]
-                        + languageTag.substring( isoLegacyTagReplacements[i].length))
+                        + languageTag.substring(isoLegacyTagReplacements[i].length))
             }
             i += 2
         }

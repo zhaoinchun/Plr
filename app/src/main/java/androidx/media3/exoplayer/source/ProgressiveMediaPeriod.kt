@@ -657,7 +657,7 @@ internal class ProgressiveMediaPeriod
         loadable: ExtractingLoadable, elapsedRealtimeMs: Long, loadDurationMs: Long, retryCount: Int
     ) {
         val loadEventInfo = if (retryCount != 0) {
-            createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
+            createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         } else {
             LoadEventInfo(loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs)
         }
@@ -676,9 +676,9 @@ internal class ProgressiveMediaPeriod
 
     private fun createLoadEventInfo(
         loadable: ExtractingLoadable, elapsedRealtimeMs: Long, loadDurationMs: Long
-    ):LoadEventInfo {
+    ): LoadEventInfo {
         val dataSource = loadable.dataSource
-       return LoadEventInfo(
+        return LoadEventInfo(
             loadable.loadTaskId, loadable.dataSpec, elapsedRealtimeMs,
             uri = dataSource.lastOpenedUri,
             responseHeaders = dataSource.lastResponseHeaders,
@@ -701,7 +701,7 @@ internal class ProgressiveMediaPeriod
                     largestQueuedTimestampUs + DEFAULT_LAST_SAMPLE_DURATION_US
             listener.onSourceInfoRefreshed(durationUs, seekMap, isLive)
         }
-        val loadEventInfo = createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         mediaSourceEventDispatcher.loadCompleted(
             loadEventInfo,
@@ -723,7 +723,7 @@ internal class ProgressiveMediaPeriod
         loadDurationMs: Long,
         released: Boolean
     ) {
-        val loadEventInfo = createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         loadErrorHandlingPolicy.onLoadTaskConcluded(loadable.loadTaskId)
         mediaSourceEventDispatcher.loadCanceled(
             loadEventInfo,
@@ -752,7 +752,7 @@ internal class ProgressiveMediaPeriod
         error: IOException,
         errorCount: Int
     ): LoadErrorAction {
-        val loadEventInfo = createLoadEventInfo(loadable,elapsedRealtimeMs,loadDurationMs)
+        val loadEventInfo = createLoadEventInfo(loadable, elapsedRealtimeMs, loadDurationMs)
         val mediaLoadData =
             MediaLoadData(
                 C.DATA_TYPE_MEDIA,
@@ -914,7 +914,7 @@ internal class ProgressiveMediaPeriod
                     } else {
                         metadata = metadata.copyWithAppendedEntries(listOf(icyHeaders))
                     }
-                    trackFormat = trackFormat.buildUpon().setMetadata(metadata).build()
+                    trackFormat = trackFormat.copy(metadata = metadata)
                 }
                 // Update the track format with the bitrate from the ICY header only if it declares neither
                 // an average or peak bitrate of its own.
@@ -922,17 +922,14 @@ internal class ProgressiveMediaPeriod
                     && trackFormat.averageBitrate == Format.NO_VALUE && trackFormat.peakBitrate == Format.NO_VALUE && icyHeaders.bitrate != Format.NO_VALUE
                 ) {
                     trackFormat =
-                        trackFormat.buildUpon().setAverageBitrate(icyHeaders.bitrate).build()
+                        trackFormat.copy(averageBitrate = icyHeaders.bitrate)
                 }
             }
             trackFormat =
-                trackFormat.copyWithCryptoType(drmSessionManager.getCryptoType(trackFormat))
+                trackFormat.copy(cryptoType = drmSessionManager.getCryptoType(trackFormat))
             if (i != primaryTrackIndex) {
                 trackFormat =
-                    trackFormat
-                        .buildUpon()
-                        .setPrimaryTrackGroupId(primaryTrackIndex.toString())
-                        .build()
+                    trackFormat.copy(primaryTrackGroupId = primaryTrackIndex.toString())
             }
             trackArray[i] = TrackGroup(i.toString(), listOf(trackFormat))
             sampleQueues[i].setReadEndTimeUs(endPositionUs)
@@ -1357,8 +1354,7 @@ internal class ProgressiveMediaPeriod
         private const val TAG = "ProgressiveMediaPeriod"
         private const val DEFAULT_LAST_SAMPLE_DURATION_US: Long = 10000
         private val ICY_METADATA_HEADERS: MutableMap<String, String> = createIcyMetadataHeaders()
-        private val ICY_FORMAT =
-            Format.Builder().setId("icy").setSampleMimeType(MimeTypes.APPLICATION_ICY).build()
+        private val ICY_FORMAT = Format(id = "icy", sampleMimeType = MimeTypes.APPLICATION_ICY)
 
         private fun createIcyMetadataHeaders(): MutableMap<String, String> {
             val headers: MutableMap<String, String> = HashMap()

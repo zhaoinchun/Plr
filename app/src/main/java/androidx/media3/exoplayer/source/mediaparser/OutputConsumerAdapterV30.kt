@@ -11,6 +11,8 @@ import androidx.media3.common.C
 import androidx.media3.common.DataReader
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format
+import androidx.media3.common.Label
+import androidx.media3.common.Metadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.MimeTypes.getTrackType
 import androidx.media3.common.util.Log.e
@@ -202,7 +204,7 @@ class OutputConsumerAdapterV30(
     private fun maybeObtainChunkIndex(mediaFormat: MediaFormat): Boolean {
         val chunkIndexSizesByteBuffer =
             mediaFormat.getByteBuffer(MEDIA_FORMAT_KEY_CHUNK_INDEX_SIZES) ?: return false
-        
+
         val chunkIndexSizes = chunkIndexSizesByteBuffer.asIntBuffer()
         val chunkIndexOffsets =
             mediaFormat.getByteBuffer(MEDIA_FORMAT_KEY_CHUNK_INDEX_OFFSETS)!!.asLongBuffer()
@@ -296,79 +298,11 @@ class OutputConsumerAdapterV30(
             mediaFormat.getInteger(
                 MediaFormat.KEY_CAPTION_SERVICE_NUMBER, Format.NO_VALUE
             )
-        val formatBuilder =
-            Format.Builder()
-                .setDrmInitData(
-                    toExoPlayerDrmInitData(
-                        mediaFormat.getString("crypto-mode-fourcc"), trackData.drmInitData
-                    )
-                )
-                .setContainerMimeType(containerMimeType)
-                .setPeakBitrate(
-                    mediaFormat.getInteger(
-                        MediaFormat.KEY_BIT_RATE, Format.NO_VALUE
-                    )
-                )
-                .setChannelCount(
-                    mediaFormat.getInteger(
-                        MediaFormat.KEY_CHANNEL_COUNT, Format.NO_VALUE
-                    )
-                )
-                .setColorInfo(MediaFormatUtil.getColorInfo(mediaFormat))
-                .setSampleMimeType(mediaFormatMimeType)
-                .setCodecs(mediaFormat.getString(MediaFormat.KEY_CODECS_STRING))
-                .setFrameRate(
-                    mediaFormat.getFloat(
-                        MediaFormat.KEY_FRAME_RATE, Format.NO_VALUE.toFloat()
-                    )
-                )
-                .setWidth(
-                    mediaFormat.getInteger(
-                        MediaFormat.KEY_WIDTH,
-                        Format.NO_VALUE
-                    )
-                )
-                .setHeight(
-                    mediaFormat.getInteger(
-                        MediaFormat.KEY_HEIGHT,
-                        Format.NO_VALUE
-                    )
-                )
-                .setInitializationData(getInitializationData(mediaFormat))
-                .setLanguage(mediaFormat.getString(MediaFormat.KEY_LANGUAGE))
-                .setMaxInputSize(
-                    mediaFormat.getInteger(
-                        MediaFormat.KEY_MAX_INPUT_SIZE, Format.NO_VALUE
-                    )
-                )
-                .setPcmEncoding(
-                    mediaFormat.getInteger("exo-pcm-encoding", Format.NO_VALUE)
-                )
-                .setRotationDegrees(
-                    mediaFormat.getInteger(MediaFormat.KEY_ROTATION, 0)
-                )
-                .setSampleRate(
-                    mediaFormat.getInteger(
-                        MediaFormat.KEY_SAMPLE_RATE, Format.NO_VALUE
-                    )
-                )
-                .setSelectionFlags(getSelectionFlags(mediaFormat))
-                .setEncoderDelay(
-                    mediaFormat.getInteger(MediaFormat.KEY_ENCODER_DELAY, 0)
-                )
-                .setEncoderPadding(
-                    mediaFormat.getInteger(MediaFormat.KEY_ENCODER_PADDING, 0)
-                )
-                .setPixelWidthHeightRatio(
-                    mediaFormat.getFloat("pixel-width-height-ratio-float", 1f)
-                )
-                .setSubsampleOffsetUs(
-                    mediaFormat.getLong(
-                        "subsample-offset-us-long",
-                        Format.OFFSET_SAMPLE_RELATIVE
-                    )
-                )
-                .setAccessibilityChannel(mediaFormatAccessibilityChannel)
+        var lang = mediaFormat.getString(MediaFormat.KEY_LANGUAGE)
+        var role = Format.NO_VALUE
+        var label: String? = null
+        var labels: List<Label> = listOf()
+        var metadata: Metadata? = null
         for (i in muxedCaptionFormats.indices) {
             val muxedCaptionFormat = muxedCaptionFormats[i]
             if (muxedCaptionFormat.sampleMimeType == mediaFormatMimeType
@@ -376,17 +310,65 @@ class OutputConsumerAdapterV30(
             ) {
                 // The track's format matches this muxedCaptionFormat, so we apply the manifest format
                 // information to the track.
-                formatBuilder
-                    .setLanguage(muxedCaptionFormat.language)
-                    .setRoleFlags(muxedCaptionFormat.roleFlags)
-                    .setSelectionFlags(muxedCaptionFormat.selectionFlags)
-                    .setLabel(muxedCaptionFormat.label)
-                    .setLabels(muxedCaptionFormat.labels)
-                    .setMetadata(muxedCaptionFormat.metadata)
+                lang = muxedCaptionFormat.language
+                role = muxedCaptionFormat.roleFlags
+                label = muxedCaptionFormat.label
+                labels = muxedCaptionFormat.labels
+                metadata = muxedCaptionFormat.metadata
                 break
             }
         }
-        return formatBuilder.build()
+
+        return Format(
+            drmInitData = toExoPlayerDrmInitData(
+                mediaFormat.getString("crypto-mode-fourcc"), trackData.drmInitData
+            ),
+            containerMimeType = containerMimeType,
+            peakBitrate = mediaFormat.getInteger(
+                MediaFormat.KEY_BIT_RATE, Format.NO_VALUE
+            ),
+            channelCount = mediaFormat.getInteger(
+                MediaFormat.KEY_CHANNEL_COUNT, Format.NO_VALUE
+            ),
+            colorInfo = MediaFormatUtil.getColorInfo(mediaFormat),
+            sampleMimeType = mediaFormatMimeType,
+            codecs = mediaFormat.getString(MediaFormat.KEY_CODECS_STRING),
+            frameRate = mediaFormat.getFloat(
+                MediaFormat.KEY_FRAME_RATE, Format.NO_VALUE.toFloat()
+            ),
+            width = mediaFormat.getInteger(
+                MediaFormat.KEY_WIDTH,
+                Format.NO_VALUE
+            ),
+            height =
+                mediaFormat.getInteger(
+                    MediaFormat.KEY_HEIGHT,
+                    Format.NO_VALUE
+                ),
+            initializationData = getInitializationData(mediaFormat),
+            language = lang,
+            maxInputSize = mediaFormat.getInteger(
+                MediaFormat.KEY_MAX_INPUT_SIZE, Format.NO_VALUE
+            ),
+            pcmEncoding = mediaFormat.getInteger("exo-pcm-encoding", Format.NO_VALUE),
+            rotationDegrees = mediaFormat.getInteger(MediaFormat.KEY_ROTATION, 0),
+            sampleRate = mediaFormat.getInteger(
+                MediaFormat.KEY_SAMPLE_RATE, Format.NO_VALUE
+            ),
+            selectionFlags = getSelectionFlags(mediaFormat),
+            encoderDelay = mediaFormat.getInteger(MediaFormat.KEY_ENCODER_DELAY, 0),
+            encoderPadding = mediaFormat.getInteger(MediaFormat.KEY_ENCODER_PADDING, 0),
+            pixelWidthHeightRatio = mediaFormat.getFloat("pixel-width-height-ratio-float", 1f),
+            subsampleOffsetUs = mediaFormat.getLong(
+                "subsample-offset-us-long",
+                Format.OFFSET_SAMPLE_RELATIVE
+            ),
+            accessibilityChannel = mediaFormatAccessibilityChannel,
+            roleFlags = role,
+            label = label,
+            labels = labels,
+            metadata = metadata
+        )
     }
 
     private class SeekMapAdapter(private val adaptedSeekMap: MediaParser.SeekMap) : SeekMap {

@@ -448,11 +448,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
             }
             if (currentVideoFormat != null && currentVideoFormat!!.height == Format.NO_VALUE && videoSize != null) {
                 val formatWithHeightAndWidth =
-                    currentVideoFormat!!
-                        .buildUpon()
-                        .setWidth(videoSize.width)
-                        .setHeight(videoSize.height)
-                        .build()
+                    currentVideoFormat!!.copy(width = videoSize.width, height = videoSize.height)
                 maybeUpdateVideoFormat(eventTime, formatWithHeightAndWidth)
             }
             if (startedLoading) {

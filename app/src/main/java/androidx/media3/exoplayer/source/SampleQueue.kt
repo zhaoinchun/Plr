@@ -83,12 +83,12 @@ class SampleQueue(
     // Called by the consuming thread when there is no loading thread.
     @CallSuper
     fun release() {
-        reset( true)
+        reset(true)
         releaseDrmSessionReferences()
     }
 
     fun reset() {
-        reset( false)
+        reset(false)
     }
 
     @CallSuper
@@ -224,7 +224,7 @@ class SampleQueue(
         val result =
             peekSampleMetadata(
                 formatHolder,
-                buffer,  
+                buffer,
                 (readFlags and SampleStream.FLAG_REQUIRE_FORMAT) != 0,
                 loadingFinished,
                 extrasHolder
@@ -283,7 +283,7 @@ class SampleQueue(
                 )
             else
                 findSampleBefore(
-                    relativeReadIndex, length - readPosition, timeUs,  true
+                    relativeReadIndex, length - readPosition, timeUs, true
                 )
         if (offset == -1) {
             return false
@@ -303,7 +303,7 @@ class SampleQueue(
             return length - readPosition
         }
         val offset =
-            findSampleBefore(relativeReadIndex, length - readPosition, timeUs,  true)
+            findSampleBefore(relativeReadIndex, length - readPosition, timeUs, true)
         if (offset == -1) {
             return 0
         }
@@ -426,11 +426,7 @@ class SampleQueue(
     protected fun getAdjustedUpstreamFormat(format: Format): Format {
         var format = format
         if (sampleOffsetUs != 0L && format.subsampleOffsetUs != Format.OFFSET_SAMPLE_RELATIVE) {
-            format =
-                format
-                    .buildUpon()
-                    .setSubsampleOffsetUs(format.subsampleOffsetUs + sampleOffsetUs)
-                    .build()
+            format = format.copy(subsampleOffsetUs = format.subsampleOffsetUs + sampleOffsetUs)
         }
         return format
     }
@@ -580,7 +576,7 @@ class SampleQueue(
 
         isLastSampleQueued = (sampleFlags and C.BUFFER_FLAG_LAST_SAMPLE) != 0
         largestQueuedTimestampUs = max(largestQueuedTimestampUs, timeUs)
-        updateReadEndTimeState( this.writeIndex, timeUs, sampleFlags)
+        updateReadEndTimeState(this.writeIndex, timeUs, sampleFlags)
 
         val relativeEndIndex = getRelativeIndex(length)
         timesUs[relativeEndIndex] = timeUs
@@ -688,7 +684,7 @@ class SampleQueue(
 
         outputFormatHolder.format =
             if (drmSessionManager != null)
-                newFormat.copyWithCryptoType(drmSessionManager.getCryptoType(newFormat))
+                newFormat.copy(cryptoType = drmSessionManager.getCryptoType(newFormat))
             else
                 newFormat
         outputFormatHolder.drmSession = currentDrmSession
@@ -768,7 +764,7 @@ class SampleQueue(
             return
         }
         for (i in 0..<length) {
-            val searchIndex = getRelativeIndex( i)
+            val searchIndex = getRelativeIndex(i)
             updateReadEndTimeState(this.firstIndex + i, timesUs[searchIndex], flags[searchIndex])
             if (readEndTimeAbsoluteIndex != C.INDEX_UNSET) {
                 return
@@ -888,14 +884,14 @@ class SampleQueue(
 
     companion object {
         @VisibleForTesting
-        
+
         const val SAMPLE_CAPACITY_INCREMENT: Int = 1000
         private const val TAG = "SampleQueue"
         private const val DEFAULT_MAX_NUM_REORDER_SAMPLES = 16
 
         fun createWithoutDrm(allocator: Allocator): SampleQueue {
             return SampleQueue(
-                allocator,  null,  null
+                allocator, null, null
             )
         }
 

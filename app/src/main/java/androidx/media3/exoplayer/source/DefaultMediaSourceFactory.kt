@@ -265,15 +265,16 @@ class DefaultMediaSourceFactory(
             mediaSources[0] = mediaSource
             for (i in subtitleConfigurations.indices) {
                 if (parseSubtitlesDuringExtraction) {
+                    val config = subtitleConfigurations[i]
                     val format =
-                        Format.Builder()
-                            .setSampleMimeType(subtitleConfigurations[i].mimeType)
-                            .setLanguage(subtitleConfigurations[i].language)
-                            .setSelectionFlags(subtitleConfigurations[i].selectionFlags)
-                            .setRoleFlags(subtitleConfigurations[i].roleFlags)
-                            .setLabel(subtitleConfigurations[i].label)
-                            .setId(subtitleConfigurations[i].id)
-                            .build()
+                        Format(
+                            sampleMimeType = config.mimeType,
+                            language = config.language,
+                            selectionFlags = config.selectionFlags,
+                            roleFlags = config.roleFlags,
+                            label = config.label,
+                            id = config.id,
+                        )
                     val extractorsFactory =
                         ExtractorsFactory {
                             arrayOf(
@@ -290,14 +291,13 @@ class DefaultMediaSourceFactory(
                             .enableLazyLoadingWithSingleTrack(
                                 SubtitleExtractor.TRACK_ID,
                                 if (subtitleParserFactory.supportsFormat(format))
-                                    format
-                                        .buildUpon()
-                                        .setSampleMimeType(MimeTypes.APPLICATION_MEDIA3_CUES)
-                                        .setCodecs(format.sampleMimeType)
-                                        .setCueReplacementBehavior(
-                                            subtitleParserFactory.getCueReplacementBehavior(format)
-                                        )
-                                        .build()
+                                    format.copy(
+                                        sampleMimeType = MimeTypes.APPLICATION_MEDIA3_CUES,
+                                        codecs = format.sampleMimeType,
+                                        cueReplacementBehavior = subtitleParserFactory.getCueReplacementBehavior(
+                                            format
+                                        ),
+                                    )
                                 else
                                     format
                             )
@@ -589,11 +589,10 @@ class DefaultMediaSourceFactory(
             output.seekMap(SeekMap.Unseekable(C.TIME_UNSET))
             output.endTracks()
             trackOutput.format(
-                format
-                    .buildUpon()
-                    .setSampleMimeType(MimeTypes.TEXT_UNKNOWN)
-                    .setCodecs(format.sampleMimeType)
-                    .build()
+                format.copy(
+                    sampleMimeType = MimeTypes.TEXT_UNKNOWN,
+                    codecs = format.sampleMimeType
+                )
             )
         }
 

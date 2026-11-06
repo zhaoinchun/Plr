@@ -87,7 +87,7 @@ abstract class MediaCodecRenderer(
             "Decoder init failed: [$errorCode], $format",
             cause,
             format.sampleMimeType,
-            secureDecoderRequired,  
+            secureDecoderRequired,
             null,
             buildCustomDiagnosticInfo(errorCode),
             null
@@ -177,11 +177,11 @@ abstract class MediaCodecRenderer(
     private val oggOpusAudioPacketizer = OggOpusAudioPacketizer()
     private val readDataResultHolder = AtomicInteger()
     private var inputFormat: Format? = null
-    private var outputFormat:Format? = null
+    private var outputFormat: Format? = null
     private var codecDrmSession: DrmSession? = null
     private var sourceDrmSession: DrmSession? = null
 
-    protected var wakeupListener:WakeupListener? = null
+    protected var wakeupListener: WakeupListener? = null
         private set
     private var mediaCrypto: MediaCrypto? = null
     private var renderTimeLimitMs = C.TIME_UNSET
@@ -253,7 +253,7 @@ abstract class MediaCodecRenderer(
         // and code called from MediaCodecAudioRenderer.processOutputBuffer expects this endianness.
         // Call ensureSpaceForWrite to make sure the buffer has non-null data, and set the expected
         // endianness.
-        bypassBatchBuffer.ensureSpaceForWrite( 0)
+        bypassBatchBuffer.ensureSpaceForWrite(0)
         bypassBatchBuffer.data!!.order(ByteOrder.nativeOrder())
     }
 
@@ -286,7 +286,7 @@ abstract class MediaCodecRenderer(
     override fun getDurationToProgressUs(positionUs: Long, elapsedRealtimeUs: Long): Long {
         return getDurationToProgressUs(
             positionUs,
-            elapsedRealtimeUs,  
+            elapsedRealtimeUs,
             codecRegisteredOnBufferAvailableListener
         )
     }
@@ -432,7 +432,7 @@ abstract class MediaCodecRenderer(
         if (outputStreamInfo.streamOffsetUs == C.TIME_UNSET) {
             // This is the first stream.
             setOutputStreamInfo(
-                OutputStreamInfo( 
+                OutputStreamInfo(
                     C.TIME_UNSET,
                     startPositionUs,
                     offsetUs,
@@ -450,7 +450,7 @@ abstract class MediaCodecRenderer(
         ) {
             // All previous streams have never queued any samples or have been fully output already.
             setOutputStreamInfo(
-                OutputStreamInfo( 
+                OutputStreamInfo(
                     C.TIME_UNSET,
                     startPositionUs,
                     offsetUs,
@@ -463,7 +463,7 @@ abstract class MediaCodecRenderer(
             }
         } else {
             pendingOutputStreamChanges.add(
-                OutputStreamInfo( 
+                OutputStreamInfo(
                     largestQueuedPresentationTimeUs,
                     startPositionUs,
                     offsetUs,
@@ -928,7 +928,7 @@ abstract class MediaCodecRenderer(
 
         if (availableCodecInfos!!.isEmpty()) {
             throw DecoderInitializationException(
-                inputFormat,  
+                inputFormat,
                 null,
                 mediaCryptoRequiresSecureDecoder,
                 DecoderInitializationException.NO_SUITABLE_DECODER_ERROR
@@ -986,7 +986,7 @@ abstract class MediaCodecRenderer(
             // know that it does not require a secure output path. Most CDM implementations allow
             // playback to proceed with a non-secure decoder in this case, so we try our luck.
             codecInfos =
-                getDecoderInfos(mediaCodecSelector, inputFormat,  false)
+                getDecoderInfos(mediaCodecSelector, inputFormat, false)
             if (!codecInfos.isEmpty()) {
                 w(
                     TAG,
@@ -1179,7 +1179,7 @@ abstract class MediaCodecRenderer(
                     readDataResultHolder.set(
                         readSource(
                             formatHolder,
-                            buffer,  
+                            buffer,
                             0
                         )
                     )
@@ -1188,7 +1188,7 @@ abstract class MediaCodecRenderer(
             onCodecError(e)
             // Skip the sample that's too large by reading it without its data. Then flush the codec so
             // that rendering will resume from the next key frame.
-            readSourceOmittingSampleData( 0)
+            readSourceOmittingSampleData(0)
             flushCodec()
             return true
         }
@@ -1236,9 +1236,9 @@ abstract class MediaCodecRenderer(
                 }
                 codecReceivedEos = true
                 codec.queueInputBuffer(
-                    inputIndex,  
-                    0,  
-                    0,  
+                    inputIndex,
+                    0,
+                    0,
                     0,
                     MediaCodec.BUFFER_FLAG_END_OF_STREAM
                 )
@@ -1322,11 +1322,11 @@ abstract class MediaCodecRenderer(
         presentationTimeUs += skippedFlushOffsetUs
         if (bufferEncrypted) {
             codec.queueSecureInputBuffer(
-                inputIndex,  0, buffer.cryptoInfo, presentationTimeUs, flags
+                inputIndex, 0, buffer.cryptoInfo, presentationTimeUs, flags
             )
         } else {
             codec.queueInputBuffer(
-                inputIndex,  
+                inputIndex,
                 0,
                 buffer.data!!.limit(),
                 presentationTimeUs,
@@ -1413,7 +1413,7 @@ abstract class MediaCodecRenderer(
                     && getDolbyVisionBaseLayerMimeType(newFormat) == MimeTypes.VIDEO_AV1))
             && !newFormat.initializationData.isEmpty()
         ) {
-            newFormat = newFormat.buildUpon().setInitializationData(null).build()
+            newFormat = newFormat.copy(initializationData = listOf())
         }
 
         setSourceDrmSession(formatHolder.drmSession)
@@ -1462,7 +1462,7 @@ abstract class MediaCodecRenderer(
             canReuseCodec(
                 codecInfo,
                 oldFormat,
-                newFormat,  
+                newFormat,
                 this.lastOutputStreamInfo.queuedBufferAfterReset
             )
         var overridingDiscardReasons: @DecoderDiscardReasons Int = 0
@@ -1694,7 +1694,7 @@ abstract class MediaCodecRenderer(
         if (!hasOutputBuffer()) {
             val outputIndex = codec.dequeueOutputBufferIndex(outputBufferInfo)
             if (outputIndex < 0) {
-                if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED ) {
+                if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     processOutputMediaFormatChanged()
                     return true
                 }
@@ -1766,7 +1766,7 @@ abstract class MediaCodecRenderer(
                 codec,
                 outputBuffer!!,
                 outputIndex,
-                outputBufferInfo.flags,  
+                outputBufferInfo.flags,
                 1,
                 outputBufferInfo.presentationTimeUs,
                 isDecodeOnlyOutputBuffer,
@@ -2002,10 +2002,10 @@ abstract class MediaCodecRenderer(
         if (bypassBatchBuffer.hasSamples()) {
             if (processOutputBuffer(
                     positionUs,
-                    elapsedRealtimeUs,  
+                    elapsedRealtimeUs,
                     null,
                     bypassBatchBuffer.data!!,
-                    outputIndex,  
+                    outputIndex,
                     0,
                     bypassBatchBuffer.sampleCount,
                     bypassBatchBuffer.firstSampleTimeUs,
@@ -2070,7 +2070,7 @@ abstract class MediaCodecRenderer(
         while (true) {
             bypassSampleBuffer.clear()
             val result: @ReadDataResult Int =
-                readSource(formatHolder, bypassSampleBuffer,  0)
+                readSource(formatHolder, bypassSampleBuffer, 0)
             when (result) {
                 C.RESULT_FORMAT_READ -> {
                     onInputFormatChanged(formatHolder)
@@ -2108,10 +2108,9 @@ abstract class MediaCodecRenderer(
                             val numberPreSkipSamples =
                                 getPreSkipSamples(outputFormat!!.initializationData[0])
                             outputFormat =
-                                outputFormat!!.buildUpon().setEncoderDelay(numberPreSkipSamples)
-                                    .build()
+                                outputFormat!!.copy(encoderDelay = numberPreSkipSamples)
                         }
-                        onOutputFormatChanged(outputFormat!!,  null)
+                        onOutputFormatChanged(outputFormat!!, null)
                         waitingForFirstSampleInFormat = false
                     }
                     // Try to append the buffer to the batch buffer.
@@ -2167,8 +2166,8 @@ abstract class MediaCodecRenderer(
     private fun isDecodeOnly(startTimeUs: Long, frameTimeUs: Long): Boolean {
         // Opus frames that precede the target position by more than seek-preroll should be skipped.
         return frameTimeUs < startTimeUs
-                && (outputFormat == null || (outputFormat!!.sampleMimeType != MimeTypes.AUDIO_OPUS) || !needToDecodeOpusFrame( 
-            startTimeUs,  frameTimeUs
+                && (outputFormat == null || (outputFormat!!.sampleMimeType != MimeTypes.AUDIO_OPUS) || !needToDecodeOpusFrame(
+            startTimeUs, frameTimeUs
         ))
     }
 
@@ -2216,11 +2215,11 @@ abstract class MediaCodecRenderer(
             get() = (streamFlags and SampleStream.FLAG_STRICT_DURATION) != 0
 
         companion object {
-            val UNSET = OutputStreamInfo( 
-                C.TIME_UNSET,  
-                C.TIME_UNSET,  
-                C.TIME_UNSET,  
-                C.TIME_UNSET,  
+            val UNSET = OutputStreamInfo(
+                C.TIME_UNSET,
+                C.TIME_UNSET,
+                C.TIME_UNSET,
+                C.TIME_UNSET,
                 0
             )
         }

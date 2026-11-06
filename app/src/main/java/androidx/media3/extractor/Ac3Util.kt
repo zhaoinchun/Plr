@@ -52,19 +52,18 @@ object Ac3Util {
         // Update data position
         dataBitArray.byteAlign()
         data.setPosition(dataBitArray.bytePosition)
-        return Format.Builder()
-            .setId(trackId)
-            .setSampleMimeType(MimeTypes.AUDIO_AC3)
-            .setChannelCount(channelCount)
-            .setSampleRate(sampleRate)
-            .setDrmInitData(drmInitData)
-            .setLanguage(language)
-            .setAverageBitrate(constantBitrate)
-            .setPeakBitrate(constantBitrate)
-            .build()
+        return Format(
+            id = trackId, sampleMimeType = MimeTypes.AUDIO_AC3,
+            channelCount = channelCount,
+            sampleRate = sampleRate,
+            drmInitData = drmInitData,
+            language = language,
+            averageBitrate = constantBitrate,
+            peakBitrate = constantBitrate
+        )
     }
 
-        fun parseEAc3AnnexFFormat(
+    fun parseEAc3AnnexFFormat(
         data: ParsableByteArray,
         trackId: String?,
         language: String?,
@@ -109,15 +108,13 @@ object Ac3Util {
         // Update data position
         dataBitArray.byteAlign()
         data.setPosition(dataBitArray.bytePosition)
-        return Format.Builder()
-            .setId(trackId)
-            .setSampleMimeType(mimeType)
-            .setChannelCount(channelCount)
-            .setSampleRate(sampleRate)
-            .setDrmInitData(drmInitData)
-            .setLanguage(language)
-            .setPeakBitrate(peakBitrate)
-            .build()
+        return Format(id=trackId,
+            sampleMimeType = mimeType,
+            channelCount = channelCount,
+            sampleRate = sampleRate,
+            drmInitData = drmInitData,
+            language = language,
+            peakBitrate = peakBitrate)
     }
 
     fun parseAc3SyncframeInfo(data: ParsableBitArray): SyncFrameInfo {
@@ -125,7 +122,7 @@ object Ac3Util {
         data.skipBits(40)
         // Parse the bitstream ID for AC-3 and E-AC-3 (see subsections 4.3, E.1.2 and E.1.3.1.6).
         val isEac3 = data.readBits(5) > 10
-        data.position=(initialPosition)
+        data.position = (initialPosition)
         var mimeType: String?
         var streamType: @SyncFrameInfo.StreamType Int =
             SyncFrameInfo.STREAM_TYPE_UNDEFINED
@@ -307,7 +304,7 @@ object Ac3Util {
                     mimeType = MimeTypes.AUDIO_E_AC3_JOC
                 }
             }
-        } else   {
+        } else {
             mimeType = MimeTypes.AUDIO_AC3
             data.skipBits(16 + 16) // syncword, crc1
             val fscod = data.readBits(2)

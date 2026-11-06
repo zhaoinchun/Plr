@@ -21,7 +21,7 @@ import androidx.media3.common.util.Util.getAudioTrackChannelConfig
 import java.nio.ByteBuffer
 
 object MediaFormatUtil {
-    
+
     // The constant value must not be changed, because it's also set by the framework MediaParser API.
     const val KEY_PIXEL_WIDTH_HEIGHT_RATIO_FLOAT: String = "exo-pixel-width-height-ratio-float"
 
@@ -36,65 +36,16 @@ object MediaFormatUtil {
 
     @SuppressLint("InlinedApi") // Inlined MediaFormat keys.
     fun createFormatFromMediaFormat(mediaFormat: MediaFormat): Format {
-        val formatBuilder =
-            Format.Builder()
-                .setSampleMimeType(mediaFormat.getString(MediaFormat.KEY_MIME))
-                .setLanguage(mediaFormat.getString(MediaFormat.KEY_LANGUAGE))
-                .setPeakBitrate(
-                    getInteger(mediaFormat, KEY_MAX_BIT_RATE,  Format.NO_VALUE)
-                )
-                .setAverageBitrate(
-                    getInteger(
-                        mediaFormat, MediaFormat.KEY_BIT_RATE,  Format.NO_VALUE
-                    )
-                )
-                .setCodecs(getCodecString(mediaFormat))
-                .setFrameRate(getFrameRate(mediaFormat))
-                .setWidth(
-                    getInteger(
-                        mediaFormat,
-                        MediaFormat.KEY_WIDTH,  
-                        Format.NO_VALUE
-                    )
-                )
-                .setHeight(
-                    getInteger(
-                        mediaFormat, MediaFormat.KEY_HEIGHT,  Format.NO_VALUE
-                    )
-                )
-                .setPixelWidthHeightRatio(
-                    getPixelWidthHeightRatio(mediaFormat,  1.0f)
-                )
-                .setMaxInputSize(
-                    getInteger(
-                        mediaFormat,
-                        MediaFormat.KEY_MAX_INPUT_SIZE,  
-                        Format.NO_VALUE
-                    )
-                )
-                .setRotationDegrees(
-                    getInteger(mediaFormat, MediaFormat.KEY_ROTATION,  0)
-                )
-                .setColorInfo(getColorInfo(mediaFormat))
-                .setSampleRate(
-                    getInteger(
-                        mediaFormat,
-                        MediaFormat.KEY_SAMPLE_RATE,  
-                        Format.NO_VALUE
-                    )
-                )
-                .setPcmEncoding(getPcmEncoding(mediaFormat))
-
         val channelCount =
             getInteger(
                 mediaFormat,
-                MediaFormat.KEY_CHANNEL_COUNT,  
+                MediaFormat.KEY_CHANNEL_COUNT,
                 Format.NO_VALUE
             )
         var channelMask =
             getInteger(
                 mediaFormat,
-                MediaFormat.KEY_CHANNEL_MASK,  
+                MediaFormat.KEY_CHANNEL_MASK,
                 Format.NO_VALUE
             )
         if (channelCount != Format.NO_VALUE && channelMask != Format.NO_VALUE && Integer.bitCount(
@@ -103,16 +54,11 @@ object MediaFormatUtil {
         ) {
             channelMask = Format.NO_VALUE
         }
-        formatBuilder.setChannelCount(channelCount)
-        formatBuilder.setChannelMask(channelMask)
 
         val csdBuffers = mutableListOf<ByteArray>()
         var csdIndex = 0
         while (true) {
-            val csdByteBuffer = mediaFormat.getByteBuffer("csd-" + csdIndex)
-            if (csdByteBuffer == null) {
-                break
-            }
+            val csdByteBuffer = mediaFormat.getByteBuffer("csd-" + csdIndex) ?: break
             val csdBufferData = ByteArray(csdByteBuffer.remaining())
             csdByteBuffer.get(csdBufferData)
             csdByteBuffer.rewind()
@@ -120,14 +66,46 @@ object MediaFormatUtil {
             csdBuffers.add(csdBufferData)
             csdIndex++
         }
+        val id = if (mediaFormat.containsKey(MediaFormat.KEY_TRACK_ID)) {
+            mediaFormat.getInteger(MediaFormat.KEY_TRACK_ID).toString()
+        } else null
 
-        formatBuilder.setInitializationData(csdBuffers.toList())
-
-        if (mediaFormat.containsKey(MediaFormat.KEY_TRACK_ID)) {
-            formatBuilder.setId(mediaFormat.getInteger(MediaFormat.KEY_TRACK_ID))
-        }
-
-        return formatBuilder.build()
+        return Format(
+            id = id,
+            sampleMimeType = mediaFormat.getString(MediaFormat.KEY_MIME),
+            language = mediaFormat.getString(MediaFormat.KEY_LANGUAGE),
+            peakBitrate = getInteger(mediaFormat, KEY_MAX_BIT_RATE, Format.NO_VALUE),
+            averageBitrate = getInteger(
+                mediaFormat, MediaFormat.KEY_BIT_RATE, Format.NO_VALUE
+            ),
+            codecs = getCodecString(mediaFormat),
+            frameRate = getFrameRate(mediaFormat),
+            width = getInteger(
+                mediaFormat,
+                MediaFormat.KEY_WIDTH,
+                Format.NO_VALUE
+            ),
+            height = getInteger(
+                mediaFormat, MediaFormat.KEY_HEIGHT, Format.NO_VALUE
+            ),
+            pixelWidthHeightRatio = getPixelWidthHeightRatio(mediaFormat, 1.0f),
+            maxInputSize = getInteger(
+                mediaFormat,
+                MediaFormat.KEY_MAX_INPUT_SIZE,
+                Format.NO_VALUE
+            ),
+            rotationDegrees = getInteger(mediaFormat, MediaFormat.KEY_ROTATION, 0),
+            colorInfo = getColorInfo(mediaFormat),
+            sampleRate = getInteger(
+                mediaFormat,
+                MediaFormat.KEY_SAMPLE_RATE,
+                Format.NO_VALUE
+            ),
+            pcmEncoding = getPcmEncoding(mediaFormat),
+            channelCount = channelCount,
+            channelMask = channelMask,
+            initializationData = csdBuffers.toList()
+        )
     }
 
     @SuppressLint("InlinedApi") // Inlined MediaFormat keys.
@@ -231,17 +209,17 @@ object MediaFormatUtil {
         }
         var colorSpace =
             getInteger(
-                mediaFormat, MediaFormat.KEY_COLOR_STANDARD,  Format.NO_VALUE
+                mediaFormat, MediaFormat.KEY_COLOR_STANDARD, Format.NO_VALUE
             )
         var colorRange =
             getInteger(
                 mediaFormat,
-                MediaFormat.KEY_COLOR_RANGE,  
+                MediaFormat.KEY_COLOR_RANGE,
                 Format.NO_VALUE
             )
         var colorTransfer =
             getInteger(
-                mediaFormat, MediaFormat.KEY_COLOR_TRANSFER,  Format.NO_VALUE
+                mediaFormat, MediaFormat.KEY_COLOR_TRANSFER, Format.NO_VALUE
             )
         val hdrStaticInfoByteBuffer = mediaFormat.getByteBuffer(MediaFormat.KEY_HDR_STATIC_INFO)
         val hdrStaticInfo =
@@ -339,19 +317,19 @@ object MediaFormatUtil {
                 val width =
                     getInteger(
                         mediaFormat,
-                        MediaFormat.KEY_WIDTH,  
+                        MediaFormat.KEY_WIDTH,
                         Format.NO_VALUE
                     )
                 val height =
                     getInteger(
                         mediaFormat,
-                        MediaFormat.KEY_HEIGHT,  
+                        MediaFormat.KEY_HEIGHT,
                         Format.NO_VALUE
                     )
                 val frameRate =
                     getFloatFromIntOrFloat(
                         mediaFormat,
-                        MediaFormat.KEY_FRAME_RATE,  
+                        MediaFormat.KEY_FRAME_RATE,
                         Format.NO_VALUE.toFloat()
                     )
                 dolbyVisionLevel = calculateMediaCodecDolbyVisionLevel(width, height, frameRate)
@@ -373,7 +351,7 @@ object MediaFormatUtil {
         var frameRate =
             getFloatFromIntOrFloat(
                 mediaFormat,
-                MediaFormat.KEY_FRAME_RATE,  
+                MediaFormat.KEY_FRAME_RATE,
                 Format.NO_VALUE.toFloat()
             )
         // Some devices may produce non-positive frame rates from MediaFormat.
@@ -384,7 +362,7 @@ object MediaFormatUtil {
         return frameRate
     }
 
-     // Inlined MediaFormat.KEY_PIXEL_ASPECT_RATIO_WIDTH and MediaFormat.KEY_PIXEL_ASPECT_RATIO_HEIGHT.
+    // Inlined MediaFormat.KEY_PIXEL_ASPECT_RATIO_WIDTH and MediaFormat.KEY_PIXEL_ASPECT_RATIO_HEIGHT.
     @SuppressLint("InlinedApi")
     private fun getPixelWidthHeightRatio(mediaFormat: MediaFormat, defaultValue: Float): Float {
         if (mediaFormat.containsKey(MediaFormat.KEY_PIXEL_ASPECT_RATIO_WIDTH)
@@ -451,12 +429,12 @@ object MediaFormatUtil {
     @SuppressLint("InlinedApi") // Inlined MediaFormat keys.
     private fun getPcmEncoding(mediaFormat: MediaFormat): @C.PcmEncoding Int {
         val exoPcmEncoding: @C.PcmEncoding Int =
-            getInteger(mediaFormat, KEY_PCM_ENCODING_EXTENDED,  Format.NO_VALUE)
+            getInteger(mediaFormat, KEY_PCM_ENCODING_EXTENDED, Format.NO_VALUE)
         if (exoPcmEncoding != Format.NO_VALUE) {
             return exoPcmEncoding
         }
         return getInteger(
-            mediaFormat, MediaFormat.KEY_PCM_ENCODING,  Format.NO_VALUE
+            mediaFormat, MediaFormat.KEY_PCM_ENCODING, Format.NO_VALUE
         )
     }
 

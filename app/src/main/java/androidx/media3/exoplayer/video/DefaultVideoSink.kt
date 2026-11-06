@@ -53,7 +53,7 @@ internal class DefaultVideoSink(
                 frameRateEstimator
             )
         videoFrameHandlers = ArrayDeque<VideoFrameHandler>()
-        inputFormat = Format.Builder().build()
+        inputFormat = Format()
         streamStartPositionUs = C.TIME_UNSET
         listener = VideoSink.Listener.NO_OP
         listenerExecutor = Executor { runnable: Runnable? -> }
@@ -81,7 +81,7 @@ internal class DefaultVideoSink(
         return true
     }
 
-    override val isInitialized: Boolean=true
+    override val isInitialized: Boolean = true
 
     override fun redraw() {
         throw UnsupportedOperationException()
@@ -137,7 +137,7 @@ internal class DefaultVideoSink(
 
     override fun clearOutputSurfaceInfo() {
         outputSurface = null
-        videoFrameReleaseControl.setOutputSurface( null)
+        videoFrameReleaseControl.setOutputSurface(null)
     }
 
     override fun setChangeFrameRateStrategy(changeFrameRateStrategy: Int) {
@@ -201,15 +201,15 @@ internal class DefaultVideoSink(
     override fun release() {}
 
     private inner class FrameRendererImpl : FrameRenderer {
-        private var outputFormat:  Format? = null
+        private var outputFormat: Format? = null
 
         override fun onVideoSizeChanged(videoSize: VideoSize) {
             outputFormat =
-                Format.Builder()
-                    .setWidth(videoSize.width)
-                    .setHeight(videoSize.height)
-                    .setSampleMimeType(MimeTypes.VIDEO_RAW)
-                    .build()
+                Format(
+                    width = videoSize.width,
+                    height = videoSize.height,
+                    sampleMimeType = MimeTypes.VIDEO_RAW
+                )
             listenerExecutor.execute { listener.onVideoSizeChanged(videoSize) }
         }
 
@@ -223,12 +223,11 @@ internal class DefaultVideoSink(
             }
             // TODO - b/292111083: outputFormat is initialized after the first frame is rendered because
             //  onVideoSizeChanged is announced after the first frame is available for rendering.
-            val format = (if (outputFormat == null) androidx.media3.common.Format.Builder()
-                .build() else outputFormat)!!
-            videoFrameMetadataListener.onVideoFrameAboutToBeRendered( 
-                framePresentationTimeUs,  
+            val format = (if (outputFormat == null) Format() else outputFormat)!!
+            videoFrameMetadataListener.onVideoFrameAboutToBeRendered(
+                framePresentationTimeUs,
                 renderTimeNs,
-                format,  
+                format,
                 null
             )
             videoFrameHandlers.remove()!!.render(renderTimeNs)

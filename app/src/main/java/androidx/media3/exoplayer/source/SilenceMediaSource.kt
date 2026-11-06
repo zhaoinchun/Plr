@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.source
 
 import android.net.Uri
@@ -57,10 +56,10 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
     override fun prepareSourceInternal(mediaTransferListener: TransferListener?) {
         refreshSourceInfo(
             SinglePeriodTimeline(
-                durationUs,  
-                true,  
-                false,  
-                false,  
+                durationUs,
+                true,
+                false,
+                false,
                 null,
                 mediaItem
             )
@@ -94,12 +93,12 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
         private val sampleStreams: MutableList<SampleStream> = mutableListOf()
 
         override fun prepare(callback: MediaPeriod.Callback, positionUs: Long) {
-            callback.onPrepared( this)
+            callback.onPrepared(this)
         }
 
         override fun maybeThrowPrepareError() {}
 
-        override val trackGroups: TrackGroupArray=TRACKS
+        override val trackGroups: TrackGroupArray = TRACKS
 
         override fun selectTracks(
             selections: Array<ExoTrackSelection?>,
@@ -148,14 +147,14 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
             return constrainSeekPosition(positionUs)
         }
 
-        override val bufferedPositionUs: Long=C.TIME_END_OF_SOURCE
-        override val nextLoadPositionUs: Long= C.TIME_END_OF_SOURCE
+        override val bufferedPositionUs: Long = C.TIME_END_OF_SOURCE
+        override val nextLoadPositionUs: Long = C.TIME_END_OF_SOURCE
 
         override fun continueLoading(loadingInfo: LoadingInfo): Boolean {
             return false
         }
 
-        override val isLoading: Boolean=false
+        override val isLoading: Boolean = false
 
         override fun reevaluateBuffer(positionUs: Long) {}
 
@@ -177,7 +176,7 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
             positionBytes = constrainValue(getAudioByteCount(positionUs), 0, durationBytes)
         }
 
-        override val isReady: Boolean=true
+        override val isReady: Boolean = true
 
         override fun maybeThrowError() {}
 
@@ -201,7 +200,7 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
             val bytesToWrite = min(SILENCE_SAMPLE.size.toLong(), bytesRemaining).toInt()
             if ((readFlags and SampleStream.FLAG_OMIT_SAMPLE_DATA) == 0) {
                 buffer.ensureSpaceForWrite(bytesToWrite)
-                buffer.data!!.put(SILENCE_SAMPLE,  0, bytesToWrite)
+                buffer.data!!.put(SILENCE_SAMPLE, 0, bytesToWrite)
             }
             if ((readFlags and SampleStream.FLAG_PEEK) == 0) {
                 positionBytes += bytesToWrite.toLong()
@@ -222,12 +221,12 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
         private const val SAMPLE_RATE_HZ = 44100
         private val PCM_ENCODING: @C.PcmEncoding Int = C.ENCODING_PCM_16BIT
         private const val CHANNEL_COUNT = 2
-        private val FORMAT = Format.Builder()
-            .setSampleMimeType(MimeTypes.AUDIO_RAW)
-            .setChannelCount(CHANNEL_COUNT)
-            .setSampleRate(SAMPLE_RATE_HZ)
-            .setPcmEncoding(PCM_ENCODING)
-            .build()
+        private val FORMAT = Format(
+            sampleMimeType = MimeTypes.AUDIO_RAW,
+            channelCount = CHANNEL_COUNT,
+            sampleRate = SAMPLE_RATE_HZ,
+            pcmEncoding = PCM_ENCODING
+        )
         private val MEDIA_ITEM = MediaItem.Builder()
             .setMediaId(MEDIA_ID)
             .setUri(Uri.EMPTY)

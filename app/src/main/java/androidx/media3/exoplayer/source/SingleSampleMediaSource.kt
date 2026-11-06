@@ -109,19 +109,17 @@ class SingleSampleMediaSource private constructor(
                 .setTag(tag)
                 .build()
         this.format =
-            Format.Builder()
-                .setSampleMimeType(
-                    MoreObjects.firstNonNull<String?>(
-                        subtitleConfiguration.mimeType,
-                        MimeTypes.TEXT_UNKNOWN
-                    )
-                )
-                .setLanguage(subtitleConfiguration.language)
-                .setSelectionFlags(subtitleConfiguration.selectionFlags)
-                .setRoleFlags(subtitleConfiguration.roleFlags)
-                .setLabel(subtitleConfiguration.label)
-                .setId(subtitleConfiguration.id ?: trackId)
-                .build()
+            Format(
+                sampleMimeType = MoreObjects.firstNonNull<String?>(
+                    subtitleConfiguration.mimeType,
+                    MimeTypes.TEXT_UNKNOWN
+                ),
+                language = subtitleConfiguration.language,
+                selectionFlags = subtitleConfiguration.selectionFlags,
+                roleFlags = subtitleConfiguration.roleFlags,
+                label = subtitleConfiguration.label,
+                id = subtitleConfiguration.id ?: trackId
+            )
         this.dataSpec =
             DataSpec.Builder()
                 .setUri(subtitleConfiguration.uri)
@@ -129,10 +127,10 @@ class SingleSampleMediaSource private constructor(
                 .build()
         this.timeline =
             SinglePeriodTimeline(
-                durationUs,  
-                true,  
-                false,  
-                false,  
+                durationUs,
+                true,
+                false,
+                false,
                 null,
                 mediaItem
             )
