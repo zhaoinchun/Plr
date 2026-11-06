@@ -2901,14 +2901,14 @@ import kotlin.math.min
         fun createFilteredCodecParameters(
             source: CodecParameters, keys: List<String?>
         ): CodecParameters {
-            val builder = source.buildUpon()
+            val builder = source.copy()
             val keysToKeep = keys.toSet()
             for (key in source.keySet()) {
                 if (!keysToKeep.contains(key)) {
-                    builder.remove(key)
+                    builder.params.remove(key)
                 }
             }
-            return builder.build()
+            return builder
         }
     }
 

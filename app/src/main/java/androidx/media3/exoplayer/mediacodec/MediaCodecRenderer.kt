@@ -795,12 +795,12 @@ abstract class MediaCodecRenderer(
 
     @RequiresApi(29)
     private fun checkAndNotifyCodecParameterChanges(mediaFormat: MediaFormat) {
-        if (subscribedCodecParameterKeys!!.isEmpty()) {
+        if (subscribedCodecParameterKeys.isEmpty()) {
             return
         }
 
         val currentValues =
-            CodecParameters.createFrom(mediaFormat, subscribedCodecParameterKeys!!).build()
+            CodecParameters.createFrom(mediaFormat, subscribedCodecParameterKeys)
 
         if (currentValues == lastDispatchedCodecParameters) {
             return
