@@ -1,7 +1,5 @@
 package androidx.media3.exoplayer.source
 
-import android.content.Context
-import android.net.Uri
 import android.os.Handler
 import android.os.Message
 import android.util.Pair
@@ -19,90 +17,60 @@ import java.util.IdentityHashMap
 
 class ConcatenatingMediaSource2 private constructor(
     var _mediaItem: MediaItem?,
-    private val mediaSourceHolders: List<MediaSourceHolder>
+    private val mediaSourceHolders: List<MediaSourceHolder>,
+    private var mediaSourceFactory: MediaSource.Factory? = null
 ) : CompositeMediaSource<Int>() {
-    class Builder {
-        private val mediaSourceHoldersBuilder: MutableList<MediaSourceHolder> = mutableListOf()
-        private var index = 0
-        private var mediaItem: MediaItem? = null
-        private var mediaSourceFactory: MediaSource.Factory? = null
-
-        fun useDefaultMediaSourceFactory(context: Context): Builder {
-            return setMediaSourceFactory(DefaultMediaSourceFactory(context))
-        }
-
-        fun setMediaSourceFactory(mediaSourceFactory: MediaSource.Factory): Builder {
-            this.mediaSourceFactory = mediaSourceFactory
-            return this
-        }
-
-        fun setMediaItem(mediaItem: MediaItem?): Builder {
-            this.mediaItem = mediaItem
-            return this
-        }
-
-        fun add(mediaItem: MediaItem): Builder {
-            return add(mediaItem, C.TIME_UNSET)
-        }
-
-        fun add(mediaItem: MediaItem, initialPlaceholderDurationMs: Long): Builder {
-            var initialPlaceholderDurationMs = initialPlaceholderDurationMs
-            if (initialPlaceholderDurationMs == C.TIME_UNSET
-                && mediaItem.clippingConfiguration.endPositionMs != C.TIME_END_OF_SOURCE
-            ) {
-                // If the item is going to be clipped, we can provide a placeholder duration automatically.
-                initialPlaceholderDurationMs =
-                    usToMs(
-                        mediaItem.clippingConfiguration.endPositionUs
-                                - mediaItem.clippingConfiguration.startPositionUs
-                    )
-            }
-            Preconditions.checkNotNull<MediaSource.Factory?>(
-                mediaSourceFactory,
-                "Must use useDefaultMediaSourceFactory or setMediaSourceFactory first."
-            )
-            return add(
-                mediaSourceFactory!!.createMediaSource(mediaItem),
-                initialPlaceholderDurationMs
-            )
-        }
-
-        fun add(mediaSource: MediaSource): Builder {
-            return add(mediaSource, C.TIME_UNSET)
-        }
-
-        fun add(mediaSource: MediaSource, initialPlaceholderDurationMs: Long): Builder {
-            Preconditions.checkState(
-                mediaSource !is ProgressiveMediaSource || initialPlaceholderDurationMs != C.TIME_UNSET,
-                "Progressive media source must define an initial placeholder duration."
-            )
-            mediaSourceHoldersBuilder.add(
-                MediaSourceHolder(mediaSource, index++, msToUs(initialPlaceholderDurationMs))
-            )
-            return this
-        }
-
-        fun build(): ConcatenatingMediaSource2 {
-            Preconditions.checkArgument(
-                index > 0,
-                "Must add at least one source to the concatenation."
-            )
-            if (mediaItem == null) {
-                mediaItem = MediaItem.fromUri(Uri.EMPTY)
-            }
-            return ConcatenatingMediaSource2(mediaItem, mediaSourceHoldersBuilder.toList())
-        }
-    }
 
     override val mediaItem: MediaItem
         @Synchronized
         get() = _mediaItem!!
     private val mediaSourceByMediaPeriod: IdentityHashMap<MediaPeriod?, MediaSourceHolder?>
+            = IdentityHashMap<MediaPeriod?, MediaSourceHolder?>()
     private var playbackThreadHandler: Handler? = null
     private var timelineUpdateScheduled = false
 
-    init {
-        mediaSourceByMediaPeriod = IdentityHashMap<MediaPeriod?, MediaSourceHolder?>()
+    fun add(mediaItem: MediaItem) {
+        add(mediaItem, C.TIME_UNSET)
+    }
+
+    fun add(mediaItem: MediaItem, initialPlaceholderDurationMs: Long) {
+        var initialPlaceholderDurationMs = initialPlaceholderDurationMs
+        if (initialPlaceholderDurationMs == C.TIME_UNSET
+            && mediaItem.clippingConfiguration.endPositionMs != C.TIME_END_OF_SOURCE
+        ) {
+            // If the item is going to be clipped, we can provide a placeholder duration automatically.
+            initialPlaceholderDurationMs =
+                usToMs(
+                    mediaItem.clippingConfiguration.endPositionUs
+                            - mediaItem.clippingConfiguration.startPositionUs
+                )
+        }
+        Preconditions.checkNotNull<MediaSource.Factory?>(
+            mediaSourceFactory,
+            "Must use useDefaultMediaSourceFactory or setMediaSourceFactory first."
+        )
+        add(
+            mediaSourceFactory!!.createMediaSource(mediaItem),
+            initialPlaceholderDurationMs
+        )
+    }
+
+    fun add(mediaSource: MediaSource) {
+        return add(mediaSource, C.TIME_UNSET)
+    }
+
+    fun add(mediaSource: MediaSource, initialPlaceholderDurationMs: Long) {
+        Preconditions.checkState(
+            mediaSource !is ProgressiveMediaSource || initialPlaceholderDurationMs != C.TIME_UNSET,
+            "Progressive media source must define an initial placeholder duration."
+        )
+        mediaSourceHolders.toMutableList().add(
+            MediaSourceHolder(
+                mediaSource,
+                mediaSourceHolders.size,
+                msToUs(initialPlaceholderDurationMs)
+            )
+        )
     }
 
     override val initialTimeline: Timeline?
@@ -120,10 +88,10 @@ class ConcatenatingMediaSource2 private constructor(
     override fun prepareSourceInternal(mediaTransferListener: TransferListener?) {
         super.prepareSourceInternal(mediaTransferListener)
         playbackThreadHandler =
-            Handler( Handler.Callback { msg: Message? -> this.handleMessage(msg!!) })
+            Handler(Handler.Callback { msg: Message? -> this.handleMessage(msg!!) })
         for (i in mediaSourceHolders.indices) {
             val holder = mediaSourceHolders[i]
-            prepareChildSource( i, holder.mediaSource)
+            prepareChildSource(i, holder.mediaSource)
         }
         scheduleTimelineUpdate()
     }
@@ -287,7 +255,7 @@ class ConcatenatingMediaSource2 private constructor(
             val periodCountInMediaSourceHolder = timeline.periodCount
             periodCount += periodCountInMediaSourceHolder
             for (j in 0..<timeline.windowCount) {
-                timeline.getWindow( j, window)
+                timeline.getWindow(j, window)
                 if (!hasInitialManifest) {
                     initialManifest = window.manifest
                     hasInitialManifest = true
@@ -314,7 +282,7 @@ class ConcatenatingMediaSource2 private constructor(
 
                 for (k in window.firstPeriodIndex..window.lastPeriodIndex) {
                     periodOffsetsInWindowUsBuilder.add(nextPeriodOffsetInWindowUs)
-                    timeline.getPeriod( k, period,  true)
+                    timeline.getPeriod(k, period, true)
                     var periodDurationUs = period.durationUs
                     if (periodDurationUs == C.TIME_UNSET) {
                         Preconditions.checkArgument(
@@ -362,7 +330,7 @@ class ConcatenatingMediaSource2 private constructor(
         val index: Int,
         val initialPlaceholderDurationUs: Long
     ) {
-        val mediaSource: MaskingMediaSource = MaskingMediaSource(mediaSource,  false)
+        val mediaSource: MaskingMediaSource = MaskingMediaSource(mediaSource, false)
         val periodTimeOffsetsByUid: MutableMap<Any, Long> = HashMap()
         var activeMediaPeriods: Int = 0
     }
@@ -378,7 +346,7 @@ class ConcatenatingMediaSource2 private constructor(
         private val defaultPositionUs: Long,
         private val manifest: Any?
     ) : Timeline() {
-        override val windowCount: Int=1
+        override val windowCount: Int = 1
 
         override val periodCount: Int
             get() = periodOffsetsInWindowUs.size
@@ -391,17 +359,17 @@ class ConcatenatingMediaSource2 private constructor(
             return window.set(
                 Window.SINGLE_WINDOW_UID,
                 mediaItem,
-                manifest,  
-                C.TIME_UNSET,  
-                C.TIME_UNSET,  
+                manifest,
+                C.TIME_UNSET,
+                C.TIME_UNSET,
                 C.TIME_UNSET,
                 isSeekable,
-                isDynamic,  
+                isDynamic,
                 null,
                 defaultPositionUs,
-                durationUs,  
-                0,  
-                periodCount - 1,  
+                durationUs,
+                0,
+                periodCount - 1,
                 -periodOffsetsInWindowUs[0]
             )
         }
@@ -438,7 +406,7 @@ class ConcatenatingMediaSource2 private constructor(
                 return C.INDEX_UNSET
             }
             val childIndex: Int = getChildIndex(uid)
-            val periodUid= getChildPeriodUid(uid)
+            val periodUid = getChildPeriodUid(uid)
             val periodIndexInChild = timelines[childIndex].getIndexOfPeriod(periodUid)
             return if (periodIndexInChild == C.INDEX_UNSET)
                 C.INDEX_UNSET
@@ -457,8 +425,8 @@ class ConcatenatingMediaSource2 private constructor(
         fun getChildIndexByPeriodIndex(periodIndex: Int): Int {
             return Util.binarySearchFloor(
                 firstPeriodIndices.toIntArray(),
-                periodIndex + 1,  
-                false,  
+                periodIndex + 1,
+                false,
                 false
             )
         }
