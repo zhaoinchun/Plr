@@ -165,50 +165,47 @@ class CmcdData private constructor(
                     cmcdConfiguration.requestConfig.getRequestedMaximumThroughputKbps(bitrateKbps)
             }
 
-            val cmcdObject = CmcdObject.Builder()
+            val cmcdObject = CmcdObject()
             if (cmcdConfiguration.isBitrateLoggingAllowed) {
-                cmcdObject.setBitrateKbps(bitrateKbps)
+                cmcdObject.bitrateKbps = bitrateKbps
             }
             if (cmcdConfiguration.isTopBitrateLoggingAllowed) {
-                cmcdObject.setTopBitrateKbps(topBitrateKbps)
+                cmcdObject.topBitrateKbps = topBitrateKbps
             }
             if (isMediaObjectType && cmcdConfiguration.isObjectDurationLoggingAllowed) {
-                cmcdObject.setObjectDurationMs(usToMs(chunkDurationUs))
+                cmcdObject.objectDurationMs = usToMs(chunkDurationUs)
             }
             if (cmcdConfiguration.isObjectTypeLoggingAllowed) {
-                cmcdObject.setObjectType(objectType)
+                cmcdObject.objectType = objectType
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_OBJECT)) {
-                cmcdObject.setCustomDataList(
-                    customData.get(CmcdConfiguration.KEY_CMCD_OBJECT) ?: listOf()
-                )
+                cmcdObject.customDataList =
+                    customData[CmcdConfiguration.KEY_CMCD_OBJECT] ?: listOf()
             }
 
-            val cmcdRequest = CmcdRequest.Builder()
+            val cmcdRequest = CmcdRequest()
             if (isMediaObjectType) {
                 if (cmcdConfiguration.isBufferLengthLoggingAllowed) {
-                    cmcdRequest.setBufferLengthMs(usToMs(bufferedDurationUs))
+                    cmcdRequest.bufferLengthMs = usToMs(bufferedDurationUs)
                 }
                 if (cmcdConfiguration.isDeadlineLoggingAllowed) {
-                    cmcdRequest.setDeadlineMs(usToMs((bufferedDurationUs / playbackRate).toLong()))
+                    cmcdRequest.deadlineMs = usToMs((bufferedDurationUs / playbackRate).toLong())
                 }
             }
             if (cmcdConfiguration.isMeasuredThroughputLoggingAllowed) {
-                cmcdRequest.setMeasuredThroughputInKbps(latestBitrateEstimateKbps)
+                cmcdRequest.measuredThroughputInKbps=latestBitrateEstimateKbps
             }
             if (cmcdConfiguration.isStartupLoggingAllowed) {
-                cmcdRequest.setStartup(didRebuffer || isBufferEmpty)
+                cmcdRequest.startup = didRebuffer || isBufferEmpty
             }
             if (cmcdConfiguration.isNextObjectRequestLoggingAllowed) {
-                cmcdRequest.setNextObjectRequest(nextObjectRequest)
+                cmcdRequest.nextObjectRequest = nextObjectRequest
             }
             if (cmcdConfiguration.isNextRangeRequestLoggingAllowed) {
-                cmcdRequest.setNextRangeRequest(nextRangeRequest)
+                cmcdRequest.nextRangeRequest = nextRangeRequest
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_REQUEST)) {
-                cmcdRequest.setCustomDataList(
-                    customData.get(CmcdConfiguration.KEY_CMCD_REQUEST) ?: listOf()
-                )
+                cmcdRequest.customDataList =  customData[CmcdConfiguration.KEY_CMCD_REQUEST] ?: listOf()
             }
 
             val cmcdSession = CmcdSession.Builder()
@@ -246,8 +243,8 @@ class CmcdData private constructor(
             }
 
             return CmcdData(
-                cmcdObject.build(),
-                cmcdRequest.build(),
+                cmcdObject,
+                cmcdRequest,
                 cmcdSession.build(),
                 cmcdStatus,
                 cmcdConfiguration.dataTransmissionMode
@@ -358,72 +355,15 @@ class CmcdData private constructor(
         }
     }
 
-    private class CmcdObject(builder: Builder) {
-        class Builder {
-            var bitrateKbps: Int
-            var topBitrateKbps: Int
-            var objectDurationMs: Long
-            var objectType: @ObjectType String? = null
-            var customDataList: List<String?>
+    private class CmcdObject(
+        var bitrateKbps: Int = C.RATE_UNSET_INT,
+        var topBitrateKbps: Int = C.RATE_UNSET_INT,
+        var objectDurationMs: Long = C.TIME_UNSET,
+        var objectType: @ObjectType String? = null,
+        var customDataList: List<String?> = listOf()
+    ) {
 
-            init {
-                this.bitrateKbps = C.RATE_UNSET_INT
-                this.topBitrateKbps = C.RATE_UNSET_INT
-                this.objectDurationMs = C.TIME_UNSET
-                this.customDataList = listOf()
-            }
-
-            fun setBitrateKbps(bitrateKbps: Int): Builder {
-                Preconditions.checkArgument(bitrateKbps >= 0 || bitrateKbps == C.RATE_UNSET_INT)
-                this.bitrateKbps = bitrateKbps
-                return this
-            }
-
-            fun setTopBitrateKbps(topBitrateKbps: Int): Builder {
-                Preconditions.checkArgument(topBitrateKbps >= 0 || topBitrateKbps == C.RATE_UNSET_INT)
-                this.topBitrateKbps = topBitrateKbps
-                return this
-            }
-
-            fun setObjectDurationMs(objectDurationMs: Long): Builder {
-                Preconditions.checkArgument(objectDurationMs >= 0 || objectDurationMs == C.TIME_UNSET)
-                this.objectDurationMs = objectDurationMs
-                return this
-            }
-
-            fun setObjectType(objectType: @ObjectType String?): Builder {
-                this.objectType = objectType
-                return this
-            }
-
-            fun setCustomDataList(customDataList: List<String>): Builder {
-                this.customDataList = customDataList.toList()
-                return this
-            }
-
-            fun build(): CmcdObject {
-                return CmcdObject(this)
-            }
-        }
-
-        val bitrateKbps: Int
-        val topBitrateKbps: Int
-        val objectDurationMs: Long
-        val objectType: @ObjectType String?
-
-        val customDataList: List<String?>
-
-        init {
-            this.bitrateKbps = builder.bitrateKbps
-            this.topBitrateKbps = builder.topBitrateKbps
-            this.objectDurationMs = builder.objectDurationMs
-            this.objectType = builder.objectType
-            this.customDataList = builder.customDataList
-        }
-
-        fun populateCmcdDataMap(
-            cmcdDataMap: ArrayListMultimap<String, String>
-        ) {
+        fun populateCmcdDataMap(cmcdDataMap: ArrayListMultimap<String, String>) {
             val keyValuePairs = ArrayList<String?>()
             if (bitrateKbps != C.RATE_UNSET_INT) {
                 keyValuePairs.add(CmcdConfiguration.KEY_BITRATE + "=" + bitrateKbps)
@@ -445,99 +385,14 @@ class CmcdData private constructor(
         }
     }
 
-    private class CmcdRequest(builder: Builder) {
-        class Builder {
-            var bufferLengthMs: Long
-            var measuredThroughputInKbps: Long
-            var deadlineMs: Long
-            var startup = false
-            var nextObjectRequest: String? = null
-            var nextRangeRequest: String? = null
-            var customDataList: List<String?>
-
-            init {
-                this.bufferLengthMs = C.TIME_UNSET
-                this.measuredThroughputInKbps = C.RATE_UNSET_INT.toLong()
-                this.deadlineMs = C.TIME_UNSET
-                this.customDataList = listOf()
-            }
-
-            fun setBufferLengthMs(bufferLengthMs: Long): Builder {
-                if (bufferLengthMs == C.TIME_UNSET) {
-                    this.bufferLengthMs = bufferLengthMs
-                } else if (bufferLengthMs >= 0) {
-                    this.bufferLengthMs = ((bufferLengthMs + 50) / 100) * 100
-                } else {
-                    throw IllegalArgumentException()
-                }
-                return this
-            }
-
-            fun setMeasuredThroughputInKbps(measuredThroughputInKbps: Long): Builder {
-                if (measuredThroughputInKbps == C.RATE_UNSET_INT.toLong()) {
-                    this.measuredThroughputInKbps = measuredThroughputInKbps
-                } else if (measuredThroughputInKbps >= 0) {
-                    this.measuredThroughputInKbps = ((measuredThroughputInKbps + 50) / 100) * 100
-                } else {
-                    throw IllegalArgumentException()
-                }
-                return this
-            }
-
-            fun setDeadlineMs(deadlineMs: Long): Builder {
-                if (deadlineMs == C.TIME_UNSET) {
-                    this.deadlineMs = deadlineMs
-                } else if (deadlineMs >= 0) {
-                    this.deadlineMs = ((deadlineMs + 50) / 100) * 100
-                } else {
-                    throw IllegalArgumentException()
-                }
-                return this
-            }
-
-            fun setStartup(startup: Boolean): Builder {
-                this.startup = startup
-                return this
-            }
-
-            fun setNextObjectRequest(nextObjectRequest: String?): Builder {
-                this.nextObjectRequest =
-                    if (nextObjectRequest == null) null else Uri.encode(nextObjectRequest)
-                return this
-            }
-
-            fun setNextRangeRequest(nextRangeRequest: String?): Builder {
-                this.nextRangeRequest = nextRangeRequest
-                return this
-            }
-
-            fun setCustomDataList(customDataList: List<String>): Builder {
-                this.customDataList = customDataList.toList()
-                return this
-            }
-
-            fun build(): CmcdRequest {
-                return CmcdRequest(this)
-            }
-        }
-
-        val bufferLengthMs: Long
-        val measuredThroughputInKbps: Long
-        val deadlineMs: Long
-        val startup: Boolean
-        val nextObjectRequest: String?
-        val nextRangeRequest: String?
-        val customDataList: List<String?>
-
-        init {
-            this.bufferLengthMs = builder.bufferLengthMs
-            this.measuredThroughputInKbps = builder.measuredThroughputInKbps
-            this.deadlineMs = builder.deadlineMs
-            this.startup = builder.startup
-            this.nextObjectRequest = builder.nextObjectRequest
-            this.nextRangeRequest = builder.nextRangeRequest
-            this.customDataList = builder.customDataList
-        }
+    private class CmcdRequest() {
+        var bufferLengthMs: Long= C.TIME_UNSET
+        var measuredThroughputInKbps: Long= C.RATE_UNSET_INT.toLong()
+        var deadlineMs: Long =C.TIME_UNSET
+        var startup = false
+        var nextObjectRequest: String? = null
+        var nextRangeRequest: String? = null
+        var customDataList: List<String?> = listOf()
 
         fun populateCmcdDataMap(
             cmcdDataMap: ArrayListMultimap<String, String>
