@@ -1,109 +1,25 @@
-
 package androidx.media3.exoplayer
 
 import android.os.SystemClock
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
-
 import androidx.media3.common.util.Util.constrainValue
 import androidx.media3.common.util.Util.msToUs
-import com.google.common.base.Preconditions
 import com.google.common.primitives.Longs
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 import kotlin.math.abs
 import kotlin.math.max
 
-class DefaultLivePlaybackSpeedControl private constructor(
-    private val fallbackMinPlaybackSpeed: Float,
-    private val fallbackMaxPlaybackSpeed: Float,
-    private val minUpdateIntervalMs: Long,
-    private val proportionalControlFactor: Float,
-    private val maxLiveOffsetErrorUsForUnitSpeed: Long,
-    private val targetLiveOffsetRebufferDeltaUs: Long,
-    private val minPossibleLiveOffsetSmoothingFactor: Float
+class DefaultLivePlaybackSpeedControl(
+    private val fallbackMinPlaybackSpeed: Float = DEFAULT_FALLBACK_MIN_PLAYBACK_SPEED,
+    private val fallbackMaxPlaybackSpeed: Float = DEFAULT_FALLBACK_MIN_PLAYBACK_SPEED,
+    private val minUpdateIntervalMs: Long = DEFAULT_MIN_UPDATE_INTERVAL_MS,
+    private val proportionalControlFactor: Float = DEFAULT_PROPORTIONAL_CONTROL_FACTOR / C.MICROS_PER_SECOND,
+    private val maxLiveOffsetErrorUsForUnitSpeed: Long =
+        msToUs(DEFAULT_MAX_LIVE_OFFSET_ERROR_MS_FOR_UNIT_SPEED),
+    private val targetLiveOffsetRebufferDeltaUs: Long =
+        msToUs(DEFAULT_TARGET_LIVE_OFFSET_INCREMENT_ON_REBUFFER_MS),
+    private val minPossibleLiveOffsetSmoothingFactor: Float = DEFAULT_MIN_POSSIBLE_LIVE_OFFSET_SMOOTHING_FACTOR
 ) : LivePlaybackSpeedControl {
-    class Builder {
-        private var fallbackMinPlaybackSpeed: Float
-        private var fallbackMaxPlaybackSpeed: Float
-        private var minUpdateIntervalMs: Long
-        private var proportionalControlFactorUs: Float
-        private var maxLiveOffsetErrorUsForUnitSpeed: Long
-        private var targetLiveOffsetIncrementOnRebufferUs: Long
-        private var minPossibleLiveOffsetSmoothingFactor: Float
-
-        init {
-            fallbackMinPlaybackSpeed = DEFAULT_FALLBACK_MIN_PLAYBACK_SPEED
-            fallbackMaxPlaybackSpeed = DEFAULT_FALLBACK_MAX_PLAYBACK_SPEED
-            minUpdateIntervalMs = DEFAULT_MIN_UPDATE_INTERVAL_MS
-            proportionalControlFactorUs = DEFAULT_PROPORTIONAL_CONTROL_FACTOR / C.MICROS_PER_SECOND
-            maxLiveOffsetErrorUsForUnitSpeed =
-                msToUs(DEFAULT_MAX_LIVE_OFFSET_ERROR_MS_FOR_UNIT_SPEED)
-            targetLiveOffsetIncrementOnRebufferUs =
-                msToUs(DEFAULT_TARGET_LIVE_OFFSET_INCREMENT_ON_REBUFFER_MS)
-            minPossibleLiveOffsetSmoothingFactor = DEFAULT_MIN_POSSIBLE_LIVE_OFFSET_SMOOTHING_FACTOR
-        }
-
-        fun setFallbackMinPlaybackSpeed(fallbackMinPlaybackSpeed: Float): Builder {
-            Preconditions.checkArgument(0 < fallbackMinPlaybackSpeed && fallbackMinPlaybackSpeed <= 1f)
-            this.fallbackMinPlaybackSpeed = fallbackMinPlaybackSpeed
-            return this
-        }
-
-        fun setFallbackMaxPlaybackSpeed(fallbackMaxPlaybackSpeed: Float): Builder {
-            Preconditions.checkArgument(fallbackMaxPlaybackSpeed >= 1f)
-            this.fallbackMaxPlaybackSpeed = fallbackMaxPlaybackSpeed
-            return this
-        }
-
-        fun setMinUpdateIntervalMs(minUpdateIntervalMs: Long): Builder {
-            Preconditions.checkArgument(minUpdateIntervalMs > 0)
-            this.minUpdateIntervalMs = minUpdateIntervalMs
-            return this
-        }
-
-        fun setProportionalControlFactor(proportionalControlFactor: Float): Builder {
-            Preconditions.checkArgument(proportionalControlFactor > 0)
-            this.proportionalControlFactorUs = proportionalControlFactor / C.MICROS_PER_SECOND
-            return this
-        }
-
-        fun setMaxLiveOffsetErrorMsForUnitSpeed(maxLiveOffsetErrorMsForUnitSpeed: Long): Builder {
-            Preconditions.checkArgument(maxLiveOffsetErrorMsForUnitSpeed > 0)
-            this.maxLiveOffsetErrorUsForUnitSpeed = msToUs(maxLiveOffsetErrorMsForUnitSpeed)
-            return this
-        }
-
-        fun setTargetLiveOffsetIncrementOnRebufferMs(
-            targetLiveOffsetIncrementOnRebufferMs: Long
-        ): Builder {
-            Preconditions.checkArgument(targetLiveOffsetIncrementOnRebufferMs >= 0)
-            this.targetLiveOffsetIncrementOnRebufferUs =
-                msToUs(targetLiveOffsetIncrementOnRebufferMs)
-            return this
-        }
-
-        fun setMinPossibleLiveOffsetSmoothingFactor(
-            minPossibleLiveOffsetSmoothingFactor: Float
-        ): Builder {
-            Preconditions.checkArgument(
-                minPossibleLiveOffsetSmoothingFactor >= 0 && minPossibleLiveOffsetSmoothingFactor < 1f
-            )
-            this.minPossibleLiveOffsetSmoothingFactor = minPossibleLiveOffsetSmoothingFactor
-            return this
-        }
-
-        fun build(): DefaultLivePlaybackSpeedControl {
-            return DefaultLivePlaybackSpeedControl(
-                fallbackMinPlaybackSpeed,
-                fallbackMaxPlaybackSpeed,
-                minUpdateIntervalMs,
-                proportionalControlFactorUs,
-                maxLiveOffsetErrorUsForUnitSpeed,
-                targetLiveOffsetIncrementOnRebufferUs,
-                minPossibleLiveOffsetSmoothingFactor
-            )
-        }
-    }
 
     private var mediaConfigurationTargetLiveOffsetUs: Long
     private var targetLiveOffsetOverrideUs: Long
@@ -111,12 +27,10 @@ class DefaultLivePlaybackSpeedControl private constructor(
     private var minTargetLiveOffsetUs: Long
     private var maxTargetLiveOffsetUs: Long
     private var currentTargetLiveOffsetUs: Long
-
     private var maxPlaybackSpeed: Float
     private var minPlaybackSpeed: Float
     private var adjustedPlaybackSpeed: Float
     private var lastPlaybackSpeedUpdateMs: Long
-
     private var smoothedMinPossibleLiveOffsetUs: Long
     private var smoothedMinPossibleLiveOffsetDeviationUs: Long
 

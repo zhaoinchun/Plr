@@ -201,7 +201,7 @@ import kotlin.math.min
     var deviceVolumeControlEnabled = false
     var playerName: String = ""
     var livePlaybackSpeedControl: LivePlaybackSpeedControl =
-        DefaultLivePlaybackSpeedControl.Builder().build()
+        DefaultLivePlaybackSpeedControl()
     var releaseTimeoutMs = ExoPlayer.DEFAULT_RELEASE_TIMEOUT_MS
     var dynamicSchedulingEnabled = true
     var perStreamMediaProgressionEnabled = false
