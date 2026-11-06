@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.video
 
 import android.annotation.SuppressLint
@@ -30,7 +29,6 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.VideoFrameProcessor
 import androidx.media3.common.VideoSize
 import androidx.media3.common.util.CodecSpecificDataUtil.getCodecProfileAndLevel
-
 import androidx.media3.common.util.Log.d
 import androidx.media3.common.util.Log.e
 import androidx.media3.common.util.Log.w
@@ -38,7 +36,6 @@ import androidx.media3.common.util.MediaFormatUtil
 import androidx.media3.common.util.Size
 import androidx.media3.common.util.TraceUtil.beginSection
 import androidx.media3.common.util.TraceUtil.endSection
-
 import androidx.media3.common.util.Util.ceilDivide
 import androidx.media3.common.util.Util.createHandlerForCurrentLooper
 import androidx.media3.common.util.Util.isFrameDropAllowedOnSurfaceInput
@@ -46,7 +43,6 @@ import androidx.media3.common.util.Util.msToUs
 import androidx.media3.common.util.Util.toLong
 import androidx.media3.decoder.DecoderInputBuffer
 import androidx.media3.exoplayer.CodecParameters
-import androidx.media3.exoplayer.DecoderCounters
 import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.DecoderReuseEvaluation.DecoderDiscardReasons
 import androidx.media3.exoplayer.ExoPlaybackException
@@ -54,7 +50,6 @@ import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.RendererCapabilities.AdaptiveSupport
-import androidx.media3.exoplayer.RendererCapabilities.Capabilities
 import androidx.media3.exoplayer.RendererCapabilities.DecoderSupport
 import androidx.media3.exoplayer.RendererCapabilities.HardwareAccelerationSupport
 import androidx.media3.exoplayer.RendererCapabilities.TunnelingSupport
@@ -70,7 +65,6 @@ import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.DecoderQueryException
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getAlternativeDecoderInfos
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getDecoderInfosSoftMatch
-import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getDecoderInfosSortedByFormatSupport
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseAction
 import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseInfo
@@ -81,7 +75,6 @@ import androidx.media3.exoplayer.video.VideoSink.VideoSinkException
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.MoreExecutors
 import org.checkerframework.checker.initialization.qual.Initialized
-
 import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import java.nio.ByteBuffer
 import java.util.PriorityQueue
@@ -89,354 +82,110 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCodecRenderer(
-    builder.context.applicationContext,
+class MediaCodecVideoRenderer(
+    val context: Context,
+    var codecAdapterFactory: MediaCodecAdapter.Factory = Factory.getDefault(context),
+    var mediaCodecSelector: MediaCodecSelector? = MediaCodecSelector.DEFAULT,
+    var enableDecoderFallback: Boolean = false,
+    var assumedMinimumCodecOperatingRate: Float = 0f,
+    var eventHandler: Handler? = null,
+    var eventListener: VideoRendererEventListener? = null,
+    var allowedJoiningTimeMs: Long = 0,
+    var lateThresholdToDropDecoderInputUs: Long = DEFAULT_LATE_THRESHOLD_TO_DROP_DECODER_INPUT_US
+) : MediaCodecRenderer(
+    context.applicationContext,
     C.TRACK_TYPE_VIDEO,
-    builder.codecAdapterFactory,
-    builder.mediaCodecSelector,
-    builder.enableDecoderFallback,
-    builder.assumedMinimumCodecOperatingRate
+    codecAdapterFactory,
+    mediaCodecSelector,
+    enableDecoderFallback,
+    assumedMinimumCodecOperatingRate
 ), FrameTimingEvaluator {
-    private val context: Context
-    private val ownsVideoSink: Boolean
-    private val eventDispatcher: VideoRendererEventListener.EventDispatcher
-    private val maxDroppedFramesToNotify: Int
-    private val deviceNeedsNoPostProcessWorkaround: Boolean
-    private val videoFrameReleaseControl: VideoFrameReleaseControl
-    private val videoFrameReleaseInfo: FrameReleaseInfo
-    private val frameRateEstimator: FixedFrameRateEstimator
-    private val av1SampleDependencyParser: Av1SampleDependencyParser?
+    private val ownsVideoSink: Boolean get() = videoSink == null
+    private val eventDispatcher: VideoRendererEventListener.EventDispatcher =
+        VideoRendererEventListener.EventDispatcher(eventHandler, eventListener)
+
+    private val deviceNeedsNoPostProcessWorkaround: Boolean = deviceNeedsNoPostProcessWorkaround()
+    private val videoFrameReleaseInfo = FrameReleaseInfo()
+    private val frameRateEstimator: FixedFrameRateEstimator =
+        FixedFrameRateEstimator(FixedFrameRateEstimator.Listener { frameRate: Float ->
+            this.onFrameRateEstimateChanged(frameRate)
+        })
+    var parseAv1SampleDependencies = true
+        set(value) {
+            field = value
+            av1SampleDependencyParser = if (value) Av1SampleDependencyParser() else null
+        }
+    private var av1SampleDependencyParser: Av1SampleDependencyParser? = null
     private val minEarlyUsToDropDecoderInput: Long
     private val videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster?
-    private val discardedDecoderInputBufferTimestamps: PriorityQueue<Long?>
-    private val enableMediaCodecBufferDecodeOnlyFlag: Boolean
-    private val enableDurationToProgressUs: Boolean
+    private val discardedDecoderInputBufferTimestamps: PriorityQueue<Long?> = PriorityQueue<Long?>()
 
-    private var codecMaxValues:CodecMaxValues? = null
+    private var codecMaxValues: CodecMaxValues? = null
     private var codecNeedsSetOutputSurfaceWorkaround = false
     private var codecNeedsStripNonHdr10PlusT35Workaround = false
     private var codecHandlesHdr10PlusOutOfBandMetadata = false
     private var isApplyingContainerHagcMetadata = false
-    private var videoSink:VideoSink?
     private var hasSetVideoSink = false
     private var nextVideoSinkFirstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int = 0
     private var videoEffects: List<Effect>? =
         null// TODO(b/260702159) Consider renaming the method to getOutputSurface().
 
+    var buildCalled = false
+    var maxDroppedFramesToNotify = 0
+    var videoSink: VideoSink? = null
+    private var enableMediaCodecBufferDecodeOnlyFlag = false
+    var enableDurationToProgressUs = false
+    var earlySchedulingThresholdUs: Long = DEFAULT_EARLY_SCHEDULING_THRESHOLD_US
+
     protected var surface: Surface? = null
         private set
     private var placeholderSurface: PlaceholderSurface? = null
-    private var outputResolution: Size
+    private var outputResolution: Size = Size.UNKNOWN
     private var haveReportedFirstFrameRenderedForCurrentSurface = false
 
     @C.VideoScalingMode
-    private var scalingMode: @C.VideoScalingMode Int
+    private var scalingMode: @C.VideoScalingMode Int = C.VIDEO_SCALING_MODE_DEFAULT
 
-    @C.VideoChangeFrameRateStrategy
-    private var changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+    private var changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int =
+        C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
     private var droppedFrameAccumulationStartTimeMs: Long = 0
     private var droppedFrames = 0
     private var consecutiveDroppedFrameCount = 0
     private var buffersInCodecCount = 0
-    private var scrubbingModeParameters: ScrubbingModeParameters?
+    private var scrubbingModeParameters: ScrubbingModeParameters? = null
     private var lastResetToKeyFramePositionUs: Long = 0
     private var isFlushRequired = false
     private var totalVideoFrameProcessingOffsetUs: Long = 0
     private var videoFrameProcessingOffsetCount = 0
     private var lastFrameReleaseTimeNs: Long = 0
-    private var decodedVideoSize: VideoSize
-    private var reportedVideoSize: VideoSize?
-    private var rendererPriority: Int
+    private var decodedVideoSize: VideoSize = VideoSize.UNKNOWN
+    private var reportedVideoSize: VideoSize? = null
+    private var rendererPriority: Int = C.PRIORITY_PLAYBACK
 
     private var tunneling = false
-    private var tunnelingAudioSessionId: Int
+    private var tunnelingAudioSessionId: Int = C.AUDIO_SESSION_ID_UNSET
     private var tunnelingOnFrameRenderedListener: OnFrameRenderedListener? = null
     private var frameMetadataListener: VideoFrameMetadataListener? = null
-    private var startPositionUs: Long
+    private var startPositionUs: Long = C.TIME_UNSET
     private var pendingVideoSinkInputStreamChange = false
 
     private var consecutiveDroppedInputBufferCount = 0
-    private var nextOutputBufferToProcessPresentationTimeUs: Long
-
-    class Builder( val context: Context) {
-         var buildCalled = false
-         var mediaCodecSelector: MediaCodecSelector?
-         var codecAdapterFactory: MediaCodecAdapter.Factory
-         var allowedJoiningTimeMs: Long = 0
-         var enableDecoderFallback = false
-         var eventHandler: Handler? = null
-         var eventListener: VideoRendererEventListener? = null
-         var maxDroppedFramesToNotify = 0
-         var assumedMinimumCodecOperatingRate = 0f
-         var videoSink: VideoSink? = null
-         var parseAv1SampleDependencies = true
-         var lateThresholdToDropDecoderInputUs: Long
-         var enableMediaCodecBufferDecodeOnlyFlag = false
-         var enableDurationToProgressUs = false
-         var earlySchedulingThresholdUs: Long
-
-        init {
-            this.mediaCodecSelector = MediaCodecSelector.DEFAULT
-            this.codecAdapterFactory = Factory.getDefault(context)
-            this.lateThresholdToDropDecoderInputUs = DEFAULT_LATE_THRESHOLD_TO_DROP_DECODER_INPUT_US
-            this.earlySchedulingThresholdUs = DEFAULT_EARLY_SCHEDULING_THRESHOLD_US
-        }
-
-        fun setMediaCodecSelector(mediaCodecSelector: MediaCodecSelector?): Builder {
-            this.mediaCodecSelector = mediaCodecSelector
-            return this
-        }
-
-        fun setCodecAdapterFactory(codecAdapterFactory: MediaCodecAdapter.Factory): Builder {
-            this.codecAdapterFactory = codecAdapterFactory
-            return this
-        }
-
-        fun setAllowedJoiningTimeMs(allowedJoiningTimeMs: Long): Builder {
-            this.allowedJoiningTimeMs = allowedJoiningTimeMs
-            return this
-        }
-
-        fun setEnableDecoderFallback(enableDecoderFallback: Boolean): Builder {
-            this.enableDecoderFallback = enableDecoderFallback
-            return this
-        }
-
-        fun setEventHandler(eventHandler: Handler?): Builder {
-            this.eventHandler = eventHandler
-            return this
-        }
-
-        fun setEventListener(eventListener: VideoRendererEventListener?): Builder {
-            this.eventListener = eventListener
-            return this
-        }
-
-        fun setMaxDroppedFramesToNotify(maxDroppedFramesToNotify: Int): Builder {
-            this.maxDroppedFramesToNotify = maxDroppedFramesToNotify
-            return this
-        }
-
-        fun setAssumedMinimumCodecOperatingRate(assumedMinimumCodecOperatingRate: Float): Builder {
-            this.assumedMinimumCodecOperatingRate = assumedMinimumCodecOperatingRate
-            return this
-        }
-
-        fun setVideoSink(videoSink: VideoSink?): Builder {
-            this.videoSink = videoSink
-            return this
-        }
-
-         // TODO: b/470365670 - Remove method once config is enabled by default.
-        fun experimentalSetParseAv1SampleDependencies(parseAv1SampleDependencies: Boolean): Builder {
-            this.parseAv1SampleDependencies = parseAv1SampleDependencies
-            return this
-        }
-
-         // TODO: b/470367421 - Remove or make non-experimental.
-        fun experimentalSetLateThresholdToDropDecoderInputUs(
-            lateThresholdToDropDecoderInputUs: Long
-        ): Builder {
-            this.lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs
-            return this
-        }
-
-        @RequiresApi(34)
-         // TODO: b/470367414 - Run experiments and enable by default.
-        fun experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
-            enableMediaCodecBufferDecodeOnlyFlag: Boolean
-        ): Builder {
-            this.enableMediaCodecBufferDecodeOnlyFlag = enableMediaCodecBufferDecodeOnlyFlag
-            return this
-        }
-
-         // TODO: b/369523131 - Remove once experiment is complete.
-        fun setEnableDurationToProgressUs(enableDurationToProgressUs: Boolean): Builder {
-            this.enableDurationToProgressUs = enableDurationToProgressUs
-            return this
-        }
-
-         // TODO: b/505688667 - Remove method once threshold is fine-tuned.
-        fun setEarlySchedulingThresholdUs(earlySchedulingThresholdUs: Long): Builder {
-            this.earlySchedulingThresholdUs = earlySchedulingThresholdUs
-            return this
-        }
-
-        fun build(): MediaCodecVideoRenderer {
-            Preconditions.checkState(!buildCalled)
-            Preconditions.checkState(
-                (eventHandler == null && eventListener == null)
-                        || (eventHandler != null && eventListener != null)
-            )
-            buildCalled = true
-            return MediaCodecVideoRenderer(this)
-        }
-    }
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?
-    ) : this(Builder(context).setMediaCodecSelector(mediaCodecSelector))
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?,
-        allowedJoiningTimeMs: Long
-    ) : this(
-        Builder(context)
-            .setMediaCodecSelector(mediaCodecSelector)
-            .setAllowedJoiningTimeMs(allowedJoiningTimeMs)
-    )
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?,
-        allowedJoiningTimeMs: Long,
-        eventHandler: Handler?,
-        eventListener: VideoRendererEventListener?,
-        maxDroppedFramesToNotify: Int
-    ) : this(
-        Builder(context)
-            .setMediaCodecSelector(mediaCodecSelector)
-            .setAllowedJoiningTimeMs(allowedJoiningTimeMs)
-            .setEventHandler(eventHandler)
-            .setEventListener(eventListener)
-            .setMaxDroppedFramesToNotify(maxDroppedFramesToNotify)
-    )
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?,
-        allowedJoiningTimeMs: Long,
-        enableDecoderFallback: Boolean,
-        eventHandler: Handler?,
-        eventListener: VideoRendererEventListener?,
-        maxDroppedFramesToNotify: Int
-    ) : this(
-        Builder(context)
-            .setMediaCodecSelector(mediaCodecSelector)
-            .setAllowedJoiningTimeMs(allowedJoiningTimeMs)
-            .setEnableDecoderFallback(enableDecoderFallback)
-            .setEventHandler(eventHandler)
-            .setEventListener(eventListener)
-            .setMaxDroppedFramesToNotify(maxDroppedFramesToNotify)
-    )
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        codecAdapterFactory: MediaCodecAdapter.Factory,
-        mediaCodecSelector: MediaCodecSelector?,
-        allowedJoiningTimeMs: Long,
-        enableDecoderFallback: Boolean,
-        eventHandler: Handler?,
-        eventListener: VideoRendererEventListener?,
-        maxDroppedFramesToNotify: Int
-    ) : this(
-        Builder(context)
-            .setMediaCodecSelector(mediaCodecSelector)
-            .setCodecAdapterFactory(codecAdapterFactory)
-            .setAllowedJoiningTimeMs(allowedJoiningTimeMs)
-            .setEnableDecoderFallback(enableDecoderFallback)
-            .setEventHandler(eventHandler)
-            .setEventListener(eventListener)
-            .setMaxDroppedFramesToNotify(maxDroppedFramesToNotify)
-    )
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        codecAdapterFactory: MediaCodecAdapter.Factory,
-        mediaCodecSelector: MediaCodecSelector?,
-        allowedJoiningTimeMs: Long,
-        enableDecoderFallback: Boolean,
-        eventHandler: Handler?,
-        eventListener: VideoRendererEventListener?,
-        maxDroppedFramesToNotify: Int,
-        assumedMinimumCodecOperatingRate: Float
-    ) : this(
-        Builder(context)
-            .setMediaCodecSelector(mediaCodecSelector)
-            .setCodecAdapterFactory(codecAdapterFactory)
-            .setAllowedJoiningTimeMs(allowedJoiningTimeMs)
-            .setEnableDecoderFallback(enableDecoderFallback)
-            .setEventHandler(eventHandler)
-            .setEventListener(eventListener)
-            .setMaxDroppedFramesToNotify(maxDroppedFramesToNotify)
-            .setAssumedMinimumCodecOperatingRate(assumedMinimumCodecOperatingRate)
-    )
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        codecAdapterFactory: MediaCodecAdapter.Factory,
-        mediaCodecSelector: MediaCodecSelector?,
-        allowedJoiningTimeMs: Long,
-        enableDecoderFallback: Boolean,
-        eventHandler: Handler?,
-        eventListener: VideoRendererEventListener?,
-        maxDroppedFramesToNotify: Int,
-        assumedMinimumCodecOperatingRate: Float,
-        videoSink: VideoSink?
-    ) : this(
-        Builder(context)
-            .setMediaCodecSelector(mediaCodecSelector)
-            .setCodecAdapterFactory(codecAdapterFactory)
-            .setAllowedJoiningTimeMs(allowedJoiningTimeMs)
-            .setEnableDecoderFallback(enableDecoderFallback)
-            .setEventHandler(eventHandler)
-            .setEventListener(eventListener)
-            .setMaxDroppedFramesToNotify(maxDroppedFramesToNotify)
-            .setAssumedMinimumCodecOperatingRate(assumedMinimumCodecOperatingRate)
-            .setVideoSink(videoSink)
-    )
+    private var nextOutputBufferToProcessPresentationTimeUs: Long = C.TIME_UNSET
+    private val videoFrameReleaseControl =
+        VideoFrameReleaseControl(
+            context, this, allowedJoiningTimeMs
+        )
 
     init {
-        this.context = builder.context.getApplicationContext()
-        this.maxDroppedFramesToNotify = builder.maxDroppedFramesToNotify
-        this.videoSink = builder.videoSink
-        eventDispatcher =
-            VideoRendererEventListener.EventDispatcher(builder.eventHandler, builder.eventListener)
-        ownsVideoSink = videoSink == null
-        val thisRef: @Initialized FrameTimingEvaluator = this
-        videoFrameReleaseControl =
-            VideoFrameReleaseControl(
-                this.context,  thisRef, builder.allowedJoiningTimeMs
-            )
-        videoFrameReleaseControl.setEarlySchedulingThresholdUs(builder.earlySchedulingThresholdUs)
-        videoFrameReleaseInfo = FrameReleaseInfo()
-        frameRateEstimator =
-            FixedFrameRateEstimator(FixedFrameRateEstimator.Listener { frameRate: Float ->
-                this.onFrameRateEstimateChanged(frameRate)
-            })
-        deviceNeedsNoPostProcessWorkaround = deviceNeedsNoPostProcessWorkaround()
-        outputResolution = Size.UNKNOWN
-        scalingMode = C.VIDEO_SCALING_MODE_DEFAULT
-        changeFrameRateStrategy = C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
-        decodedVideoSize = VideoSize.UNKNOWN
-        tunnelingAudioSessionId = C.AUDIO_SESSION_ID_UNSET
-        reportedVideoSize = null
-        rendererPriority = C.PRIORITY_PLAYBACK
-        startPositionUs = C.TIME_UNSET
-        av1SampleDependencyParser =
-            if (builder.parseAv1SampleDependencies) Av1SampleDependencyParser() else null
-        discardedDecoderInputBufferTimestamps = PriorityQueue<Long?>()
-        if (builder.lateThresholdToDropDecoderInputUs != C.TIME_UNSET) {
-            minEarlyUsToDropDecoderInput = -builder.lateThresholdToDropDecoderInputUs
+        videoFrameReleaseControl.setEarlySchedulingThresholdUs(earlySchedulingThresholdUs)
+        if (lateThresholdToDropDecoderInputUs != C.TIME_UNSET) {
+            minEarlyUsToDropDecoderInput = -lateThresholdToDropDecoderInputUs
             videoFrameReleaseEarlyTimeForecaster =
-                VideoFrameReleaseEarlyTimeForecaster( 1f)
+                VideoFrameReleaseEarlyTimeForecaster(1f)
         } else {
             minEarlyUsToDropDecoderInput = C.TIME_UNSET
             videoFrameReleaseEarlyTimeForecaster = null
         }
-        enableMediaCodecBufferDecodeOnlyFlag = builder.enableMediaCodecBufferDecodeOnlyFlag
-        enableDurationToProgressUs = builder.enableDurationToProgressUs
-        nextOutputBufferToProcessPresentationTimeUs = C.TIME_UNSET
-        scrubbingModeParameters = null
     }
 
     // FrameTimingEvaluator methods
@@ -535,7 +284,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 val playbackVideoGraphWrapper =
                     createPlaybackVideoGraphWrapper(context, videoFrameReleaseControl)
                 playbackVideoGraphWrapper.setTotalVideoInputCount(1)
-                videoSink = playbackVideoGraphWrapper.getSink( 0)
+                videoSink = playbackVideoGraphWrapper.getSink(0)
             }
             hasSetVideoSink = true
         }
@@ -580,8 +329,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
 
                 override fun onFrameDropped() {
                     if (this@MediaCodecVideoRenderer.surface != null) {
-                        updateDroppedBufferCounters( 
-                            0,  1
+                        updateDroppedBufferCounters(
+                            0, 1
                         )
                     }
                 }
@@ -671,7 +420,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             if (!joining) {
                 // Flush the video sink first to ensure it stops reading textures that will be owned by
                 // MediaCodec once the codec is flushed.
-                videoSink!!.flush( true)
+                videoSink!!.flush(true)
             }
         }
         if (sampleStreamIsResetToKeyFrame) {
@@ -689,9 +438,9 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             // first. This prevents a stuttering effect caused by showing the first frame and then
             // dropping many of the subsequent frames during the catch up phase.
             if (videoSink != null) {
-                videoSink!!.join( false)
+                videoSink!!.join(false)
             } else {
-                videoFrameReleaseControl.join( false)
+                videoFrameReleaseControl.join(false)
             }
         }
 
@@ -799,16 +548,16 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
     @Throws(ExoPlaybackException::class)
     override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
         when (messageType) {
-          Renderer. MSG_SET_VIDEO_OUTPUT -> setOutput(message)
-            Renderer.  MSG_SET_SCALING_MODE -> {
-                scalingMode =message as Int
+            Renderer.MSG_SET_VIDEO_OUTPUT -> setOutput(message)
+            Renderer.MSG_SET_SCALING_MODE -> {
+                scalingMode = message as Int
                 val codec = codec
                 if (codec != null) {
                     codec.setVideoScalingMode(scalingMode)
                 }
             }
 
-            Renderer.  MSG_SET_CHANGE_FRAME_RATE_STRATEGY -> {
+            Renderer.MSG_SET_CHANGE_FRAME_RATE_STRATEGY -> {
                 changeFrameRateStrategy = message!! as Int
                 if (videoSink != null) {
                     videoSink!!.setChangeFrameRateStrategy(changeFrameRateStrategy)
@@ -817,7 +566,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 }
             }
 
-            Renderer.  MSG_SET_VIDEO_FRAME_METADATA_LISTENER -> {
+            Renderer.MSG_SET_VIDEO_FRAME_METADATA_LISTENER -> {
                 frameMetadataListener =
                     message!! as VideoFrameMetadataListener
                 if (videoSink != null) {
@@ -825,7 +574,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 }
             }
 
-            Renderer. MSG_SET_AUDIO_SESSION_ID -> {
+            Renderer.MSG_SET_AUDIO_SESSION_ID -> {
                 val tunnelingAudioSessionId = message!! as Int
                 if (this.tunnelingAudioSessionId != tunnelingAudioSessionId) {
                     this.tunnelingAudioSessionId = tunnelingAudioSessionId
@@ -835,12 +584,12 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 }
             }
 
-            Renderer.  MSG_SET_VIDEO_EFFECTS -> {
+            Renderer.MSG_SET_VIDEO_EFFECTS -> {
                 val videoEffects = message as List<Effect>
                 setVideoEffects(videoEffects)
             }
 
-            Renderer.  MSG_SET_VIDEO_OUTPUT_RESOLUTION -> {
+            Renderer.MSG_SET_VIDEO_OUTPUT_RESOLUTION -> {
                 val outputResolution = message!! as Size
                 if (outputResolution.width != 0 && outputResolution.height != 0) {
                     this.outputResolution = outputResolution
@@ -852,19 +601,19 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 }
             }
 
-            Renderer. MSG_SET_PRIORITY -> {
+            Renderer.MSG_SET_PRIORITY -> {
                 rendererPriority = message!! as Int
                 updateCodecImportance()
             }
 
-            Renderer.  MSG_TRANSFER_RESOURCES -> {
+            Renderer.MSG_TRANSFER_RESOURCES -> {
                 val surface = this.surface
                 setOutput(null)
                 (message!! as MediaCodecVideoRenderer)
                     .handleMessage(Renderer.MSG_SET_VIDEO_OUTPUT, surface)
             }
 
-            Renderer. MSG_SET_SCRUBBING_MODE -> {
+            Renderer.MSG_SET_SCRUBBING_MODE -> {
                 val codecRateAlreadyIncreasedForScrubbing =
                     scrubbingModeParameters != null
                             && scrubbingModeParameters!!.shouldIncreaseCodecOperatingRate
@@ -986,7 +735,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         val evaluation = codecInfo.canReuseCodec(oldFormat, newFormat)
 
         var discardReasons: @DecoderDiscardReasons Int = evaluation.discardReasons
-        val codecMaxValues: CodecMaxValues =this.codecMaxValues!!
+        val codecMaxValues: CodecMaxValues = this.codecMaxValues!!
         if (newFormat.width > codecMaxValues.width || newFormat.height > codecMaxValues.height) {
             discardReasons =
                 discardReasons or DecoderReuseEvaluation.DISCARD_REASON_VIDEO_MAX_RESOLUTION_EXCEEDED
@@ -1036,9 +785,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         consecutiveDroppedInputBufferCount = 0
         isFlushRequired = false
         nextOutputBufferToProcessPresentationTimeUs = C.TIME_UNSET
-        if (av1SampleDependencyParser != null) {
-            av1SampleDependencyParser.reset()
-        }
+        av1SampleDependencyParser?.reset()
     }
 
     @Throws(ExoPlaybackException::class)
@@ -1067,20 +814,20 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             // When not started, we can only make further progress if we don't have a first frame rendered
             // or a frame ready to render.
             return if (isReady || isEnded)
-                Renderer.  DEFAULT_IDLE_DURATION_TO_PROGRESS_US
+                Renderer.DEFAULT_IDLE_DURATION_TO_PROGRESS_US
             else
-                Renderer. DEFAULT_DURATION_TO_PROGRESS_US
+                Renderer.DEFAULT_DURATION_TO_PROGRESS_US
         }
 
         if (nextOutputBufferToProcessPresentationTimeUs == C.TIME_UNSET || videoSink != null) {
-            return  Renderer.DEFAULT_DURATION_TO_PROGRESS_US
+            return Renderer.DEFAULT_DURATION_TO_PROGRESS_US
         }
 
         if (isEnded) {
             // If processed all output then return half of the duration to the end.
             var durationUs = (nextOutputBufferToProcessPresentationTimeUs - positionUs)
             durationUs = (durationUs / playbackSpeed / 2).toLong()
-            return max( Renderer.DEFAULT_DURATION_TO_PROGRESS_US, durationUs)
+            return max(Renderer.DEFAULT_DURATION_TO_PROGRESS_US, durationUs)
         }
 
         try {
@@ -1089,8 +836,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                     nextOutputBufferToProcessPresentationTimeUs,
                     positionUs,
                     elapsedRealtimeUs,
-                    outputStreamStartPositionUs,  
-                    false,  
+                    outputStreamStartPositionUs,
+                    false,
                     false,
                     frameRateEstimator.frameDurationNs,
                     frameRateEstimator.frameIndex,
@@ -1107,7 +854,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         } catch (exoPlaybackException: ExoPlaybackException) {
             w(TAG, "Error while evaluating frame release action")
         }
-        return  Renderer.DEFAULT_DURATION_TO_PROGRESS_US
+        return Renderer.DEFAULT_DURATION_TO_PROGRESS_US
     }
 
     override fun getCodecOperatingRateV23(
@@ -1189,8 +936,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
     ) {
         eventDispatcher.decoderInitialized(name, initializedTimestampMs, initializationDurationMs)
         codecNeedsSetOutputSurfaceWorkaround = codecNeedsSetOutputSurfaceWorkaround(name)
-        codecHandlesHdr10PlusOutOfBandMetadata =codecInfo!!.isHdr10PlusOutOfBandMetadataSupported
-        codecNeedsStripNonHdr10PlusT35Workaround =codecInfo!!.mimeType == MimeTypes.VIDEO_AV1
+        codecHandlesHdr10PlusOutOfBandMetadata = codecInfo!!.isHdr10PlusOutOfBandMetadataSupported
+        codecNeedsStripNonHdr10PlusT35Workaround = codecInfo!!.mimeType == MimeTypes.VIDEO_AV1
         maybeSetupTunnelingForFirstFrame()
     }
 
@@ -1259,6 +1006,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
     @Throws(ExoPlaybackException::class)
     override fun onQueueInputBuffer(buffer: DecoderInputBuffer) {
         val mimeType = codecInfo!!.mimeType
+        val av1SampleDependencyParser = av1SampleDependencyParser
         if (mimeType == MimeTypes.VIDEO_AV1 && buffer.data != null) {
             val bufferData: ByteBuffer = buffer.data!!
             val codecInputFormat = codecInputFormat
@@ -1314,6 +1062,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             // Make sure to decode and render the last frame.
             return false
         }
+        val av1SampleDependencyParser = av1SampleDependencyParser
         val isBufferBeforeStartTime = isBufferBeforeStartTime(buffer)
         var shouldDropDecoderInputBuffer = false
         if (videoFrameReleaseEarlyTimeForecaster != null) {
@@ -1354,7 +1103,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                             < readOnlySample.capacity())
                 // An encrypted buffer cannot be partially discarded.
                 if (hasSpaceForNextFrame && !buffer.isEncrypted) {
-                    buffer.data!! .position(sampleLimitAfterSkippingNonReferenceFrames)
+                    buffer.data!!.position(sampleLimitAfterSkippingNonReferenceFrames)
                     bufferDiscarded = true
                 }
             }
@@ -1439,7 +1188,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 return
             }
             changeVideoSinkInputStream(
-                videoSink!!,  
+                videoSink!!,
                 VideoSink.INPUT_TYPE_SURFACE,
                 format
                     .buildUpon()
@@ -1647,13 +1396,12 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         }
     }
 
-     // TODO: b/417646815 - Remove this workaround method once it's no longer needed.
+    // TODO: b/417646815 - Remove this workaround method once it's no longer needed.
     protected fun experimentalDisableAdvancingTimestampChecksInVideoFrameReleaseControl() {
         videoFrameReleaseControl.experimentalDisableAdvancingTimestampChecks()
     }
 
     protected val bufferTimestampAdjustmentUs: Long
-        
         get() = -startPositionUs
 
     private fun releaseFrame(
@@ -1756,8 +1504,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         beginSection("dropVideoBuffer")
         codec.releaseOutputBuffer(index, false)
         endSection()
-        updateDroppedBufferCounters( 
-            0,  1
+        updateDroppedBufferCounters(
+            0, 1
         )
     }
 
@@ -1793,15 +1541,15 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             decoderCounters.skippedInputBufferCount += skippedInQueue
         } else {
             decoderCounters.droppedToKeyframeCount++
-            updateDroppedBufferCounters( 
-                droppedSourceBufferCount + droppedInQueue,  
+            updateDroppedBufferCounters(
+                droppedSourceBufferCount + droppedInQueue,
                 buffersInCodecCount
             )
             decoderCounters.skippedInputBufferCount += skippedInQueue
         }
         flushOrReinitializeCodec()
         if (videoSink != null) {
-            videoSink!!.flush( false)
+            videoSink!!.flush(false)
         }
         return true
     }
@@ -1838,7 +1586,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 skippedInputBufferCount++
             }
         }
-        updateDroppedBufferCounters(droppedInputBufferCount,  0)
+        updateDroppedBufferCounters(droppedInputBufferCount, 0)
         decoderCounters.skippedInputBufferCount += skippedInputBufferCount
     }
 
@@ -2079,7 +1827,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             mediaFormat, MediaFormat.KEY_MAX_INPUT_SIZE, codecMaxValues.inputSize
         )
         // Set codec configuration values.
-        mediaFormat.setInteger(MediaFormat.KEY_PRIORITY, 0 )
+        mediaFormat.setInteger(MediaFormat.KEY_PRIORITY, 0)
         if (codecOperatingRate != CODEC_OPERATING_RATE_UNSET) {
             mediaFormat.setFloat(MediaFormat.KEY_OPERATING_RATE, codecOperatingRate)
         }
@@ -2179,7 +1927,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
    *    different pixel formats. If we can find a way to query the Surface instances to determine
    *    whether this case applies, then we'll be able to provide a more targeted workaround.
    */
-    
+
     protected fun codecNeedsSetOutputSurfaceWorkaround(name: String): Boolean {
         if (name.startsWith("OMX.google")) {
             // Google OMX decoders are not known to have this issue on any API level.
@@ -2239,8 +1987,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         private val handler: Handler
 
         init {
-            handler = createHandlerForCurrentLooper( this)
-            codec.setOnFrameRenderedListener( this, handler)
+            handler = createHandlerForCurrentLooper(this)
+            codec.setOnFrameRenderedListener(this, handler)
         }
 
         override fun onFrameRendered(
@@ -2258,9 +2006,9 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             if (Build.VERSION.SDK_INT < 30) {
                 val message =
                     Message.obtain(
-                        handler,  
-                        HANDLE_FRAME_RENDERED,  
-                        (presentationTimeUs shr 32).toInt(),  
+                        handler,
+                        HANDLE_FRAME_RENDERED,
+                        (presentationTimeUs shr 32).toInt(),
                         presentationTimeUs.toInt()
                     )
                 handler.sendMessageAtFrontOfQueue(message)
@@ -2359,7 +2107,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                     context,
                     mediaCodecSelector,
                     format,
-                    requiresSecureDecryption,  
+                    requiresSecureDecryption,
                     false
                 )
             if (requiresSecureDecryption && decoderInfos.isEmpty()) {
@@ -2368,8 +2116,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                     getDecoderInfos(
                         context,
                         mediaCodecSelector,
-                        format,  
-                        false,  
+                        format,
+                        false,
                         false
                     )
             }
@@ -2402,29 +2150,30 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                 if (decoderInfo.isSeamlessAdaptationSupported(format))
                     RendererCapabilities.ADAPTIVE_SEAMLESS
                 else
-                    RendererCapabilities.  ADAPTIVE_NOT_SEAMLESS
+                    RendererCapabilities.ADAPTIVE_NOT_SEAMLESS
             val hardwareAccelerationSupport: @HardwareAccelerationSupport Int =
                 if (decoderInfo.hardwareAccelerated)
-                    RendererCapabilities.  HARDWARE_ACCELERATION_SUPPORTED
+                    RendererCapabilities.HARDWARE_ACCELERATION_SUPPORTED
                 else
-                    RendererCapabilities.  HARDWARE_ACCELERATION_NOT_SUPPORTED
+                    RendererCapabilities.HARDWARE_ACCELERATION_NOT_SUPPORTED
             var decoderSupport: @DecoderSupport Int =
-                if (isPreferredDecoder)  RendererCapabilities.DECODER_SUPPORT_PRIMARY else  RendererCapabilities.DECODER_SUPPORT_FALLBACK
+                if (isPreferredDecoder) RendererCapabilities.DECODER_SUPPORT_PRIMARY else RendererCapabilities.DECODER_SUPPORT_FALLBACK
 
             if (Build.VERSION.SDK_INT >= 26 && MimeTypes.VIDEO_DOLBY_VISION == format.sampleMimeType
                 && !Api26.doesDisplaySupportDolbyVision(context)
             ) {
-                decoderSupport =  RendererCapabilities.DECODER_SUPPORT_FALLBACK_MIMETYPE
+                decoderSupport = RendererCapabilities.DECODER_SUPPORT_FALLBACK_MIMETYPE
             }
 
-            var tunnelingSupport: @TunnelingSupport Int =  RendererCapabilities.TUNNELING_NOT_SUPPORTED
+            var tunnelingSupport: @TunnelingSupport Int =
+                RendererCapabilities.TUNNELING_NOT_SUPPORTED
             if (isFormatSupported) {
                 val tunnelingDecoderInfos: List<MediaCodecInfo> =
                     getDecoderInfos(
                         context,
                         mediaCodecSelector,
                         format,
-                        requiresSecureDecryption,  
+                        requiresSecureDecryption,
                         true
                     )
                 if (!tunnelingDecoderInfos.isEmpty()) {
@@ -2435,7 +2184,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                     if (tunnelingDecoderInfo.isFormatSupported(context, format)
                         && tunnelingDecoderInfo.isSeamlessAdaptationSupported(format)
                     ) {
-                        tunnelingSupport =  RendererCapabilities.TUNNELING_SUPPORTED
+                        tunnelingSupport = RendererCapabilities.TUNNELING_SUPPORTED
                     }
                 }
             }
@@ -2450,7 +2199,7 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
         }
 
         // Other methods
-        
+
         @Throws(DecoderQueryException::class)
         private fun getDecoderInfos(
             context: Context,
@@ -2509,7 +2258,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
             // Attempt to infer a maximum input size from the format.
             when (sampleMimeType) {
                 MimeTypes.VIDEO_H263, MimeTypes.VIDEO_MP4V, MimeTypes.VIDEO_AV1, MimeTypes.VIDEO_VP8 ->         // Assume a min compression of 2 similar to the platform's SoftVPX.cpp.
-                    return getMaxSampleSize( width * height,  
+                    return getMaxSampleSize(
+                        width * height,
                         2
                     )
 
@@ -2517,7 +2267,8 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                     // the minimum size.
                     return max(
                         HEVC_MAX_INPUT_SIZE_THRESHOLD,
-                        getMaxSampleSize( width * height,  
+                        getMaxSampleSize(
+                            width * height,
                             2
                         )
                     )
@@ -2535,10 +2286,11 @@ class MediaCodecVideoRenderer protected constructor(builder: Builder) : MediaCod
                     }
                     // Round up width/height to an integer number of macroblocks.
                     val maxPixels = ceilDivide(width, 16) * ceilDivide(height, 16) * 16 * 16
-                    return getMaxSampleSize(maxPixels,  2)
+                    return getMaxSampleSize(maxPixels, 2)
                 }
 
-                MimeTypes.VIDEO_VP9 -> return getMaxSampleSize( width * height,  
+                MimeTypes.VIDEO_VP9 -> return getMaxSampleSize(
+                    width * height,
                     4
                 )
 

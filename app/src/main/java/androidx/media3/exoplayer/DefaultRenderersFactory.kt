@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer
 
 import android.content.Context
@@ -84,7 +83,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return this
     }
 
-     // TODO: b/470368123 - Remove method once flag usage once safe.
+    // TODO: b/470368123 - Remove method once flag usage once safe.
     fun experimentalSetMediaCodecAsyncCryptoFlagEnabled(
         enableAsyncCryptoFlag: Boolean
     ): DefaultRenderersFactory {
@@ -123,7 +122,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return this
     }
 
-     // TODO: b/470365582 - Enable as a permanent, non-experimental option.
+    // TODO: b/470365582 - Enable as a permanent, non-experimental option.
     fun experimentalSetEnableMediaCodecVideoRendererPrewarming(
         enableMediaCodecVideoRendererPrewarming: Boolean
     ): DefaultRenderersFactory {
@@ -131,7 +130,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return this
     }
 
-     // TODO: b/470365670 - Remove method once config is enabled by default.
+    // TODO: b/470365670 - Remove method once config is enabled by default.
     fun experimentalSetParseAv1SampleDependencies(
         parseAv1SampleDependencies: Boolean
     ): DefaultRenderersFactory {
@@ -140,8 +139,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     }
 
     @RequiresApi(34)
-
-     // TODO: b/470367414 - Run experiments and enable by default.
+    // TODO: b/470367414 - Run experiments and enable by default.
     fun experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
         enableMediaCodecBufferDecodeOnlyFlag: Boolean
     ): DefaultRenderersFactory {
@@ -149,7 +147,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return this
     }
 
-     // TODO: b/369523131 - Remove once experiment is complete.
+    // TODO: b/369523131 - Remove once experiment is complete.
     fun setEnableMediaCodecVideoRendererDurationToProgressUs(
         enableMediaCodecVideoRendererDurationToProgressUs: Boolean
     ): DefaultRenderersFactory {
@@ -165,7 +163,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return this
     }
 
-     // TODO: b/470367421 - Remove or make non-experimental.
+    // TODO: b/470367421 - Remove or make non-experimental.
     fun experimentalSetLateThresholdToDropDecoderInputUs(
         lateThresholdToDropDecoderInputUs: Long
     ): DefaultRenderersFactory {
@@ -241,25 +239,27 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         allowedVideoJoiningTimeMs: Long
     ): MediaCodecVideoRenderer {
         var builder =
-            MediaCodecVideoRenderer.Builder(context)
-                .setCodecAdapterFactory(getCodecAdapterFactory())
-                .setMediaCodecSelector(mediaCodecSelector)
-                .setAllowedJoiningTimeMs(allowedVideoJoiningTimeMs)
-                .setEnableDecoderFallback(enableDecoderFallback)
-                .setEventHandler(eventHandler)
-                .setEventListener(eventListener)
-                .setMaxDroppedFramesToNotify(MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY)
-                .experimentalSetParseAv1SampleDependencies(parseAv1SampleDependencies)
-                .experimentalSetLateThresholdToDropDecoderInputUs(lateThresholdToDropDecoderInputUs)
-                .setEnableDurationToProgressUs(enableMediaCodecVideoRendererDurationToProgressUs)
-                .setEarlySchedulingThresholdUs(videoRendererEarlySchedulingThresholdUs)
-        if (Build.VERSION.SDK_INT >= 34) {
-            builder =
-                builder.experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
-                    enableMediaCodecBufferDecodeOnlyFlag
-                )
-        }
-        return builder.build()
+            MediaCodecVideoRenderer(
+                context,
+                codecAdapterFactory = getCodecAdapterFactory(),
+                mediaCodecSelector = mediaCodecSelector,
+                eventHandler = eventHandler,
+                eventListener = eventListener,
+                lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs,
+                enableDecoderFallback = enableDecoderFallback
+            ).apply {
+                maxDroppedFramesToNotify=MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY
+                parseAv1SampleDependencies = parseAv1SampleDependencies
+                enableDurationToProgressUs=enableMediaCodecVideoRendererDurationToProgressUs
+                earlySchedulingThresholdUs = videoRendererEarlySchedulingThresholdUs
+                allowedJoiningTimeMs = allowedVideoJoiningTimeMs
+                if (Build.VERSION.SDK_INT >= 34) {
+                        experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
+                            enableMediaCodecBufferDecodeOnlyFlag
+                        )
+                }
+            }
+        return builder
     }
 
     protected fun buildVideoRenderers(
@@ -588,7 +588,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     @Deprecated("Override {@link #buildImageRenderers(Context, ArrayList)} instead.")
     protected fun buildImageRenderers(out: ArrayList<Renderer>) {
-        out.add(ImageRenderer(getImageDecoderFactory(context),  null))
+        out.add(ImageRenderer(getImageDecoderFactory(context), null))
     }
 
     protected fun buildImageRenderers(context: Context?, out: ArrayList<Renderer>) {

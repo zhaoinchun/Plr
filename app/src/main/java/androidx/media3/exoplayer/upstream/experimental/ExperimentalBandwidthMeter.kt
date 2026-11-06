@@ -17,92 +17,20 @@ import com.google.common.base.Ascii
 import com.google.common.base.Strings
 
 class ExperimentalBandwidthMeter private constructor(
-    context: Context?,
+    context: Context,
     initialBitrateEstimates: MutableMap<Int, Long?>,
 // Used in TransferListener methods that are called on a background thread.
-    @field:GuardedBy("this") private val timeToFirstByteEstimator: TimeToFirstByteEstimator,
+    @field:GuardedBy("this")
+    private val timeToFirstByteEstimator: TimeToFirstByteEstimator = PercentileTimeToFirstByteEstimator(
+        DEFAULT_TIME_TO_FIRST_BYTE_SAMPLES,
+        DEFAULT_TIME_TO_FIRST_BYTE_PERCENTILE
+    ),
+
     // Used in TransferListener methods that are called on a background thread.
-    @field:GuardedBy("this") private val bandwidthEstimator: BandwidthEstimator,
-    private val resetOnNetworkTypeChange: Boolean
+    @field:GuardedBy("this") private val bandwidthEstimator: BandwidthEstimator
+    = SplitParallelSampleBandwidthEstimator.Builder().build(),
+    private val resetOnNetworkTypeChange: Boolean = true
 ) : BandwidthMeter, TransferListener {
-    class Builder(context: Context) {
-        // Handling of null is for backward compatibility only.
-        private val context: Context? = context.applicationContext
-        private val initialBitrateEstimates = HashMap<Int, Long?>(8)
-
-        private var timeToFirstByteEstimator: TimeToFirstByteEstimator =
-            PercentileTimeToFirstByteEstimator(
-                DEFAULT_TIME_TO_FIRST_BYTE_SAMPLES,
-                DEFAULT_TIME_TO_FIRST_BYTE_PERCENTILE
-            )
-        private var bandwidthEstimator: BandwidthEstimator =
-            SplitParallelSampleBandwidthEstimator.Builder().build()
-        private var resetOnNetworkTypeChange = true
-
-        init {
-            initialBitrateEstimates[C.NETWORK_TYPE_UNKNOWN] = DEFAULT_INITIAL_BITRATE_ESTIMATE
-            initialBitrateEstimates[C.NETWORK_TYPE_WIFI] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_2G] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_3G] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_4G] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_5G_NSA] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_5G_SA] = C.TIME_UNSET
-            initialBitrateEstimates[C.NETWORK_TYPE_ETHERNET] = C.TIME_UNSET
-        }
-
-        fun setInitialBitrateEstimate(initialBitrateEstimate: Long): Builder {
-            for (networkType in initialBitrateEstimates.keys) {
-                setInitialBitrateEstimate(networkType, initialBitrateEstimate)
-            }
-            return this
-        }
-
-        fun setInitialBitrateEstimate(
-            @C.NetworkType networkType: @C.NetworkType Int, initialBitrateEstimate: Long
-        ): Builder {
-            initialBitrateEstimates.put(networkType, initialBitrateEstimate)
-            return this
-        }
-
-        fun setInitialBitrateEstimate(countryCode: String): Builder {
-            var countryCode = countryCode
-            countryCode = Ascii.toUpperCase(countryCode)
-            for (networkType in initialBitrateEstimates.keys) {
-                setInitialBitrateEstimate(
-                    networkType, getInitialBitrateEstimatesForCountry(countryCode, networkType)
-                )
-            }
-            return this
-        }
-
-        fun setTimeToFirstByteEstimator(timeToFirstByteEstimator: TimeToFirstByteEstimator): Builder {
-            this.timeToFirstByteEstimator = timeToFirstByteEstimator
-            return this
-        }
-
-        fun setBandwidthEstimator(bandwidthEstimator: BandwidthEstimator): Builder {
-            this.bandwidthEstimator = bandwidthEstimator
-            return this
-        }
-
-        fun setResetOnNetworkTypeChange(resetOnNetworkTypeChange: Boolean): Builder {
-            this.resetOnNetworkTypeChange = resetOnNetworkTypeChange
-            return this
-        }
-
-        fun build(): ExperimentalBandwidthMeter {
-            return ExperimentalBandwidthMeter(
-                context,
-                initialBitrateEstimates,
-                timeToFirstByteEstimator,
-                bandwidthEstimator,
-                resetOnNetworkTypeChange
-            )
-        }
-    }
-
-    private val context: Context?
-    private val initialBitrateEstimates = initialBitrateEstimates.toMap()
 
     @C.NetworkType
     private var networkType: @C.NetworkType Int
@@ -111,17 +39,48 @@ class ExperimentalBandwidthMeter private constructor(
 
     @C.NetworkType
     private var networkTypeOverride: @C.NetworkType Int = 0
-    private var countryCode:String? = null
+    private var countryCode: String? = null
+    private val context: Context? = context.applicationContext
+    private val initialBitrateEstimates = HashMap<Int, Long?>(8)
 
     init {
-        this.context = if (context == null) null else context.getApplicationContext()
-        val networkTypeObserver = NetworkTypeObserver.getInstance(context!!)
+        val networkTypeObserver = NetworkTypeObserver.getInstance(context)
         networkType = networkTypeObserver.getNetworkType()
         initialBitrateEstimate = getInitialBitrateEstimateForNetworkType(networkType)
         networkTypeObserver.register(
             NetworkTypeObserver.Listener { networkType: Int -> this.onNetworkTypeChanged(networkType) },
-            get()!!
+            get()
         )
+        initialBitrateEstimates[C.NETWORK_TYPE_UNKNOWN] = DEFAULT_INITIAL_BITRATE_ESTIMATE
+        initialBitrateEstimates[C.NETWORK_TYPE_WIFI] = C.TIME_UNSET
+        initialBitrateEstimates[C.NETWORK_TYPE_2G] = C.TIME_UNSET
+        initialBitrateEstimates[C.NETWORK_TYPE_3G] = C.TIME_UNSET
+        initialBitrateEstimates[C.NETWORK_TYPE_4G] = C.TIME_UNSET
+        initialBitrateEstimates[C.NETWORK_TYPE_5G_NSA] = C.TIME_UNSET
+        initialBitrateEstimates[C.NETWORK_TYPE_5G_SA] = C.TIME_UNSET
+        initialBitrateEstimates[C.NETWORK_TYPE_ETHERNET] = C.TIME_UNSET
+    }
+
+    fun setInitialBitrateEstimate(initialBitrateEstimate: Long) {
+        for (networkType in initialBitrateEstimates.keys) {
+            setInitialBitrateEstimate(networkType, initialBitrateEstimate)
+        }
+    }
+
+    fun setInitialBitrateEstimate(
+        @C.NetworkType networkType: @C.NetworkType Int, initialBitrateEstimate: Long
+    ) {
+        initialBitrateEstimates.put(networkType, initialBitrateEstimate)
+    }
+
+    fun setInitialBitrateEstimate(countryCode: String) {
+        var countryCode = countryCode
+        countryCode = Ascii.toUpperCase(countryCode)
+        for (networkType in initialBitrateEstimates.keys) {
+            setInitialBitrateEstimate(
+                networkType, getInitialBitrateEstimatesForCountry(countryCode, networkType)
+            )
+        }
     }
 
     @Synchronized
