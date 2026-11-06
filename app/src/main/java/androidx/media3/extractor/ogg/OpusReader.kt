@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ogg
 
 import androidx.media3.common.Format
@@ -47,13 +46,13 @@ internal class OpusReader : StreamReader() {
                 return true
             }
             setupData.format =
-                Format.Builder()
-                    .setContainerMimeType(MimeTypes.AUDIO_OGG)
-                    .setSampleMimeType(MimeTypes.AUDIO_OPUS)
-                    .setChannelCount(channelCount)
-                    .setSampleRate(OpusUtil.SAMPLE_RATE)
-                    .setInitializationData(initializationData)
-                    .build()
+                Format(
+                    containerMimeType = MimeTypes.AUDIO_OGG,
+                    sampleMimeType = MimeTypes.AUDIO_OPUS,
+                    channelCount = channelCount,
+                    sampleRate = OpusUtil.SAMPLE_RATE,
+                    initializationData = initializationData
+                )
             return true
         } else if (peekPacketStartsWith(packet, OPUS_COMMENT_HEADER_SIGNATURE)) {
             // The comment header must come immediately after the ID header, so the format will already
@@ -71,19 +70,12 @@ internal class OpusReader : StreamReader() {
             packet.skipBytes(OPUS_COMMENT_HEADER_SIGNATURE.size)
             val commentHeader =
                 readVorbisCommentHeader(
-                    packet,  false,  false
+                    packet, false, false
                 )
             val vorbisMetadata =
-                parseVorbisComments(commentHeader.comments.toList() )
-            if (vorbisMetadata == null) {
-                return true
-            }
-            setupData.format =
-                setupData
-                    .format!!
-                    .buildUpon()
-                    .setMetadata(vorbisMetadata.copyWithAppendedEntriesFrom(setupData.format!!.metadata))
-                    .build()
+                parseVorbisComments(commentHeader.comments.toList()) ?: return true
+            setupData.format = setupData.format!!
+                .copy(metadata = vorbisMetadata.copyWithAppendedEntriesFrom(setupData.format!!.metadata))
             return true
         } else {
             // The ID header must come at the start of the file, so the format must already be populated:

@@ -26,9 +26,9 @@ class LatmReader(
     private val sampleBitArray: ParsableBitArray
 
     // Track output info.
-    private var output:TrackOutput? = null
-    private var formatId:String? = null
-    private var format:Format? = null
+    private var output: TrackOutput? = null
+    private var formatId: String? = null
+    private var format: Format? = null
 
     // Parser state info.
     private var state = 0
@@ -107,7 +107,7 @@ class LatmReader(
                     data.readBytes(sampleBitArray.data, bytesRead, bytesToRead)
                     bytesRead += bytesToRead
                     if (bytesRead == sampleSize) {
-                        sampleBitArray.position=(0)
+                        sampleBitArray.position = (0)
                         parseAudioMuxElement(sampleBitArray)
                         state = STATE_FINDING_SYNC_1
                     }
@@ -131,7 +131,8 @@ class LatmReader(
 
         if (audioMuxVersionA == 0) {
             if (numSubframes != 0) {
-                throw ParserException.createForMalformedContainer( null,  
+                throw ParserException.createForMalformedContainer(
+                    null,
                     null
                 )
             }
@@ -142,7 +143,8 @@ class LatmReader(
             }
         } else {
             // Not defined by ISO/IEC 14496-3:2009.
-            throw ParserException.createForMalformedContainer( null,  
+            throw ParserException.createForMalformedContainer(
+                null,
                 null
             )
         }
@@ -158,7 +160,8 @@ class LatmReader(
                 latmGetValue(data) // Skip taraBufferFullness.
             }
             if (!data.readBit()) {
-                throw ParserException.createForMalformedContainer( null,  
+                throw ParserException.createForMalformedContainer(
+                    null,
                     null
                 )
             }
@@ -166,28 +169,29 @@ class LatmReader(
             val numProgram = data.readBits(4)
             val numLayer = data.readBits(3)
             if (numProgram != 0 || numLayer != 0) {
-                throw ParserException.createForMalformedContainer( null,  
+                throw ParserException.createForMalformedContainer(
+                    null,
                     null
                 )
             }
             if (audioMuxVersion == 0) {
                 val startPosition = data.position
                 val readBits = parseAudioSpecificConfig(data)
-                data.position=(startPosition)
+                data.position = (startPosition)
                 val initData = ByteArray((readBits + 7) / 8)
                 data.readBits(initData, 0, readBits)
                 val format =
-                    Format.Builder()
-                        .setId(formatId)
-                        .setContainerMimeType(containerMimeType)
-                        .setSampleMimeType(MimeTypes.AUDIO_AAC)
-                        .setCodecs(codecs)
-                        .setChannelCount(channelCount)
-                        .setSampleRate(sampleRateHz)
-                        .setInitializationData(mutableListOf<ByteArray>(initData))
-                        .setLanguage(language)
-                        .setRoleFlags(roleFlags)
-                        .build()
+                    Format(
+                        id = formatId,
+                        containerMimeType = containerMimeType,
+                        sampleMimeType = MimeTypes.AUDIO_AAC,
+                        codecs = codecs,
+                        channelCount = channelCount,
+                        sampleRate = sampleRateHz,
+                        initializationData = mutableListOf<ByteArray>(initData),
+                        language = language,
+                        roleFlags = roleFlags
+                    )
                 if (!format.equals(this.format)) {
                     this.format = format
                     sampleDurationUs = (C.MICROS_PER_SECOND * 1024) / format.sampleRate
@@ -218,7 +222,8 @@ class LatmReader(
             }
         } else {
             // This is not defined by ISO/IEC 14496-3:2009.
-            throw ParserException.createForMalformedContainer( null,  
+            throw ParserException.createForMalformedContainer(
+                null,
                 null
             )
         }
@@ -238,7 +243,7 @@ class LatmReader(
     @Throws(ParserException::class)
     private fun parseAudioSpecificConfig(data: ParsableBitArray): Int {
         val bitsLeft = data.bitsLeft()
-        val config = parseAudioSpecificConfig(data,  true)
+        val config = parseAudioSpecificConfig(data, true)
         codecs = config.codecs
         sampleRateHz = config.sampleRateHz
         channelCount = config.channelCount
@@ -257,7 +262,8 @@ class LatmReader(
             } while (tmp == 255)
             return muxSlotLengthBytes
         } else {
-            throw ParserException.createForMalformedContainer( null,  
+            throw ParserException.createForMalformedContainer(
+                null,
                 null
             )
         }

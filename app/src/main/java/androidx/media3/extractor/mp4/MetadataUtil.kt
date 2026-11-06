@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.media3.common.C
@@ -67,11 +66,10 @@ internal object MetadataUtil {
     fun setFormatMetadata(
         trackType: @C.TrackType Int,
         mdtaMetadata: Metadata?,
-        formatBuilder: Format.Builder,
         existingMetadata: Metadata?,
         vararg additionalMetadata: Metadata?
-    ) {
-        var formatMetadata = if (existingMetadata != null) existingMetadata else Metadata(listOf())
+    ): Metadata? {
+        var formatMetadata = existingMetadata ?: Metadata(listOf())
         if (mdtaMetadata != null) {
             for (mdtaMetadataEntry in mdtaMetadata.getEntriesOfType<MdtaMetadataEntry>(
                 MdtaMetadataEntry::class.java
@@ -79,7 +77,8 @@ internal object MetadataUtil {
                 // If KEY_ANDROID_CAPTURE_FPS key is present in the moov.meta box it should only be exposed
                 // in video track metadata. All other mdta entries can be added to all tracks.
                 if (mdtaMetadataEntry!!.key != MdtaMetadataEntry.KEY_ANDROID_CAPTURE_FPS || trackType == C.TRACK_TYPE_VIDEO) {
-                    formatMetadata = formatMetadata.copyWithAppendedEntries(listOf(mdtaMetadataEntry))
+                    formatMetadata =
+                        formatMetadata.copyWithAppendedEntries(listOf(mdtaMetadataEntry))
                 }
             }
         }
@@ -89,17 +88,17 @@ internal object MetadataUtil {
         }
 
         if (formatMetadata.length() > 0) {
-            formatBuilder.setMetadata(formatMetadata)
+            return formatMetadata
         }
+        return null
     }
 
     fun setFormatGaplessInfo(
-        trackType: Int, gaplessInfoHolder: GaplessInfoHolder, formatBuilder: Format.Builder
+        trackType: Int, gaplessInfoHolder: GaplessInfoHolder, formatBuilder: Format
     ) {
         if (trackType == C.TRACK_TYPE_AUDIO && gaplessInfoHolder.hasGaplessInfo()) {
-            formatBuilder
-                .setEncoderDelay(gaplessInfoHolder.encoderDelay)
-                .setEncoderPadding(gaplessInfoHolder.encoderPadding)
+            formatBuilder.encoderDelay = gaplessInfoHolder.encoderDelay
+            formatBuilder.encoderPadding = gaplessInfoHolder.encoderPadding
         }
     }
 
@@ -236,9 +235,9 @@ internal object MetadataUtil {
             data.skipBytes(8) // version (1), flags (3), empty (4)
             val value: String = data.readNullTerminatedString(atomSize - 16)
             return TextInformationFrame(
-                id,  
+                id,
                 null,
-               listOf(value)
+                listOf(value)
             )
         }
         Log.w(TAG, "Failed to parse text attribute: " + Mp4Box.getBoxTypeString(type))
@@ -271,7 +270,7 @@ internal object MetadataUtil {
         if (value >= 0) {
             return if (isTextInformationFrame)
                 TextInformationFrame(
-                    id,  null, listOf(value.toString())
+                    id, null, listOf(value.toString())
                 )
             else
                 CommentFrame(C.LANGUAGE_UNDETERMINED, id, value.toString())
@@ -313,7 +312,7 @@ internal object MetadataUtil {
                     value += "/" + count
                 }
                 return TextInformationFrame(
-                    attributeName,  null, listOf(value)
+                    attributeName, null, listOf(value)
                 )
             }
         }
@@ -328,7 +327,7 @@ internal object MetadataUtil {
         val genreString: String? = Id3Util.resolveV1Genre(genreCode - 1)
         if (genreString != null) {
             return TextInformationFrame(
-                "TCON",  null, listOf(genreString)
+                "TCON", null, listOf(genreString)
             )
         }
         Log.w(TAG, "Failed to parse standard genre code")
@@ -350,8 +349,8 @@ internal object MetadataUtil {
             val pictureData = ByteArray(atomSize - 16)
             data.readBytes(pictureData, 0, pictureData.size)
             return ApicFrame(
-                mimeType,  
-                null,  
+                mimeType,
+                null,
                 PICTURE_TYPE_FRONT_COVER,
                 pictureData
             )

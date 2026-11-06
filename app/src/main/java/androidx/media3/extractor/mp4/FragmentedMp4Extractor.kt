@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import android.util.Pair
@@ -47,7 +46,7 @@ import java.util.Arrays
 import java.util.Collections
 import kotlin.math.max
 
-class FragmentedMp4Extractor  constructor(
+class FragmentedMp4Extractor constructor(
     subtitleParserFactory: SubtitleParser.Factory,
     flags: @Flags Int = 0,
     timestampAdjuster: TimestampAdjuster? = null,
@@ -132,21 +131,21 @@ class FragmentedMp4Extractor  constructor(
 
     @Deprecated("Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory)} instead")
     constructor() : this(
-        SubtitleParser.Factory.UNSUPPORTED,  
-        FLAG_EMIT_RAW_SUBTITLE_DATA,  
-        null,  
-        null,  
-        listOf<Format>(),  
+        SubtitleParser.Factory.UNSUPPORTED,
+        FLAG_EMIT_RAW_SUBTITLE_DATA,
+        null,
+        null,
+        listOf<Format>(),
         null
     )
 
     @Deprecated("Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory, int)} instead")
     constructor(flags: @Flags Int) : this(
         SubtitleParser.Factory.UNSUPPORTED,
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,  
-        null,  
-        null,  
-        listOf(),  
+        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
+        null,
+        null,
+        listOf(),
         null
     )
 
@@ -157,9 +156,9 @@ class FragmentedMp4Extractor  constructor(
     constructor(flags: @Flags Int, timestampAdjuster: TimestampAdjuster?) : this(
         SubtitleParser.Factory.UNSUPPORTED,
         flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        timestampAdjuster,  
-        null,  
-        listOf(),  
+        timestampAdjuster,
+        null,
+        listOf(),
         null
     )
 
@@ -175,8 +174,8 @@ class FragmentedMp4Extractor  constructor(
         SubtitleParser.Factory.UNSUPPORTED,
         flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
         timestampAdjuster,
-        sideloadedTrack,  
-        listOf(),  
+        sideloadedTrack,
+        listOf(),
         null
     )
 
@@ -194,7 +193,7 @@ class FragmentedMp4Extractor  constructor(
         flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
         timestampAdjuster,
         sideloadedTrack,
-        closedCaptionFormats,  
+        closedCaptionFormats,
         null
     )
 
@@ -243,7 +242,7 @@ class FragmentedMp4Extractor  constructor(
         ceaTrackOutputs = arrayOf()
         reorderingBufferQueue =
             ReorderingBufferQueue(
-                object :ReorderingBufferQueue.OutputConsumer {
+                object : ReorderingBufferQueue.OutputConsumer {
                     override fun consume(presentationTimeUs: Long, buffer: ParsableByteArray?) {
                         CeaUtil.consume(
                             presentationTimeUs,
@@ -277,30 +276,31 @@ class FragmentedMp4Extractor  constructor(
         enterReadingAtomHeaderState()
         initExtraTracks()
         if (sideloadedTrack != null) {
-            val formatBuilder = sideloadedTrack.format!!.buildUpon()
-            formatBuilder.setContainerMimeType(MimeTypeResolver.getContainerMimeType(sideloadedTrack.format))
+            val formatBuilder = sideloadedTrack.format!!.copy(
+                containerMimeType = MimeTypeResolver.getContainerMimeType(sideloadedTrack.format)
+            )
             val bundle =
                 TrackBundle(
                     extractorOutput.track(0, sideloadedTrack.type),
                     TrackSampleTable(
-                        sideloadedTrack,  
-                        LongArray(0),  
-                        IntArray(0),  
-                        0,  
-                        LongArray(0),  
-                        IntArray(0),  
-                        IntArray(0),  
-                        false,  
-                        0,  
+                        sideloadedTrack,
+                        LongArray(0),
+                        IntArray(0),
+                        0,
+                        LongArray(0),
+                        IntArray(0),
+                        IntArray(0),
+                        false,
+                        0,
                         0
                     ),
-                    DefaultSampleValues( 
-                        0,  
-                        0,  
-                        0,  
+                    DefaultSampleValues(
+                        0,
+                        0,
+                        0,
                         0
                     ),
-                    formatBuilder.build()
+                    formatBuilder
                 )
             trackBundles.put(0, bundle)
             extractorOutput.endTracks()
@@ -431,7 +431,7 @@ class FragmentedMp4Extractor  constructor(
                 chunkIndexMerger.add(result.second!!)
             } else {
                 input.skipFully(
-                    (atomSize - atomHeaderBytesRead).toInt(),  
+                    (atomSize - atomHeaderBytesRead).toInt(),
                     true
                 )
             }
@@ -583,7 +583,7 @@ class FragmentedMp4Extractor  constructor(
         val drmInitData: DrmInitData? = getDrmInitDataFromAtoms(moov.leafChildren)
 
         // Read declaration of track fragments in the moov box.
-        val mvex: Mp4Box.ContainerBox =moov.getContainerBoxOfType(Mp4Box.TYPE_mvex)!!
+        val mvex: Mp4Box.ContainerBox = moov.getContainerBoxOfType(Mp4Box.TYPE_mvex)!!
         val defaultSampleValuesArray = SparseArray<DefaultSampleValues?>()
         var duration = C.TIME_UNSET
         val mvexChildrenSize: Int = mvex.leafChildren.size
@@ -608,17 +608,19 @@ class FragmentedMp4Extractor  constructor(
         if (udta != null) {
             udtaMetadata =
                 BoxParser.parseUdta(
-                    udta,  (flags and FLAG_DISABLE_ARTWORK_METADATA) != 0
+                    udta, (flags and FLAG_DISABLE_ARTWORK_METADATA) != 0
                 )
             gaplessInfoHolder.setFromMetadata(udtaMetadata)
         }
         val mvhdMetadata =
             Metadata(
-                listOf(BoxParser.parseMvhd(
-                    moov.getLeafBoxOfType(
-                        Mp4Box.TYPE_mvhd
-                    )!!.data!!
-                ))
+                listOf(
+                    BoxParser.parseMvhd(
+                        moov.getLeafBoxOfType(
+                            Mp4Box.TYPE_mvhd
+                        )!!.data!!
+                    )
+                )
             )
 
         // Construction of tracks and sample tables.
@@ -627,10 +629,10 @@ class FragmentedMp4Extractor  constructor(
                 moov,
                 gaplessInfoHolder,
                 duration,
-                drmInitData,  
-                (flags and FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0,  
+                drmInitData,
+                (flags and FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0,
                 false,
-                Function { track: Track? -> this.modifyTrack(track) },  
+                Function { track: Track? -> this.modifyTrack(track) },
                 false
             )
 
@@ -646,22 +648,23 @@ class FragmentedMp4Extractor  constructor(
                 }
                 val output: TrackOutput? = extractorOutput.track(i, track.type)
                 output!!.durationUs(track.durationUs)
-                val formatBuilder = track.format!!.buildUpon()
-                formatBuilder.setContainerMimeType(containerMimeType)
-                MetadataUtil.setFormatGaplessInfo(track.type, gaplessInfoHolder, formatBuilder)
-                MetadataUtil.setFormatMetadata(
+                val metadata = MetadataUtil.setFormatMetadata(
                     track.type,
                     mdtaMetadata,
-                    formatBuilder,
-                    track.format.metadata,
+                    track.format!!.metadata,
                     mvhdMetadata,
                 )
+                val formatBuilder = track.format!!.copy(
+                    containerMimeType = containerMimeType,
+                    metadata = metadata,
+                )
+                MetadataUtil.setFormatGaplessInfo(track.type, gaplessInfoHolder, formatBuilder)
                 val trackBundle =
                     TrackBundle(
                         output,
                         sampleTable,
                         getDefaultSampleValues(defaultSampleValuesArray, track.id)!!,
-                        formatBuilder.build()
+                        formatBuilder
                     )
                 trackBundles.put(track.id, trackBundle)
                 durationUs = max(durationUs, track.durationUs)
@@ -701,7 +704,7 @@ class FragmentedMp4Extractor  constructor(
         if (defaultSampleValuesArray.size() == 1) {
             // Ignore track id if there is only one track to cope with non-matching track indices.
             // See https://github.com/google/ExoPlayer/issues/4477.
-            return defaultSampleValuesArray.valueAt( 0)
+            return defaultSampleValuesArray.valueAt(0)
         }
         return defaultSampleValuesArray.get(trackId)!!
     }
@@ -736,7 +739,7 @@ class FragmentedMp4Extractor  constructor(
             list.add(additionalEmsgTrackOutput)
         }
         if ((flags and FLAG_ENABLE_EMSG_TRACK) != 0) {
-            list.add( extractorOutput.track(nextExtraTrackId++, C.TRACK_TYPE_METADATA))
+            list.add(extractorOutput.track(nextExtraTrackId++, C.TRACK_TYPE_METADATA))
         }
         emsgTrackOutputs = list.toTypedArray()
         for (eventMessageTrackOutput in emsgTrackOutputs) {
@@ -792,7 +795,7 @@ class FragmentedMp4Extractor  constructor(
                     Util.scaleLargeTimestamp(atom.readUnsignedInt(), C.MILLIS_PER_SECOND, timescale)
                 id = atom.readUnsignedInt()
                 schemeIdUri = atom.readNullTerminatedString()!!
-                value =atom.readNullTerminatedString()!!
+                value = atom.readNullTerminatedString()!!
             }
 
             else -> {
@@ -802,7 +805,7 @@ class FragmentedMp4Extractor  constructor(
         }
 
         val messageData = ByteArray(atom.bytesLeft())
-        atom.readBytes(messageData,  0, atom.bytesLeft())
+        atom.readBytes(messageData, 0, atom.bytesLeft())
         val eventMessage: EventMessage =
             EventMessage(schemeIdUri, value, durationMs, id, messageData)
         val encodedEventMessage: ParsableByteArray =
@@ -821,7 +824,7 @@ class FragmentedMp4Extractor  constructor(
             // calculate its absolute sample timestamp. Defer outputting the metadata until we can.
             pendingMetadataSampleInfos.addLast(
                 MetadataSampleInfo(
-                    presentationTimeDeltaUs,  true, sampleSize
+                    presentationTimeDeltaUs, true, sampleSize
                 )
             )
             pendingMetadataSampleBytes += sampleSize
@@ -830,7 +833,7 @@ class FragmentedMp4Extractor  constructor(
             // we will output metadata for samples in the wrong order. See:
             // https://github.com/google/ExoPlayer/issues/9996.
             pendingMetadataSampleInfos.addLast(
-                MetadataSampleInfo(sampleTimeUs,  false, sampleSize)
+                MetadataSampleInfo(sampleTimeUs, false, sampleSize)
             )
             pendingMetadataSampleBytes += sampleSize
         } else if (timestampAdjuster != null && !timestampAdjuster.isInitialized) {
@@ -838,7 +841,7 @@ class FragmentedMp4Extractor  constructor(
             // else we will set a wrong timestampOffsetUs in timestampAdjuster. See:
             // https://github.com/androidx/media/issues/356.
             pendingMetadataSampleInfos.addLast(
-                MetadataSampleInfo(sampleTimeUs,  false, sampleSize)
+                MetadataSampleInfo(sampleTimeUs, false, sampleSize)
             )
             pendingMetadataSampleBytes += sampleSize
         } else {
@@ -848,7 +851,7 @@ class FragmentedMp4Extractor  constructor(
             }
             for (emsgTrackOutput in emsgTrackOutputs) {
                 emsgTrackOutput.sampleMetadata(
-                    sampleTimeUs, C.BUFFER_FLAG_KEY_FRAME, sampleSize,  0, null
+                    sampleTimeUs, C.BUFFER_FLAG_KEY_FRAME, sampleSize, 0, null
                 )
             }
         }
@@ -875,7 +878,7 @@ class FragmentedMp4Extractor  constructor(
         val bytesToSkip = (nextDataOffset - input.position) as Int
         if (bytesToSkip < 0) {
             throw ParserException.createForMalformedContainer(
-                "Offset to encryption data was negative.",  null
+                "Offset to encryption data was negative.", null
             )
         }
         input.skipFully(bytesToSkip)
@@ -893,7 +896,7 @@ class FragmentedMp4Extractor  constructor(
                 val bytesToSkip = (endOfMdatPosition - input.position) as Int
                 if (bytesToSkip < 0) {
                     throw ParserException.createForMalformedContainer(
-                        "Offset to end of mdat was negative.",  null
+                        "Offset to end of mdat was negative.", null
                     )
                 }
                 input.skipFully(bytesToSkip)
@@ -946,7 +949,7 @@ class FragmentedMp4Extractor  constructor(
                 sampleBytesWritten += Ac4Util.SAMPLE_HEADER_SIZE
             } else {
                 sampleBytesWritten =
-                    trackBundle.outputSampleEncryptionData(sampleSize,  0)
+                    trackBundle.outputSampleEncryptionData(sampleSize, 0)
             }
             sampleSize += sampleBytesWritten
             parserState = STATE_READING_SAMPLE_CONTINUE
@@ -1001,7 +1004,7 @@ class FragmentedMp4Extractor  constructor(
                     val nalLengthInt = nalPrefix.readInt()
                     if (nalLengthInt < 0) {
                         throw ParserException.createForMalformedContainer(
-                            "Invalid NAL length",  null
+                            "Invalid NAL length", null
                         )
                     }
                     sampleCurrentNalBytesRemaining = nalLengthInt - numberOfNalUnitHeaderBytesToRead
@@ -1013,15 +1016,15 @@ class FragmentedMp4Extractor  constructor(
                     processSeiNalUnitPayload =
                         ceaTrackOutputs.size > 0 && numberOfNalUnitHeaderBytesToRead > 0 && NalUnitUtil.isNalUnitSei(
                             track.format!!,
-                            nalPrefixData,  
+                            nalPrefixData,
                             4
                         )
                     // Write the extra NAL unit bytes to the output.
                     output.sampleData(nalPrefix, numberOfNalUnitHeaderBytesToRead)
                     sampleBytesWritten += numberOfNalUnitHeaderBytesToRead
                     if (numberOfNalUnitHeaderBytesToRead > 0 && !isSampleDependedOn && NalUnitUtil.isDependedOn(
-                            nalPrefixData,  
-                            4,  
+                            nalPrefixData,
+                            4,
                             numberOfNalUnitHeaderBytesToRead,
                             track.format!!
                         )
@@ -1077,8 +1080,7 @@ class FragmentedMp4Extractor  constructor(
                 trackBundle.baseFormat =
                     DtsUtil.updateFormatWithDtsHdInfo(input, sampleSize, trackBundle.baseFormat)
                 val outputFormat =
-                    trackBundle.baseFormat.buildUpon().setDrmInitData(pendingFormat.drmInitData)
-                        .build()
+                    trackBundle.baseFormat.copy(drmInitData = pendingFormat.drmInitData)
                 trackBundle.output.format(outputFormat)
                 trackBundle.pendingFormat = null
             }
@@ -1160,7 +1162,7 @@ class FragmentedMp4Extractor  constructor(
         if (!input.readFully(
                 scratch.data,
                 0,
-                MFRO_FIXED_BOX_SIZE,  
+                MFRO_FIXED_BOX_SIZE,
                 true
             )
         ) {
@@ -1198,7 +1200,7 @@ class FragmentedMp4Extractor  constructor(
         if (!input.peekFully(
                 scratch.data,
                 0,
-                Mp4Box.HEADER_SIZE,  
+                Mp4Box.HEADER_SIZE,
                 true
             )
         ) {
@@ -1399,8 +1401,8 @@ class FragmentedMp4Extractor  constructor(
             val index =
                 Util.binarySearchFloor(
                     timesUs,
-                    timeUs,  
-                    true,  
+                    timeUs,
+                    true,
                     true
                 )
             return SeekMap.SeekPoints(SeekPoint(timesUs[index], offsets!![index]))
@@ -1427,11 +1429,11 @@ class FragmentedMp4Extractor  constructor(
         private val encryptionSignalByte: ParsableByteArray
         private val defaultInitializationVector: ParsableByteArray
 
-         var pendingFormat: Format? = null
+        var pendingFormat: Format? = null
 
-         var baseFormat: Format
+        var baseFormat: Format
 
-         var currentlyInFragment = false
+        var currentlyInFragment = false
 
         init {
             this.output = output
@@ -1464,7 +1466,7 @@ class FragmentedMp4Extractor  constructor(
                 )
             val schemeType = if (encryptionBox != null) encryptionBox.schemeType else null
             val updatedDrmInitData = drmInitData.copyWithSchemeType(schemeType)
-            val format = baseFormat.buildUpon().setDrmInitData(updatedDrmInitData).build()
+            val format = baseFormat.copy(drmInitData = updatedDrmInitData)
             if (pendingFormat != null) {
                 pendingFormat = format
             } else {
@@ -1486,7 +1488,7 @@ class FragmentedMp4Extractor  constructor(
             while (searchIndex < fragment.sampleCount
                 && fragment.getSamplePresentationTimeUs(searchIndex) <= timeUs
             ) {
-                if (fragment.sampleIsSyncFrameTable?.get(searchIndex)==true) {
+                if (fragment.sampleIsSyncFrameTable?.get(searchIndex) == true) {
                     firstSampleToOutputIndex = searchIndex
                 }
                 searchIndex++
@@ -1494,28 +1496,24 @@ class FragmentedMp4Extractor  constructor(
         }
 
         val currentSamplePresentationTimeUs: Long
-            
             get() = if (!currentlyInFragment)
                 moovSampleTable.timestampsUs[currentSampleIndex]
             else
                 fragment.getSamplePresentationTimeUs(currentSampleIndex)
 
         val currentSampleOffset: Long
-            
             get() = if (!currentlyInFragment)
                 moovSampleTable.offsets[currentSampleIndex]
             else
                 fragment.trunDataPosition?.get(currentTrackRunIndex)!!
 
         val currentSampleSize: Int
-            
             get() = if (!currentlyInFragment)
                 moovSampleTable.sizes[currentSampleIndex]
             else
                 fragment.sampleSizeTable[currentSampleIndex]
 
         val currentSampleFlags: Int
-            
             get() {
                 var flags =
                     if (!currentlyInFragment)
@@ -1555,7 +1553,7 @@ class FragmentedMp4Extractor  constructor(
                 vectorSize = encryptionBox.perSampleIvSize
             } else {
                 // The default initialization vector should be used.
-                val initVectorData: ByteArray =encryptionBox.defaultInitializationVector!!
+                val initVectorData: ByteArray = encryptionBox.defaultInitializationVector!!
                 defaultInitializationVector.reset(initVectorData, initVectorData.size)
                 initializationVectorData = defaultInitializationVector
                 vectorSize = initVectorData.size
@@ -1614,7 +1612,7 @@ class FragmentedMp4Extractor  constructor(
                 // clearDataSize for the first subsample specified in the subsample encryption data.
                 scratch.reset(subsampleDataLength)
                 val scratchData = scratch.data
-                subsampleEncryptionData.readBytes(scratchData,  0, subsampleDataLength)
+                subsampleEncryptionData.readBytes(scratchData, 0, subsampleDataLength)
 
                 val clearDataSize =
                     (scratchData[2].toInt() and 0xFF) shl 8 or (scratchData[3].toInt() and 0xFF)
@@ -1671,9 +1669,9 @@ class FragmentedMp4Extractor  constructor(
     }
 
     companion object {
-        
+
         fun newFactory(subtitleParserFactory: SubtitleParser.Factory?): ExtractorsFactory {
-            return object :ExtractorsFactory {
+            return object : ExtractorsFactory {
                 override fun createExtractors(): Array<Extractor> {
                     return arrayOf<Extractor>(
                         FragmentedMp4Extractor(
@@ -1686,21 +1684,21 @@ class FragmentedMp4Extractor  constructor(
 
         const val FLAG_WORKAROUND_EVERY_VIDEO_FRAME_IS_SYNC_FRAME: Int = 1
         const val FLAG_WORKAROUND_IGNORE_TFDT_BOX: Int = 1 shl 1 // 2
-        const  val FLAG_ENABLE_EMSG_TRACK: Int = 1 shl 2 // 4
-        const    val FLAG_WORKAROUND_IGNORE_EDIT_LISTS: Int = 1 shl 4 // 16
-        const  val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1 shl 5 // 32
-        const   val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES: Int = 1 shl 6 // 64
-        const   val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES_H265: Int = 1 shl 7
-        const   val FLAG_MERGE_FRAGMENTED_SIDX: Int = 1 shl 8
-        const   val FLAG_READ_MFRA_FOR_SEEK_MAP: Int = 1 shl 9
-        const   val FLAG_DISABLE_ARTWORK_METADATA: Int = 1 shl 10
+        const val FLAG_ENABLE_EMSG_TRACK: Int = 1 shl 2 // 4
+        const val FLAG_WORKAROUND_IGNORE_EDIT_LISTS: Int = 1 shl 4 // 16
+        const val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1 shl 5 // 32
+        const val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES: Int = 1 shl 6 // 64
+        const val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES_H265: Int = 1 shl 7
+        const val FLAG_MERGE_FRAGMENTED_SIDX: Int = 1 shl 8
+        const val FLAG_READ_MFRA_FOR_SEEK_MAP: Int = 1 shl 9
+        const val FLAG_DISABLE_ARTWORK_METADATA: Int = 1 shl 10
 
         @Deprecated("Use {@link #newFactory(SubtitleParser.Factory)} instead.")
-        val FACTORY: ExtractorsFactory =object :ExtractorsFactory {
+        val FACTORY: ExtractorsFactory = object : ExtractorsFactory {
             override fun createExtractors(): Array<Extractor> {
-                return   arrayOf<Extractor>(
+                return arrayOf<Extractor>(
                     FragmentedMp4Extractor(
-                        SubtitleParser.Factory.UNSUPPORTED,  FLAG_EMIT_RAW_SUBTITLE_DATA
+                        SubtitleParser.Factory.UNSUPPORTED, FLAG_EMIT_RAW_SUBTITLE_DATA
                     )
                 )
             }
@@ -1715,8 +1713,7 @@ class FragmentedMp4Extractor  constructor(
             byteArrayOf(-94, 57, 79, 82, 90, -101, 79, 20, -94, 68, 108, 66, 124, 100, -115, -12)
 
         // Extra tracks constants.
-        private val EMSG_FORMAT =
-            Format.Builder().setSampleMimeType(MimeTypes.APPLICATION_EMSG).build()
+        private val EMSG_FORMAT = Format(sampleMimeType = MimeTypes.APPLICATION_EMSG)
         private const val EXTRA_TRACKS_BASE_ID = 100
 
         // Parser states.
@@ -1795,8 +1792,9 @@ class FragmentedMp4Extractor  constructor(
             flags: @Flags Int,
             extendedTypeScratch: ByteArray?
         ) {
-            val tfhd: Mp4Box.LeafBox =traf.getLeafBoxOfType(Mp4Box.TYPE_tfhd)!!
-            val trackBundle: TrackBundle? = parseTfhd(tfhd!!.data!!, trackBundles, haveSideloadedTrack)
+            val tfhd: Mp4Box.LeafBox = traf.getLeafBoxOfType(Mp4Box.TYPE_tfhd)!!
+            val trackBundle: TrackBundle? =
+                parseTfhd(tfhd!!.data!!, trackBundles, haveSideloadedTrack)
             if (trackBundle == null) {
                 return
             }
@@ -1857,7 +1855,11 @@ class FragmentedMp4Extractor  constructor(
         }
 
         @Throws(ParserException::class)
-        private fun parseTruns(traf: Mp4Box.ContainerBox, trackBundle: TrackBundle, flags: @Flags Int) {
+        private fun parseTruns(
+            traf: Mp4Box.ContainerBox,
+            trackBundle: TrackBundle,
+            flags: @Flags Int
+        ) {
             var trunCount = 0
             var totalSampleCount = 0
             val leafChildren: MutableList<Mp4Box.LeafBox> = traf.leafChildren
@@ -1909,7 +1911,7 @@ class FragmentedMp4Extractor  constructor(
                     ("Saiz sample count "
                             + sampleCount
                             + " is greater than fragment sample count"
-                            + out.sampleCount),  
+                            + out.sampleCount),
                     null
                 )
             }
@@ -1951,7 +1953,7 @@ class FragmentedMp4Extractor  constructor(
             if (entryCount != 1) {
                 // We only support one trun element currently, so always expect one entry.
                 throw ParserException.createForMalformedContainer(
-                    "Unexpected saio entry count: " + entryCount,  null
+                    "Unexpected saio entry count: " + entryCount, null
                 )
             }
 
@@ -1974,7 +1976,7 @@ class FragmentedMp4Extractor  constructor(
             if (trackBundle == null) {
                 return null
             }
-            if ((atomFlags and 0x01 ) != 0) {
+            if ((atomFlags and 0x01) != 0) {
                 val baseDataPosition: Long = tfhd.readUnsignedLongToLong()
                 trackBundle.fragment.dataPosition = baseDataPosition
                 trackBundle.fragment.auxiliaryDataPosition = baseDataPosition
@@ -1982,22 +1984,22 @@ class FragmentedMp4Extractor  constructor(
 
             val defaultSampleValues = trackBundle.defaultSampleValues
             val defaultSampleDescriptionIndex =
-                if ((atomFlags and 0x02 ) != 0)
+                if ((atomFlags and 0x02) != 0)
                     tfhd.readInt() - 1
                 else
                     defaultSampleValues.sampleDescriptionIndex
             val defaultSampleDuration =
-                if ((atomFlags and 0x08 ) != 0)
+                if ((atomFlags and 0x08) != 0)
                     tfhd.readInt()
                 else
                     defaultSampleValues.duration
             val defaultSampleSize =
-                if ((atomFlags and 0x10 ) != 0)
+                if ((atomFlags and 0x10) != 0)
                     tfhd.readInt()
                 else
                     defaultSampleValues.size
             val defaultSampleFlags =
-                if ((atomFlags and 0x20 ) != 0)
+                if ((atomFlags and 0x20) != 0)
                     tfhd.readInt()
                 else
                     defaultSampleValues.flags
@@ -2057,21 +2059,21 @@ class FragmentedMp4Extractor  constructor(
 
             fragment.trunLength[index] = trun.readUnsignedIntToInt()
             fragment.trunDataPosition!![index] = fragment.dataPosition
-            if ((atomFlags and 0x01 ) != 0) {
+            if ((atomFlags and 0x01) != 0) {
                 fragment.trunDataPosition!![index] += trun.readInt().toLong()
             }
 
-            val firstSampleFlagsPresent = (atomFlags and 0x04 ) != 0
+            val firstSampleFlagsPresent = (atomFlags and 0x04) != 0
             var firstSampleFlags = defaultSampleValues.flags
             if (firstSampleFlagsPresent) {
                 firstSampleFlags = trun.readInt()
             }
 
-            val sampleDurationsPresent = (atomFlags and 0x100 ) != 0
-            val sampleSizesPresent = (atomFlags and 0x200 ) != 0
-            val sampleFlagsPresent = (atomFlags and 0x400 ) != 0
+            val sampleDurationsPresent = (atomFlags and 0x100) != 0
+            val sampleSizesPresent = (atomFlags and 0x200) != 0
+            val sampleFlagsPresent = (atomFlags and 0x400) != 0
             val sampleCompositionTimeOffsetsPresent =
-                (atomFlags and 0x800 ) != 0
+                (atomFlags and 0x800) != 0
 
             // Offset to the entire video timeline. In the presence of B-frames this is usually used to
             // ensure that the first frame's presentation timestamp is zero.
@@ -2133,7 +2135,7 @@ class FragmentedMp4Extractor  constructor(
         private fun checkNonNegative(value: Int): Int {
             if (value < 0) {
                 throw ParserException.createForMalformedContainer(
-                    "Unexpected negative value: " + value,  null
+                    "Unexpected negative value: " + value, null
                 )
             }
             return value
@@ -2168,14 +2170,14 @@ class FragmentedMp4Extractor  constructor(
             val fullAtom: Int = senc.readInt()
             val flags = BoxParser.parseFullBoxFlags(fullAtom)
 
-            if ((flags and 0x01 ) != 0) {
+            if ((flags and 0x01) != 0) {
                 // TODO: Implement this.
                 throw ParserException.createForUnsupportedContainerFeature(
                     "Overriding TrackEncryptionBox parameters is unsupported."
                 )
             }
 
-            val subsampleEncryption = (flags and 0x02 ) != 0
+            val subsampleEncryption = (flags and 0x02) != 0
             val sampleCount: Int = senc.readUnsignedIntToInt()
             if (sampleCount == 0) {
                 // Samples are unencrypted.
@@ -2186,7 +2188,7 @@ class FragmentedMp4Extractor  constructor(
                     ("Senc sample count "
                             + sampleCount
                             + " is different from fragment sample count"
-                            + out.sampleCount),  
+                            + out.sampleCount),
                     null
                 )
             }
@@ -2320,7 +2322,7 @@ class FragmentedMp4Extractor  constructor(
                 val type = -0x80000000 and firstInt
                 if (type != 0) {
                     throw ParserException.createForMalformedContainer(
-                        "Unhandled indirect reference",  null
+                        "Unhandled indirect reference", null
                     )
                 }
                 val referenceDuration: Long = atom.readUnsignedInt()

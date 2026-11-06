@@ -38,9 +38,9 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
     private val scratchSampleArray: ParsableByteArray
 
     private var subtitleData: ByteArray
-    private var trackOutput:TrackOutput? = null
-    private var extractorOutput:ExtractorOutput? = null
-    private var seekMap:IndexSeekMap? = null
+    private var trackOutput: TrackOutput? = null
+    private var extractorOutput: ExtractorOutput? = null
+    private var seekMap: IndexSeekMap? = null
     private var bytesRead = 0
     private var state: @State Int
     private var timestamps: LongArray
@@ -53,15 +53,11 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
         // TODO: b/376693592 - Simplify this by taking the post-transformation Format as a parameter
         //  instead.
         this.format =
-            if (format != null)
-                format
-                    .buildUpon()
-                    .setSampleMimeType(MimeTypes.APPLICATION_MEDIA3_CUES)
-                    .setCodecs(format.sampleMimeType)
-                    .setCueReplacementBehavior(subtitleParser.cueReplacementBehavior)
-                    .build()
-            else
-                null
+            format?.copy(
+                sampleMimeType = MimeTypes.APPLICATION_MEDIA3_CUES,
+                codecs = format.sampleMimeType,
+                cueReplacementBehavior = subtitleParser.cueReplacementBehavior
+            )
         samples = ArrayList<Sample>()
         state = STATE_CREATED
         timestamps = Util.EMPTY_LONG_ARRAY
@@ -163,11 +159,11 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
     private fun readFromInput(input: ExtractorInput): Boolean {
         if (subtitleData.size == bytesRead) {
             subtitleData =
-                subtitleData.copyOf( subtitleData.size + DEFAULT_BUFFER_SIZE)
+                subtitleData.copyOf(subtitleData.size + DEFAULT_BUFFER_SIZE)
         }
         val readResult =
             input.read(
-                subtitleData,  bytesRead,  subtitleData.size - bytesRead
+                subtitleData, bytesRead, subtitleData.size - bytesRead
             )
         if (readResult != C.RESULT_END_OF_INPUT) {
             bytesRead += readResult
@@ -187,11 +183,11 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
                     OutputOptions.allCues()
             val maxEndTimeUs = AtomicLong(C.TIME_UNSET)
             subtitleParser.parse(
-                subtitleData,  
-                0,  
+                subtitleData,
+                0,
                 bytesRead,
                 outputOptions,
-                 { cuesWithTiming ->
+                { cuesWithTiming ->
                     val sample =
                         Sample(
                             cuesWithTiming.startTimeUs,
@@ -219,7 +215,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
             if (maxEndTimeUs.get() != C.TIME_UNSET) {
                 trackOutput!!.durationUs(maxEndTimeUs.get())
                 if (seekMap != null) {
-                    seekMap!!.durationUs=(maxEndTimeUs.get())
+                    seekMap!!.durationUs = (maxEndTimeUs.get())
                     extractorOutput!!.seekMap(seekMap!!)
                 }
             }
@@ -235,7 +231,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
                 0
             else
                 binarySearchFloor(
-                    timestamps, seekTimeUs,  true,  true
+                    timestamps, seekTimeUs, true, true
                 )
         for (i in index..<samples.size) {
             writeToOutput(samples[i]!!)
@@ -247,23 +243,23 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
         scratchSampleArray.reset(sample.data)
         trackOutput!!.sampleData(scratchSampleArray, size)
         trackOutput!!.sampleMetadata(
-            sample.timeUs,  
-            C.BUFFER_FLAG_KEY_FRAME,  
-            size,  
-            0,  
+            sample.timeUs,
+            C.BUFFER_FLAG_KEY_FRAME,
+            size,
+            0,
             null
         )
     }
 
-     class Sample( val timeUs: Long,  val data: ByteArray) :
+    class Sample(val timeUs: Long, val data: ByteArray) :
         Comparable<Sample> {
         override fun compareTo(sample: Sample): Int {
-            return timeUs.compareTo( sample.timeUs)
+            return timeUs.compareTo(sample.timeUs)
         }
     }
 
     companion object {
-        
+
         const val TRACK_ID: Int = 0
 
         private const val STATE_CREATED = 0

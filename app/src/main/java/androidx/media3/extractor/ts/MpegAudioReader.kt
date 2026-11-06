@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -28,8 +27,8 @@ class MpegAudioReader(
     private val roleFlags: @RoleFlags Int
     private val containerMimeType: String?
 
-    private var output:TrackOutput? = null
-    private var formatId:String? = null
+    private var output: TrackOutput? = null
+    private var formatId: String? = null
 
     private var state: Int
     private var frameBytesRead = 0
@@ -45,7 +44,7 @@ class MpegAudioReader(
     // The timestamp to attach to the next sample in the current packet.
     private var timeUs: Long
 
-    constructor(containerMimeType: String?) : this(null,  0, containerMimeType)
+    constructor(containerMimeType: String?) : this(null, 0, containerMimeType)
 
     init {
         state = STATE_FINDING_HEADER
@@ -133,16 +132,16 @@ class MpegAudioReader(
         if (!hasOutputFormat) {
             frameDurationUs = (C.MICROS_PER_SECOND * header.samplesPerFrame) / header.sampleRate
             val format =
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(header.mimeType)
-                    .setMaxInputSize(MpegAudioUtil.MAX_FRAME_SIZE_BYTES)
-                    .setChannelCount(header.channels)
-                    .setSampleRate(header.sampleRate)
-                    .setLanguage(language)
-                    .setRoleFlags(roleFlags)
-                    .build()
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = header.mimeType,
+                    maxInputSize = MpegAudioUtil.MAX_FRAME_SIZE_BYTES,
+                    channelCount = header.channels,
+                    sampleRate = header.sampleRate,
+                    language = language,
+                    roleFlags = roleFlags
+                )
             output!!.format(format)
             hasOutputFormat = true
         }

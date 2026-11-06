@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import android.util.Pair
@@ -10,6 +9,7 @@ import androidx.media3.common.C.StereoMode
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format
+import androidx.media3.common.Format.Companion.NO_VALUE
 import androidx.media3.common.Label
 import androidx.media3.common.Metadata
 import androidx.media3.common.MimeTypes
@@ -128,7 +128,7 @@ object BoxParser {
             val track =
                 modifyTrackFunction.apply(
                     parseTrak(
-                        atom,moov.getLeafBoxOfType(Mp4Box.TYPE_mvhd)!!,
+                        atom, moov.getLeafBoxOfType(Mp4Box.TYPE_mvhd)!!,
                         duration,
                         drmInitData,
                         ignoreEditLists,
@@ -138,7 +138,7 @@ object BoxParser {
             if (track == null) {
                 continue
             }
-            val stblAtom =atom.getContainerBoxOfType(Mp4Box.TYPE_mdia)!!
+            val stblAtom = atom.getContainerBoxOfType(Mp4Box.TYPE_mdia)!!
                 .getContainerBoxOfType(Mp4Box.TYPE_minf)!!
                 .getContainerBoxOfType(Mp4Box.TYPE_stbl)!!
             val trackSampleTable =
@@ -228,7 +228,11 @@ object BoxParser {
             if (keyIndex >= 0 && keyIndex < keyNames.size) {
                 val key = keyNames[keyIndex]
                 val entry: Metadata.Entry? =
-                    MetadataUtil.parseMdtaMetadataEntryFromIlst(ilst, atomPosition + atomSize, key!!)
+                    MetadataUtil.parseMdtaMetadataEntryFromIlst(
+                        ilst,
+                        atomPosition + atomSize,
+                        key!!
+                    )
                 if (entry != null) {
                     entries.add(entry)
                 }
@@ -263,12 +267,13 @@ object BoxParser {
         isQuickTime: Boolean
     ): Track? {
         var duration = duration
-        val mdia =trak.getContainerBoxOfType(Mp4Box.TYPE_mdia)!!
+        val mdia = trak.getContainerBoxOfType(Mp4Box.TYPE_mdia)!!
         val trackType: @C.TrackType Int =
             getTrackTypeForHdlr(
-                BoxParser.parseHdlr(mdia.getLeafBoxOfType(
-                    Mp4Box.TYPE_hdlr
-                )!!.data!!
+                BoxParser.parseHdlr(
+                    mdia.getLeafBoxOfType(
+                        Mp4Box.TYPE_hdlr
+                    )!!.data!!
                 )
             )
         if (trackType == C.TRACK_TYPE_UNKNOWN) {
@@ -338,14 +343,17 @@ object BoxParser {
             format =
                 stsdData
                     .format!!
-                    .buildUpon()
-                    .setMetadata(
-                        if (stsdData.format!!.metadata != null)
-                            stsdData.format!!.metadata!!.copyWithAppendedEntries(listOf(alternateGroupEntry))
-                        else
-                            Metadata(listOf(alternateGroupEntry))
+                    .copy(
+                        metadata =
+                            if (stsdData.format!!.metadata != null)
+                                stsdData.format!!.metadata!!.copyWithAppendedEntries(
+                                    listOf(
+                                        alternateGroupEntry
+                                    )
+                                )
+                            else
+                                Metadata(listOf(alternateGroupEntry))
                     )
-                    .build()
         } else {
             format = stsdData.format
         }
@@ -384,7 +392,7 @@ object BoxParser {
             val stz2Atom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stz2)
             if (stz2Atom == null) {
                 throw ParserException.createForMalformedContainer(
-                    "Track has no sample table size information",  null
+                    "Track has no sample table size information", null
                 )
             }
             sampleSizeBox = Stz2SampleSizeBox(stz2Atom)
@@ -393,22 +401,22 @@ object BoxParser {
         var sampleCount = sampleSizeBox.sampleCount
         if (sampleCount == 0) {
             return TrackSampleTable(
-                track,  
-                LongArray(0),  
-                IntArray(0),  
-                0,  
-                LongArray(0),  
-                IntArray(0),  
-                IntArray(0),  
-                false,  
-                0,  
+                track,
+                LongArray(0),
+                IntArray(0),
+                0,
+                LongArray(0),
+                IntArray(0),
+                IntArray(0),
+                false,
+                0,
                 0
             )
         }
 
         if (track.type == C.TRACK_TYPE_VIDEO && track.mediaDurationUs > 0) {
             val frameRate = sampleCount / (track.mediaDurationUs / 1000000f)
-            val format = track.format!!.buildUpon().setFrameRate(frameRate).build()
+            val format = track.format!!.copy(frameRate = frameRate)
             track = track.buildUpon().setFormat(format).build()
         }
 
@@ -417,13 +425,13 @@ object BoxParser {
         var chunkOffsetsAtom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stco)
         if (chunkOffsetsAtom == null) {
             chunkOffsetsAreLongs = true
-            chunkOffsetsAtom =stblBox.getLeafBoxOfType(Mp4Box.TYPE_co64)!!
+            chunkOffsetsAtom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_co64)!!
         }
         val chunkOffsets = chunkOffsetsAtom.data
         // Entries are (chunk number, number of samples per chunk, sample description index).
-        val stsc =stblBox.getLeafBoxOfType(Mp4Box.TYPE_stsc)!!.data
+        val stsc = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stsc)!!.data
         // Entries are (number of samples, timestamp delta between those samples).
-        val stts =stblBox.getLeafBoxOfType(Mp4Box.TYPE_stts)!!.data
+        val stts = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stts)!!.data
         // Entries are the indices of samples that are synchronization samples.
         val stssAtom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stss)
         var stss = if (stssAtom != null) stssAtom.data else null
@@ -570,7 +578,7 @@ object BoxParser {
                 if (stss != null && i == nextSynchronizationSampleIndex) {
                     remainingSynchronizationSamples--
                     if (remainingSynchronizationSamples > 0) {
-                        nextSynchronizationSampleIndex =stss!! .readUnsignedIntToInt() - 1
+                        nextSynchronizationSampleIndex = stss!!.readUnsignedIntToInt() - 1
                     }
                 }
 
@@ -638,7 +646,7 @@ object BoxParser {
                 )
             if (averageBitrate > 0 && averageBitrate < Int.MAX_VALUE) {
                 val format =
-                    track.format.buildUpon().setAverageBitrate(averageBitrate.toInt()).build()
+                    track.format.copy(averageBitrate = averageBitrate.toInt())
                 track = track.buildUpon().setFormat(format).build()
             }
         }
@@ -666,7 +674,7 @@ object BoxParser {
 
         if (omitTrackSampleTable) {
             val editedDurationUs: Long
-            val editListMediaTimes =track.editListMediaTimes!!
+            val editListMediaTimes = track.editListMediaTimes!!
             if (track.editListDurations.length() == 1 && track.editListDurations.get(0) == 0L) {
                 val editStartTime = editListMediaTimes.get(0)
                 editedDurationUs =
@@ -704,7 +712,7 @@ object BoxParser {
         // handles simple discarding/delaying of samples. The extractor may place further restrictions
         // on what edited streams are playable.
         if (track.editListDurations.length() == 1 && track.type == C.TRACK_TYPE_AUDIO && timestamps.size >= 2) {
-            val editStartTime =track.editListMediaTimes!!.get(0)
+            val editStartTime = track.editListMediaTimes!!.get(0)
             val editEndTime =
                 (editStartTime
                         + scaleLargeTimestamp(
@@ -758,7 +766,7 @@ object BoxParser {
             // The current version of the spec leaves handling of an edit with zero segment_duration in
             // unfragmented files open to interpretation. We handle this as a special case and include all
             // samples in the edit.
-            val editStartTime =track.editListMediaTimes!!.get(0)
+            val editStartTime = track.editListMediaTimes!!.get(0)
             for (i in timestamps.indices) {
                 timestamps[i] =
                     scaleLargeTimestamp(
@@ -793,7 +801,7 @@ object BoxParser {
         var copyMetadata = false
         val startIndices = IntArray(track.editListDurations.length())
         val endIndices = IntArray(track.editListDurations.length())
-        val editListMediaTimes =track.editListMediaTimes!!
+        val editListMediaTimes = track.editListMediaTimes!!
         for (i in 0..<track.editListDurations.length()) {
             val editMediaTime = editListMediaTimes[i]
             if (editMediaTime != -1L) {
@@ -812,7 +820,7 @@ object BoxParser {
                 // decoding must start from a keyframe.
                 startIndices[i] =
                     binarySearchFloor(
-                        timestamps, editMediaTime,  true,  true
+                        timestamps, editMediaTime, true, true
                     )
 
                 // The endIndices calculation finds the true end of the edit by searching past the
@@ -820,8 +828,8 @@ object BoxParser {
                 val firstSampleAfterEdit =
                     binarySearchCeil(
                         timestamps,
-                        editEndTime,  
-                        omitZeroDurationClippedSample,  
+                        editEndTime,
+                        omitZeroDurationClippedSample,
                         false
                     )
 
@@ -916,7 +924,7 @@ object BoxParser {
         val editedDurationUs =
             scaleLargeTimestamp(pts, C.MICROS_PER_SECOND, track.movieTimescale)
         if (hasPrerollSamples) {
-            val format = track.format!!.buildUpon().setHasPrerollSamples(true).build()
+            val format = track.format!!.copy(hasPrerollSamples = true)
             track = track.buildUpon().setFormat(format).build()
         }
         return TrackSampleTable(
@@ -1130,7 +1138,7 @@ object BoxParser {
             }
         }
 
-        val language = getLanguageFromCode( mdhd.readUnsignedShort())
+        val language = getLanguageFromCode(mdhd.readUnsignedShort())
         return MdhdData(timescale, mediaDurationUs, language)
     }
 
@@ -1199,10 +1207,10 @@ object BoxParser {
                 parseMetaDataSampleEntry(stsd, childAtomType, childStartPosition, tkhdData.id, out)
             } else if (childAtomType == Mp4Box.TYPE_camm) {
                 out.format =
-                    Format.Builder()
-                        .setId(tkhdData.id)
-                        .setSampleMimeType(MimeTypes.APPLICATION_CAMERA_MOTION)
-                        .build()
+                    Format(
+                        id = tkhdData.id.toString(),
+                        sampleMimeType = MimeTypes.APPLICATION_CAMERA_MOTION
+                    )
             }
             stsd.setPosition(childStartPosition + childAtomSize)
         }
@@ -1267,13 +1275,13 @@ object BoxParser {
 
         if (mimeType != null) {
             out.format =
-                Format.Builder()
-                    .setId(tkhdData.id)
-                    .setSampleMimeType(mimeType)
-                    .setLanguage(language)
-                    .setSubsampleOffsetUs(subsampleOffsetUs)
-                    .setInitializationData(initializationData)
-                    .build()
+                Format(
+                    id = tkhdData.id.toString(),
+                    sampleMimeType = mimeType,
+                    language = language,
+                    subsampleOffsetUs = subsampleOffsetUs,
+                    initializationData = initializationData ?: listOf()
+                )
         }
     }
 
@@ -1389,7 +1397,7 @@ object BoxParser {
             checkContainerInput(childAtomSize > 0, "childAtomSize must be positive")
             val childAtomType = parent.readInt()
             if (childAtomType == Mp4Box.TYPE_avcC) {
-                checkContainerInput(mimeType == null,  null)
+                checkContainerInput(mimeType == null, null)
                 mimeType = MimeTypes.VIDEO_H264
                 parent.setPosition(childStartPosition + Mp4Box.HEADER_SIZE)
                 val avcConfig = AvcConfig.parse(parent)
@@ -1406,7 +1414,7 @@ object BoxParser {
                 bitdepthLuma = avcConfig.bitdepthLuma
                 bitdepthChroma = avcConfig.bitdepthChroma
             } else if (childAtomType == Mp4Box.TYPE_hvcC) {
-                checkContainerInput(mimeType == null,  null)
+                checkContainerInput(mimeType == null, null)
                 mimeType = MimeTypes.VIDEO_H265
                 parent.setPosition(childStartPosition + Mp4Box.HEADER_SIZE)
                 val hevcConfig = HevcConfig.parse(parent)
@@ -1490,7 +1498,7 @@ object BoxParser {
                 }
                 codecs = lhevcConfig.codecs
             } else if (childAtomType == Mp4Box.TYPE_vvcC) {
-                checkContainerInput(mimeType == null,  null)
+                checkContainerInput(mimeType == null, null)
                 mimeType = MimeTypes.VIDEO_H266
                 parent.setPosition(childStartPosition + Mp4Box.HEADER_SIZE)
                 val vvcConfig = VvcConfig.parse(parent)
@@ -1530,7 +1538,7 @@ object BoxParser {
             } else if (childAtomType == Mp4Box.TYPE_dvcC || childAtomType == Mp4Box.TYPE_dvvC || childAtomType == Mp4Box.TYPE_dvwC) {
                 dolbyVisionConfig = DolbyVisionConfig.parse(parent)
             } else if (childAtomType == Mp4Box.TYPE_vpcC) {
-                checkContainerInput(mimeType == null,  null)
+                checkContainerInput(mimeType == null, null)
                 mimeType =
                     if (atomType == Mp4Box.TYPE_vp08) MimeTypes.VIDEO_VP8 else MimeTypes.VIDEO_VP9
                 parent.setPosition(childStartPosition + Mp4Box.FULL_HEADER_SIZE)
@@ -1560,7 +1568,7 @@ object BoxParser {
 
                 val childAtomBodySize = childAtomSize - Mp4Box.HEADER_SIZE
                 val initializationDataChunk = ByteArray(childAtomBodySize)
-                parent.readBytes(initializationDataChunk,  0, childAtomBodySize)
+                parent.readBytes(initializationDataChunk, 0, childAtomBodySize)
 
                 initializationData = listOf<ByteArray>()
                 val av1Config = Av1Config.parse(initializationDataChunk)
@@ -1610,10 +1618,10 @@ object BoxParser {
                 hdrStaticInfo.putShort((maxDisplayMasteringLuminance / 10000).toShort())
                 hdrStaticInfo.putShort((minDisplayMasteringLuminance / 10000).toShort())
             } else if (childAtomType == Mp4Box.TYPE_d263) {
-                checkContainerInput(mimeType == null,  null)
+                checkContainerInput(mimeType == null, null)
                 mimeType = MimeTypes.VIDEO_H263
             } else if (childAtomType == Mp4Box.TYPE_esds) {
-                checkContainerInput(mimeType == null,  null)
+                checkContainerInput(mimeType == null, null)
                 esdsData = parseEsdsFromParent(parent, childStartPosition)
                 mimeType = esdsData.mimeType
                 val initializationDataBytes = esdsData.initializationData
@@ -1646,7 +1654,7 @@ object BoxParser {
                 val childAtomBodySize = childAtomSize - Mp4Box.FULL_HEADER_SIZE
                 val initializationDataChunk = ByteArray(childAtomBodySize)
                 parent.setPosition(childStartPosition + Mp4Box.FULL_HEADER_SIZE) // Skip version and flags.
-                parent.readBytes(initializationDataChunk,  0, childAtomBodySize)
+                parent.readBytes(initializationDataChunk, 0, childAtomBodySize)
                 codecs = buildApvCodecString(initializationDataChunk)
                 initializationData = listOf(initializationDataChunk)
 
@@ -1704,55 +1712,53 @@ object BoxParser {
             return
         }
 
-        val formatBuilder =
-            Format.Builder()
-                .setId(tkhdData.id)
-                .setSampleMimeType(mimeType)
-                .setCodecs(codecs)
-                .setWidth(width)
-                .setHeight(height)
-                .setDecodedWidth(decodedWidth)
-                .setDecodedHeight(decodedHeight)
-                .setPixelWidthHeightRatio(pixelWidthHeightRatio)
-                .setRotationDegrees(tkhdData.rotationDegrees)
-                .setMirrorHorizontal(tkhdData.mirrorHorizontal)
-                .setProjectionData(projectionData)
-                .setStereoMode(stereoMode)
-                .setInitializationData(initializationData)
-                .setMaxNumReorderSamples(maxNumReorderSamples)
-                .setMaxSubLayers(maxSubLayers)
-                .setDrmInitData(drmInitData)
-                .setLanguage(language) // Note that if either mdcv or clli are missing, we leave the corresponding HDR static
-                // metadata bytes with value zero. See [Internal ref: b/194535665].
-                .setColorInfo(
-                    ColorInfo.Builder()
-                        .setColorSpace(colorSpace)
-                        .setColorRange(colorRange)
-                        .setColorTransfer(colorTransfer)
-                        .setHdrStaticInfo(if (hdrStaticInfo != null) hdrStaticInfo.array() else null)
-                        .setLumaBitdepth(bitdepthLuma)
-                        .setChromaBitdepth(bitdepthChroma)
-                        .build()
-                )
-
+        var avgBitrate = NO_VALUE
+        var peakBitrate = NO_VALUE
         // Prefer btrtData over esdsData for video track.
         if (btrtData != null) {
-            formatBuilder
-                .setAverageBitrate(Ints.saturatedCast(btrtData.avgBitrate))
-                .setPeakBitrate(Ints.saturatedCast(btrtData.maxBitrate))
+            avgBitrate = Ints.saturatedCast(btrtData.avgBitrate)
+            peakBitrate = Ints.saturatedCast(btrtData.maxBitrate)
         } else if (esdsData != null) {
-            formatBuilder
-                .setAverageBitrate(Ints.saturatedCast(esdsData.bitrate))
-                .setPeakBitrate(Ints.saturatedCast(esdsData.peakBitrate))
+            avgBitrate = Ints.saturatedCast(esdsData.bitrate)
+            peakBitrate = Ints.saturatedCast(esdsData.peakBitrate)
         }
-
-        out.format = formatBuilder.build()
+        val formatBuilder =
+            Format(
+                id = tkhdData.id.toString(),
+                sampleMimeType = mimeType,
+                codecs = codecs,
+                width = width,
+                height = height,
+                decodedWidth = decodedWidth,
+                decodedHeight = decodedHeight,
+                pixelWidthHeightRatio = pixelWidthHeightRatio,
+                rotationDegrees = tkhdData.rotationDegrees,
+                mirrorHorizontal = tkhdData.mirrorHorizontal,
+                projectionData = projectionData,
+                stereoMode = stereoMode,
+                initializationData = initializationData ?: listOf(),
+                maxNumReorderSamples = maxNumReorderSamples,
+                maxSubLayers = maxSubLayers,
+                drmInitData = drmInitData,
+                language = language,
+                colorInfo = ColorInfo.Builder()
+                    .setColorSpace(colorSpace)
+                    .setColorRange(colorRange)
+                    .setColorTransfer(colorTransfer)
+                    .setHdrStaticInfo(hdrStaticInfo?.array())
+                    .setLumaBitdepth(bitdepthLuma)
+                    .setChromaBitdepth(bitdepthChroma)
+                    .build(),
+                averageBitrate = avgBitrate,
+                peakBitrate = peakBitrate,
+            )
+        out.format = formatBuilder
     }
 
     private fun parseApvc(data: ParsableByteArray): ColorInfo {
         val colorInfo = ColorInfo.Builder()
         val bitArray = ParsableBitArray(data.data)
-        bitArray.position=(data.getPosition() * 8) // Convert byte to bit position.
+        bitArray.position = (data.getPosition() * 8) // Convert byte to bit position.
         // See APVDecoderConfigurationRecord syntax.
         bitArray.skipBytes(1) // configurationVersion
         val numConfigurationEntries = bitArray.readBits(8) // number_of_configuration_entry
@@ -1806,18 +1812,20 @@ object BoxParser {
             parent.readNullTerminatedString() // Skip optional content_encoding
             val mimeType = parent.readNullTerminatedString()
             if (mimeType != null) {
-                out.format = Format.Builder().setId(trackId).setSampleMimeType(mimeType).build()
+                out.format = Format(
+                    id = trackId.toString(), sampleMimeType = mimeType
+                )
             }
         } else if (atomType == Mp4Box.TYPE_it35) {
             val identifierLength = parent.readUnsignedByte()
             val identifier = ByteArray(identifierLength)
             parent.readBytes(identifier, 0, identifierLength)
             out.format =
-                Format.Builder()
-                    .setId(trackId)
-                    .setSampleMimeType(MimeTypes.APPLICATION_ITUT_T35)
-                    .setInitializationData(listOf(identifier))
-                    .build()
+                Format(
+                    id = trackId.toString(),
+                    sampleMimeType = MimeTypes.APPLICATION_ITUT_T35,
+                    initializationData = listOf(identifier)
+                )
         }
     }
 
@@ -2053,7 +2061,7 @@ object BoxParser {
                 } else {
                     // We assume that the mhaP box has been parsed before and so add the compatible profile
                     // level sets as the second entry.
-                    initializationData =listOf(
+                    initializationData = listOf(
                         initializationDataBytes,
                         initializationData[0]
                     )
@@ -2067,7 +2075,7 @@ object BoxParser {
                     val mpeghCompatibleProfileLevelSet = ByteArray(numCompatibleSets)
                     parent.readBytes(mpeghCompatibleProfileLevelSet, 0, numCompatibleSets)
                     if (initializationData == null) {
-                        initializationData =listOf(mpeghCompatibleProfileLevelSet)
+                        initializationData = listOf(mpeghCompatibleProfileLevelSet)
                     } else {
                         // We assume that the mhaC box has been parsed before and so add the compatible profile
                         // level sets as the second entry.
@@ -2126,7 +2134,7 @@ object BoxParser {
             } else if (childAtomType == Mp4Box.TYPE_dmlp) {
                 if (sampleRateMlp <= 0) {
                     throw ParserException.createForMalformedContainer(
-                        "Invalid sample rate for Dolby TrueHD MLP stream: " + sampleRateMlp,  
+                        "Invalid sample rate for Dolby TrueHD MLP stream: " + sampleRateMlp,
                         null
                     )
                 }
@@ -2137,14 +2145,14 @@ object BoxParser {
                 channelCount = 2
             } else if (childAtomType == Mp4Box.TYPE_ddts || childAtomType == Mp4Box.TYPE_udts) {
                 out.format =
-                    Format.Builder()
-                        .setId(trackId)
-                        .setSampleMimeType(mimeType)
-                        .setChannelCount(channelCount)
-                        .setSampleRate(sampleRate)
-                        .setDrmInitData(drmInitData)
-                        .setLanguage(language)
-                        .build()
+                    Format(
+                        id = trackId.toString(),
+                        sampleMimeType = mimeType,
+                        channelCount = channelCount,
+                        sampleRate = sampleRate,
+                        drmInitData = drmInitData,
+                        language = language
+                    )
             } else if (childAtomType == Mp4Box.TYPE_dOps) {
                 // Build an Opus Identification Header (defined in RFC-7845) by concatenating the Opus Magic
                 // Signature and the body of the dOps atom.
@@ -2161,13 +2169,13 @@ object BoxParser {
                 initializationDataBytes[2] = 0x61 // a
                 initializationDataBytes[3] = 0x43 // C
                 parent.setPosition(childPosition + Mp4Box.FULL_HEADER_SIZE)
-                parent.readBytes(initializationDataBytes,  4, childAtomBodySize)
+                parent.readBytes(initializationDataBytes, 4, childAtomBodySize)
                 initializationData = listOf(initializationDataBytes)
             } else if (childAtomType == Mp4Box.TYPE_alac) {
                 val childAtomBodySize = childAtomSize - Mp4Box.FULL_HEADER_SIZE
                 val initializationDataBytes = ByteArray(childAtomBodySize)
                 parent.setPosition(childPosition + Mp4Box.FULL_HEADER_SIZE)
-                parent.readBytes(initializationDataBytes,  0, childAtomBodySize)
+                parent.readBytes(initializationDataBytes, 0, childAtomBodySize)
                 // Update sampleRate and channelCount from the AudioSpecificConfig initialization data,
                 // which is more reliable. See https://github.com/google/ExoPlayer/pull/6629.
                 val parsedAlacConfig =
@@ -2186,7 +2194,7 @@ object BoxParser {
                 ) // header and configuration version
                 val configObusSize = parent.readUnsignedLeb128ToInt()
                 val initializationDataBytes = ByteArray(configObusSize)
-                parent.readBytes(initializationDataBytes,  0, configObusSize)
+                parent.readBytes(initializationDataBytes, 0, configObusSize)
                 codecs = buildIamfCodecString(initializationDataBytes)
                 initializationData = listOf(initializationDataBytes)
             } else if (childAtomType == Mp4Box.TYPE_pcmC) {
@@ -2212,30 +2220,31 @@ object BoxParser {
         }
 
         if (out.format == null && mimeType != null) {
-            val formatBuilder =
-                Format.Builder()
-                    .setId(trackId)
-                    .setSampleMimeType(mimeType)
-                    .setCodecs(codecs)
-                    .setChannelCount(channelCount)
-                    .setSampleRate(sampleRate)
-                    .setPcmEncoding(pcmEncoding)
-                    .setInitializationData(initializationData)
-                    .setDrmInitData(drmInitData)
-                    .setLanguage(language)
-
-            // Prefer esdsData over btrtData for audio track.
+            var avgBitrate = NO_VALUE
+            var peakBitrate = NO_VALUE
+            // Prefer btrtData over esdsData for video track.
             if (esdsData != null) {
-                formatBuilder
-                    .setAverageBitrate(Ints.saturatedCast(esdsData.bitrate))
-                    .setPeakBitrate(Ints.saturatedCast(esdsData.peakBitrate))
+                avgBitrate = Ints.saturatedCast(esdsData.bitrate)
+                peakBitrate = Ints.saturatedCast(esdsData.peakBitrate)
             } else if (btrtData != null) {
-                formatBuilder
-                    .setAverageBitrate(Ints.saturatedCast(btrtData.avgBitrate))
-                    .setPeakBitrate(Ints.saturatedCast(btrtData.maxBitrate))
+                avgBitrate = Ints.saturatedCast(btrtData.avgBitrate)
+                peakBitrate = Ints.saturatedCast(btrtData.maxBitrate)
             }
-
-            out.format = formatBuilder.build()
+            val formatBuilder =
+                Format(
+                    id = trackId.toString(),
+                    sampleMimeType = mimeType,
+                    codecs = codecs,
+                    channelCount = channelCount,
+                    sampleRate = sampleRate,
+                    pcmEncoding = pcmEncoding,
+                    initializationData = initializationData ?: listOf(),
+                    drmInitData = drmInitData,
+                    language = language,
+                    averageBitrate = avgBitrate,
+                    peakBitrate = peakBitrate
+                )
+            out.format = formatBuilder
         }
     }
 
@@ -2244,7 +2253,7 @@ object BoxParser {
         parent: ParsableByteArray, boxType: Int, parentBoxPosition: Int, parentBoxSize: Int
     ): Int {
         var childAtomPosition = parent.getPosition()
-        checkContainerInput(childAtomPosition >= parentBoxPosition,  null)
+        checkContainerInput(childAtomPosition >= parentBoxPosition, null)
         while (childAtomPosition - parentBoxPosition < parentBoxSize) {
             parent.setPosition(childAtomPosition)
             val childAtomSize = parent.readInt()
@@ -2266,13 +2275,13 @@ object BoxParser {
         parent.skipBytes(2) // ES_ID
 
         val flags = parent.readUnsignedByte()
-        if ((flags and 0x80 ) != 0) {
+        if ((flags and 0x80) != 0) {
             parent.skipBytes(2)
         }
-        if ((flags and 0x40 ) != 0) {
+        if ((flags and 0x40) != 0) {
             parent.skipBytes(parent.readUnsignedByte())
         }
-        if ((flags and 0x20 ) != 0) {
+        if ((flags and 0x20) != 0) {
             parent.skipBytes(2)
         }
 
@@ -2288,9 +2297,9 @@ object BoxParser {
             || MimeTypes.AUDIO_DTS_HD == mimeType
         ) {
             return EsdsData(
-                mimeType,  
-                null,  
-                Format.NO_VALUE.toLong(),  
+                mimeType,
+                null,
+                Format.NO_VALUE.toLong(),
                 Format.NO_VALUE.toLong()
             )
         }
@@ -2307,9 +2316,9 @@ object BoxParser {
 
         // Skipping zero values as unknown.
         return EsdsData(
-            mimeType,  
-            initializationData,  
-            if (bitrate > 0) bitrate else Format.NO_VALUE.toLong(),  
+            mimeType,
+            initializationData,
+            if (bitrate > 0) bitrate else Format.NO_VALUE.toLong(),
             if (peakBitrate > 0) peakBitrate else Format.NO_VALUE.toLong()
         )
     }
@@ -2453,7 +2462,7 @@ object BoxParser {
                 var defaultSkipByteBlock = 0
                 if (version == 0) {
                     parent.skipBytes(1) // reserved = 0.
-                } else   {
+                } else {
                     val patternByte = parent.readUnsignedByte()
                     defaultCryptByteBlock = (patternByte and 0xF0) shr 4
                     defaultSkipByteBlock = patternByte and 0x0F
@@ -2571,13 +2580,13 @@ object BoxParser {
     }
 
     private class TkhdData(
-         val id: Int,
-         val duration: Long,
-         val alternateGroup: Int,
-         val rotationDegrees: Int,
-         val mirrorHorizontal: Boolean,
-         val width: Int,
-         val height: Int
+        val id: Int,
+        val duration: Long,
+        val alternateGroup: Int,
+        val rotationDegrees: Int,
+        val mirrorHorizontal: Boolean,
+        val width: Int,
+        val height: Int
     )
 
     private class StsdData(numberOfEntries: Int) {
@@ -2598,29 +2607,29 @@ object BoxParser {
     }
 
     private class EsdsData(
-         val mimeType: String?,
-         val initializationData: ByteArray?,
-         val bitrate: Long,
-         val peakBitrate: Long
+        val mimeType: String?,
+        val initializationData: ByteArray?,
+        val bitrate: Long,
+        val peakBitrate: Long
     )
 
-     class BtrtData( val avgBitrate: Long,  val maxBitrate: Long)
+    class BtrtData(val avgBitrate: Long, val maxBitrate: Long)
 
-     class StriData(
-         val hasLeftEyeView: Boolean,
-         val hasRightEyeView: Boolean,
-         val eyeViewsReversed: Boolean
+    class StriData(
+        val hasLeftEyeView: Boolean,
+        val hasRightEyeView: Boolean,
+        val eyeViewsReversed: Boolean
     )
 
-     class EyesData( val striData: StriData)
+    class EyesData(val striData: StriData)
 
     private class MdhdData(
-         val timescale: Long,
-         val mediaDurationUs: Long,
-         val language: String?
+        val timescale: Long,
+        val mediaDurationUs: Long,
+        val language: String?
     )
 
-     class VexuData( val eyesData: EyesData?) {
+    class VexuData(val eyesData: EyesData?) {
         fun hasBothEyeViews(): Boolean {
             return eyesData != null && eyesData.striData.hasLeftEyeView
                     && eyesData.striData.hasRightEyeView
@@ -2628,7 +2637,7 @@ object BoxParser {
     }
 
     private interface SampleSizeBox {
-        
+
         val sampleCount: Int
 
         val fixedSampleSize: Int
@@ -2687,7 +2696,7 @@ object BoxParser {
             sampleCount = data.readUnsignedIntToInt()
         }
 
-        override val fixedSampleSize: Int= C.LENGTH_UNSET
+        override val fixedSampleSize: Int = C.LENGTH_UNSET
 
         override fun readNextSampleSize(): Int {
             if (fieldSize == 8) {

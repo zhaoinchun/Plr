@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.annotation.IntDef
@@ -37,8 +36,8 @@ class Ac3Reader(
     private val roleFlags: @RoleFlags Int
     private val containerMimeType: String?
 
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
 
     private var state: @State Int
     private var bytesRead = 0
@@ -48,13 +47,13 @@ class Ac3Reader(
 
     // Used when parsing the header.
     private var sampleDurationUs: Long = 0
-    private var format:Format? = null
+    private var format: Format? = null
     private var sampleSize = 0
 
     // Used when reading the samples.
     private var timeUs: Long
 
-    constructor(containerMimeType: String?) : this(null,  0, containerMimeType)
+    constructor(containerMimeType: String?) : this(null, 0, containerMimeType)
 
     init {
         headerScratchBits = ParsableBitArray(ByteArray(HEADER_SIZE))
@@ -85,7 +84,7 @@ class Ac3Reader(
 
     override fun consume(data: ParsableByteArray) {
         // Asserts that createTracks has been called.
-        val output=output!!
+        val output = output!!
         while (data.bytesLeft() > 0) {
             when (state) {
                 STATE_FINDING_SYNC -> if (skipToNextSync(data)) {
@@ -161,24 +160,26 @@ class Ac3Reader(
 
     @RequiresNonNull("output")
     private fun parseHeader() {
-        headerScratchBits.position=(0)
+        headerScratchBits.position = (0)
         val frameInfo = parseAc3SyncframeInfo(headerScratchBits)
+        var avgBitrate = Format.NO_VALUE
         if (format == null || frameInfo.channelCount != format!!.channelCount || frameInfo.sampleRate != format!!.sampleRate || (frameInfo.mimeType != format!!.sampleMimeType)) {
-            val formatBuilder =
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(frameInfo.mimeType)
-                    .setChannelCount(frameInfo.channelCount)
-                    .setSampleRate(frameInfo.sampleRate)
-                    .setLanguage(language)
-                    .setRoleFlags(roleFlags)
-                    .setPeakBitrate(frameInfo.bitrate)
             // AC3 has constant bitrate, so averageBitrate = peakBitrate
             if (MimeTypes.AUDIO_AC3 == frameInfo.mimeType) {
-                formatBuilder.setAverageBitrate(frameInfo.bitrate)
+                avgBitrate = frameInfo.bitrate
             }
-            format = formatBuilder.build()
+            val formatBuilder =
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = frameInfo.mimeType,
+                    channelCount = frameInfo.channelCount,
+                    sampleRate = frameInfo.sampleRate,
+                    language = language,
+                    roleFlags = roleFlags, peakBitrate = frameInfo.bitrate,
+                    averageBitrate = avgBitrate
+                )
+            format = formatBuilder
             output!!.format(format!!)
         }
         sampleSize = frameInfo.frameSize

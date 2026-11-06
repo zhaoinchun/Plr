@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -13,15 +12,15 @@ import com.google.common.base.Preconditions
 class PassthroughSectionPayloadReader(sampleMimeType: String?, containerMimeType: String?) :
     SectionPayloadReader {
     private var format: Format
-    private lateinit var timestampAdjuster:TimestampAdjuster
-    private var output:TrackOutput? = null
+    private lateinit var timestampAdjuster: TimestampAdjuster
+    private var output: TrackOutput? = null
 
     init {
         this.format =
-            Format.Builder()
-                .setContainerMimeType(containerMimeType)
-                .setSampleMimeType(sampleMimeType)
-                .build()
+            Format(
+                containerMimeType = containerMimeType,
+                sampleMimeType = sampleMimeType
+            )
     }
 
     override fun init(
@@ -46,7 +45,7 @@ class PassthroughSectionPayloadReader(sampleMimeType: String?, containerMimeType
             return
         }
         if (subsampleOffsetUs != format.subsampleOffsetUs) {
-            format = format.buildUpon().setSubsampleOffsetUs(subsampleOffsetUs).build()
+            format = format.copy(subsampleOffsetUs = subsampleOffsetUs)
             output!!.format(format)
         }
         val sampleSize: Int = sectionData.bytesLeft()

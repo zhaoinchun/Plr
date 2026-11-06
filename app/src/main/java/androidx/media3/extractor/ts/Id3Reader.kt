@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -18,7 +17,7 @@ import kotlin.math.min
 class Id3Reader(private val containerMimeType: String?) : ElementaryStreamReader {
     private val id3Header: ParsableByteArray
 
-    private var output:TrackOutput? = null
+    private var output: TrackOutput? = null
 
     // State that should be reset on seek.
     private var writingSample = false
@@ -42,11 +41,11 @@ class Id3Reader(private val containerMimeType: String?) : ElementaryStreamReader
         idGenerator.generateNewId()
         output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_METADATA)
         output!!.format(
-            Format.Builder()
-                .setId(idGenerator.getFormatId())
-                .setContainerMimeType(containerMimeType)
-                .setSampleMimeType(MimeTypes.APPLICATION_ID3)
-                .build()
+            Format(
+                id = idGenerator.getFormatId(),
+                containerMimeType = containerMimeType,
+                sampleMimeType = MimeTypes.APPLICATION_ID3
+            )
         )
     }
 

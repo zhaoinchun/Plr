@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.flv
 
 import androidx.media3.common.C
@@ -58,15 +57,15 @@ internal class VideoTagPayloadReader(output: TrackOutput) : TagPayloadReader(out
             nalUnitLengthFieldLength = avcConfig.nalUnitLengthFieldLength
             // Construct and output the format.
             val format =
-                Format.Builder()
-                    .setContainerMimeType(MimeTypes.VIDEO_FLV)
-                    .setSampleMimeType(MimeTypes.VIDEO_H264)
-                    .setCodecs(avcConfig.codecs)
-                    .setWidth(avcConfig.width)
-                    .setHeight(avcConfig.height)
-                    .setPixelWidthHeightRatio(avcConfig.pixelWidthHeightRatio)
-                    .setInitializationData(avcConfig.initializationData)
-                    .build()
+                Format(
+                    containerMimeType = MimeTypes.VIDEO_FLV,
+                    sampleMimeType = MimeTypes.VIDEO_H264,
+                    codecs = avcConfig.codecs,
+                    width = avcConfig.width,
+                    height = avcConfig.height,
+                    pixelWidthHeightRatio = avcConfig.pixelWidthHeightRatio,
+                    initializationData = avcConfig.initializationData ?: mutableListOf()
+                )
             output.format(format)
             hasOutputFormat = true
             return false

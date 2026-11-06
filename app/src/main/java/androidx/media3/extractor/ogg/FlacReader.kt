@@ -47,7 +47,7 @@ internal class FlacReader : StreamReader() {
             this.streamMetadata = streamMetadata
             val metadata = Arrays.copyOfRange(data, 9, packet.limit())
             val format = streamMetadata.getFormat(metadata,  null)
-            setupData.format = format.buildUpon().setContainerMimeType(MimeTypes.AUDIO_OGG).build()
+            setupData.format = format.copy(containerMimeType = MimeTypes.AUDIO_OGG)
             return true
         }
 

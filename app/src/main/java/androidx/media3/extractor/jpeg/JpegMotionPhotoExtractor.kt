@@ -37,7 +37,7 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 
 internal class JpegMotionPhotoExtractor : Extractor {
-    
+
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
@@ -49,7 +49,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
 
     private val scratch: ParsableByteArray
 
-    private var extractorOutput:ExtractorOutput? = null
+    private var extractorOutput: ExtractorOutput? = null
 
     private var state: @State Int = 0
     private var marker = 0
@@ -57,13 +57,13 @@ internal class JpegMotionPhotoExtractor : Extractor {
     private var mp4StartPosition: Long
 
     private var motionPhotoMetadata: MotionPhotoMetadata? = null
-    private var lastExtractorInput:ExtractorInput? = null
-    private var mp4ExtractorStartOffsetExtractorInput:StartOffsetExtractorInput? =
+    private var lastExtractorInput: ExtractorInput? = null
+    private var mp4ExtractorStartOffsetExtractorInput: StartOffsetExtractorInput? =
         null
     private var mp4Extractor: Mp4Extractor? = null
 
     init {
-        scratch = ParsableByteArray( MARKER_SIZE)
+        scratch = ParsableByteArray(MARKER_SIZE)
         mp4StartPosition = C.INDEX_UNSET.toLong()
     }
 
@@ -93,7 +93,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
             }
 
             scratch.reset(payloadLength)
-            input.peekFully(scratch.data,  0,  payloadLength)
+            input.peekFully(scratch.data, 0, payloadLength)
             if (isMotionPhotoXmp(scratch)) {
                 return true
             }
@@ -172,8 +172,8 @@ internal class JpegMotionPhotoExtractor : Extractor {
 
     @Throws(IOException::class)
     private fun peekMarker(input: ExtractorInput): Int {
-        scratch.reset( MARKER_SIZE)
-        input.peekFully(scratch.data,  0,  MARKER_SIZE)
+        scratch.reset(MARKER_SIZE)
+        input.peekFully(scratch.data, 0, MARKER_SIZE)
         return scratch.readUnsignedShort()
     }
 
@@ -186,8 +186,8 @@ internal class JpegMotionPhotoExtractor : Extractor {
 
     @Throws(IOException::class)
     private fun readMarker(input: ExtractorInput) {
-        scratch.reset( MARKER_SIZE)
-        input.readFully(scratch.data,  0,  MARKER_SIZE)
+        scratch.reset(MARKER_SIZE)
+        input.readFully(scratch.data, 0, MARKER_SIZE)
         marker = scratch.readUnsignedShort()
         if (marker == MARKER_SOS) { // Start of scan.
             if (mp4StartPosition != C.INDEX_UNSET.toLong()) {
@@ -203,7 +203,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
     @Throws(IOException::class)
     private fun peekSegmentLength(input: ExtractorInput): Int {
         scratch.reset(SEGMENT_LENGTH_SIZE)
-        input.peekFully(scratch.data,  0,  SEGMENT_LENGTH_SIZE)
+        input.peekFully(scratch.data, 0, SEGMENT_LENGTH_SIZE)
         return scratch.readUnsignedShort() - SEGMENT_LENGTH_SIZE
     }
 
@@ -218,7 +218,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
     private fun readSegment(input: ExtractorInput) {
         if (marker == MARKER_APP1) {
             val payload = ParsableByteArray(segmentLength)
-            input.readFully(payload.data,  0,  segmentLength)
+            input.readFully(payload.data, 0, segmentLength)
             if (motionPhotoMetadata == null
                 && HEADER_XMP_APP1 == payload.readNullTerminatedString()
             ) {
@@ -241,7 +241,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
         // Check if the file is truncated.
         val peekedData =
             input.peekFully(
-                scratch.data,  0,  1,  true
+                scratch.data, 0, 1, true
             )
         if (!peekedData) {
             endReading()
@@ -277,7 +277,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
 
     private fun endReading() {
         extractorOutput!!.endTracks()
-        extractorOutput!!.seekMap(Unseekable( C.TIME_UNSET))
+        extractorOutput!!.seekMap(Unseekable(C.TIME_UNSET))
         state = STATE_ENDED
     }
 
@@ -287,10 +287,10 @@ internal class JpegMotionPhotoExtractor : Extractor {
                 SingleSampleExtractor.IMAGE_TRACK_ID, C.TRACK_TYPE_IMAGE
             )
         imageTrackOutput!!.format(
-            Format.Builder()
-                .setContainerMimeType(MimeTypes.IMAGE_JPEG)
-                .setMetadata(Metadata(listOf(motionPhotoMetadata)))
-                .build()
+            Format(
+                containerMimeType = MimeTypes.IMAGE_JPEG,
+                metadata = Metadata(listOf(motionPhotoMetadata))
+            )
         )
     }
 

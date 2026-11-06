@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -24,7 +23,7 @@ class SeiReader(
         outputs = arrayOfNulls<TrackOutput>(closedCaptionFormats.size)
         reorderingBufferQueue =
             ReorderingBufferQueue(
-                object :ReorderingBufferQueue.OutputConsumer {
+                object : ReorderingBufferQueue.OutputConsumer {
                     override fun consume(
                         presentationTimeUs: Long,
                         buffer: ParsableByteArray?
@@ -54,15 +53,15 @@ class SeiReader(
             val formatId =
                 if (channelFormat.id != null) channelFormat.id else idGenerator.getFormatId()
             output!!.format(
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(channelMimeType)
-                    .setSelectionFlags(channelFormat.selectionFlags)
-                    .setLanguage(channelFormat.language)
-                    .setAccessibilityChannel(channelFormat.accessibilityChannel)
-                    .setInitializationData(channelFormat.initializationData)
-                    .build()
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = channelMimeType,
+                    selectionFlags = channelFormat.selectionFlags,
+                    language = channelFormat.language,
+                    accessibilityChannel = channelFormat.accessibilityChannel,
+                    initializationData = channelFormat.initializationData
+                )
             )
             outputs[i] = output
         }

@@ -22,7 +22,7 @@ internal class UserDataReader(
         outputs = arrayOfNulls<TrackOutput>(closedCaptionFormats.size)
         reorderingBufferQueue =
             ReorderingBufferQueue(
-                object :ReorderingBufferQueue.OutputConsumer {
+                object : ReorderingBufferQueue.OutputConsumer {
                     override fun consume(presentationTimeUs: Long, buffer: ParsableByteArray?) {
                         CeaUtil.consumeCcData(
                             presentationTimeUs,
@@ -52,15 +52,15 @@ internal class UserDataReader(
                 channelMimeType
             )
             output!!.format(
-                Format.Builder()
-                    .setId(idGenerator.getFormatId())
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(channelMimeType)
-                    .setSelectionFlags(channelFormat.selectionFlags)
-                    .setLanguage(channelFormat.language)
-                    .setAccessibilityChannel(channelFormat.accessibilityChannel)
-                    .setInitializationData(channelFormat.initializationData)
-                    .build()
+                Format(
+                    id = idGenerator.getFormatId(),
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = channelMimeType,
+                    selectionFlags = channelFormat.selectionFlags,
+                    language = channelFormat.language,
+                    accessibilityChannel = channelFormat.accessibilityChannel,
+                    initializationData = channelFormat.initializationData
+                )
             )
             outputs[i] = output
         }

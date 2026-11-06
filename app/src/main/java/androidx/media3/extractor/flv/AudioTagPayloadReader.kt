@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.flv
 
 import androidx.media3.common.C
@@ -28,24 +27,24 @@ internal class AudioTagPayloadReader(output: TrackOutput) : TagPayloadReader(out
                 val sampleRateIndex = (header shr 2) and 0x03
                 val sampleRate: Int = AUDIO_SAMPLING_RATE_TABLE[sampleRateIndex]
                 val format =
-                    Format.Builder()
-                        .setContainerMimeType(MimeTypes.VIDEO_FLV)
-                        .setSampleMimeType(MimeTypes.AUDIO_MPEG)
-                        .setChannelCount(1)
-                        .setSampleRate(sampleRate)
-                        .build()
+                    Format(
+                        containerMimeType = MimeTypes.VIDEO_FLV,
+                        sampleMimeType = MimeTypes.AUDIO_MPEG,
+                        channelCount = 1,
+                        sampleRate = sampleRate
+                    )
                 output.format(format)
                 hasOutputFormat = true
             } else if (audioFormat == AUDIO_FORMAT_ALAW || audioFormat == AUDIO_FORMAT_ULAW) {
                 val mimeType =
                     if (audioFormat == AUDIO_FORMAT_ALAW) MimeTypes.AUDIO_ALAW else MimeTypes.AUDIO_MLAW
                 val format =
-                    Format.Builder()
-                        .setContainerMimeType(MimeTypes.VIDEO_FLV)
-                        .setSampleMimeType(mimeType)
-                        .setChannelCount(1)
-                        .setSampleRate(8000)
-                        .build()
+                    Format(
+                        containerMimeType = MimeTypes.VIDEO_FLV,
+                        sampleMimeType = mimeType,
+                        channelCount = 1,
+                        sampleRate = 8000
+                    )
                 output.format(format)
                 hasOutputFormat = true
             } else if (audioFormat != AUDIO_FORMAT_AAC) {
@@ -74,14 +73,14 @@ internal class AudioTagPayloadReader(output: TrackOutput) : TagPayloadReader(out
                 data.readBytes(audioSpecificConfig, 0, audioSpecificConfig.size)
                 val aacConfig = parseAudioSpecificConfig(audioSpecificConfig)
                 val format =
-                    Format.Builder()
-                        .setContainerMimeType(MimeTypes.VIDEO_FLV)
-                        .setSampleMimeType(MimeTypes.AUDIO_AAC)
-                        .setCodecs(aacConfig.codecs)
-                        .setChannelCount(aacConfig.channelCount)
-                        .setSampleRate(aacConfig.sampleRateHz)
-                        .setInitializationData(mutableListOf<ByteArray>(audioSpecificConfig))
-                        .build()
+                    Format(
+                        containerMimeType = MimeTypes.VIDEO_FLV,
+                        sampleMimeType = MimeTypes.AUDIO_AAC,
+                        codecs = aacConfig.codecs,
+                        channelCount = aacConfig.channelCount,
+                        sampleRate = aacConfig.sampleRateHz,
+                        initializationData = mutableListOf<ByteArray>(audioSpecificConfig)
+                    )
                 output.format(format)
                 hasOutputFormat = true
                 return false

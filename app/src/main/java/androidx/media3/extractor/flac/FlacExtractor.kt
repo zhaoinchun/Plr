@@ -181,7 +181,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
         minFrameSize = max(flacStreamMetadata!!.minFrameSize, FlacConstants.MIN_FRAME_HEADER_SIZE)
         val format = flacStreamMetadata!!.getFormat(streamMarkerAndInfoBlock, id3Metadata)
         trackOutput!!
-            .format(format.buildUpon().setContainerMimeType(MimeTypes.AUDIO_FLAC).build())
+            .format(format.copy(containerMimeType = MimeTypes.AUDIO_FLAC))
         trackOutput!!.durationUs(flacStreamMetadata!!.durationUs)
 
         state = STATE_GET_FRAME_START_MARKER

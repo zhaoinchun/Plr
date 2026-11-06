@@ -45,7 +45,7 @@ internal class SubtitleTranscodingTrackOutput(
     private var sampleDataEnd: Int
     private var sampleData: ByteArray
     private var currentSubtitleParser: SubtitleParser? = null
-    private var currentFormat:Format? = null
+    private var currentFormat: Format? = null
     private var shouldSuppressParsingErrors = false
 
     init {
@@ -81,18 +81,14 @@ internal class SubtitleTranscodingTrackOutput(
             delegate.format(format)
         } else {
             delegate.format(
-                format
-                    .buildUpon()
-                    .setSampleMimeType(MimeTypes.APPLICATION_MEDIA3_CUES)
-                    .setCodecs(format.sampleMimeType) // Reset this value to the default. All non-default timestamp adjustments are done
-                    // below in sampleMetadata() and there are no 'subsamples' after transcoding.
-                    .setSubsampleOffsetUs(Format.OFFSET_SAMPLE_RELATIVE)
-                    .setCueReplacementBehavior(
-                        subtitleParserFactory.getCueReplacementBehavior(
-                            format
-                        )
+                format.copy(
+                    sampleMimeType = MimeTypes.APPLICATION_MEDIA3_CUES,
+                    codecs = format.sampleMimeType,
+                    subsampleOffsetUs = Format.OFFSET_SAMPLE_RELATIVE,
+                    cueReplacementBehavior = subtitleParserFactory.getCueReplacementBehavior(
+                        format
                     )
-                    .build()
+                )
             )
         }
     }
@@ -108,7 +104,7 @@ internal class SubtitleTranscodingTrackOutput(
             return delegate.sampleData(input, length, allowEndOfInput, sampleDataPart)
         }
         ensureSampleDataCapacity(length)
-        val bytesRead = input.read(sampleData,  sampleDataEnd, length)
+        val bytesRead = input.read(sampleData, sampleDataEnd, length)
         if (bytesRead == C.RESULT_END_OF_INPUT) {
             if (allowEndOfInput) {
                 return C.RESULT_END_OF_INPUT
@@ -131,7 +127,7 @@ internal class SubtitleTranscodingTrackOutput(
             return
         }
         ensureSampleDataCapacity(length)
-        data.readBytes(sampleData,  sampleDataEnd, length)
+        data.readBytes(sampleData, sampleDataEnd, length)
         sampleDataEnd += length
     }
 
@@ -155,7 +151,7 @@ internal class SubtitleTranscodingTrackOutput(
                 sampleStart,
                 size,
                 OutputOptions.allCues(),
-                 { cuesWithTiming -> outputSample(cuesWithTiming, timeUs, flags) })
+                { cuesWithTiming -> outputSample(cuesWithTiming, timeUs, flags) })
         } catch (e: RuntimeException) {
             if (shouldSuppressParsingErrors) {
                 // TODO: b/391362063 - Propagate this error out in a non-fatal way.
@@ -195,8 +191,8 @@ internal class SubtitleTranscodingTrackOutput(
         delegate.sampleMetadata(
             outputSampleTimeUs,
             flags or C.BUFFER_FLAG_KEY_FRAME,
-            cuesWithDurationBytes!!.size,  
-            0,  
+            cuesWithDurationBytes!!.size,
+            0,
             null
         )
     }

@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.annotation.IntDef
@@ -54,11 +53,11 @@ import kotlin.collections.toTypedArray
 import kotlin.math.max
 import kotlin.math.min
 
-class Mp4Extractor  constructor(
+class Mp4Extractor constructor(
     private val subtitleParserFactory: SubtitleParser.Factory,
     private val flags: @Flags Int = 0
 ) : Extractor {
-    
+
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
@@ -131,7 +130,7 @@ class Mp4Extractor  constructor(
 
     @Deprecated("Use {@link #Mp4Extractor(SubtitleParser.Factory)} instead")
     constructor() : this(
-        SubtitleParser.Factory.UNSUPPORTED,  
+        SubtitleParser.Factory.UNSUPPORTED,
         FLAG_EMIT_RAW_SUBTITLE_DATA
     )
 
@@ -429,29 +428,31 @@ class Mp4Extractor  constructor(
         if (udta != null) {
             udtaMetadata =
                 BoxParser.parseUdta(
-                    udta,  (flags and FLAG_DISABLE_ARTWORK_METADATA) != 0
+                    udta, (flags and FLAG_DISABLE_ARTWORK_METADATA) != 0
                 )
             gaplessInfoHolder.setFromMetadata(udtaMetadata)
         }
 
         val mvhdMetadata =
             Metadata(
-                listOf(BoxParser.parseMvhd(
-                    moov.getLeafBoxOfType(
-                        Mp4Box.TYPE_mvhd
-                    )!!.data!!
-                ))
+                listOf(
+                    BoxParser.parseMvhd(
+                        moov.getLeafBoxOfType(
+                            Mp4Box.TYPE_mvhd
+                        )!!.data!!
+                    )
+                )
             )
 
         val ignoreEditLists = (flags and FLAG_WORKAROUND_IGNORE_EDIT_LISTS) != 0
         val trackSampleTables =
             BoxParser.parseTraks(
                 moov,
-                gaplessInfoHolder,  
-                C.TIME_UNSET,  
+                gaplessInfoHolder,
+                C.TIME_UNSET,
                 null,
                 ignoreEditLists,
-                isQuickTime,  
+                isQuickTime,
                 Function { track: Track? -> track },
                 omitTrackSampleTable
             )
@@ -513,8 +514,8 @@ class Mp4Extractor  constructor(
                 maxInputSize = trackSampleTable.maximumSize + 3 * 10
             }
 
-            val formatBuilder = track.format!!.buildUpon()
-            formatBuilder.setMaxInputSize(maxInputSize)
+            var auxiliaryTrackType = C.AUXILIARY_TRACK_TYPE_UNDEFINED
+            var rFlags = 0
             if (track.type == C.TRACK_TYPE_VIDEO) {
                 @RoleFlags var roleFlags: @RoleFlags Int = track.format.roleFlags
                 if ((flags and FLAG_MARK_FIRST_VIDEO_TRACK_WITH_MAIN_ROLE) != 0) {
@@ -523,11 +524,10 @@ class Mp4Extractor  constructor(
                 }
                 if (readingAuxiliaryTracks) {
                     roleFlags = roleFlags or C.ROLE_FLAG_AUXILIARY
-                    formatBuilder.setAuxiliaryTrackType(auxiliaryTrackTypesForAuxiliaryTracks[i]!!)
+                    auxiliaryTrackType = auxiliaryTrackTypesForAuxiliaryTracks[i]!!
                 }
-                formatBuilder.setRoleFlags(roleFlags)
+                rFlags = roleFlags
             }
-
             var thumbnailMetadata: Metadata? = null
             val thumbnailPresentationTimeUs: Long =
                 findBestThumbnailPresentationTimeUs(trackSampleTable, trackDurationUs)
@@ -535,11 +535,9 @@ class Mp4Extractor  constructor(
                 thumbnailMetadata = Metadata(listOf(ThumbnailMetadata(thumbnailPresentationTimeUs)))
             }
 
-            MetadataUtil.setFormatGaplessInfo(track.type, gaplessInfoHolder, formatBuilder)
-            MetadataUtil.setFormatMetadata(
+            val metadata = MetadataUtil.setFormatMetadata(
                 track.type,
                 mdtaMetadata,
-                formatBuilder,
                 track.format.metadata,
                 if (slowMotionMetadataEntries.isEmpty()) null else Metadata(
                     slowMotionMetadataEntries
@@ -548,8 +546,15 @@ class Mp4Extractor  constructor(
                 mvhdMetadata,
                 thumbnailMetadata
             )
-            formatBuilder.setContainerMimeType(containerMimeType)
-            val format = formatBuilder.build()
+            val format = track.format.copy(
+                maxInputSize = maxInputSize,
+                auxiliaryTrackType = auxiliaryTrackType,
+                roleFlags = rFlags,
+                metadata = metadata,
+                containerMimeType = containerMimeType,
+            )
+            MetadataUtil.setFormatGaplessInfo(track.type, gaplessInfoHolder, format)
+
             // The moov and esds boxes don't contain enough information to distinguish between MPEG
             // audio layers 1, 2 and 3, but the distinction is important to select the right MIME type
             // for MediaCodec decoders (and other decoders that handle the same audio/mpeg-L1 and
@@ -622,7 +627,7 @@ class Mp4Extractor  constructor(
     private fun getAuxiliaryTrackTypesForAuxiliaryTracks(
         metadata: Metadata
     ): MutableList<Int?> {
-        val trackTypesMetadata =metadata.getFirstMatchingEntry<MdtaMetadataEntry>(
+        val trackTypesMetadata = metadata.getFirstMatchingEntry<MdtaMetadataEntry>(
             MdtaMetadataEntry::class.java,
             Predicate { mdtaEntry: MdtaMetadataEntry? -> mdtaEntry!!.key == MdtaMetadataEntry.KEY_AUXILIARY_TRACKS_MAP })!!
         val auxiliaryTrackTypesFromMap = trackTypesMetadata.auxiliaryTrackTypesFromMap
@@ -712,7 +717,7 @@ class Mp4Extractor  constructor(
                     val nalLengthInt = nalPrefix.readInt()
                     if (nalLengthInt < 0) {
                         throw ParserException.createForMalformedContainer(
-                            "Invalid NAL length",  null
+                            "Invalid NAL length", null
                         )
                     }
                     sampleCurrentNalBytesRemaining =
@@ -731,8 +736,8 @@ class Mp4Extractor  constructor(
                         // If any NAL unit that's part of this sample can be depended on, treat the entire
                         // sample as depended on.
                         if (isDependedOn(
-                                nalPrefixData,  
-                                4,  
+                                nalPrefixData,
+                                4,
                                 numberOfBytesToDetermineSampleDependencies,
                                 track.track.format
                             )
@@ -761,18 +766,15 @@ class Mp4Extractor  constructor(
             } else if (pendingFormat != null
                 && track.track.format.sampleMimeType == MimeTypes.AUDIO_MPEG
             ) {
-                scratch.reset( 4)
-                input.peekFully(scratch.data,  0,  4)
+                scratch.reset(4)
+                input.peekFully(scratch.data, 0, 4)
                 input.resetPeekPosition()
                 val mpegHeader = MpegAudioUtil.Header()
                 track.trackOutput.format(
                     if (mpegHeader.setForHeaderData(scratch.readInt())
                         && pendingFormat.sampleMimeType != mpegHeader.mimeType
                     )
-                        pendingFormat
-                            .buildUpon()
-                            .setSampleMimeType(mpegHeader.mimeType!!)
-                            .build()
+                        pendingFormat.copy(sampleMimeType = mpegHeader.mimeType)
                     else
                         pendingFormat
                 )
@@ -807,19 +809,19 @@ class Mp4Extractor  constructor(
                 trackOutput,
                 timeUs,
                 sampleFlags,
-                sampleSize,  
-                0,  
+                sampleSize,
+                0,
                 null
             )
             if (sampleIndex + 1 == track.sampleTable.sampleCount) {
                 trueHdSampleRechunker.outputPendingSampleMetadata(
-                    trackOutput,  
+                    trackOutput,
                     null
                 )
             }
         } else {
             trackOutput.sampleMetadata(
-                timeUs, sampleFlags, sampleSize,  0,  null
+                timeUs, sampleFlags, sampleSize, 0, null
             )
         }
 
@@ -858,7 +860,7 @@ class Mp4Extractor  constructor(
                 Chapter.Builder()
                     .setStartTimeMs(startTimeMs)
                     .setEndTimeMs(endTimeMs)
-                    .setTitle(Label( null, text))
+                    .setTitle(Label(null, text))
                     .build()
             )
             chapterSampleIndex++
@@ -878,8 +880,7 @@ class Mp4Extractor  constructor(
                     )
                 }
                 filteredEntries.addAll(quickTimeChapters)
-                val updatedFormat =
-                    currentFormat.buildUpon().setMetadata(Metadata(filteredEntries)).build()
+                val updatedFormat = currentFormat.copy(metadata = Metadata(filteredEntries))
 
                 // The format was kept pending in processMoovAtom either because it was waiting for chapter
                 // metadata, or because it is MPEG or DTS audio (which needs to wait for the first sample to
@@ -1000,12 +1001,12 @@ class Mp4Extractor  constructor(
         val trackOutput: TrackOutput
     ) {
         val trueHdSampleRechunker: TrueHdSampleRechunker?
-         val isVideo: Boolean
-         val isItutT35: Boolean
+        val isVideo: Boolean
+        val isItutT35: Boolean
 
         var sampleIndex: Int = 0
 
-         var pendingFormat: Format? = null
+        var pendingFormat: Format? = null
 
         init {
             this.isVideo = track.type == C.TRACK_TYPE_VIDEO
@@ -1031,7 +1032,7 @@ class Mp4Extractor  constructor(
         }
 
         override fun getSeekPoints(timeUs: Long): SeekPoints {
-            return getSeekPoints(timeUs,  C.INDEX_UNSET)
+            return getSeekPoints(timeUs, C.INDEX_UNSET)
         }
 
         override fun getSeekPoints(timeUs: Long, trackId: Int): SeekPoints {
@@ -1094,9 +1095,9 @@ class Mp4Extractor  constructor(
     }
 
     companion object {
-        
+
         fun newFactory(subtitleParserFactory: SubtitleParser.Factory): ExtractorsFactory {
-            return object :ExtractorsFactory {
+            return object : ExtractorsFactory {
                 override fun createExtractors(): Array<Extractor> {
                     return arrayOf<Extractor>(Mp4Extractor(subtitleParserFactory))
                 }
@@ -1104,19 +1105,19 @@ class Mp4Extractor  constructor(
         }
 
         const val FLAG_WORKAROUND_IGNORE_EDIT_LISTS: Int = 1
-        const  val FLAG_READ_SEF_DATA: Int = 1 shl 2
-        const  val FLAG_MARK_FIRST_VIDEO_TRACK_WITH_MAIN_ROLE: Int = 1 shl 3
-        const  val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1 shl 4
-        const  val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES: Int = 1 shl 5
-        const  val FLAG_READ_AUXILIARY_TRACKS: Int = 1 shl 6
-        const  val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES_H265: Int = 1 shl 7
-        const  val FLAG_OMIT_TRACK_SAMPLE_TABLE: Int = 1 shl 8
-        const  val FLAG_DISABLE_ARTWORK_METADATA: Int = 1 shl 9
+        const val FLAG_READ_SEF_DATA: Int = 1 shl 2
+        const val FLAG_MARK_FIRST_VIDEO_TRACK_WITH_MAIN_ROLE: Int = 1 shl 3
+        const val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1 shl 4
+        const val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES: Int = 1 shl 5
+        const val FLAG_READ_AUXILIARY_TRACKS: Int = 1 shl 6
+        const val FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES_H265: Int = 1 shl 7
+        const val FLAG_OMIT_TRACK_SAMPLE_TABLE: Int = 1 shl 8
+        const val FLAG_DISABLE_ARTWORK_METADATA: Int = 1 shl 9
         private const val MAX_SYNC_SAMPLES_TO_SCAN_FOR_THUMBNAIL = 20
         private const val MAX_DURATION_US_TO_SCAN_FOR_THUMBNAIL = 10000000L
 
         @Deprecated("Use {@link #newFactory(SubtitleParser.Factory)} instead.")
-        val FACTORY: ExtractorsFactory = object :ExtractorsFactory {
+        val FACTORY: ExtractorsFactory = object : ExtractorsFactory {
             override fun createExtractors(): Array<Extractor> {
                 return arrayOf<Extractor>(
                     Mp4Extractor(SubtitleParser.Factory.UNSUPPORTED, FLAG_EMIT_RAW_SUBTITLE_DATA)

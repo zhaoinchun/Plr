@@ -32,11 +32,11 @@ class WavExtractor : Extractor {
     )
     private annotation class State
 
-    private lateinit var extractorOutput:ExtractorOutput
-    private lateinit var trackOutput:TrackOutput
+    private lateinit var extractorOutput: ExtractorOutput
+    private lateinit var trackOutput: TrackOutput
     private var state: @State Int
     private var rf64SampleDataSize: Long
-    private var outputWriter:OutputWriter? = null
+    private var outputWriter: OutputWriter? = null
     private var dataStartPosition: Int
     private var dataEndPosition: Long
 
@@ -117,7 +117,7 @@ class WavExtractor : Extractor {
         if (!WavHeaderReader.checkFileType(input)) {
             // Should only happen if the media wasn't sniffed.
             throw ParserException.createForMalformedContainer(
-                "Unsupported or unrecognized wav file type.",  null
+                "Unsupported or unrecognized wav file type.", null
             )
         }
         input.skipFully((input.peekPosition - input.position) as Int)
@@ -142,7 +142,7 @@ class WavExtractor : Extractor {
                     extractorOutput,
                     trackOutput,
                     wavFormat,
-                    MimeTypes.AUDIO_ALAW,  
+                    MimeTypes.AUDIO_ALAW,
                     Format.NO_VALUE
                 )
         } else if (wavFormat.formatType == WavUtil.TYPE_MLAW) {
@@ -151,7 +151,7 @@ class WavExtractor : Extractor {
                     extractorOutput,
                     trackOutput,
                     wavFormat,
-                    MimeTypes.AUDIO_MLAW,  
+                    MimeTypes.AUDIO_MLAW,
                     Format.NO_VALUE
                 )
         } else {
@@ -201,7 +201,7 @@ class WavExtractor : Extractor {
     }
 
     private interface OutputWriter {
-        
+
         fun reset(timeUs: Long)
 
         @Throws(ParserException::class)
@@ -234,7 +234,7 @@ class WavExtractor : Extractor {
             // Validate the WAV format. Blocks are expected to correspond to single frames.
             if (wavFormat.blockSize != bytesPerFrame) {
                 throw ParserException.createForMalformedContainer(
-                    "Expected block size: " + bytesPerFrame + "; got: " + wavFormat.blockSize,  
+                    "Expected block size: " + bytesPerFrame + "; got: " + wavFormat.blockSize,
                     null
                 )
             }
@@ -246,17 +246,17 @@ class WavExtractor : Extractor {
                     wavFormat.frameRateHz * bytesPerFrame / TARGET_SAMPLES_PER_SECOND
                 )
             format =
-                Format.Builder()
-                    .setContainerMimeType(MimeTypes.AUDIO_WAV)
-                    .setSampleMimeType(mimeType)
-                    .setAverageBitrate(constantBitrate)
-                    .setPeakBitrate(constantBitrate)
-                    .setMaxInputSize(targetSampleSizeBytes)
-                    .setChannelCount(wavFormat.numChannels)
-                    .setChannelMask(WavUtil.mapToAudioFormatChannelMask(wavFormat.channelMask))
-                    .setSampleRate(wavFormat.frameRateHz)
-                    .setPcmEncoding(pcmEncoding)
-                    .build()
+                Format(
+                    containerMimeType = MimeTypes.AUDIO_WAV,
+                    sampleMimeType = mimeType,
+                    averageBitrate = constantBitrate,
+                    peakBitrate = constantBitrate,
+                    maxInputSize = targetSampleSizeBytes,
+                    channelCount = wavFormat.numChannels,
+                    channelMask = WavUtil.mapToAudioFormatChannelMask(wavFormat.channelMask),
+                    sampleRate = wavFormat.frameRateHz,
+                    pcmEncoding = pcmEncoding
+                )
         }
 
         override fun reset(timeUs: Long) {
@@ -268,7 +268,7 @@ class WavExtractor : Extractor {
         override fun init(dataStartPosition: Int, dataEndPosition: Long) {
             val wavSeekMap =
                 WavSeekMap(
-                    wavFormat,  
+                    wavFormat,
                     1,
                     dataStartPosition.toLong(),
                     dataEndPosition
@@ -308,7 +308,7 @@ class WavExtractor : Extractor {
                 val size = pendingFrames * bytesPerFrame
                 val offset = pendingOutputBytes - size
                 trackOutput.sampleMetadata(
-                    timeUs, C.BUFFER_FLAG_KEY_FRAME, size, offset,  null
+                    timeUs, C.BUFFER_FLAG_KEY_FRAME, size, offset, null
                 )
                 outputFrameCount += pendingFrames.toLong()
                 pendingOutputBytes = offset
@@ -355,7 +355,7 @@ class WavExtractor : Extractor {
                         + 1)
             if (framesPerBlock != expectedFramesPerBlock) {
                 throw ParserException.createForMalformedContainer(
-                    "Expected frames per block: " + expectedFramesPerBlock + "; got: " + framesPerBlock,  
+                    "Expected frames per block: " + expectedFramesPerBlock + "; got: " + framesPerBlock,
                     null
                 )
             }
@@ -373,16 +373,16 @@ class WavExtractor : Extractor {
             // bitrate of the stream itself.
             val constantBitrate = wavFormat.frameRateHz * wavFormat.blockSize * 8 / framesPerBlock
             format =
-                Format.Builder()
-                    .setSampleMimeType(MimeTypes.AUDIO_RAW)
-                    .setAverageBitrate(constantBitrate)
-                    .setPeakBitrate(constantBitrate)
-                    .setMaxInputSize(numOutputFramesToBytes(targetSampleSizeFrames, numChannels))
-                    .setChannelCount(wavFormat.numChannels)
-                    .setChannelMask(WavUtil.mapToAudioFormatChannelMask(wavFormat.channelMask))
-                    .setSampleRate(wavFormat.frameRateHz)
-                    .setPcmEncoding(C.ENCODING_PCM_16BIT)
-                    .build()
+                Format(
+                    containerMimeType = MimeTypes.AUDIO_WAV,
+                    averageBitrate = constantBitrate,
+                    peakBitrate = constantBitrate,
+                    maxInputSize = numOutputFramesToBytes(targetSampleSizeFrames, numChannels),
+                    channelCount = wavFormat.numChannels,
+                    channelMask = WavUtil.mapToAudioFormatChannelMask(wavFormat.channelMask),
+                    sampleRate = wavFormat.frameRateHz,
+                    pcmEncoding = C.ENCODING_PCM_16BIT
+                )
         }
 
         override fun reset(timeUs: Long) {
@@ -461,7 +461,7 @@ class WavExtractor : Extractor {
             val size = numOutputFramesToBytes(sampleFrames)
             val offset = pendingOutputBytes - size
             trackOutput.sampleMetadata(
-                timeUs, C.BUFFER_FLAG_KEY_FRAME, size, offset,  null
+                timeUs, C.BUFFER_FLAG_KEY_FRAME, size, offset, null
             )
             outputFrameCount += sampleFrames.toLong()
             pendingOutputBytes -= size
@@ -532,7 +532,7 @@ class WavExtractor : Extractor {
 
                 predictedSample += difference
                 predictedSample =
-                    Util.constrainValue(predictedSample,  -32768,  32767)
+                    Util.constrainValue(predictedSample, -32768, 32767)
 
                 // Output the next 16 bit PCM sample to the correct position in the output.
                 outputIndex += 2 * numChannels
@@ -541,7 +541,7 @@ class WavExtractor : Extractor {
 
                 stepIndex += INDEX_TABLE[originalSample]
                 stepIndex =
-                    Util.constrainValue(stepIndex,  0,  STEP_TABLE.size - 1)
+                    Util.constrainValue(stepIndex, 0, STEP_TABLE.size - 1)
                 step = STEP_TABLE[stepIndex]
             }
         }

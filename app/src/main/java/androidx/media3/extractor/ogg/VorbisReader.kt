@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ogg
 
 import androidx.annotation.VisibleForTesting
@@ -96,16 +95,16 @@ internal class VorbisReader : StreamReader() {
             )
 
         setupData.format =
-            Format.Builder()
-                .setContainerMimeType(MimeTypes.AUDIO_OGG)
-                .setSampleMimeType(MimeTypes.AUDIO_VORBIS)
-                .setAverageBitrate(idHeader.bitrateNominal)
-                .setPeakBitrate(idHeader.bitrateMaximum)
-                .setChannelCount(idHeader.channels)
-                .setSampleRate(idHeader.sampleRate)
-                .setInitializationData(codecInitializationData)
-                .setMetadata(metadata)
-                .build()
+            Format(
+                containerMimeType = MimeTypes.AUDIO_OGG,
+                sampleMimeType = MimeTypes.AUDIO_VORBIS,
+                averageBitrate = idHeader.bitrateNominal,
+                peakBitrate = idHeader.bitrateMaximum,
+                channelCount = idHeader.channels,
+                sampleRate = idHeader.sampleRate,
+                initializationData = codecInitializationData,
+                metadata = metadata
+            )
         return true
     }
 
@@ -147,13 +146,14 @@ internal class VorbisReader : StreamReader() {
     companion object {
         fun verifyBitstreamType(data: ParsableByteArray): Boolean {
             try {
-                return verifyVorbisHeaderCapturePattern( 0x01, data, true)
+                return verifyVorbisHeaderCapturePattern(0x01, data, true)
             } catch (e: ParserException) {
                 return false
             }
         }
 
-        @VisibleForTesting  fun appendNumberOfSamples(
+        @VisibleForTesting
+        fun appendNumberOfSamples(
             buffer: ParsableByteArray, packetSampleCount: Long
         ) {
             if (buffer.capacity() < buffer.limit() + 4) {

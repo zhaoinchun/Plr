@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.heif
 
 import androidx.annotation.IntDef
@@ -35,10 +34,10 @@ internal class HeicMotionPhotoExtractor : Extractor {
 
     private val scratch: ParsableByteArray
 
-    private var extractorOutput:ExtractorOutput? = null
-    private var motionPhotoMetadata:MotionPhotoMetadata? = null
-    private var lastExtractorInput:ExtractorInput? = null
-    private var mp4ExtractorStartOffsetExtractorInput:StartOffsetExtractorInput? =
+    private var extractorOutput: ExtractorOutput? = null
+    private var motionPhotoMetadata: MotionPhotoMetadata? = null
+    private var lastExtractorInput: ExtractorInput? = null
+    private var mp4ExtractorStartOffsetExtractorInput: StartOffsetExtractorInput? =
         null
     private var mp4Extractor: Mp4Extractor? = null
 
@@ -56,7 +55,7 @@ internal class HeicMotionPhotoExtractor : Extractor {
 
     @Throws(IOException::class)
     override fun sniff(input: ExtractorInput): Boolean {
-        return HeifSniffer.sniff(input,  true)
+        return HeifSniffer.sniff(input, true)
     }
 
     override fun init(output: ExtractorOutput) {
@@ -106,9 +105,9 @@ internal class HeicMotionPhotoExtractor : Extractor {
     private fun readAtomHeader(input: ExtractorInput): Boolean {
         if (atomHeaderBytesRead == 0) {
             if (!input.readFully(
-                    scratch.data,  
+                    scratch.data,
                     0,
-                    Mp4Box.HEADER_SIZE,  
+                    Mp4Box.HEADER_SIZE,
                     true
                 )
             ) {
@@ -131,11 +130,11 @@ internal class HeicMotionPhotoExtractor : Extractor {
             mp4StartPosition = input.position
             val boxStartPosition = mp4StartPosition - atomHeaderBytesRead
             motionPhotoMetadata =
-                MotionPhotoMetadata( 
-                    0,  
-                    boxStartPosition,  
-                    C.TIME_UNSET,  
-                    mp4StartPosition,  
+                MotionPhotoMetadata(
+                    0,
+                    boxStartPosition,
+                    C.TIME_UNSET,
+                    mp4StartPosition,
                     atomSize - atomHeaderBytesRead
                 )
             outputImageTrack(motionPhotoMetadata!!)
@@ -197,17 +196,17 @@ internal class HeicMotionPhotoExtractor : Extractor {
             extractorOutput!!.track(
                 SingleSampleExtractor.IMAGE_TRACK_ID, C.TRACK_TYPE_IMAGE
             )
-        imageTrackOutput!!.format(
-            Format.Builder()
-                .setContainerMimeType(MimeTypes.IMAGE_HEIC)
-                .setMetadata(Metadata(listOf(motionPhotoMetadata)))
-                .build()
+        imageTrackOutput.format(
+            Format(
+                containerMimeType = MimeTypes.IMAGE_HEIC,
+                metadata = Metadata(listOf(motionPhotoMetadata))
+            )
         )
     }
 
     private fun endReading() {
         extractorOutput!!.endTracks()
-        extractorOutput!!.seekMap(Unseekable( C.TIME_UNSET))
+        extractorOutput!!.seekMap(Unseekable(C.TIME_UNSET))
         state = STATE_ENDED
     }
 

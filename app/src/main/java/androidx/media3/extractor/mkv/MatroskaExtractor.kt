@@ -2003,15 +2003,16 @@ class MatroskaExtractor internal constructor(
             selectionFlags = selectionFlags or if (flagDefault) C.SELECTION_FLAG_DEFAULT else 0
             selectionFlags = selectionFlags or if (flagForced) C.SELECTION_FLAG_FORCED else 0
 
-            val formatBuilder = Format.Builder()
+            var formatBuilder = Format()
             // TODO: Consider reading the name elements of the tracks and, if present, incorporating them
             // into the trackId passed when creating the formats.
             if (MimeTypes.isAudio(mimeType)) {
-                formatBuilder
-                    .setChannelCount(channelCount)
-                    .setChannelMask(channelMask)
-                    .setSampleRate(sampleRate)
-                    .setPcmEncoding(pcmEncoding)
+                formatBuilder = formatBuilder.copy(
+                    channelCount = channelCount,
+                    channelMask = channelMask,
+                    sampleRate = sampleRate,
+                    pcmEncoding = pcmEncoding
+                )
             } else if (MimeTypes.isVideo(mimeType)) {
                 if (displayUnit == DISPLAY_UNIT_PIXELS) {
                     displayWidth = if (displayWidth == Format.NO_VALUE) width else displayWidth
@@ -2088,14 +2089,15 @@ class MatroskaExtractor internal constructor(
                         rotationDegrees = 270
                     }
                 }
-                formatBuilder
-                    .setWidth(width)
-                    .setHeight(height)
-                    .setPixelWidthHeightRatio(pixelWidthHeightRatio)
-                    .setRotationDegrees(rotationDegrees)
-                    .setProjectionData(projectionData)
-                    .setStereoMode(stereoMode)
-                    .setColorInfo(colorInfo)
+                formatBuilder = formatBuilder.copy(
+                    width = width,
+                    height = height,
+                    pixelWidthHeightRatio = pixelWidthHeightRatio,
+                    rotationDegrees = rotationDegrees,
+                    projectionData = projectionData,
+                    stereoMode = stereoMode,
+                    colorInfo = colorInfo,
+                )
             } else if (MimeTypes.APPLICATION_SUBRIP == mimeType
                 || MimeTypes.TEXT_SSA == mimeType
                 || MimeTypes.TEXT_VTT == mimeType
@@ -2110,21 +2112,20 @@ class MatroskaExtractor internal constructor(
             }
 
             if (name != null && !TRACK_NAME_TO_ROTATION_DEGREES.containsKey(name)) {
-                formatBuilder.setLabel(name)
+                formatBuilder = formatBuilder.copy(label = name)
             }
 
-            format =
-                formatBuilder
-                    .setId(trackId)
-                    .setContainerMimeType(if (isWebm) MimeTypes.VIDEO_WEBM else MimeTypes.VIDEO_MATROSKA)
-                    .setSampleMimeType(mimeType)
-                    .setMaxInputSize(maxInputSize)
-                    .setLanguage(language)
-                    .setSelectionFlags(selectionFlags)
-                    .setInitializationData(initializationData)
-                    .setCodecs(codecs)
-                    .setDrmInitData(drmInitData)
-                    .build()
+            format = formatBuilder.copy(
+                id = trackId.toString(),
+                containerMimeType = if (isWebm) MimeTypes.VIDEO_WEBM else MimeTypes.VIDEO_MATROSKA,
+                sampleMimeType = mimeType,
+                maxInputSize = maxInputSize,
+                language = language,
+                selectionFlags = selectionFlags,
+                initializationData = initializationData ?: listOf(),
+                codecs = codecs,
+                drmInitData = drmInitData
+            )
         }
 
         @RequiresNonNull("output")
@@ -2225,7 +2226,7 @@ class MatroskaExtractor internal constructor(
                         Metadata(listOf(thumbnailMetadata))
                     else
                         existingMetadata.copyWithAppendedEntries(listOf(thumbnailMetadata))
-                format = format!!.buildUpon().setMetadata(newMetadata).build()
+                format = format!!.copy(metadata = newMetadata)
                 thumbnailMetadataAdded = true
             }
         }
@@ -2256,14 +2257,12 @@ class MatroskaExtractor internal constructor(
                 }
             }
             if (!chapters.isEmpty()) {
-                format = format!!.buildUpon()
-                    .setMetadata(
-                        if (format!!.metadata != null)
-                            format!!.metadata!!.copyWithAppendedEntries(chapters)
-                        else
-                            Metadata(chapters)
-                    )
-                    .build()
+                format = format!!.copy(
+                    metadata = if (format!!.metadata != null)
+                        format!!.metadata!!.copyWithAppendedEntries(chapters)
+                    else
+                        Metadata(chapters)
+                )
                 chaptersMetadataAdded = true
             }
         }

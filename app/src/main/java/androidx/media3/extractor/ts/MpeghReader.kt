@@ -30,8 +30,8 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
 
     private var state: @State Int
 
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
 
     // The timestamp to attach to the next sample in the current packet.
     private var timeUs: Double
@@ -124,7 +124,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
                 }
 
                 STATE_READING_PACKET_HEADER -> {
-                    copyData(data, headerScratchBytes,  false)
+                    copyData(data, headerScratchBytes, false)
                     if (headerScratchBytes.bytesLeft() == 0) {
                         if (parseHeader()) {
                             // write the MHAS packet header to output
@@ -152,7 +152,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
 
                 STATE_READING_PACKET_PAYLOAD -> {
                     if (shouldParsePacket(header.packetType)) {
-                        copyData(data, dataScratchBytes,  true)
+                        copyData(data, dataScratchBytes, true)
                     }
                     writeSampleData(data)
                     if (payloadBytesRead == header.packetLength) {
@@ -265,14 +265,14 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
                     )
             }
             val format =
-                Format.Builder()
-                    .setId(formatId)
-                    .setContainerMimeType(containerMimeType)
-                    .setSampleMimeType(MimeTypes.AUDIO_MPEGH_MHM1)
-                    .setSampleRate(samplingRate)
-                    .setCodecs(codecs)
-                    .setInitializationData(initializationData)
-                    .build()
+                Format(
+                    id = formatId,
+                    containerMimeType = containerMimeType,
+                    sampleMimeType = MimeTypes.AUDIO_MPEGH_MHM1,
+                    sampleRate = samplingRate,
+                    codecs = codecs,
+                    initializationData = initializationData ?: listOf()
+                )
             output!!.format(format)
         }
         configFound = true
