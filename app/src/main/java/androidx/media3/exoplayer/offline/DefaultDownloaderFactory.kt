@@ -56,10 +56,10 @@ class DefaultDownloaderFactory(
                 .setStreamKeys(request.streamKeys)
                 .setCustomCacheKey(request.customCacheKey)
                 .build()
-        if (request.timeRange != null) {
+        request.timeRange?.also {
             downloaderFactory
-                .setStartPositionUs(request.timeRange.startPositionUs)!!
-                .setDurationUs(request.timeRange.durationUs)
+                .setStartPositionUs(it.startPositionUs)
+                .setDurationUs(it.durationUs)
         }
         return downloaderFactory.setExecutor(executor).create(mediaItem)
     }

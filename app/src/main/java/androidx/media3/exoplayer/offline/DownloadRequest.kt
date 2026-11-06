@@ -14,89 +14,20 @@ import java.io.IOException
 import java.util.Collections
 import androidx.core.net.toUri
 
-class DownloadRequest : Parcelable {
+class DownloadRequest(
+    var id: String,
+    var uri: Uri,
+    var mimeType: String? = null,
+    var streamKeys: List<StreamKey> = listOf(),
+    var keySetId: ByteArray? = null,
+    var customCacheKey: String? = null,
+    var data: ByteArray? = Util.EMPTY_BYTE_ARRAY,
+    var byteRange: ByteRange? = null,
+    var timeRange: TimeRange? = null,
+) : Parcelable {
     class UnsupportedRequestException : IOException()
 
-    class Builder(private val id: String, private val uri: Uri) {
-        private var mimeType: String? = null
-        private var streamKeys: List<StreamKey>? = null
-        private var keySetId: ByteArray? = null
-        private var customCacheKey: String? = null
-        private var data: ByteArray? = null
-        private var byteRange: ByteRange? = null
-        private var timeRange: TimeRange? = null
-
-        fun setMimeType(mimeType: String?): Builder {
-            this.mimeType = normalizeMimeType(mimeType)
-            return this
-        }
-
-        fun setStreamKeys(streamKeys: List<StreamKey>?): Builder {
-            this.streamKeys = streamKeys
-            return this
-        }
-
-        fun setKeySetId(keySetId: ByteArray?): Builder {
-            this.keySetId = keySetId
-            return this
-        }
-
-        fun setCustomCacheKey(customCacheKey: String?): Builder {
-            this.customCacheKey = customCacheKey
-            return this
-        }
-
-        fun setData(data: ByteArray?): Builder {
-            this.data = data
-            return this
-        }
-
-        fun setByteRange(offset: Long, length: Long): Builder {
-            this.byteRange = ByteRange(offset, length)
-            return this
-        }
-
-        fun setTimeRange(startPositionUs: Long, durationUs: Long): Builder {
-            this.timeRange = TimeRange(startPositionUs, durationUs)
-            return this
-        }
-
-        fun build(): DownloadRequest {
-            return DownloadRequest(
-                id,
-                uri,
-                mimeType,
-                streamKeys ?: listOf(),
-                keySetId,
-                customCacheKey,
-                data,
-                byteRange,
-                timeRange
-            )
-        }
-    }
-
-    val id: String
-    val uri: Uri
-    val mimeType: String?
-    val streamKeys: MutableList<StreamKey>
-    val keySetId: ByteArray?
-    val customCacheKey: String?
-    val data: ByteArray?
-    val byteRange: ByteRange?
-    val timeRange: TimeRange?
-
-    private constructor(
-        id: String,
-        uri: Uri,
-        mimeType: String?,
-        streamKeys: List<StreamKey>,
-        keySetId: ByteArray?,
-        customCacheKey: String?,
-        data: ByteArray?,
-        byteRange: ByteRange?,
-        timeRange: TimeRange?
-    ) {
+    init {
         @C.ContentType val contentType: @C.ContentType Int =
             inferContentTypeForUriAndMimeType(uri, mimeType)
         if (contentType == C.CONTENT_TYPE_DASH || contentType == C.CONTENT_TYPE_HLS || contentType == C.CONTENT_TYPE_SS) {
@@ -109,20 +40,12 @@ class DownloadRequest : Parcelable {
             this.byteRange = byteRange
             this.timeRange = null
         }
-        this.id = id
-        this.uri = uri
-        this.mimeType = mimeType
         val mutableKeys = ArrayList<StreamKey>(streamKeys)
         Collections.sort(mutableKeys)
         this.streamKeys = Collections.unmodifiableList(mutableKeys)
-        this.keySetId = keySetId?.copyOf(keySetId.size)
-        this.customCacheKey = customCacheKey
-        this.data = data?.copyOf(data.size) ?: Util.EMPTY_BYTE_ARRAY
     }
 
-    internal constructor(`in`: Parcel) {
-        id = `in`.readString()!!
-        uri = (`in`.readString()!!).toUri()
+    internal constructor(`in`: Parcel) : this(`in`.readString()!!, (`in`.readString()!!).toUri()) {
         mimeType = `in`.readString()
         val streamKeyCount = `in`.readInt()
         val mutableStreamKeys = ArrayList<StreamKey?>(streamKeyCount)

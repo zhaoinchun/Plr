@@ -120,11 +120,11 @@ class MediaItem private constructor(
             return this
         }
 
-        fun setStreamKeys(streamKeys: MutableList<StreamKey>?): Builder {
+        fun setStreamKeys(streamKeys: List<StreamKey>?): Builder {
             this.streamKeys =
                 if (!streamKeys.isNullOrEmpty())
                     Collections.unmodifiableList(ArrayList(streamKeys))
-                else mutableListOf<StreamKey?>()
+                else listOf<StreamKey?>()
             return this
         }
 

@@ -193,7 +193,7 @@ class CmcdData private constructor(
                 }
             }
             if (cmcdConfiguration.isMeasuredThroughputLoggingAllowed) {
-                cmcdRequest.measuredThroughputInKbps=latestBitrateEstimateKbps
+                cmcdRequest.measuredThroughputInKbps = latestBitrateEstimateKbps
             }
             if (cmcdConfiguration.isStartupLoggingAllowed) {
                 cmcdRequest.startup = didRebuffer || isBufferEmpty
@@ -205,29 +205,29 @@ class CmcdData private constructor(
                 cmcdRequest.nextRangeRequest = nextRangeRequest
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_REQUEST)) {
-                cmcdRequest.customDataList =  customData[CmcdConfiguration.KEY_CMCD_REQUEST] ?: listOf()
+                cmcdRequest.customDataList =
+                    customData[CmcdConfiguration.KEY_CMCD_REQUEST] ?: listOf()
             }
 
-            val cmcdSession = CmcdSession.Builder()
+            val cmcdSession = CmcdSession()
             if (cmcdConfiguration.isContentIdLoggingAllowed) {
-                cmcdSession.setContentId(cmcdConfiguration.contentId)
+                cmcdSession.contentId = cmcdConfiguration.contentId
             }
             if (cmcdConfiguration.isSessionIdLoggingAllowed) {
-                cmcdSession.setSessionId(cmcdConfiguration.sessionId)
+                cmcdSession.sessionId = cmcdConfiguration.sessionId
             }
             if (cmcdConfiguration.isStreamingFormatLoggingAllowed) {
-                cmcdSession.setStreamingFormat(streamingFormat)
+                cmcdSession.streamingFormat = streamingFormat
             }
             if (isLive != null && cmcdConfiguration.isStreamTypeLoggingAllowed) {
-                cmcdSession.setStreamType(if (isLive!!) STREAM_TYPE_LIVE else STREAM_TYPE_VOD)
+                cmcdSession.streamType = if (isLive!!) STREAM_TYPE_LIVE else STREAM_TYPE_VOD
             }
             if (cmcdConfiguration.isPlaybackRateLoggingAllowed) {
-                cmcdSession.setPlaybackRate(playbackRate)
+                cmcdSession.playbackRate = playbackRate
             }
             if (customData.containsKey(CmcdConfiguration.KEY_CMCD_SESSION)) {
-                cmcdSession.setCustomDataList(
-                    customData.get(CmcdConfiguration.KEY_CMCD_SESSION) ?: listOf()
-                )
+                cmcdSession.customDataList =
+                    customData[CmcdConfiguration.KEY_CMCD_SESSION] ?: listOf()
             }
 
             val cmcdStatus = CmcdStatus()
@@ -245,7 +245,7 @@ class CmcdData private constructor(
             return CmcdData(
                 cmcdObject,
                 cmcdRequest,
-                cmcdSession.build(),
+                cmcdSession,
                 cmcdStatus,
                 cmcdConfiguration.dataTransmissionMode
             )
@@ -386,9 +386,9 @@ class CmcdData private constructor(
     }
 
     private class CmcdRequest() {
-        var bufferLengthMs: Long= C.TIME_UNSET
-        var measuredThroughputInKbps: Long= C.RATE_UNSET_INT.toLong()
-        var deadlineMs: Long =C.TIME_UNSET
+        var bufferLengthMs: Long = C.TIME_UNSET
+        var measuredThroughputInKbps: Long = C.RATE_UNSET_INT.toLong()
+        var deadlineMs: Long = C.TIME_UNSET
         var startup = false
         var nextObjectRequest: String? = null
         var nextRangeRequest: String? = null
@@ -438,78 +438,15 @@ class CmcdData private constructor(
         }
     }
 
-    private class CmcdSession(builder: Builder) {
-        class Builder {
-            var contentId: String? = null
-            var sessionId: String? = null
-            var streamingFormat: @StreamingFormat String? = null
-            var streamType: @StreamType String? = null
-            var playbackRate: Float
-            var customDataList: List<String?>
+    private class CmcdSession() {
+        var contentId: String? = null
+        var sessionId: String? = null
+        var streamingFormat: @StreamingFormat String? = null
+        var streamType: @StreamType String? = null
+        var playbackRate: Float = C.RATE_UNSET
+        var customDataList: List<String?> = listOf()
 
-            init {
-                this.playbackRate = C.RATE_UNSET
-                this.customDataList = listOf()
-            }
-
-            fun setContentId(contentId: String?): Builder {
-                Preconditions.checkArgument(contentId == null || contentId.length <= CmcdConfiguration.MAX_ID_LENGTH)
-                this.contentId = contentId
-                return this
-            }
-
-            fun setSessionId(sessionId: String?): Builder {
-                Preconditions.checkArgument(sessionId == null || sessionId.length <= CmcdConfiguration.MAX_ID_LENGTH)
-                this.sessionId = sessionId
-                return this
-            }
-
-            fun setStreamingFormat(streamingFormat: @StreamingFormat String?): Builder {
-                this.streamingFormat = streamingFormat
-                return this
-            }
-
-            fun setStreamType(streamType: @StreamType String?): Builder {
-                this.streamType = streamType
-                return this
-            }
-
-            fun setPlaybackRate(playbackRate: Float): Builder {
-                Preconditions.checkArgument(playbackRate > 0 || playbackRate == C.RATE_UNSET)
-                this.playbackRate = playbackRate
-                return this
-            }
-
-            fun setCustomDataList(customDataList: List<String>): Builder {
-                this.customDataList = customDataList.toList()
-                return this
-            }
-
-            fun build(): CmcdSession {
-                return CmcdSession(this)
-            }
-        }
-
-        val contentId: String?
-        val sessionId: String?
-        val streamingFormat: @StreamingFormat String?
-        val streamType: @StreamType String?
-        val playbackRate: Float
-
-        val customDataList: List<String?>
-
-        init {
-            this.contentId = builder.contentId
-            this.sessionId = builder.sessionId
-            this.streamingFormat = builder.streamingFormat
-            this.streamType = builder.streamType
-            this.playbackRate = builder.playbackRate
-            this.customDataList = builder.customDataList
-        }
-
-        fun populateCmcdDataMap(
-            cmcdDataMap: ArrayListMultimap<String, String>
-        ) {
+        fun populateCmcdDataMap(cmcdDataMap: ArrayListMultimap<String, String>) {
             val keyValuePairs = ArrayList<String?>()
             if (!TextUtils.isEmpty(this.contentId)) {
                 keyValuePairs.add(

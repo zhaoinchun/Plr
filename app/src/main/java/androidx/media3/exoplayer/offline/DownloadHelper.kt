@@ -27,6 +27,8 @@ import androidx.media3.exoplayer.RenderersFactory
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.drm.DrmSessionManager
 import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
+import androidx.media3.exoplayer.offline.DownloadRequest.ByteRange
+import androidx.media3.exoplayer.offline.DownloadRequest.TimeRange
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaPeriod
 import androidx.media3.exoplayer.source.MediaSource
@@ -397,7 +399,7 @@ class DownloadHelper(
     }
 
     fun getDownloadRequest(id: String, data: ByteArray?): DownloadRequest {
-        return getDownloadRequestBuilder(id, data).build()
+        return getDownloadRequestBuilder(id, data)
     }
 
     fun getDownloadRequest(
@@ -406,16 +408,16 @@ class DownloadHelper(
         val builder = getDownloadRequestBuilder(id, data)
         assertPreparedWithMedia()
         populateDownloadRequestBuilderWithDownloadRange(builder, startPositionMs, durationMs)
-        return builder.build()
+        return builder
     }
 
-    private fun getDownloadRequestBuilder(id: String, data: ByteArray?): DownloadRequest.Builder {
+    private fun getDownloadRequestBuilder(id: String, data: ByteArray?): DownloadRequest {
         val requestBuilder =
-            DownloadRequest.Builder(id, localConfiguration.uri)
-                .setMimeType(localConfiguration.mimeType)
-                .setKeySetId(localConfiguration.drmConfiguration?.getKeySetId())
-                .setCustomCacheKey(localConfiguration.customCacheKey)
-                .setData(data)
+            DownloadRequest(id, localConfiguration.uri,
+                mimeType = localConfiguration.mimeType,
+                keySetId = localConfiguration.drmConfiguration?.getKeySetId(),
+                customCacheKey = localConfiguration.customCacheKey,
+                data = data)
         if (mode == MODE_PREPARE_NON_PROGRESSIVE_SOURCE_AND_SELECT_TRACKS) {
             assertPreparedWithNonProgressiveSourceAndTracksSelected()
             val streamKeys: MutableList<StreamKey> = ArrayList()
@@ -433,13 +435,13 @@ class DownloadHelper(
                     )
                 )
             }
-            requestBuilder.setStreamKeys(streamKeys)
+            requestBuilder.streamKeys = streamKeys
         }
         return requestBuilder
     }
 
     private fun populateDownloadRequestBuilderWithDownloadRange(
-        requestBuilder: DownloadRequest.Builder, startPositionMs: Long, durationMs: Long
+        requestBuilder: DownloadRequest, startPositionMs: Long, durationMs: Long
     ) {
         when (mode) {
             MODE_PREPARE_PROGRESSIVE_SOURCE -> populateDownloadRequestBuilderWithByteRange(
@@ -459,7 +461,7 @@ class DownloadHelper(
     }
 
     private fun populateDownloadRequestBuilderWithByteRange(
-        requestBuilder: DownloadRequest.Builder, startPositionMs: Long, durationMs: Long
+        requestBuilder: DownloadRequest, startPositionMs: Long, durationMs: Long
     ) {
         assertPreparedWithProgressiveSource()
         val timeline = mediaPreparer!!.timeline!!
@@ -503,14 +505,14 @@ class DownloadHelper(
                     else
                         C.LENGTH_UNSET.toLong()
             }
-            requestBuilder.setByteRange(byteRangeStartPositionOffset, byteRangeLength)
+            requestBuilder.byteRange = ByteRange(byteRangeStartPositionOffset, byteRangeLength)
         } else {
             w(TAG, "Cannot set download byte range for progressive stream that is unseekable")
         }
     }
 
     private fun populateDownloadRequestBuilderWithTimeRange(
-        requestBuilder: DownloadRequest.Builder, startPositionMs: Long, durationMs: Long
+        requestBuilder: DownloadRequest, startPositionMs: Long, durationMs: Long
     ) {
         assertPreparedWithNonProgressiveSourceAndTracksSelected()
         val timeline = mediaPreparer!!.timeline
@@ -528,7 +530,7 @@ class DownloadHelper(
             startPositionUs = min(startPositionUs, windowDurationUs)
             durationUs = min(durationUs, windowDurationUs - startPositionUs)
         }
-        requestBuilder.setTimeRange(startPositionUs, durationUs)
+        requestBuilder.timeRange = TimeRange(startPositionUs, durationUs)
     }
 
     @RequiresNonNull(

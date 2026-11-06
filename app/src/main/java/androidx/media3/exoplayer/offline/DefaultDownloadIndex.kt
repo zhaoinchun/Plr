@@ -17,7 +17,7 @@ import androidx.media3.database.VersionTable
 import com.google.common.base.Preconditions
 import androidx.core.net.toUri
 
-class DefaultDownloadIndex  constructor(
+class DefaultDownloadIndex(
     private val databaseProvider: DatabaseProvider,
     private val name: String = ""
 ) : WritableDownloadIndex {
@@ -423,17 +423,15 @@ class DefaultDownloadIndex  constructor(
 
         private fun getDownloadForCurrentRow(cursor: Cursor): Download {
             val keySetId = cursor.getBlob(COLUMN_INDEX_KEY_SET_ID)
-            val request =
-                DownloadRequest.Builder(
-                    cursor.getString(COLUMN_INDEX_ID)!!,
-                    (cursor.getString(COLUMN_INDEX_URI)!!).toUri()
-                )
-                    .setMimeType(cursor.getString(COLUMN_INDEX_MIME_TYPE))
-                    .setStreamKeys(decodeStreamKeys(cursor.getString(COLUMN_INDEX_STREAM_KEYS)))
-                    .setKeySetId(if (keySetId.size > 0) keySetId else null)
-                    .setCustomCacheKey(cursor.getString(COLUMN_INDEX_CUSTOM_CACHE_KEY))
-                    .setData(cursor.getBlob(COLUMN_INDEX_DATA))
-                    .build()
+            val request = DownloadRequest(
+                cursor.getString(COLUMN_INDEX_ID)!!,
+                (cursor.getString(COLUMN_INDEX_URI)!!).toUri(),
+                mimeType = cursor.getString(COLUMN_INDEX_MIME_TYPE),
+                streamKeys = decodeStreamKeys(cursor.getString(COLUMN_INDEX_STREAM_KEYS)),
+                keySetId = if (keySetId.size > 0) keySetId else null,
+                customCacheKey = cursor.getString(COLUMN_INDEX_CUSTOM_CACHE_KEY),
+                data = cursor.getBlob(COLUMN_INDEX_DATA)
+            )
             val downloadProgress = DownloadProgress()
             downloadProgress.bytesDownloaded = cursor.getLong(COLUMN_INDEX_BYTES_DOWNLOADED)
             downloadProgress.percentDownloaded = cursor.getFloat(COLUMN_INDEX_PERCENT_DOWNLOADED)
@@ -477,15 +475,14 @@ class DefaultDownloadIndex  constructor(
      * 13     bytes_downloaded    integer
      */
             val request =
-                DownloadRequest.Builder(
+                DownloadRequest(
                     cursor.getString(0)!!,
-                    (cursor.getString(2)!!).toUri()
+                    (cursor.getString(2)!!).toUri(),
+                    mimeType = inferMimeType(cursor.getString(1)),
+                    streamKeys = decodeStreamKeys(cursor.getString(3)),
+                    customCacheKey = cursor.getString(4),
+                    data = cursor.getBlob(5)
                 )
-                    .setMimeType(inferMimeType(cursor.getString(1)))
-                    .setStreamKeys(decodeStreamKeys(cursor.getString(3)))
-                    .setCustomCacheKey(cursor.getString(4))
-                    .setData(cursor.getBlob(5))
-                    .build()
             val downloadProgress = DownloadProgress()
             downloadProgress.bytesDownloaded = cursor.getLong(13)
             downloadProgress.percentDownloaded = cursor.getFloat(12)
