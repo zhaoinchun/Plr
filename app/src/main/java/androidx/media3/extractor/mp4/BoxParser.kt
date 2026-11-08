@@ -358,22 +358,21 @@ object BoxParser {
             format = stsdData.format
         }
         val shouldBeExposed = format!!.sampleMimeType != MimeTypes.TEXT_UNKNOWN
-        return Track.Builder()
-            .setId(tkhdData.id)
-            .setType(trackType)
-            .setTimescale(mdhdData.timescale)
-            .setMovieTimescale(movieTimescale)
-            .setDurationUs(durationUs)
-            .setMediaDurationUs(mdhdData.mediaDurationUs)
-            .setFormat(format)
-            .setSampleTransformation(stsdData.requiredSampleTransformation)
-            .setSampleDescriptionEncryptionBoxes(stsdData.trackEncryptionBoxes)
-            .setNalUnitLengthFieldLength(stsdData.nalUnitLengthFieldLength)
-            .setEditListDurations(editListDurations)
-            .setEditListMediaTimes(editListMediaTimes)
-            .setShouldBeExposed(shouldBeExposed)
-            .setChapterTrackId(chapterTrackId)
-            .build()
+        return Track(
+            id = tkhdData.id,
+            type = trackType,
+            timescale = mdhdData.timescale,
+            movieTimescale = movieTimescale,
+            durationUs = durationUs,
+            mediaDurationUs = mdhdData.mediaDurationUs,
+            format = format,
+            sampleTransformation = stsdData.requiredSampleTransformation,
+            sampleDescriptionEncryptionBoxes = stsdData.trackEncryptionBoxes,
+            nalUnitLengthFieldLength = stsdData.nalUnitLengthFieldLength,
+            editListDurations = editListDurations,
+            editListMediaTimes = editListMediaTimes,
+            shouldBeExposed = shouldBeExposed, chapterTrackId = chapterTrackId
+        )
     }
 
     @Throws(ParserException::class)
@@ -390,11 +389,9 @@ object BoxParser {
             sampleSizeBox = StszSampleSizeBox(stszAtom, track.format!!)
         } else {
             val stz2Atom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stz2)
-            if (stz2Atom == null) {
-                throw ParserException.createForMalformedContainer(
+                ?: throw ParserException.createForMalformedContainer(
                     "Track has no sample table size information", null
                 )
-            }
             sampleSizeBox = Stz2SampleSizeBox(stz2Atom)
         }
 
@@ -417,7 +414,7 @@ object BoxParser {
         if (track.type == C.TRACK_TYPE_VIDEO && track.mediaDurationUs > 0) {
             val frameRate = sampleCount / (track.mediaDurationUs / 1000000f)
             val format = track.format!!.copy(frameRate = frameRate)
-            track = track.buildUpon().setFormat(format).build()
+            track = track.copy(format = format)
         }
 
         // Entries are byte offsets of chunks.
@@ -647,7 +644,7 @@ object BoxParser {
             if (averageBitrate > 0 && averageBitrate < Int.MAX_VALUE) {
                 val format =
                     track.format.copy(averageBitrate = averageBitrate.toInt())
-                track = track.buildUpon().setFormat(format).build()
+                track = track.copy(format = format)
             }
         }
 
@@ -925,7 +922,7 @@ object BoxParser {
             scaleLargeTimestamp(pts, C.MICROS_PER_SECOND, track.movieTimescale)
         if (hasPrerollSamples) {
             val format = track.format!!.copy(hasPrerollSamples = true)
-            track = track.buildUpon().setFormat(format).build()
+            track = track.copy(format = format)
         }
         return TrackSampleTable(
             track,
