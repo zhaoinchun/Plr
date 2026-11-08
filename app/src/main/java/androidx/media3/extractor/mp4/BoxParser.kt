@@ -1739,14 +1739,13 @@ object BoxParser {
                 maxSubLayers = maxSubLayers,
                 drmInitData = drmInitData,
                 language = language,
-                colorInfo = ColorInfo.Builder()
-                    .setColorSpace(colorSpace)
-                    .setColorRange(colorRange)
-                    .setColorTransfer(colorTransfer)
-                    .setHdrStaticInfo(hdrStaticInfo?.array())
-                    .setLumaBitdepth(bitdepthLuma)
-                    .setChromaBitdepth(bitdepthChroma)
-                    .build(),
+                colorInfo = ColorInfo(
+                    colorSpace = colorSpace,
+                    colorRange = colorRange,
+                    colorTransfer = colorTransfer,
+                    lumaBitdepth = bitdepthLuma,
+                    chromaBitdepth = bitdepthChroma
+                ),
                 averageBitrate = avgBitrate,
                 peakBitrate = peakBitrate,
             )
@@ -1754,12 +1753,16 @@ object BoxParser {
     }
 
     private fun parseApvc(data: ParsableByteArray): ColorInfo {
-        val colorInfo = ColorInfo.Builder()
         val bitArray = ParsableBitArray(data.data)
         bitArray.position = (data.getPosition() * 8) // Convert byte to bit position.
         // See APVDecoderConfigurationRecord syntax.
         bitArray.skipBytes(1) // configurationVersion
         val numConfigurationEntries = bitArray.readBits(8) // number_of_configuration_entry
+        var lumaBitdepth = Format.NO_VALUE
+        var chromaBitdepth = Format.NO_VALUE
+        var colorSpace = Format.NO_VALUE
+        var colorRange = Format.NO_VALUE
+        var colorTransfer = Format.NO_VALUE
         for (i in 0..<numConfigurationEntries) {
             bitArray.skipBytes(1) // pbu_type
             val numberOfFrameInfo = bitArray.readBits(8)
@@ -1773,26 +1776,29 @@ object BoxParser {
                 bitArray.skipBytes(11)
                 bitArray.skipBits(4) // chroma_format_idc (4 bits)
                 val bitDepth = bitArray.readBits(4) + 8 // bit_depth_minus8 + 8
-                colorInfo.setLumaBitdepth(bitDepth)
-                colorInfo.setChromaBitdepth(bitDepth)
+                lumaBitdepth = bitDepth
+                chromaBitdepth = bitDepth
                 bitArray.skipBytes(1) // capture_time_distance
                 if (isColorDescriptionPresent) {
                     val colorPrimaries = bitArray.readBits(8) // color_primaries
                     val transferCharacteristics = bitArray.readBits(8) // transfer_characteristics
                     bitArray.skipBytes(1) // matrix_coefficients
                     val fullRangeFlag = bitArray.readBit() // full_range_flag
-                    colorInfo
-                        .setColorSpace(ColorInfo.isoColorPrimariesToColorSpace(colorPrimaries))
-                        .setColorRange(if (fullRangeFlag) C.COLOR_RANGE_FULL else C.COLOR_RANGE_LIMITED)
-                        .setColorTransfer(
-                            ColorInfo.isoTransferCharacteristicsToColorTransfer(
-                                transferCharacteristics
-                            )
-                        )
+                    colorSpace = ColorInfo.isoColorPrimariesToColorSpace(colorPrimaries)
+                    colorRange = if (fullRangeFlag) C.COLOR_RANGE_FULL else C.COLOR_RANGE_LIMITED
+                    colorTransfer = ColorInfo.isoTransferCharacteristicsToColorTransfer(
+                        transferCharacteristics
+                    )
                 }
             }
         }
-        return colorInfo.build()
+        return ColorInfo(
+            colorSpace = colorSpace,
+            colorRange = colorRange,
+            colorTransfer = colorTransfer,
+            lumaBitdepth = lumaBitdepth,
+            chromaBitdepth = chromaBitdepth
+        )
     }
 
     private fun allocateHdrStaticInfo(): ByteBuffer {

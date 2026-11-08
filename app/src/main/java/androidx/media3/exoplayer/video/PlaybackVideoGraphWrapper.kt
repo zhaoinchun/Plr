@@ -291,8 +291,7 @@ class PlaybackVideoGraphWrapper(
                     // PQ SurfaceView output is supported from API 33, but HLG output is supported from API
                     // 34. Therefore, convert HLG to PQ if PQ is supported, so that HLG input can be displayed
                     // properly on API 33.
-                    outputColorInfo =
-                        inputColorInfo.buildUpon().setColorTransfer(C.COLOR_TRANSFER_ST2084).build()
+                    outputColorInfo = inputColorInfo.copy(colorTransfer = C.COLOR_TRANSFER_ST2084)
                     // Force OpenGL tone mapping if the GL extension required to output HDR colors is not
                     // available. OpenGL tone mapping is only supported on API 29+.
                 } else if (!GlUtil.isColorTransferSupported(inputColorInfo.colorTransfer)

@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
@@ -25,9 +24,9 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull
 
 class H265Reader(private val seiReader: SeiReader, private val containerMimeType: String?) :
     ElementaryStreamReader {
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
-    private var sampleReader:SampleReader? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
+    private var sampleReader: SampleReader? = null
 
     // State that should not be reset on seek.
     private var hasOutputFormat = false
@@ -312,7 +311,7 @@ class H265Reader(private val seiReader: SeiReader, private val containerMimeType
         }
 
         companion object {
-            
+
             private const val FIRST_SLICE_FLAG_OFFSET = 2
 
             private fun isPrefixNalUnit(nalUnitType: Int): Boolean {
@@ -345,7 +344,7 @@ class H265Reader(private val seiReader: SeiReader, private val containerMimeType
             // Skip the 3-byte NAL unit start code synthesised by the NalUnitTargetBuffer constructor.
             val spsData =
                 parseH265SpsNalUnit(
-                    sps.nalData,  3, sps.nalLength,  null
+                    sps.nalData, 3, sps.nalLength, null
                 )
 
             var codecs: String? = null
@@ -360,25 +359,27 @@ class H265Reader(private val seiReader: SeiReader, private val containerMimeType
                         spsData.profileTierLevel.generalLevelIdc
                     )
             }
-            return Format(id=formatId,
-                containerMimeType=containerMimeType,
-                sampleMimeType =MimeTypes.VIDEO_H265,
+            return Format(
+                id = formatId,
+                containerMimeType = containerMimeType,
+                sampleMimeType = MimeTypes.VIDEO_H265,
                 codecs = codecs,
                 width = spsData.width,
                 height = spsData.height,
                 decodedWidth = spsData.decodedWidth,
                 decodedHeight = spsData.decodedHeight,
-                colorInfo =         ColorInfo.Builder()
-                    .setColorSpace(spsData.colorSpace)
-                    .setColorRange(spsData.colorRange)
-                    .setColorTransfer(spsData.colorTransfer)
-                    .setLumaBitdepth(spsData.bitDepthLumaMinus8 + 8)
-                    .setChromaBitdepth(spsData.bitDepthChromaMinus8 + 8)
-                    .build(),
+                colorInfo = ColorInfo(
+                    colorSpace = spsData.colorSpace,
+                    colorRange = spsData.colorRange,
+                    colorTransfer = spsData.colorTransfer,
+                    lumaBitdepth = spsData.bitDepthLumaMinus8 + 8,
+                    chromaBitdepth = spsData.bitDepthChromaMinus8 + 8
+                ),
                 pixelWidthHeightRatio = spsData.pixelWidthHeightRatio,
                 maxNumReorderSamples = spsData.maxNumReorderPics,
-                maxSubLayers = spsData.maxSubLayersMinus1+1,
-                initializationData = mutableListOf(csdData))
+                maxSubLayers = spsData.maxSubLayersMinus1 + 1,
+                initializationData = mutableListOf(csdData)
+            )
         }
     }
 }

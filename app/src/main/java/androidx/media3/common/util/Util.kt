@@ -1364,11 +1364,11 @@ object Util {
             return null
         }
 
-        return ColorInfo.Builder()
-            .setColorSpace(colorSpace)
-            .setColorRange(colorRange)
-            .setColorTransfer(colorTransfer)
-            .build()
+        return ColorInfo(
+            colorSpace = colorSpace,
+            colorRange = colorRange,
+            colorTransfer = colorTransfer
+        )
     }
 
     fun getCodecsWithoutType(codecs: String?, trackType: @C.TrackType Int): String? {

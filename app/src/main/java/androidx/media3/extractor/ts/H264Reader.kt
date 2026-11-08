@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.ts
 
 import android.util.SparseArray
@@ -40,9 +39,9 @@ class H264Reader(
     private var totalBytesWritten: Long = 0
     private val prefixFlags: BooleanArray
 
-    private var formatId:String? = null
-    private var output:TrackOutput? = null
-    private var sampleReader:SampleReader? = null
+    private var formatId: String? = null
+    private var output: TrackOutput? = null
+    private var sampleReader: SampleReader? = null
 
     // State that should not be reset on seek.
     private var hasOutputFormat = false
@@ -197,22 +196,24 @@ class H264Reader(
                             spsData.levelIdc
                         )
                     output!!.format(
-                        Format(id=formatId,
-                            containerMimeType=containerMimeType,
-                            sampleMimeType =MimeTypes.VIDEO_H264,
+                        Format(
+                            id = formatId,
+                            containerMimeType = containerMimeType,
+                            sampleMimeType = MimeTypes.VIDEO_H264,
                             codecs = codecs,
                             width = spsData.width,
                             height = spsData.height,
-                            colorInfo = ColorInfo.Builder()
-                                .setColorSpace(spsData.colorSpace)
-                                .setColorRange(spsData.colorRange)
-                                .setColorTransfer(spsData.colorTransfer)
-                                .setLumaBitdepth(spsData.bitDepthLumaMinus8 + 8)
-                                .setChromaBitdepth(spsData.bitDepthChromaMinus8 + 8)
-                                .build(),
+                            colorInfo = ColorInfo(
+                                colorSpace = spsData.colorSpace,
+                                colorRange = spsData.colorRange,
+                                colorTransfer = spsData.colorTransfer,
+                                lumaBitdepth = spsData.bitDepthLumaMinus8 + 8,
+                                chromaBitdepth = spsData.bitDepthChromaMinus8 + 8
+                            ),
                             pixelWidthHeightRatio = spsData.pixelWidthHeightRatio,
                             initializationData = initializationData,
-                            maxNumReorderSamples = spsData.maxNumReorderFrames)
+                            maxNumReorderSamples = spsData.maxNumReorderFrames
+                        )
                     )
                     hasOutputFormat = true
                     seiReader.setReorderingQueueSize(spsData.maxNumReorderFrames)
@@ -248,7 +249,7 @@ class H264Reader(
     }
 
     private fun assertTracksCreated() {
-      output!!
+        output!!
         sampleReader!!
     }
 

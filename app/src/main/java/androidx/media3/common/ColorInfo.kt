@@ -6,20 +6,16 @@ import androidx.media3.common.C.ColorTransfer
 import androidx.media3.common.util.Util
 import org.checkerframework.dataflow.qual.Pure
 
-class ColorInfo private constructor(
-    val colorSpace: @C.ColorSpace Int,
-    val colorRange: @ColorRange Int,
-    val colorTransfer: @ColorTransfer Int,
-    val hdrStaticInfo: ByteArray?,
-    val lumaBitdepth: Int,
-    val chromaBitdepth: Int
+data class ColorInfo(
+    val colorSpace: @C.ColorSpace Int = Format.NO_VALUE,
+    val colorRange: @ColorRange Int = Format.NO_VALUE,
+    val colorTransfer: @ColorTransfer Int = Format.NO_VALUE,
+    val hdrStaticInfo: ByteArray? = null,
+    val lumaBitdepth: Int = Format.NO_VALUE,
+    val chromaBitdepth: Int = Format.NO_VALUE
 ) {
     // Lazily initialized hashcode.
     private var hashCode = 0
-
-    fun buildUpon(): Builder {
-        return ColorInfo.Builder(this)
-    }
 
     val isValid: Boolean
         get() = this.isBitdepthValid || this.isDataSpaceValid
@@ -100,80 +96,18 @@ class ColorInfo private constructor(
         return bundle
     }
 
-    class Builder {
-        private var colorSpace: @C.ColorSpace Int
-        private var colorRange: @ColorRange Int
-        private var colorTransfer: @ColorTransfer Int
-        private var hdrStaticInfo: ByteArray? = null
-        private var lumaBitdepth: Int
-        private var chromaBitdepth: Int
-
-        constructor() {
-            colorSpace = Format.NO_VALUE
-            colorRange = Format.NO_VALUE
-            colorTransfer = Format.NO_VALUE
-            lumaBitdepth = Format.NO_VALUE
-            chromaBitdepth = Format.NO_VALUE
-        }
-
-        constructor(colorInfo: ColorInfo) {
-            this.colorSpace = colorInfo.colorSpace
-            this.colorRange = colorInfo.colorRange
-            this.colorTransfer = colorInfo.colorTransfer
-            this.hdrStaticInfo = colorInfo.hdrStaticInfo
-            this.lumaBitdepth = colorInfo.lumaBitdepth
-            this.chromaBitdepth = colorInfo.chromaBitdepth
-        }
-
-        fun setColorSpace(colorSpace: @C.ColorSpace Int): Builder {
-            this.colorSpace = colorSpace
-            return this
-        }
-
-        fun setColorRange(colorRange: @ColorRange Int): Builder {
-            this.colorRange = colorRange
-            return this
-        }
-
-        fun setColorTransfer(colorTransfer: @ColorTransfer Int): Builder {
-            this.colorTransfer = colorTransfer
-            return this
-        }
-
-        fun setHdrStaticInfo(hdrStaticInfo: ByteArray?): Builder {
-            this.hdrStaticInfo = hdrStaticInfo
-            return this
-        }
-
-        fun setLumaBitdepth(lumaBitdepth: Int): Builder {
-            this.lumaBitdepth = lumaBitdepth
-            return this
-        }
-
-        fun setChromaBitdepth(chromaBitdepth: Int): Builder {
-            this.chromaBitdepth = chromaBitdepth
-            return this
-        }
-
-        fun build(): ColorInfo {
-            return ColorInfo(
-                colorSpace, colorRange, colorTransfer, hdrStaticInfo, lumaBitdepth, chromaBitdepth
-            )
-        }
-    }
-
     companion object {
-        val SDR_BT709_LIMITED: ColorInfo = Builder()
-            .setColorSpace(C.COLOR_SPACE_BT709)
-            .setColorRange(C.COLOR_RANGE_LIMITED)
-            .setColorTransfer(C.COLOR_TRANSFER_SDR)
-            .build()
+        val SDR_BT709_LIMITED: ColorInfo = ColorInfo(
+            colorSpace = C.COLOR_SPACE_BT709,
+            colorRange = C.COLOR_RANGE_LIMITED,
+            colorTransfer = C.COLOR_TRANSFER_SDR
+        )
 
-        val SRGB_BT709_FULL: ColorInfo = Builder()
-            .setColorSpace(C.COLOR_SPACE_BT709)
-            .setColorRange(C.COLOR_RANGE_FULL)
-            .setColorTransfer(C.COLOR_TRANSFER_SRGB)
-            .build()
+        val SRGB_BT709_FULL: ColorInfo = ColorInfo(
+            colorSpace = C.COLOR_SPACE_BT709,
+            colorRange = C.COLOR_RANGE_FULL,
+            colorTransfer = C.COLOR_TRANSFER_SRGB,
+        )
 
         fun isEquivalentToAssumedSdrDefault(colorInfo: ColorInfo?): Boolean {
             if (colorInfo == null) {

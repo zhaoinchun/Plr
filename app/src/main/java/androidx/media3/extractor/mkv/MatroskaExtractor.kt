@@ -2060,14 +2060,13 @@ class MatroskaExtractor internal constructor(
 
                 val hdrStaticInfo = this.hdrStaticInfo
                 val colorInfo: ColorInfo =
-                    ColorInfo.Builder()
-                        .setColorSpace(colorSpace)
-                        .setColorRange(colorRange)
-                        .setColorTransfer(colorTransfer)
-                        .setHdrStaticInfo(hdrStaticInfo)
-                        .setLumaBitdepth(lumaBitdepth)
-                        .setChromaBitdepth(chromaBitdepth)
-                        .build()
+                    ColorInfo(
+                        colorSpace = colorSpace,
+                        colorRange = colorRange,
+                        colorTransfer = colorTransfer,
+                        lumaBitdepth = lumaBitdepth,
+                        chromaBitdepth = chromaBitdepth
+                    )
                 var rotationDegrees = Format.NO_VALUE
 
                 if (name != null && TRACK_NAME_TO_ROTATION_DEGREES.containsKey(name)) {

@@ -236,12 +236,12 @@ object MediaFormatUtil {
             colorTransfer = Format.NO_VALUE
         }
         if (colorSpace != Format.NO_VALUE || colorRange != Format.NO_VALUE || colorTransfer != Format.NO_VALUE || hdrStaticInfo != null) {
-            return ColorInfo.Builder()
-                .setColorSpace(colorSpace)
-                .setColorRange(colorRange)
-                .setColorTransfer(colorTransfer)
-                .setHdrStaticInfo(hdrStaticInfo)
-                .build()
+            return ColorInfo(
+                colorSpace = colorSpace,
+                colorRange = colorRange,
+                colorTransfer = colorTransfer,
+                hdrStaticInfo = hdrStaticInfo
+            )
         }
         return null
     }
