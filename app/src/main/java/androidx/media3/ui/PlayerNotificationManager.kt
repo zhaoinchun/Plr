@@ -15,7 +15,6 @@ import android.os.Looper
 import android.os.Message
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntDef
-import androidx.annotation.IntRange
 import androidx.core.app.NotificationBuilderWithBuilderAccessor
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.BadgeIconType
@@ -24,7 +23,6 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.util.NotificationUtil
 import androidx.media3.common.util.NotificationUtil.createNotificationChannel
-
 import androidx.media3.common.util.Util.createHandler
 import androidx.media3.common.util.Util.handlePauseButtonAction
 import androidx.media3.common.util.Util.handlePlayButtonAction
@@ -37,9 +35,11 @@ class PlayerNotificationManager(
     context: Context,
     private val channelId: String,
     private val notificationId: Int,
-    private val mediaDescriptionAdapter: MediaDescriptionAdapter,
-    private val notificationListener: NotificationListener?,
-    private val customActionReceiver: CustomActionReceiver?,
+    private val mediaDescriptionAdapter: MediaDescriptionAdapter = DefaultMediaDescriptionAdapter(
+        null
+    ),
+    private val notificationListener: NotificationListener? = null,
+    private val customActionReceiver: CustomActionReceiver? = null,
     @field:DrawableRes private var smallIconResourceId: Int,
     playActionIconResourceId: Int,
     pauseActionIconResourceId: Int,
@@ -48,8 +48,23 @@ class PlayerNotificationManager(
     fastForwardActionIconResourceId: Int,
     previousActionIconResourceId: Int,
     nextActionIconResourceId: Int,
-    private val groupKey: String?
+    private val groupKey: String? = null,
+    var channelNameResourceId: Int = 0,
+    var channelDescriptionResourceId: Int = 0,
+    var channelImportance: Int = NotificationUtil.IMPORTANCE_LOW,
 ) {
+    init {
+        if (channelNameResourceId != 0) {
+            createNotificationChannel(
+                context,
+                channelId,
+                channelNameResourceId,
+                channelDescriptionResourceId,
+                channelImportance
+            )
+        }
+    }
+
     interface MediaDescriptionAdapter {
         fun getCurrentContentTitle(player: Player): CharSequence
         fun createCurrentContentIntent(player: Player): PendingIntent?
@@ -76,138 +91,6 @@ class PlayerNotificationManager(
         fun onNotificationPosted(
             notificationId: Int, notification: Notification, ongoing: Boolean
         ) {
-        }
-    }
-
-    class Builder(
-        val context: Context,
-        @IntRange(from = 1) val notificationId: Int,
-        val channelId: String
-    ) {
-        var notificationListener: NotificationListener? = null
-        var customActionReceiver: CustomActionReceiver? = null
-        var mediaDescriptionAdapter: MediaDescriptionAdapter =
-            DefaultMediaDescriptionAdapter(null)
-        var channelNameResourceId: Int = 0
-        var channelDescriptionResourceId: Int = 0
-        var channelImportance = NotificationUtil.IMPORTANCE_LOW
-        var smallIconResourceId = R.drawable.exo_notification_small_icon
-        var rewindActionIconResourceId = R.drawable.exo_notification_rewind
-        var playActionIconResourceId = R.drawable.exo_notification_play
-        var pauseActionIconResourceId = R.drawable.exo_notification_pause
-        var stopActionIconResourceId = R.drawable.exo_notification_stop
-        var fastForwardActionIconResourceId = R.drawable.exo_notification_fastforward
-        var previousActionIconResourceId = R.drawable.exo_notification_previous
-        var nextActionIconResourceId = R.drawable.exo_notification_next
-        var groupKey: String? = null
-
-        init {
-            Preconditions.checkArgument(notificationId > 0)
-        }
-
-        fun setChannelNameResourceId(channelNameResourceId: Int): Builder {
-            this.channelNameResourceId = channelNameResourceId
-            return this
-        }
-
-        fun setChannelDescriptionResourceId(channelDescriptionResourceId: Int): Builder {
-            this.channelDescriptionResourceId = channelDescriptionResourceId
-            return this
-        }
-
-        fun setChannelImportance(channelImportance: @NotificationUtil.Importance Int): Builder {
-            this.channelImportance = channelImportance
-            return this
-        }
-
-        fun setNotificationListener(notificationListener: NotificationListener?): Builder {
-            this.notificationListener = notificationListener
-            return this
-        }
-
-        fun setCustomActionReceiver(customActionReceiver: CustomActionReceiver?): Builder {
-            this.customActionReceiver = customActionReceiver
-            return this
-        }
-
-        fun setSmallIconResourceId(smallIconResourceId: Int): Builder {
-            this.smallIconResourceId = smallIconResourceId
-            return this
-        }
-
-        fun setPlayActionIconResourceId(playActionIconResourceId: Int): Builder {
-            this.playActionIconResourceId = playActionIconResourceId
-            return this
-        }
-
-        fun setPauseActionIconResourceId(pauseActionIconResourceId: Int): Builder {
-            this.pauseActionIconResourceId = pauseActionIconResourceId
-            return this
-        }
-
-        fun setStopActionIconResourceId(stopActionIconResourceId: Int): Builder {
-            this.stopActionIconResourceId = stopActionIconResourceId
-            return this
-        }
-
-        fun setRewindActionIconResourceId(rewindActionIconResourceId: Int): Builder {
-            this.rewindActionIconResourceId = rewindActionIconResourceId
-            return this
-        }
-
-        fun setFastForwardActionIconResourceId(fastForwardActionIconResourceId: Int): Builder {
-            this.fastForwardActionIconResourceId = fastForwardActionIconResourceId
-            return this
-        }
-
-        fun setPreviousActionIconResourceId(previousActionIconResourceId: Int): Builder {
-            this.previousActionIconResourceId = previousActionIconResourceId
-            return this
-        }
-
-        fun setNextActionIconResourceId(nextActionIconResourceId: Int): Builder {
-            this.nextActionIconResourceId = nextActionIconResourceId
-            return this
-        }
-
-        fun setGroup(groupKey: String?): Builder {
-            this.groupKey = groupKey
-            return this
-        }
-
-        fun setMediaDescriptionAdapter(mediaDescriptionAdapter: MediaDescriptionAdapter): Builder {
-            this.mediaDescriptionAdapter = mediaDescriptionAdapter
-            return this
-        }
-
-        fun build(): PlayerNotificationManager {
-            if (channelNameResourceId != 0) {
-                createNotificationChannel(
-                    context,
-                    channelId,
-                    channelNameResourceId,
-                    channelDescriptionResourceId,
-                    channelImportance
-                )
-            }
-
-            return PlayerNotificationManager(
-                context,
-                channelId,
-                notificationId,
-                mediaDescriptionAdapter,
-                notificationListener,
-                customActionReceiver,
-                smallIconResourceId,
-                playActionIconResourceId,
-                pauseActionIconResourceId,
-                stopActionIconResourceId,
-                rewindActionIconResourceId,
-                fastForwardActionIconResourceId,
-                previousActionIconResourceId,
-                nextActionIconResourceId,
-                groupKey
-            )
         }
     }
 
@@ -323,7 +206,7 @@ class PlayerNotificationManager(
         if (this.player != null) {
             this.player!!.removeListener(playerListener)
             if (player == null) {
-                stopNotification( false)
+                stopNotification(false)
             }
         }
         this.player = player
@@ -520,7 +403,7 @@ class PlayerNotificationManager(
         val ongoing = getOngoing(player)
         builder = createNotification(player, builder, ongoing, bitmap)
         if (builder == null) {
-            stopNotification( false)
+            stopNotification(false)
             return
         }
         val notification = builder!!.build()
@@ -715,7 +598,7 @@ class PlayerNotificationManager(
     private fun postUpdateNotificationBitmap(bitmap: Bitmap?, notificationTag: Int) {
         mainHandler
             .obtainMessage(
-                MSG_UPDATE_NOTIFICATION_BITMAP, notificationTag, C.INDEX_UNSET,  bitmap
+                MSG_UPDATE_NOTIFICATION_BITMAP, notificationTag, C.INDEX_UNSET, bitmap
             )
             .sendToTarget()
     }
@@ -723,7 +606,7 @@ class PlayerNotificationManager(
     private fun handleMessage(msg: Message): Boolean {
         when (msg.what) {
             MSG_START_OR_UPDATE_NOTIFICATION -> if (player != null) {
-                startOrUpdateNotification(player!!,  null)
+                startOrUpdateNotification(player!!, null)
             }
 
             MSG_UPDATE_NOTIFICATION_BITMAP -> if (player != null && isNotificationStarted && currentNotificationTag == msg.arg1) {
@@ -791,7 +674,7 @@ class PlayerNotificationManager(
                     player.clearMediaItems()
                 }
             } else if (ACTION_DISMISS == action) {
-                stopNotification( true)
+                stopNotification(true)
             } else if (action != null && customActionReceiver != null && customActions.containsKey(
                     action
                 )
