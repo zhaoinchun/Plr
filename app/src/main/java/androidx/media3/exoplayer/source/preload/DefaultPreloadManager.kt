@@ -37,11 +37,31 @@ import java.io.IOException
 import java.util.concurrent.Executor
 import kotlin.math.abs
 
-class DefaultPreloadManager(builder: Builder) :
+class DefaultPreloadManager(
+    rankingDataComparator: RankingDataComparator<Int>,
+    targetPreloadStatusControl: TargetPreloadStatusControl<Int, PreloadStatus>,
+    mediaSourceFactory: MediaSource.Factory,
+    var dataSourceFactory: DataSource.Factory? = null,
+    var preloadLooperProvider: PlaybackLooperProvider= PlaybackLooperProvider(),
+    var trackSelectorFactory: TrackSelector.Factory
+    =TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) },
+    var bandwidthMeterSupplier: Supplier<BandwidthMeter> = Supplier {
+        DefaultBandwidthMeter.getSingletonInstance(
+            context
+        )
+    },
+    var renderersFactorySupplier: Supplier<RenderersFactory>,
+    var loadControlSupplier: Supplier<LoadControl> = Suppliers.memoize<LoadControl>(Supplier { DefaultLoadControl() }),
+    var cache: Cache? = null,
+    var cachingExecutor: Executor = Executor { obj: Runnable? -> obj!!.run() },
+    var clock: Clock = Clock.DEFAULT,
+    var buildCalled = false,
+    var buildExoPlayerCalled = false,
+) :
     BasePreloadManager<Int, PreloadStatus>(
-        builder.rankingDataComparator,
-        builder.targetPreloadStatusControl,
-        builder.mediaSourceFactorySupplier.get()
+        rankingDataComparator,
+        targetPreloadStatusControl,
+        mediaSourceFactory
     ) {
 
     class Builder(
@@ -54,14 +74,18 @@ class DefaultPreloadManager(builder: Builder) :
         DefaultMediaSourceFactorySupplier(context)
     ) {
         var dataSourceFactory: DataSource.Factory? = null
-        var preloadLooperProvider: PlaybackLooperProvider
-        var trackSelectorFactory: TrackSelector.Factory
-        var bandwidthMeterSupplier: Supplier<BandwidthMeter>
+        var preloadLooperProvider: PlaybackLooperProvider= PlaybackLooperProvider()
+        var trackSelectorFactory: TrackSelector.Factory=TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) }
+        var bandwidthMeterSupplier: Supplier<BandwidthMeter> = Supplier {
+            DefaultBandwidthMeter.getSingletonInstance(
+                context
+            )
+        }
         var renderersFactorySupplier: Supplier<RenderersFactory>
-        var loadControlSupplier: Supplier<LoadControl>
+        var loadControlSupplier: Supplier<LoadControl> = Suppliers.memoize<LoadControl>(Supplier { DefaultLoadControl() })
         var cache: Cache? = null
-        var cachingExecutor: Executor
-        var clock: Clock
+        var cachingExecutor: Executor = Executor { obj: Runnable? -> obj!!.run() }
+        var clock: Clock = Clock.DEFAULT
         var buildCalled = false
         var buildExoPlayerCalled = false
 
@@ -326,7 +350,8 @@ class DefaultPreloadManager(builder: Builder) :
     private val rendererCapabilitiesList =
         DefaultRendererCapabilitiesList.Factory(builder.renderersFactorySupplier.get())
             .createRendererCapabilitiesList()
-    private val trackSelector: TrackSelector = builder.trackSelectorFactory.createTrackSelector(builder.context)
+    private val trackSelector: TrackSelector =
+        builder.trackSelectorFactory.createTrackSelector(builder.context)
     private val preloadLooperProvider: PlaybackLooperProvider
     private val preloadMediaSourceFactory: PreloadMediaSource.Factory
     private val preCacheThread: HandlerThread?

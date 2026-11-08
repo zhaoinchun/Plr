@@ -14,18 +14,10 @@ import com.google.common.base.Predicate
 import java.util.Collections
 
 abstract class BasePreloadManager<T, PreloadStatusT> protected constructor(
-    protected val rankingDataComparator: RankingDataComparator<T>,
-    private val targetPreloadStatusControl: TargetPreloadStatusControl<T, PreloadStatusT>,
-    private val mediaSourceFactory: MediaSource.Factory
+    val rankingDataComparator: RankingDataComparator<T>,
+    val targetPreloadStatusControl: TargetPreloadStatusControl<T, PreloadStatusT>,
+    val mediaSourceFactory: MediaSource.Factory
 ) {
-    abstract class BuilderBase<T, PreloadStatusT>(
-        var rankingDataComparator: RankingDataComparator<T>,
-        val targetPreloadStatusControl: TargetPreloadStatusControl<T, PreloadStatusT>,
-        var mediaSourceFactorySupplier: MediaSourceFactorySupplier
-    ) {
-        abstract fun build(): BasePreloadManager<T, PreloadStatusT>
-    }
-
     private val lock = Any()
     private val mediaSourceHolderMap = MediaSourceHolderMap()
     private val applicationHandler: Handler = createHandlerForCurrentOrMainLooper()
