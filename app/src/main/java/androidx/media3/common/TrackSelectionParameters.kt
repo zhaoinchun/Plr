@@ -181,7 +181,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
     }
 
     @CallSuper
-   open fun toBundle(): Bundle {
+    open fun toBundle(): Bundle {
         val bundle = Bundle()
 
         // Video
@@ -267,7 +267,11 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
         return bundle
     }
 
-    class AudioOffloadPreferences private constructor(builder: Builder) {
+    data class AudioOffloadPreferences(
+        var audioOffloadMode: @AudioOffloadMode Int = AUDIO_OFFLOAD_MODE_DISABLED,
+        var isGaplessSupportRequired: Boolean = false,
+        var isSpeedChangeSupportRequired: Boolean = false,
+    ) {
         @MustBeDocumented
         @Retention(AnnotationRetention.SOURCE)
         @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
@@ -275,71 +279,6 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             value = [AUDIO_OFFLOAD_MODE_REQUIRED, AUDIO_OFFLOAD_MODE_ENABLED, AUDIO_OFFLOAD_MODE_DISABLED]
         )
         annotation class AudioOffloadMode
-
-        class Builder {
-            var audioOffloadMode: @AudioOffloadMode Int
-            var isGaplessSupportRequired = false
-            var isSpeedChangeSupportRequired = false
-
-            init {
-                this.audioOffloadMode = AUDIO_OFFLOAD_MODE_DISABLED
-            }
-
-            fun setAudioOffloadMode(audioOffloadMode: @AudioOffloadMode Int): Builder {
-                this.audioOffloadMode = audioOffloadMode
-                return this
-            }
-
-            fun setIsGaplessSupportRequired(isGaplessSupportRequired: Boolean): Builder {
-                this.isGaplessSupportRequired = isGaplessSupportRequired
-                return this
-            }
-
-            fun setIsSpeedChangeSupportRequired(isSpeedChangeSupportRequired: Boolean): Builder {
-                this.isSpeedChangeSupportRequired = isSpeedChangeSupportRequired
-                return this
-            }
-
-            fun build(): AudioOffloadPreferences {
-                return AudioOffloadPreferences(this)
-            }
-        }
-
-        val audioOffloadMode: @AudioOffloadMode Int
-        val isGaplessSupportRequired: Boolean
-        val isSpeedChangeSupportRequired: Boolean
-
-        fun buildUpon(): Builder {
-            return Builder()
-                .setAudioOffloadMode(audioOffloadMode)
-                .setIsGaplessSupportRequired(isGaplessSupportRequired)
-                .setIsSpeedChangeSupportRequired(isSpeedChangeSupportRequired)
-        }
-
-        override fun equals(obj: Any?): Boolean {
-            if (this === obj) {
-                return true
-            }
-            if (obj == null || javaClass != obj.javaClass) {
-                return false
-            }
-            val other = obj as AudioOffloadPreferences
-            return audioOffloadMode == other.audioOffloadMode && isGaplessSupportRequired == other.isGaplessSupportRequired && isSpeedChangeSupportRequired == other.isSpeedChangeSupportRequired
-        }
-
-        override fun hashCode(): Int {
-            var result = 1
-            result = 31 * result + audioOffloadMode
-            result = 31 * result + (if (isGaplessSupportRequired) 1 else 0)
-            result = 31 * result + (if (isSpeedChangeSupportRequired) 1 else 0)
-            return result
-        }
-
-        init {
-            this.audioOffloadMode = builder.audioOffloadMode
-            this.isGaplessSupportRequired = builder.isGaplessSupportRequired
-            this.isSpeedChangeSupportRequired = builder.isSpeedChangeSupportRequired
-        }
 
         fun toBundle(): Bundle {
             val bundle = Bundle()
@@ -353,29 +292,26 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             const val AUDIO_OFFLOAD_MODE_REQUIRED: Int = 2
             const val AUDIO_OFFLOAD_MODE_ENABLED: Int = 1
             const val AUDIO_OFFLOAD_MODE_DISABLED: Int = 0
-            val DEFAULT: AudioOffloadPreferences = Builder().build()
+            val DEFAULT: AudioOffloadPreferences = AudioOffloadPreferences()
 
             private val FIELD_AUDIO_OFFLOAD_MODE_PREFERENCE = intToStringMaxRadix(1)
             private val FIELD_IS_GAPLESS_SUPPORT_REQUIRED = intToStringMaxRadix(2)
             private val FIELD_IS_SPEED_CHANGE_SUPPORT_REQUIRED = intToStringMaxRadix(3)
 
             fun fromBundle(bundle: Bundle): AudioOffloadPreferences {
-                return Builder()
-                    .setAudioOffloadMode(
-                        bundle.getInt(FIELD_AUDIO_OFFLOAD_MODE_PREFERENCE, DEFAULT.audioOffloadMode)
+                return AudioOffloadPreferences(
+                    audioOffloadMode = bundle.getInt(
+                        FIELD_AUDIO_OFFLOAD_MODE_PREFERENCE,
+                        DEFAULT.audioOffloadMode
+                    ),
+                    isGaplessSupportRequired = bundle.getBoolean(
+                        FIELD_IS_GAPLESS_SUPPORT_REQUIRED, DEFAULT.isGaplessSupportRequired
+                    ),
+                    isSpeedChangeSupportRequired = bundle.getBoolean(
+                        FIELD_IS_SPEED_CHANGE_SUPPORT_REQUIRED,
+                        DEFAULT.isSpeedChangeSupportRequired
                     )
-                    .setIsGaplessSupportRequired(
-                        bundle.getBoolean(
-                            FIELD_IS_GAPLESS_SUPPORT_REQUIRED, DEFAULT.isGaplessSupportRequired
-                        )
-                    )
-                    .setIsSpeedChangeSupportRequired(
-                        bundle.getBoolean(
-                            FIELD_IS_SPEED_CHANGE_SUPPORT_REQUIRED,
-                            DEFAULT.isSpeedChangeSupportRequired
-                        )
-                    )
-                    .build()
+                )
             }
         }
     }
@@ -510,7 +446,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             val preferredAudioLanguages1 = bundle.getStringArray(FIELD_PREFERRED_AUDIO_LANGUAGES)
             preferredAudioLanguages = preferredAudioLanguages1?.map {
                 normalizeLanguageCode(it)
-            }?:listOf()
+            } ?: listOf()
             preferredAudioLabels =
                 bundle.getStringArray(FIELD_PREFERRED_AUDIO_LABELS)?.toList() ?: listOf()
             preferredAudioRoleFlags =
@@ -525,7 +461,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             selectTextByDefault =
                 bundle.getBoolean(FIELD_SELECT_TEXT_BY_DEFAULT, DEFAULT.selectTextByDefault)
             preferredTextLanguages = bundle.getStringArray(FIELD_PREFERRED_TEXT_LANGUAGES)
-                ?.map { normalizeLanguageCode(it) }?:listOf()
+                ?.map { normalizeLanguageCode(it) } ?: listOf()
             preferredTextRoleFlags =
                 bundle.getInt(FIELD_PREFERRED_TEXT_ROLE_FLAGS, DEFAULT.preferredTextRoleFlags)
             usePreferredTextLanguagesAndRoleFlagsFromCaptioningManager =
@@ -633,47 +569,47 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open  fun setMaxVideoSizeSd(): Builder {
+        open fun setMaxVideoSizeSd(): Builder {
             return setMaxVideoSize(1279, 719)
         }
 
-        open   fun clearVideoSizeConstraints(): Builder {
+        open fun clearVideoSizeConstraints(): Builder {
             return setMaxVideoSize(Int.MAX_VALUE, Int.MAX_VALUE)
         }
 
-        open   fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int): Builder {
+        open fun setMaxVideoSize(maxVideoWidth: Int, maxVideoHeight: Int): Builder {
             this.maxVideoWidth = maxVideoWidth
             this.maxVideoHeight = maxVideoHeight
             return this
         }
 
-        open   fun setMaxVideoFrameRate(maxVideoFrameRate: Int): Builder {
+        open fun setMaxVideoFrameRate(maxVideoFrameRate: Int): Builder {
             this.maxVideoFrameRate = maxVideoFrameRate
             return this
         }
 
-        open   fun setMaxVideoBitrate(maxVideoBitrate: Int): Builder {
+        open fun setMaxVideoBitrate(maxVideoBitrate: Int): Builder {
             this.maxVideoBitrate = maxVideoBitrate
             return this
         }
 
-        open   fun setMinVideoSize(minVideoWidth: Int, minVideoHeight: Int): Builder {
+        open fun setMinVideoSize(minVideoWidth: Int, minVideoHeight: Int): Builder {
             this.minVideoWidth = minVideoWidth
             this.minVideoHeight = minVideoHeight
             return this
         }
 
-        open  fun setMinVideoFrameRate(minVideoFrameRate: Int): Builder {
+        open fun setMinVideoFrameRate(minVideoFrameRate: Int): Builder {
             this.minVideoFrameRate = minVideoFrameRate
             return this
         }
 
-        open   fun setMinVideoBitrate(minVideoBitrate: Int): Builder {
+        open fun setMinVideoBitrate(minVideoBitrate: Int): Builder {
             this.minVideoBitrate = minVideoBitrate
             return this
         }
 
-        open   fun setViewportSizeToPhysicalDisplaySize(viewportOrientationMayChange: Boolean): Builder {
+        open fun setViewportSizeToPhysicalDisplaySize(viewportOrientationMayChange: Boolean): Builder {
             this.isViewportSizeLimitedByPhysicalDisplaySize = true
             this.viewportOrientationMayChange = viewportOrientationMayChange
             this.viewportHeight = Int.MAX_VALUE
@@ -681,17 +617,17 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open  fun setViewportSizeToPhysicalDisplaySize(
+        open fun setViewportSizeToPhysicalDisplaySize(
             context: Context?, viewportOrientationMayChange: Boolean
         ): Builder {
             return setViewportSizeToPhysicalDisplaySize(viewportOrientationMayChange)
         }
 
-        open   fun clearViewportSizeConstraints(): Builder {
+        open fun clearViewportSizeConstraints(): Builder {
             return setViewportSize(Int.MAX_VALUE, Int.MAX_VALUE, true)
         }
 
-        open   fun setViewportSize(
+        open fun setViewportSize(
             viewportWidth: Int, viewportHeight: Int, viewportOrientationMayChange: Boolean
         ): Builder {
             this.viewportWidth = viewportWidth
@@ -701,17 +637,18 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open  fun setPreferredVideoMimeType(mimeType: String?): Builder {
-            return setPreferredVideoMimeTypes(mimeType?.let { listOf(it) }?:listOf())
+        open fun setPreferredVideoMimeType(mimeType: String?): Builder {
+            return setPreferredVideoMimeTypes(mimeType?.let { listOf(it) } ?: listOf())
         }
 
-        open  fun setPreferredVideoMimeTypes(mimeTypes: List<String>): Builder {
+        open fun setPreferredVideoMimeTypes(mimeTypes: List<String>): Builder {
             preferredVideoMimeTypes = mimeTypes.toList()
             return this
         }
 
         open fun setPreferredVideoLanguage(preferredVideoLanguage: String?): Builder {
-            return setPreferredVideoLanguages(preferredVideoLanguage?.let { listOf(it) }?:listOf())
+            return setPreferredVideoLanguages(preferredVideoLanguage?.let { listOf(it) }
+                ?: listOf())
         }
 
         open fun setPreferredVideoLanguages(preferredVideoLanguages: List<String>): Builder {
@@ -732,66 +669,67 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
         }
 
         open fun setPreferredAudioLanguage(preferredAudioLanguage: String?): Builder {
-            return setPreferredAudioLanguages(preferredAudioLanguage?.let { listOf(it) }?:listOf())
+            return setPreferredAudioLanguages(preferredAudioLanguage?.let { listOf(it) }
+                ?: listOf())
         }
 
-        open  fun setPreferredAudioLanguages(preferredAudioLanguages: List<String>): Builder {
+        open fun setPreferredAudioLanguages(preferredAudioLanguages: List<String>): Builder {
             this.preferredAudioLanguages =
                 preferredAudioLanguages.map { normalizeLanguageCode(it) }
             return this
         }
 
-        open  fun setPreferredAudioRoleFlags(@RoleFlags preferredAudioRoleFlags: @RoleFlags Int): Builder {
+        open fun setPreferredAudioRoleFlags(@RoleFlags preferredAudioRoleFlags: @RoleFlags Int): Builder {
             this.preferredAudioRoleFlags = preferredAudioRoleFlags
             return this
         }
 
-        open   fun setPreferredAudioLabels(preferredAudioLabels: List<String>): Builder {
+        open fun setPreferredAudioLabels(preferredAudioLabels: List<String>): Builder {
             this.preferredAudioLabels = preferredAudioLabels.toList()
             return this
         }
 
-        open   fun setMaxAudioChannelCount(maxAudioChannelCount: Int): Builder {
+        open fun setMaxAudioChannelCount(maxAudioChannelCount: Int): Builder {
             this.maxAudioChannelCount = maxAudioChannelCount
             return this
         }
 
-        open    fun setMaxAudioBitrate(maxAudioBitrate: Int): Builder {
+        open fun setMaxAudioBitrate(maxAudioBitrate: Int): Builder {
             this.maxAudioBitrate = maxAudioBitrate
             return this
         }
 
-        open   fun setPreferredAudioMimeType(mimeType: String?): Builder {
-            return setPreferredAudioMimeTypes(mimeType?.let { listOf(it) }?:listOf())
+        open fun setPreferredAudioMimeType(mimeType: String?): Builder {
+            return setPreferredAudioMimeTypes(mimeType?.let { listOf(it) } ?: listOf())
         }
 
-        open   fun setPreferredAudioMimeTypes(mimeTypes: List<String>): Builder {
+        open fun setPreferredAudioMimeTypes(mimeTypes: List<String>): Builder {
             preferredAudioMimeTypes = mimeTypes.toList()
             return this
         }
 
-        open   fun setAudioOffloadPreferences(audioOffloadPreferences: AudioOffloadPreferences?): Builder {
+        open fun setAudioOffloadPreferences(audioOffloadPreferences: AudioOffloadPreferences?): Builder {
             this.audioOffloadPreferences = audioOffloadPreferences
             return this
         }
 
-        open   fun setSelectTextByDefault(selectTextByDefault: Boolean): Builder {
+        open fun setSelectTextByDefault(selectTextByDefault: Boolean): Builder {
             this.selectTextByDefault = selectTextByDefault
             return this
         }
 
-        open    fun setPreferredTextLanguageAndRoleFlagsToCaptioningManagerSettings(): Builder {
+        open fun setPreferredTextLanguageAndRoleFlagsToCaptioningManagerSettings(): Builder {
             usePreferredTextLanguagesAndRoleFlagsFromCaptioningManager = true
             preferredTextLanguages = listOf()
             preferredTextRoleFlags = 0
             return this
         }
 
-        open  fun setPreferredTextLanguage(preferredTextLanguage: String?): Builder {
-            return setPreferredTextLanguages(preferredTextLanguage?.let { listOf(it) }?:listOf())
+        open fun setPreferredTextLanguage(preferredTextLanguage: String?): Builder {
+            return setPreferredTextLanguages(preferredTextLanguage?.let { listOf(it) } ?: listOf())
         }
 
-        open   fun setPreferredTextLanguages(preferredTextLanguages: List<String>): Builder {
+        open fun setPreferredTextLanguages(preferredTextLanguages: List<String>): Builder {
             this.preferredTextLanguages = preferredTextLanguages.map {
                 normalizeLanguageCode(it)
             }
@@ -799,7 +737,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open  fun setPreferredTextRoleFlags(@RoleFlags preferredTextRoleFlags: @RoleFlags Int): Builder {
+        open fun setPreferredTextRoleFlags(@RoleFlags preferredTextRoleFlags: @RoleFlags Int): Builder {
             this.preferredTextRoleFlags = preferredTextRoleFlags
             this.usePreferredTextLanguagesAndRoleFlagsFromCaptioningManager = false
             return this
@@ -810,12 +748,12 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open  fun setIgnoredTextSelectionFlags(@SelectionFlags ignoredTextSelectionFlags: @SelectionFlags Int): Builder {
+        open fun setIgnoredTextSelectionFlags(@SelectionFlags ignoredTextSelectionFlags: @SelectionFlags Int): Builder {
             this.ignoredTextSelectionFlags = ignoredTextSelectionFlags
             return this
         }
 
-        open   fun setSelectUndeterminedTextLanguage(selectUndeterminedTextLanguage: Boolean): Builder {
+        open fun setSelectUndeterminedTextLanguage(selectUndeterminedTextLanguage: Boolean): Builder {
             this.selectUndeterminedTextLanguage = selectUndeterminedTextLanguage
             return this
         }
@@ -825,33 +763,33 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open  fun setForceLowestBitrate(forceLowestBitrate: Boolean): Builder {
+        open fun setForceLowestBitrate(forceLowestBitrate: Boolean): Builder {
             this.forceLowestBitrate = forceLowestBitrate
             return this
         }
 
-        open   fun setForceHighestSupportedBitrate(forceHighestSupportedBitrate: Boolean): Builder {
+        open fun setForceHighestSupportedBitrate(forceHighestSupportedBitrate: Boolean): Builder {
             this.forceHighestSupportedBitrate = forceHighestSupportedBitrate
             return this
         }
 
-        open  fun addOverride(override: TrackSelectionOverride): Builder {
+        open fun addOverride(override: TrackSelectionOverride): Builder {
             overrides!![override.mediaTrackGroup] = override
             return this
         }
 
-        open  fun setOverrideForType(override: TrackSelectionOverride): Builder {
+        open fun setOverrideForType(override: TrackSelectionOverride): Builder {
             clearOverridesOfType(override.type)
             overrides!![override.mediaTrackGroup] = override
             return this
         }
 
-        open   fun clearOverride(mediaTrackGroup: TrackGroup?): Builder {
+        open fun clearOverride(mediaTrackGroup: TrackGroup?): Builder {
             overrides!!.remove(mediaTrackGroup)
             return this
         }
 
-        open    fun clearOverridesOfType(trackType: @C.TrackType Int): Builder {
+        open fun clearOverridesOfType(trackType: @C.TrackType Int): Builder {
             val it = overrides!!.values.iterator()
             while (it.hasNext()) {
                 val override = it.next()
@@ -862,18 +800,18 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open    fun clearOverrides(): Builder {
+        open fun clearOverrides(): Builder {
             overrides!!.clear()
             return this
         }
 
-        open   fun setDisabledTrackTypes(disabledTrackTypes: MutableSet<Int>): Builder {
+        open fun setDisabledTrackTypes(disabledTrackTypes: MutableSet<Int>): Builder {
             this.disabledTrackTypes!!.clear()
             this.disabledTrackTypes!!.addAll(disabledTrackTypes)
             return this
         }
 
-        open  fun setTrackTypeDisabled(trackType: @C.TrackType Int, disabled: Boolean): Builder {
+        open fun setTrackTypeDisabled(trackType: @C.TrackType Int, disabled: Boolean): Builder {
             if (disabled) {
                 disabledTrackTypes!!.add(trackType)
             } else {
@@ -882,7 +820,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-       open fun build(): TrackSelectionParameters {
+        open fun build(): TrackSelectionParameters {
             return TrackSelectionParameters(this)
         }
 
@@ -893,26 +831,20 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
                 return if (audioOffloadPreferencesBundle != null)
                     AudioOffloadPreferences.fromBundle(audioOffloadPreferencesBundle)
                 else
-                    AudioOffloadPreferences.Builder()
-                        .setAudioOffloadMode(
-                            bundle.getInt(
-                                FIELD_AUDIO_OFFLOAD_MODE_PREFERENCE,
-                                AudioOffloadPreferences.DEFAULT.audioOffloadMode
-                            )
+                    AudioOffloadPreferences(
+                        audioOffloadMode = bundle.getInt(
+                            FIELD_AUDIO_OFFLOAD_MODE_PREFERENCE,
+                            AudioOffloadPreferences.DEFAULT.audioOffloadMode
+                        ),
+                        isGaplessSupportRequired = bundle.getBoolean(
+                            FIELD_IS_GAPLESS_SUPPORT_REQUIRED,
+                            AudioOffloadPreferences.DEFAULT.isGaplessSupportRequired
+                        ),
+                        isSpeedChangeSupportRequired = bundle.getBoolean(
+                            FIELD_IS_SPEED_CHANGE_SUPPORT_REQUIRED,
+                            AudioOffloadPreferences.DEFAULT.isSpeedChangeSupportRequired
                         )
-                        .setIsGaplessSupportRequired(
-                            bundle.getBoolean(
-                                FIELD_IS_GAPLESS_SUPPORT_REQUIRED,
-                                AudioOffloadPreferences.DEFAULT.isGaplessSupportRequired
-                            )
-                        )
-                        .setIsSpeedChangeSupportRequired(
-                            bundle.getBoolean(
-                                FIELD_IS_SPEED_CHANGE_SUPPORT_REQUIRED,
-                                AudioOffloadPreferences.DEFAULT.isSpeedChangeSupportRequired
-                            )
-                        )
-                        .build()
+                    )
             }
         }
     }

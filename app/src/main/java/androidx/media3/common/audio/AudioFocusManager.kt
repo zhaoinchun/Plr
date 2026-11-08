@@ -16,7 +16,6 @@ import androidx.media3.common.audio.AudioManagerCompat.AudioFocusGain
 import androidx.media3.common.audio.AudioManagerCompat.getAudioManager
 import androidx.media3.common.util.Log.w
 import com.google.common.base.Preconditions
-import com.google.common.base.Supplier
 import com.google.common.base.Suppliers
 
 class AudioFocusManager(
@@ -54,7 +53,7 @@ class AudioFocusManager(
     private var focusGainToRequest: @AudioFocusGain Int = 0
     var volumeMultiplier: Float = VOLUME_MULTIPLIER_DEFAULT
         private set
-    private var audioFocusRequest:AudioFocusRequestCompat? = null
+    private var audioFocusRequest: AudioFocusRequestCompat? = null
     private var rebuildAudioFocusRequest = false
 
     fun setAudioAttributes(audioAttributes: AudioAttributes?) {
@@ -132,22 +131,27 @@ class AudioFocusManager(
 
     private fun requestAudioFocusInternal(): Int {
         if (audioFocusRequest == null || rebuildAudioFocusRequest) {
-            val builder = audioFocusRequest?.buildUpon()
-                ?: AudioFocusRequestCompat.Builder(focusGainToRequest)
-
-            val willPauseWhenDucked = willPauseWhenDucked()
-            this.audioFocusRequest =
-                builder
-                    .setAudioAttributes(audioAttributes!!)
-                    .setWillPauseWhenDucked(willPauseWhenDucked)
-                    .setAcceptsDelayedFocusGain(true)
-                    .setOnAudioFocusChangeListener(OnAudioFocusChangeListener { focusChange: Int ->
-                        this.handlePlatformAudioFocusChange(
-                            focusChange
-                        )
-                    }, eventHandler)
-                    .build()
-
+            val listener = OnAudioFocusChangeListener { focusChange: Int ->
+                this.handlePlatformAudioFocusChange(
+                    focusChange
+                )
+            }
+            val builder = audioFocusRequest?.copy(
+                audioAttributes = audioAttributes!!,
+                pauseOnDuck = willPauseWhenDucked(),
+                acceptsDelayedFocusGain = true,
+                onAudioFocusChangeListener = listener,
+                focusChangeHandler = eventHandler
+            )
+                ?: AudioFocusRequestCompat(
+                    focusGainToRequest,
+                    audioAttributes = audioAttributes!!,
+                    pauseOnDuck = willPauseWhenDucked(),
+                    acceptsDelayedFocusGain = true,
+                    onAudioFocusChangeListener = listener,
+                    focusChangeHandler = eventHandler
+                )
+            this.audioFocusRequest = builder
             rebuildAudioFocusRequest = false
         }
         return AudioManagerCompat.requestAudioFocus(audioManager.get(), audioFocusRequest!!)

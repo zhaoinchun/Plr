@@ -3342,10 +3342,11 @@ class ExoPlayerImpl(
         }
 
         private fun createDeviceInfo(streamVolumeManager: StreamVolumeManager?): DeviceInfo {
-            return DeviceInfo.Builder(DeviceInfo.PLAYBACK_TYPE_LOCAL)
-                .setMinVolume(streamVolumeManager?.minVolume ?: 0)
-                .setMaxVolume(streamVolumeManager?.maxVolume ?: 0)
-                .build()
+            return DeviceInfo(
+                DeviceInfo.PLAYBACK_TYPE_LOCAL,
+                minVolume = streamVolumeManager?.minVolume ?: 0,
+                maxVolume = streamVolumeManager?.maxVolume ?: 0
+            )
         }
 
         private fun addDisabledTrackTypes(
