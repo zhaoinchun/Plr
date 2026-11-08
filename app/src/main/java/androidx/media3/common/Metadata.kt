@@ -12,7 +12,7 @@ class Metadata(val presentationTimeUs: Long, entries: List<Entry>) {
         val wrappedMetadataBytes: ByteArray?
             get() = null
 
-        fun populateMediaMetadata(builder: MediaMetadata.Builder) {}
+        fun populateMediaMetadata(builder: MediaMetadata) {}
     }
 
     private val entries: List<Entry> = entries

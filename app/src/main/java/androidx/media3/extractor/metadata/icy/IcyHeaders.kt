@@ -39,12 +39,12 @@ class IcyHeaders(
         this.metadataInterval = metadataInterval
     }
 
-    override fun populateMediaMetadata(builder: MediaMetadata.Builder) {
+    override fun populateMediaMetadata(builder: MediaMetadata) {
         if (name != null) {
-            builder.setStation(name)
+            builder.station = name
         }
         if (genre != null) {
-            builder.setGenre(genre)
+            builder.genre = genre
         }
     }
 

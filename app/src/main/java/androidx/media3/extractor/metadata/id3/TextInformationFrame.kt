@@ -33,26 +33,29 @@ class TextInformationFrame(id: String?, description: String?, values: List<Strin
         listOf(value)
     )
 
-    override fun populateMediaMetadata(builder: MediaMetadata.Builder) {
+    override fun populateMediaMetadata(builder: MediaMetadata) {
         when (id) {
-            "TT2", "TIT2" -> builder.setTitle(values[0])
-            "TP1", "TPE1" -> builder.setArtist(values[0])
-            "TP2", "TPE2" -> builder.setAlbumArtist(values[0])
-            "TAL", "TALB" -> builder.setAlbumTitle(values[0])
+            "TT2", "TIT2" -> builder.title = values[0]
+            "TP1", "TPE1" -> builder.artist = values[0]
+            "TP2", "TPE2" -> builder.albumTitle = values[0]
+            "TAL", "TALB" -> builder.albumTitle = values[0]
             "TRK", "TRCK" -> {
                 val trackNumbers: Array<String> = split(values[0], "/")
                 try {
                     val trackNumber = trackNumbers[0]!!.toInt()
                     val totalTrackCount =
                         if (trackNumbers.size > 1) trackNumbers[1]!!.toInt() else null
-                    builder.setTrackNumber(trackNumber).setTotalTrackCount(totalTrackCount)
+                    builder.apply {
+                        this.trackNumber = trackNumber
+                        this.totalTrackCount = totalTrackCount
+                    }
                 } catch (e: NumberFormatException) {
                     // Do nothing, invalid input.
                 }
             }
 
             "TYE", "TYER" -> try {
-                builder.setRecordingYear(values[0].toInt())
+                builder.recordingYear = values[0].toInt()
             } catch (e: NumberFormatException) {
                 // Do nothing, invalid input.
             }
@@ -61,7 +64,10 @@ class TextInformationFrame(id: String?, description: String?, values: List<Strin
                 val date = values[0]
                 val month = date.substring(2, 4).toInt()
                 val day = date.substring(0, 2).toInt()
-                builder.setRecordingMonth(month).setRecordingDay(day)
+                builder.apply {
+                    recordingMonth = month
+                    recordingDay = day
+                }
             } catch (e: NumberFormatException) {
                 // Do nothing, invalid input.
             } catch (e: StringIndexOutOfBoundsException) {
@@ -72,17 +78,21 @@ class TextInformationFrame(id: String?, description: String?, values: List<Strin
                     parseId3v2point4TimestampFrameForDate(values[0])
                 when (recordingDate.size) {
                     3 -> {
-                        builder.setRecordingDay(recordingDate.get(2)!!)
-                        builder.setRecordingMonth(recordingDate.get(1)!!)
-                        builder.setRecordingYear(recordingDate[0]!!)
+                        builder.apply {
+                            recordingDay = recordingDate.get(2)!!
+                            recordingMonth = recordingDate.get(1)!!
+                            recordingYear = recordingDate.get(0)!!
+                        }
                     }
 
                     2 -> {
-                        builder.setRecordingMonth(recordingDate.get(1)!!)
-                        builder.setRecordingYear(recordingDate[0]!!)
+                        builder.apply {
+                            recordingMonth = recordingDate.get(1)!!
+                            recordingYear = recordingDate.get(0)!!
+                        }
                     }
 
-                    1 -> builder.setRecordingYear(recordingDate[0]!!)
+                    1 -> builder.recordingYear = recordingDate.get(0)!!
                     else -> {}
                 }
             }
@@ -92,44 +102,51 @@ class TextInformationFrame(id: String?, description: String?, values: List<Strin
                     parseId3v2point4TimestampFrameForDate(values[0])
                 when (releaseDate.size) {
                     3 -> {
-                        builder.setReleaseDay(releaseDate.get(2)!!)
-                        builder.setReleaseMonth(releaseDate.get(1)!!)
-                        builder.setReleaseYear(releaseDate[0]!!)
+                        builder.apply {
+                            releaseDay = releaseDate.get(2)!!
+                            releaseMonth = releaseDate.get(1)!!
+                            releaseYear = releaseDate.get(0)!!
+                        }
                     }
 
                     2 -> {
-                        builder.setReleaseMonth(releaseDate.get(1)!!)
-                        builder.setReleaseYear(releaseDate[0]!!)
+                        builder.apply {
+                            releaseMonth = releaseDate.get(1)!!
+                            releaseYear = releaseDate.get(0)!!
+                        }
                     }
 
-                    1 -> builder.setReleaseYear(releaseDate[0]!!)
+                    1 -> builder.releaseYear = releaseDate.get(0)!!
                     else -> {}
                 }
             }
 
-            "TCM", "TCOM" -> builder.setComposer(values[0])
-            "TP3", "TPE3" -> builder.setConductor(values[0])
-            "TXT", "TEXT" -> builder.setWriter(values[0])
+            "TCM", "TCOM" -> builder.composer = values[0]
+            "TP3", "TPE3" -> builder.conductor = values[0]
+            "TXT", "TEXT" -> builder.writer = values[0]
             "TCON" -> {
                 val genreCode = Ints.tryParse(values[0])
                 if (genreCode == null) {
-                    builder.setGenre(values[0])
-                }else {
+                    builder.genre = values[0]
+                } else {
                     val genre = Id3Util.resolveV1Genre(genreCode)
                     if (genre != null) {
-                        builder.setGenre(genre)
+                        builder.genre = genre
                     }
                 }
             }
 
-            "TSST" -> builder.setDiscSubtitle(values[0])
+            "TSST" -> builder.discSubtitle=values[0]
             "TPOS" -> {
                 val discNumbers: Array<String> = split(values[0], "/")
                 try {
                     val discNumber = discNumbers[0]!!.toInt()
                     val totalDiscCount =
                         if (discNumbers.size > 1) discNumbers[1]!!.toInt() else null
-                    builder.setDiscNumber(discNumber).setTotalDiscCount(totalDiscCount!!)
+                    builder.apply {
+                        this.discNumber = discNumber
+                        this.totalDiscCount = totalDiscCount!!
+                    }
                 } catch (e: NumberFormatException) {
                     // Do nothing, invalid input.
                 }

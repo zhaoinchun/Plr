@@ -100,7 +100,7 @@ import kotlin.math.min
 
 // The constructor may be executed on a background thread. Wait with accessing the player from
 // the app thread until the constructor finished executing.
- class ExoPlayerImpl(
+class ExoPlayerImpl(
     val context: Context,
     val renderersFactory: RenderersFactory = DefaultRenderersFactory(context),
     val mediaSourceFactory: MediaSource.Factory = DefaultMediaSourceFactory(
@@ -143,7 +143,7 @@ import kotlin.math.min
     private var virtualDeviceIdChangeListener: VirtualDeviceIdChangeListener? = null
     private val audioListenerManager = CodecParameterListenerManager(C.TRACK_TYPE_AUDIO)
     private val videoListenerManager = CodecParameterListenerManager(C.TRACK_TYPE_VIDEO)
-    lateinit var  emptyTrackSelectorResult: TrackSelectorResult
+    lateinit var emptyTrackSelectorResult: TrackSelectorResult
     private var _repeatMode: @Player.RepeatMode Int = 0
     private var _shuffleModeEnabled = false
     private var pendingOperationAcks = 0
@@ -194,7 +194,7 @@ import kotlin.math.min
     private var seekForwardIncrementMs: Long = C.DEFAULT_SEEK_FORWARD_INCREMENT_MS
     private var maxSeekToPreviousPositionMs: Long = C.DEFAULT_MAX_SEEK_TO_PREVIOUS_POSITION_MS
     private var staticAndDynamicMediaMetadata: MediaMetadata? = null
-    private lateinit var  playbackInfo: PlaybackInfo
+    private lateinit var playbackInfo: PlaybackInfo
     private var maskingWindowIndex = 0
     private var maskingWindowPositionMs: Long = 0
 
@@ -1937,10 +1937,10 @@ import kotlin.math.min
             || previousPlaybackInfo.staticMetadata != newPlaybackInfo.staticMetadata
         ) {
             staticAndDynamicMediaMetadata =
-                staticAndDynamicMediaMetadata!!
-                    .buildUpon()
-                    .populateFromMetadata(newPlaybackInfo.staticMetadata!!)
-                    .build()
+                staticAndDynamicMediaMetadata!!.copy()
+                    .apply {
+                        populateFromMetadata(newPlaybackInfo.staticMetadata!!)
+                    }
         }
         val newMediaMetadata = buildUpdatedMediaMetadata()
         val metadataChanged = newMediaMetadata != _mediaMetadata
@@ -2607,7 +2607,9 @@ import kotlin.math.min
         }
         val mediaItem = timeline.getWindow(currentMediaItemIndex, window).mediaItem
         // MediaItem metadata is prioritized over metadata within the media.
-        return staticAndDynamicMediaMetadata!!.buildUpon().populate(mediaItem.mediaMetadata).build()
+        return staticAndDynamicMediaMetadata!!.copy().apply {
+            populate(mediaItem.mediaMetadata)
+        }
     }
 
     private fun removeSurfaceCallbacks() {
@@ -3084,7 +3086,9 @@ import kotlin.math.min
         // MetadataOutput implementation
         override fun onMetadata(metadata: Metadata) {
             staticAndDynamicMediaMetadata =
-                staticAndDynamicMediaMetadata!!.buildUpon().populateFromMetadata(metadata).build()
+                staticAndDynamicMediaMetadata!!.copy().apply {
+                    populateFromMetadata(metadata)
+                }
             val newMediaMetadata = buildUpdatedMediaMetadata()
             if (newMediaMetadata != _mediaMetadata) {
                 _mediaMetadata = newMediaMetadata

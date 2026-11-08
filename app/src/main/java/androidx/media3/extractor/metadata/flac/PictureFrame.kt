@@ -24,7 +24,7 @@ class PictureFrame(
     
     val pictureData: ByteArray
 ) : Metadata.Entry {
-    override fun populateMediaMetadata(builder: MediaMetadata.Builder) {
+    override fun populateMediaMetadata(builder: MediaMetadata) {
         builder.maybeSetArtworkData(pictureData, pictureType)
     }
 

@@ -10,7 +10,7 @@ class ApicFrame(
 ) : Id3Frame(
     ID
 ) {
-    override fun populateMediaMetadata(builder: MediaMetadata.Builder) {
+    override fun populateMediaMetadata(builder: MediaMetadata) {
         builder.maybeSetArtworkData(pictureData, pictureType)
     }
 

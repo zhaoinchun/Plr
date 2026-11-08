@@ -12,46 +12,46 @@ class VorbisComment(key: String, val value: String) : Metadata.Entry {
         this.key = Ascii.toUpperCase(key)
     }
 
-    override fun populateMediaMetadata(builder: MediaMetadata.Builder) {
+    override fun populateMediaMetadata(builder: MediaMetadata) {
         // Vorbis comments can have duplicate keys, but all these fields are singular on MediaMetadata,
         // so we naively overwrite whatever any previously set value (which results in 'keep last'
         // semantics).
         when (key) {
-            "TITLE" -> builder.setTitle(value)
-            "ARTIST" -> builder.setArtist(value)
-            "ALBUM" -> builder.setAlbumTitle(value)
-            "ALBUMARTIST" -> builder.setAlbumArtist(value)
+            "TITLE" -> builder.title = value
+            "ARTIST" -> builder.artist = value
+            "ALBUM" -> builder.albumTitle = value
+            "ALBUMARTIST" -> builder.albumArtist = value
             "TRACKNUMBER" -> {
                 val trackNumber = Ints.tryParse(value)
                 if (trackNumber != null) {
-                    builder.setTrackNumber(trackNumber)
+                    builder.trackNumber = trackNumber
                 }
             }
 
             "TOTALTRACKS" -> {
                 val totalTracks = Ints.tryParse(value)
                 if (totalTracks != null) {
-                    builder.setTotalTrackCount(totalTracks)
+                    builder.totalTrackCount = totalTracks
                 }
             }
 
-            "DISCSUBTITLE" -> builder.setDiscSubtitle(value)
+            "DISCSUBTITLE" -> builder.discSubtitle = value
             "DISCNUMBER" -> {
                 val discNumber = Ints.tryParse(value)
                 if (discNumber != null) {
-                    builder.setDiscNumber(discNumber)
+                    builder.discNumber = discNumber
                 }
             }
 
             "TOTALDISCS" -> {
                 val totalDiscs = Ints.tryParse(value)
                 if (totalDiscs != null) {
-                    builder.setTotalDiscCount(totalDiscs)
+                    builder.totalDiscCount = totalDiscs
                 }
             }
 
-            "GENRE" -> builder.setGenre(value)
-            "DESCRIPTION" -> builder.setDescription(value)
+            "GENRE" -> builder.genre = value
+            "DESCRIPTION" -> builder.description = value
             else -> {}
         }
     }

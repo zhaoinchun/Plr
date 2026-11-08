@@ -12,9 +12,9 @@ class IcyInfo
     
     val url: String?
 ) : Metadata.Entry {
-    override fun populateMediaMetadata(builder: MediaMetadata.Builder) {
+    override fun populateMediaMetadata(builder: MediaMetadata) {
         if (title != null) {
-            builder.setTitle(title)
+            builder.title = title
         }
     }
 

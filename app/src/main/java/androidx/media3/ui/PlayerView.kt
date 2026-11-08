@@ -987,7 +987,7 @@ class PlayerView(
         }
         val bitmap =
             BitmapFactory.decodeByteArray(
-                mediaMetadata.artworkData, 0, mediaMetadata.artworkData.size
+                mediaMetadata.artworkData, 0, mediaMetadata.artworkData!!.size
             )
         return setDrawableArtwork(BitmapDrawable(getResources(), bitmap))
     }

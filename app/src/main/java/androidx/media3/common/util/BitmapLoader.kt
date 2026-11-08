@@ -15,9 +15,9 @@ interface BitmapLoader {
     fun loadBitmapFromMetadata(metadata: MediaMetadata): ListenableFuture<Bitmap?>? {
         val future: ListenableFuture<Bitmap?>?
         if (metadata.artworkData != null) {
-            future = decodeBitmap(metadata.artworkData)
+            future = decodeBitmap(metadata.artworkData!!)
         } else if (metadata.artworkUri != null) {
-            future = loadBitmap(metadata.artworkUri)
+            future = loadBitmap(metadata.artworkUri!!)
         } else {
             future = null
         }
