@@ -293,23 +293,6 @@ data class MediaMetadata(
         }
     }
 
-    class Builder {
-        var title: CharSequence? = null
-        var artist: CharSequence? = null
-        var albumTitle: CharSequence? = null
-        var albumArtist: CharSequence? = null
-        var displayTitle: CharSequence? = null
-        var subtitle: CharSequence? = null
-        var description: CharSequence? = null
-        var durationMs: Long? = null
-        var userRating: Rating? = null
-        var overallRating: Rating? = null
-        var artworkData: ByteArray? = null
-        var bundleableArtworkData: BundleableByteArray? = null
-        var artworkDataType: @PictureType Int? = null
-
-    }
-
     companion object {
         const val MEDIA_TYPE_MIXED: Int = 0
         const val MEDIA_TYPE_MUSIC: Int = 1

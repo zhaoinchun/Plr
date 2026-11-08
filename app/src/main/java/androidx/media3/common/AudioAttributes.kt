@@ -13,102 +13,14 @@ import androidx.media3.common.C.SpatializationBehavior
 import androidx.media3.common.util.Util.intToStringMaxRadix
 
 class AudioAttributes private constructor(
-    @field:AudioContentType @param:AudioContentType val contentType: @AudioContentType Int,
-    @field:AudioFlags @param:AudioFlags val flags: @AudioFlags Int,
-    @field:AudioUsage @param:AudioUsage val usage: @AudioUsage Int,
-    @field:AudioAllowedCapturePolicy @param:AudioAllowedCapturePolicy val allowedCapturePolicy: @AudioAllowedCapturePolicy Int,
-    val spatializationBehavior: @SpatializationBehavior Int,
-    val isContentSpatialized: Boolean,
-    val hapticChannelsMuted: Boolean
+    var contentType: @AudioContentType Int = C.AUDIO_CONTENT_TYPE_UNKNOWN,
+    var flags: @AudioFlags Int = 0,
+    var usage: @AudioUsage Int = C.USAGE_MEDIA,
+    var allowedCapturePolicy: @AudioAllowedCapturePolicy Int = C.ALLOW_CAPTURE_BY_ALL,
+    var spatializationBehavior: @SpatializationBehavior Int = C.SPATIALIZATION_BEHAVIOR_AUTO,
+    var isContentSpatialized: Boolean = false,
+    var hapticChannelsMuted: Boolean = true,
 ) {
-    class Builder {
-        @AudioContentType
-        private var contentType: @AudioContentType Int
-
-        @AudioFlags
-        private var flags: @AudioFlags Int
-
-        @AudioUsage
-        private var usage: @AudioUsage Int
-
-        @AudioAllowedCapturePolicy
-        private var allowedCapturePolicy: @AudioAllowedCapturePolicy Int
-        private var spatializationBehavior: @SpatializationBehavior Int
-        private var isContentSpatialized: Boolean
-        private var hapticChannelsMuted: Boolean
-
-        constructor() {
-            contentType = C.AUDIO_CONTENT_TYPE_UNKNOWN
-            flags = 0
-            usage = C.USAGE_MEDIA
-            allowedCapturePolicy = C.ALLOW_CAPTURE_BY_ALL
-            spatializationBehavior = C.SPATIALIZATION_BEHAVIOR_AUTO
-            isContentSpatialized = false
-            hapticChannelsMuted = true
-        }
-
-        constructor(other: AudioAttributes) {
-            contentType = other.contentType
-            flags = other.flags
-            usage = other.usage
-            allowedCapturePolicy = other.allowedCapturePolicy
-            spatializationBehavior = other.spatializationBehavior
-            isContentSpatialized = other.isContentSpatialized
-            hapticChannelsMuted = other.hapticChannelsMuted
-        }
-
-        fun setContentType(@AudioContentType contentType: @AudioContentType Int): Builder {
-            this.contentType = contentType
-            return this
-        }
-
-        fun setFlags(@AudioFlags flags: @AudioFlags Int): Builder {
-            this.flags = flags
-            return this
-        }
-
-        fun setUsage(@AudioUsage usage: @AudioUsage Int): Builder {
-            this.usage = usage
-            return this
-        }
-
-        fun setAllowedCapturePolicy(@AudioAllowedCapturePolicy allowedCapturePolicy: @AudioAllowedCapturePolicy Int): Builder {
-            this.allowedCapturePolicy = allowedCapturePolicy
-            return this
-        }
-
-        fun setSpatializationBehavior(spatializationBehavior: @SpatializationBehavior Int): Builder {
-            this.spatializationBehavior = spatializationBehavior
-            return this
-        }
-
-        fun setIsContentSpatialized(isContentSpatialized: Boolean): Builder {
-            this.isContentSpatialized = isContentSpatialized
-            return this
-        }
-
-        fun setHapticChannelsMuted(hapticChannelsMuted: Boolean): Builder {
-            this.hapticChannelsMuted = hapticChannelsMuted
-            return this
-        }
-
-        fun build(): AudioAttributes {
-            return AudioAttributes(
-                contentType,
-                flags,
-                usage,
-                allowedCapturePolicy,
-                spatializationBehavior,
-                isContentSpatialized,
-                hapticChannelsMuted
-            )
-        }
-    }
-
-    fun buildUpon(): Builder {
-        return Builder(this)
-    }
-
     var platformAudioAttributes: android.media.AudioAttributes? = null
         get() {
             if (field == null) {
@@ -240,7 +152,10 @@ class AudioAttributes private constructor(
             builder.setAllowedCapturePolicy(allowedCapturePolicy)
         }
 
-        fun setHapticChannelsMuted(builder: android.media.AudioAttributes.Builder, hapticChannelsMuted: Boolean) {
+        fun setHapticChannelsMuted(
+            builder: android.media.AudioAttributes.Builder,
+            hapticChannelsMuted: Boolean
+        ) {
             builder.setHapticChannelsMuted(hapticChannelsMuted)
         }
     }
@@ -249,36 +164,40 @@ class AudioAttributes private constructor(
     private object Api32 {
         @SuppressLint("WrongConstant") // Setting C.SpatializationBehavior to platform API.
         fun setSpatializationBehavior(
-            builder:android.media.AudioAttributes. Builder,
+            builder: android.media.AudioAttributes.Builder,
             spatializationBehavior: @SpatializationBehavior Int
         ) {
             builder.setSpatializationBehavior(spatializationBehavior)
         }
 
-        fun setIsContentSpatialized(builder:android.media.AudioAttributes.Builder, isContentSpatialized: Boolean) {
+        fun setIsContentSpatialized(
+            builder: android.media.AudioAttributes.Builder,
+            isContentSpatialized: Boolean
+        ) {
             builder.setIsContentSpatialized(isContentSpatialized)
         }
     }
 
     companion object {
-        val DEFAULT: AudioAttributes = Builder().build()
+        val DEFAULT: AudioAttributes = AudioAttributes()
 
         @SuppressLint("WrongConstant") // Assigning platform constants as C.AudioAllowedCapturePolicy
         fun fromPlatformAudioAttributes(audioAttributes: AudioAttributes): AudioAttributes {
             val builder =
-                Builder()
-                    .setContentType(audioAttributes.contentType)
-                    .setFlags(audioAttributes.flags)
-                    .setUsage(audioAttributes.usage)
+                AudioAttributes(
+                    contentType = audioAttributes.contentType,
+                    flags = audioAttributes.flags,
+                    usage = audioAttributes.usage
+                )
             if (Build.VERSION.SDK_INT >= 29) {
-                builder.setAllowedCapturePolicy(audioAttributes.allowedCapturePolicy)
-                builder.setHapticChannelsMuted(audioAttributes.hapticChannelsMuted)
+                builder.allowedCapturePolicy = audioAttributes.allowedCapturePolicy
+                builder.hapticChannelsMuted = audioAttributes.hapticChannelsMuted
             }
             if (Build.VERSION.SDK_INT >= 32) {
-                builder.setSpatializationBehavior(audioAttributes.spatializationBehavior)
-                builder.setIsContentSpatialized(audioAttributes.isContentSpatialized)
+                builder.spatializationBehavior = audioAttributes.spatializationBehavior
+                builder.isContentSpatialized = audioAttributes.isContentSpatialized
             }
-            return builder.build()
+            return builder
         }
 
         private val FIELD_CONTENT_TYPE = intToStringMaxRadix(0)
@@ -290,29 +209,29 @@ class AudioAttributes private constructor(
         private val FIELD_HAPTIC_CHANNELS_MUTED = intToStringMaxRadix(6)
 
         fun fromBundle(bundle: Bundle): AudioAttributes {
-            val builder = Builder()
+            val builder = AudioAttributes()
             if (bundle.containsKey(FIELD_CONTENT_TYPE)) {
-                builder.setContentType(bundle.getInt(FIELD_CONTENT_TYPE))
+                builder.contentType = bundle.getInt(FIELD_CONTENT_TYPE)
             }
             if (bundle.containsKey(FIELD_FLAGS)) {
-                builder.setFlags(bundle.getInt(FIELD_FLAGS))
+                builder.flags = bundle.getInt(FIELD_FLAGS)
             }
             if (bundle.containsKey(FIELD_USAGE)) {
-                builder.setUsage(bundle.getInt(FIELD_USAGE))
+                builder.usage = bundle.getInt(FIELD_USAGE)
             }
             if (bundle.containsKey(FIELD_ALLOWED_CAPTURE_POLICY)) {
-                builder.setAllowedCapturePolicy(bundle.getInt(FIELD_ALLOWED_CAPTURE_POLICY))
+                builder.allowedCapturePolicy = bundle.getInt(FIELD_ALLOWED_CAPTURE_POLICY)
             }
             if (bundle.containsKey(FIELD_SPATIALIZATION_BEHAVIOR)) {
-                builder.setSpatializationBehavior(bundle.getInt(FIELD_SPATIALIZATION_BEHAVIOR))
+                builder.spatializationBehavior = bundle.getInt(FIELD_SPATIALIZATION_BEHAVIOR)
             }
             if (bundle.containsKey(FIELD_IS_CONTENT_SPATIALIZED)) {
-                builder.setIsContentSpatialized(bundle.getBoolean(FIELD_IS_CONTENT_SPATIALIZED))
+                builder.isContentSpatialized = bundle.getBoolean(FIELD_IS_CONTENT_SPATIALIZED)
             }
             if (bundle.containsKey(FIELD_HAPTIC_CHANNELS_MUTED)) {
-                builder.setHapticChannelsMuted(bundle.getBoolean(FIELD_HAPTIC_CHANNELS_MUTED))
+                builder.hapticChannelsMuted = bundle.getBoolean(FIELD_HAPTIC_CHANNELS_MUTED)
             }
-            return builder.build()
+            return builder
         }
     }
 }

@@ -494,11 +494,11 @@ class DefaultAudioSink(
             }
         }
         audioProcessingPipeline!!.flush(
-            AudioProcessor.StreamMetadata.Builder()
-                .setTimeline(configuration.timeline)
-                .setPeriodUid(configuration.periodUid)
-                .setPositionOffsetUs(positionOffsetUs)
-                .build()
+            AudioProcessor.StreamMetadata(
+                timeline = configuration.timeline,
+                periodUid = configuration.periodUid,
+                positionOffsetUs = positionOffsetUs
+            )
         )
     }
 

@@ -16,108 +16,14 @@ import java.io.IOException
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
-class DataSourceBitmapLoader : BitmapLoader {
-    class Builder(val context: Context) {
-        var listeningExecutorService: ListeningExecutorService? = null
-        var dataSourceFactory: DataSource.Factory? = null
-        var options: BitmapFactory.Options? = null
-        var maximumOutputDimension: Int
-        var makeShared = false
-
-        init {
-            this.maximumOutputDimension = C.LENGTH_UNSET
-        }
-
-        fun setDataSourceFactory(dataSourceFactory: DataSource.Factory?): Builder {
-            this.dataSourceFactory = dataSourceFactory
-            return this
-        }
-
-        fun setExecutorService(listeningExecutorService: ListeningExecutorService?): Builder {
-            this.listeningExecutorService = listeningExecutorService
-            return this
-        }
-
-        fun setBitmapFactoryOptions(options: BitmapFactory.Options?): Builder {
-            this.options = options
-            return this
-        }
-
-        fun setMaximumOutputDimension(maximumOutputDimension: Int): Builder {
-            this.maximumOutputDimension = maximumOutputDimension
-            return this
-        }
-
-        fun setMakeShared(makeShared: Boolean): Builder {
-            this.makeShared = makeShared
-            return this
-        }
-
-        fun build(): DataSourceBitmapLoader {
-            return DataSourceBitmapLoader(this)
-        }
-    }
-
-    private val listeningExecutorService: ListeningExecutorService
-    private val dataSourceFactory: DataSource.Factory
-    private var options: BitmapFactory.Options? = null
-    private val maximumOutputDimension: Int
-    private val makeShared: Boolean
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(context: Context) : this(Builder(context))
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        context: Context,
-        maximumOutputDimension: Int
-    ) : this(Builder(context).setMaximumOutputDimension(maximumOutputDimension))
-
-    @Suppress("deprecation") // Calling deprecated constructor.
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        listeningExecutorService: ListeningExecutorService,
-        dataSourceFactory: DataSource.Factory
-    ) : this(listeningExecutorService, dataSourceFactory,  null)
-
-    @Suppress("deprecation") // Calling deprecated constructor.
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        listeningExecutorService: ListeningExecutorService,
-        dataSourceFactory: DataSource.Factory,
-        options: BitmapFactory.Options?
-    ) : this(
-        listeningExecutorService,
-        dataSourceFactory,
-        options,  
-        C.LENGTH_UNSET
-    )
-
-    @Deprecated("Use {@link Builder} instead.")
-    constructor(
-        listeningExecutorService: ListeningExecutorService,
-        dataSourceFactory: DataSource.Factory,
-        options: BitmapFactory.Options?,
-        maximumOutputDimension: Int
-    ) {
-        this.listeningExecutorService = listeningExecutorService
-        this.dataSourceFactory = dataSourceFactory
-        this.options = options
-        this.maximumOutputDimension = maximumOutputDimension
-        this.makeShared = false
-    }
-
-    private constructor(builder: Builder) {
-        this.dataSourceFactory =
-            (if (builder.dataSourceFactory != null)
-                builder.dataSourceFactory
-            else
-                DefaultDataSource.Factory(builder.context))!!
-        this.listeningExecutorService =
-            builder.listeningExecutorService ?: DEFAULT_EXECUTOR_SERVICE.get()!!
-        this.maximumOutputDimension = builder.maximumOutputDimension
-        this.makeShared = builder.makeShared
-    }
+class DataSourceBitmapLoader(
+    context: Context,
+    var listeningExecutorService: ListeningExecutorService = DEFAULT_EXECUTOR_SERVICE.get()!!,
+    var dataSourceFactory: DataSource.Factory = DefaultDataSource.Factory(context),
+    var options: BitmapFactory.Options? = null,
+    var maximumOutputDimension: Int = C.LENGTH_UNSET,
+    var makeShared: Boolean = false,
+) : BitmapLoader {
 
     override fun supportsMimeType(mimeType: String): Boolean {
         return Util.isBitmapFactorySupportedMimeType(mimeType)

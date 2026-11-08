@@ -5,10 +5,10 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue
 import java.nio.ByteBuffer
 
 class AudioProcessingPipeline(
-    
+
     private val audioProcessors: List<AudioProcessor>
 ) {
-    
+
     private val activeAudioProcessors: MutableList<AudioProcessor>
 
     private var outputBuffers: Array<ByteBuffer>
@@ -66,24 +66,20 @@ class AudioProcessingPipeline(
                 continue
             }
             previousStreamMetadata =
-                previousStreamMetadata
-                    .buildUpon()
-                    .setPositionOffsetUs(
-                        audioProcessor.getDurationAfterProcessorApplied(
-                            previousStreamMetadata.positionOffsetUs
-                        )
+                previousStreamMetadata.copy(
+                    positionOffsetUs = audioProcessor.getDurationAfterProcessorApplied(
+                        previousStreamMetadata.positionOffsetUs
                     )
-                    .build()
+                )
             activeAudioProcessors.add(audioProcessor)
         }
 
-        outputBuffers = MutableList<ByteBuffer>(activeAudioProcessors.size){
+        outputBuffers = MutableList<ByteBuffer>(activeAudioProcessors.size) {
             activeAudioProcessors.get(it).output!!
         }.toTypedArray()
     }
 
     val isOperational: Boolean
-        
         get() = !activeAudioProcessors.isEmpty()
 
     fun queueInput(inputBuffer: ByteBuffer) {
@@ -94,7 +90,6 @@ class AudioProcessingPipeline(
     }
 
     val output: ByteBuffer?
-        
         get() {
             if (!this.isOperational) {
                 return AudioProcessor.EMPTY_BUFFER
@@ -117,7 +112,6 @@ class AudioProcessingPipeline(
     }
 
     val isEnded: Boolean
-        
         get() = inputEnded
                 && activeAudioProcessors.get(this.finalOutputBufferIndex).isEnded
                 && !outputBuffers[this.finalOutputBufferIndex].hasRemaining()
