@@ -136,7 +136,7 @@ class PlayerView(
 
     constructor(context: Context, attrs: AttributeSet? = null) : this(
         context,
-        attrs,  
+        attrs,
         0
     )
 
@@ -187,7 +187,7 @@ class PlayerView(
                     context
                         .getTheme()
                         .obtainStyledAttributes(
-                            attrs, R.styleable.PlayerView, defStyleAttr,  0
+                            attrs, R.styleable.PlayerView, defStyleAttr, 0
                         )
                 try {
                     shutterColorSet = a.hasValue(R.styleable.PlayerView_shutter_background_color)
@@ -402,7 +402,7 @@ class PlayerView(
             this.useController = useController && controller != null
             if (controller != null) {
                 controller.hideImmediately()
-                controller.addVisibilityListener( componentListener)
+                controller.addVisibilityListener(componentListener)
             }
             if (useController) {
                 setClickable(true)
@@ -443,7 +443,7 @@ class PlayerView(
         }
         updateBuffering()
         updateErrorMessage()
-        updateForCurrentTrackSelections( true)
+        updateForCurrentTrackSelections(true)
         if (player != null) {
             if (player.isCommandAvailable(Player.COMMAND_SET_VIDEO_SURFACE)) {
                 if (this.videoSurfaceView is TextureView) {
@@ -523,7 +523,7 @@ class PlayerView(
         Preconditions.checkState(artworkDisplayMode == ARTWORK_DISPLAY_MODE_OFF || artworkView != null)
         if (this.artworkDisplayMode != artworkDisplayMode) {
             this.artworkDisplayMode = artworkDisplayMode
-            updateForCurrentTrackSelections( false)
+            updateForCurrentTrackSelections(false)
         }
     }
 
@@ -538,7 +538,7 @@ class PlayerView(
     fun setDefaultArtwork(defaultArtwork: Drawable?) {
         if (this.defaultArtwork !== defaultArtwork) {
             this.defaultArtwork = defaultArtwork
-            updateForCurrentTrackSelections( false)
+            updateForCurrentTrackSelections(false)
         }
     }
 
@@ -569,7 +569,7 @@ class PlayerView(
             controller!!.setPlayer(player)
         } else if (controller != null) {
             controller.hide()
-            controller.setPlayer( null)
+            controller.setPlayer(null)
         }
         updateContentDescription()
     }
@@ -583,7 +583,7 @@ class PlayerView(
     fun setKeepContentOnPlayerReset(keepContentOnPlayerReset: Boolean) {
         if (this.keepContentOnPlayerReset != keepContentOnPlayerReset) {
             this.keepContentOnPlayerReset = keepContentOnPlayerReset
-            updateForCurrentTrackSelections( false)
+            updateForCurrentTrackSelections(false)
         }
     }
 
@@ -844,14 +844,16 @@ class PlayerView(
         val overlayViews: MutableList<AdOverlayInfo> = ArrayList<AdOverlayInfo>()
         if (overlayFrameLayout != null) {
             overlayViews.add(
-                AdOverlayInfo.Builder(overlayFrameLayout, AdOverlayInfo.PURPOSE_NOT_VISIBLE)
-                    .setDetailedReason("Transparent overlay does not impact viewability")
-                    .build()
+                AdOverlayInfo(
+                    overlayFrameLayout,
+                    AdOverlayInfo.PURPOSE_NOT_VISIBLE,
+                    "Transparent overlay does not impact viewability"
+                )
             )
         }
         if (controller != null) {
             overlayViews.add(
-                AdOverlayInfo.Builder(controller, AdOverlayInfo.PURPOSE_CONTROLS).build()
+                AdOverlayInfo(controller, AdOverlayInfo.PURPOSE_CONTROLS)
             )
         }
         return overlayViews.toMutableList()
@@ -985,7 +987,7 @@ class PlayerView(
         }
         val bitmap =
             BitmapFactory.decodeByteArray(
-                mediaMetadata.artworkData,  0, mediaMetadata.artworkData.size
+                mediaMetadata.artworkData, 0, mediaMetadata.artworkData.size
             )
         return setDrawableArtwork(BitmapDrawable(getResources(), bitmap))
     }
@@ -1140,16 +1142,16 @@ class PlayerView(
 
     private fun updateContentDescription() {
         if (controller == null || !useController) {
-            setContentDescription( null)
+            setContentDescription(null)
         } else if (controller.isFullyVisible) {
-            setContentDescription( 
+            setContentDescription(
                 if (controllerHideOnTouch)
                     getResources().getString(R.string.exo_controls_hide)
                 else
                     null
             )
         } else {
-            setContentDescription( 
+            setContentDescription(
                 getResources().getString(R.string.exo_controls_show)
             )
         }
@@ -1221,9 +1223,9 @@ class PlayerView(
                 // Register a SurfaceSyncGroup to work around https://github.com/androidx/media/issues/1237
                 // (only present on API 34, fixed on API 35).
                 surfaceSyncGroupV34!!.postRegister(
-                        mainLooperHandler,
-                        this@PlayerView.videoSurfaceView as SurfaceView,
-                        Runnable { this@PlayerView.invalidate() })
+                    mainLooperHandler,
+                    this@PlayerView.videoSurfaceView as SurfaceView,
+                    Runnable { this@PlayerView.invalidate() })
             }
         }
 
@@ -1254,7 +1256,7 @@ class PlayerView(
                 && !player.currentTracks!!.isEmpty
             ) {
                 lastPeriodUidWithTracks =
-                    timeline.getPeriod(player.currentPeriodIndex, period,  true).uid
+                    timeline.getPeriod(player.currentPeriodIndex, period, true).uid
             } else if (lastPeriodUidWithTracks != null) {
                 val lastPeriodIndexWithTracks = timeline.getIndexOfPeriod(lastPeriodUidWithTracks!!)
                 if (lastPeriodIndexWithTracks != C.INDEX_UNSET) {
@@ -1268,7 +1270,7 @@ class PlayerView(
                 lastPeriodUidWithTracks = null
             }
 
-            updateForCurrentTrackSelections( false)
+            updateForCurrentTrackSelections(false)
         }
 
         override fun onPlaybackStateChanged(@Player.State playbackState: @Player.State Int) {
