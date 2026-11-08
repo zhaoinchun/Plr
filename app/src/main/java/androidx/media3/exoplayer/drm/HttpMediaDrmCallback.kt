@@ -87,7 +87,7 @@ class HttpMediaDrmCallback(
         }
         if (TextUtils.isEmpty(url)) {
             throw MediaDrmCallbackException(
-                DataSpec.Builder().setUri(Uri.EMPTY).build(),
+                DataSpec(uri = Uri.EMPTY),
                 Uri.EMPTY,  
                 mutableMapOf(),  
                 0,  

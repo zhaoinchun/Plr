@@ -40,6 +40,7 @@ import androidx.media3.extractor.TrackAwareSeekMap
 import androidx.media3.extractor.TrackOutput
 import androidx.media3.extractor.TrueHdSampleRechunker
 import androidx.media3.extractor.metadata.Chapter
+import androidx.media3.extractor.metadata.ChapterImpl
 import androidx.media3.extractor.metadata.ThumbnailMetadata
 import androidx.media3.extractor.text.SubtitleParser
 import androidx.media3.extractor.text.SubtitleTranscodingExtractorOutput
@@ -857,11 +858,11 @@ class Mp4Extractor constructor(
                 else
                     usToMs(chapterSampleTable.durationUs)
             quickTimeChapters.add(
-                Chapter.Builder()
-                    .setStartTimeMs(startTimeMs)
-                    .setEndTimeMs(endTimeMs)
-                    .setTitle(Label(null, text))
-                    .build()
+                ChapterImpl(
+                    startTimeMs = startTimeMs,
+                    endTimeMs = endTimeMs,
+                    title = Label(null, text)
+                )
             )
             chapterSampleIndex++
             return Extractor.RESULT_CONTINUE

@@ -35,6 +35,7 @@ import java.nio.ByteBuffer
 import java.util.concurrent.Executor
 import kotlin.concurrent.Volatile
 import kotlin.math.min
+import androidx.core.net.toUri
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 class HttpEngineDataSource internal constructor(
@@ -49,7 +50,7 @@ class HttpEngineDataSource internal constructor(
     private val defaultRequestProperties: RequestProperties?,
     private val contentTypePredicate: Predicate<String>?,
     private val keepPostFor302Redirects: Boolean
-) : BaseDataSource( true), HttpDataSource {
+) : BaseDataSource(true), HttpDataSource {
 
     class Factory(private val httpEngine: HttpEngine, private val executor: Executor) :
         HttpDataSource.Factory {
@@ -439,7 +440,7 @@ class HttpEngineDataSource internal constructor(
         if (readBuffer != null) {
             // If there is existing data in the readBuffer, read as much as possible. Return if any read.
             val copyBytes: Int =
-                Companion.copyByteBuffer( readBuffer!!,  buffer)
+                Companion.copyByteBuffer(readBuffer!!, buffer)
             if (copyBytes != 0) {
                 if (bytesRemaining != C.LENGTH_UNSET.toLong()) {
                     bytesRemaining -= copyBytes.toLong()
@@ -560,7 +561,7 @@ class HttpEngineDataSource internal constructor(
         var now = clock.elapsedRealtime()
         var opened = false
         while (!opened && now < currentConnectTimeoutMs) {
-            opened = operation.block(currentConnectTimeoutMs - now + 5 )
+            opened = operation.block(currentConnectTimeoutMs - now + 5)
             now = clock.elapsedRealtime()
         }
         return opened
@@ -747,10 +748,10 @@ class HttpEngineDataSource internal constructor(
                     exception =
                         InvalidResponseCodeException(
                             responseCode,
-                            info.getHttpStatusText(),  
+                            info.getHttpStatusText(),
                             null,
                             info.getHeaders().getAsMap(),
-                            dataSpec,  
+                            dataSpec,
                             Util.EMPTY_BYTE_ARRAY
                         )
                     operation.open()
@@ -794,12 +795,11 @@ class HttpEngineDataSource internal constructor(
                 // For POST redirects that aren't 307 or 308, the redirect is followed but request is
                 // transformed into a GET unless shouldKeepPost is true.
                 redirectUrlDataSpec =
-                    dataSpec
-                        .buildUpon()
-                        .setUri(newLocationUrl)
-                        .setHttpMethod(DataSpec.HTTP_METHOD_GET)
-                        .setHttpBody(null)
-                        .build()
+                    dataSpec.copy(
+                        uri = newLocationUrl.toUri(),
+                        httpMethod = DataSpec.HTTP_METHOD_GET,
+                        body = null
+                    )
             } else {
                 redirectUrlDataSpec = dataSpec.withUri(Uri.parse(newLocationUrl))
             }
@@ -808,8 +808,7 @@ class HttpEngineDataSource internal constructor(
                 val requestHeaders: MutableMap<String, String> = mutableMapOf()
                 requestHeaders.putAll(dataSpec.httpRequestHeaders)
                 requestHeaders[HttpHeaders.COOKIE] = cookieHeaders
-                redirectUrlDataSpec =
-                    redirectUrlDataSpec.buildUpon().setHttpRequestHeaders(requestHeaders).build()
+                redirectUrlDataSpec =redirectUrlDataSpec.copy(headers=requestHeaders)
             }
 
             val redirectUrlRequestWrapper: UrlRequestWrapper?

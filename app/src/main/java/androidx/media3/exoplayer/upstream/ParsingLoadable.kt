@@ -32,12 +32,12 @@ class ParsingLoadable<T> : Loadable {
 
     constructor(
         dataSource: DataSource,
-        uri: Uri?,
+        uri: Uri,
         type: @C.DataType Int,
         parser: Parser<out T?>
     ) : this(
         dataSource,
-        DataSpec.Builder().setUri(uri).setFlags(DataSpec.FLAG_ALLOW_GZIP).build(),
+        DataSpec(uri = uri, flags = DataSpec.FLAG_ALLOW_GZIP),
         type,
         parser
     )

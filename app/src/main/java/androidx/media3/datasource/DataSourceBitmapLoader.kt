@@ -154,7 +154,7 @@ class DataSourceBitmapLoader : BitmapLoader {
         @Throws(IOException::class)
         private fun load(
             dataSource: DataSource,
-            uri: Uri?,
+            uri: Uri,
             options: BitmapFactory.Options?,
             maximumOutputDimension: Int,
             makeShared: Boolean

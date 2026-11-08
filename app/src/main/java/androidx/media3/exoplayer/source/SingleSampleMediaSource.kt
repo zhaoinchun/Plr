@@ -121,10 +121,10 @@ class SingleSampleMediaSource private constructor(
                 id = subtitleConfiguration.id ?: trackId
             )
         this.dataSpec =
-            DataSpec.Builder()
-                .setUri(subtitleConfiguration.uri)
-                .setFlags(DataSpec.FLAG_ALLOW_GZIP)
-                .build()
+            DataSpec(
+                uri = subtitleConfiguration.uri,
+                flags = DataSpec.FLAG_ALLOW_GZIP
+            )
         this.timeline =
             SinglePeriodTimeline(
                 durationUs,

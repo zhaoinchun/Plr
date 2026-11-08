@@ -61,7 +61,7 @@ class CacheWriter(
                 if (contentLength == C.LENGTH_UNSET.toLong()) C.INDEX_UNSET.toLong() else contentLength
         }
         if (progressListener != null) {
-            progressListener.onProgress(this.length, bytesCached,  0)
+            progressListener.onProgress(this.length, bytesCached, 0)
         }
 
         while (endPosition == C.INDEX_UNSET.toLong() || nextPosition < endPosition) {
@@ -90,8 +90,7 @@ class CacheWriter(
         if (length != C.LENGTH_UNSET.toLong()) {
             // If the length is specified, try to open the data source with a bounded request to avoid
             // the underlying network stack requesting more data than required.
-            val boundedDataSpec: DataSpec =
-                dataSpec.buildUpon().setPosition(position).setLength(length).build()
+            val boundedDataSpec: DataSpec = dataSpec.copy(position = position, length = length)
             try {
                 resolvedLength = dataSource.open(boundedDataSpec)
                 isDataSourceOpen = true
@@ -105,8 +104,7 @@ class CacheWriter(
             // DataSource with the specified length failed.
             throwIfCanceled()
             val unboundedDataSpec: DataSpec =
-                dataSpec.buildUpon().setPosition(position).setLength(C.LENGTH_UNSET.toLong())
-                    .build()
+                dataSpec.copy(position = position, length = C.LENGTH_UNSET.toLong())
             try {
                 resolvedLength = dataSource.open(unboundedDataSpec)
             } catch (e: Exception) {
@@ -123,7 +121,7 @@ class CacheWriter(
             var bytesRead = 0
             while (bytesRead != C.RESULT_END_OF_INPUT) {
                 throwIfCanceled()
-                bytesRead = dataSource.read(temporaryBuffer,  0, temporaryBuffer.size)
+                bytesRead = dataSource.read(temporaryBuffer, 0, temporaryBuffer.size)
                 if (bytesRead != C.RESULT_END_OF_INPUT) {
                     onNewBytesCached(bytesRead.toLong())
                     totalBytesRead += bytesRead
@@ -150,7 +148,7 @@ class CacheWriter(
         }
         this.endPosition = endPosition
         if (progressListener != null) {
-            progressListener.onProgress(this.length, bytesCached,  0)
+            progressListener.onProgress(this.length, bytesCached, 0)
         }
     }
 
@@ -172,7 +170,7 @@ class CacheWriter(
     }
 
     companion object {
-        
+
         val DEFAULT_BUFFER_SIZE_BYTES: Int = 128 * 1024
     }
 }

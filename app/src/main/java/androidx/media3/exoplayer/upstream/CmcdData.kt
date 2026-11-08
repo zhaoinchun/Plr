@@ -351,7 +351,7 @@ class CmcdData private constructor(
                         CmcdConfiguration.CMCD_QUERY_PARAMETER_KEY,
                         COMMA_JOINER.join(keyValuePairs)
                     )
-            return dataSpec.buildUpon().setUri(uriBuilder.build()).build()
+            return dataSpec.copy(uri = uriBuilder.build())
         }
     }
 

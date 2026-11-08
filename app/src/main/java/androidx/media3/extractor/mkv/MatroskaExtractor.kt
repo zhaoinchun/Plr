@@ -54,6 +54,7 @@ import java.util.UUID
 import kotlin.math.max
 import kotlin.math.min
 import androidx.core.util.size
+import androidx.media3.extractor.metadata.ChapterImpl
 
 class MatroskaExtractor internal constructor(
     private val reader: EbmlReader,
@@ -2240,20 +2241,17 @@ class MatroskaExtractor internal constructor(
                 val chapterEntry = chapterEntries.valueAt(i)
                 // Check if the chapter is tied to a specific track (and whether it's *this* track).
                 if (chapterEntry.trackUid == 0L || chapterEntry.trackUid == uid) {
-                    val chapter =
-                        Chapter.Builder()
-                            .setStartTimeMs(Util.nsToMs(chapterEntry.timeStartNs))
-                            .setEndTimeMs(Util.nsToMs(chapterEntry.timeEndNs))
-                            .setHidden(chapterEntry.flagHidden)
-                    if (chapterEntry.chapString != null) {
-                        chapter.setTitle(
-                            Label(
-                                chapterEntry.chapLanguage,
-                                chapterEntry.chapString!!
-                            )
-                        )
+                    val title = chapterEntry?.chapString?.let {
+                        Label(chapterEntry.chapLanguage, it)
                     }
-                    chapters.add(chapter.build())
+                    val chapter =
+                        ChapterImpl(
+                            startTimeMs = Util.nsToMs(chapterEntry.timeStartNs),
+                            endTimeMs = Util.nsToMs(chapterEntry.timeEndNs),
+                            isHidden = chapterEntry.flagHidden,
+                            title = title,
+                        )
+                    chapters.add(chapter)
                 }
             }
             if (!chapters.isEmpty()) {

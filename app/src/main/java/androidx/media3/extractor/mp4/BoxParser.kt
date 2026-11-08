@@ -54,6 +54,7 @@ import androidx.media3.extractor.HevcConfig
 import androidx.media3.extractor.VorbisUtil.parseVorbisCsdFromEsdsInitializationData
 import androidx.media3.extractor.VvcConfig
 import androidx.media3.extractor.metadata.Chapter
+import androidx.media3.extractor.metadata.ChapterImpl
 import com.google.common.base.Function
 import com.google.common.base.Joiner
 import com.google.common.base.Preconditions
@@ -1004,10 +1005,10 @@ object BoxParser {
                 val titleLength = chplData.readUnsignedByte()
                 val title = chplData.readString(titleLength)
                 chapters.add(
-                    Chapter.Builder()
-                        .setStartTimeMs(startTimeMs)
-                        .setTitle(Label(null, title))
-                        .build()
+                    ChapterImpl(
+                        startTimeMs = startTimeMs,
+                        title = Label(null, title)
+                    )
                 )
             }
             return if (chapters.isEmpty()) null else Metadata(chapters)

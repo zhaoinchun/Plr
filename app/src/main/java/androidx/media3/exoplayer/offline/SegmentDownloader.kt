@@ -437,8 +437,8 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         const val DEFAULT_MAX_MERGED_SEGMENT_START_TIME_DIFF_MS: Long = 20 * C.MILLIS_PER_SECOND
         private const val BUFFER_SIZE_BYTES = 128 * 1024
 
-        protected fun getCompressibleDataSpec(uri: Uri?): DataSpec {
-            return DataSpec.Builder().setUri(uri).setFlags(DataSpec.FLAG_ALLOW_GZIP).build()
+        protected fun getCompressibleDataSpec(uri: Uri): DataSpec {
+            return DataSpec(uri = uri, flags = DataSpec.FLAG_ALLOW_GZIP)
         }
 
         private fun mergeSegments(

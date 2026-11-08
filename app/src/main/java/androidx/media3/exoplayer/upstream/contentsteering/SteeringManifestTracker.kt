@@ -97,10 +97,7 @@ class SteeringManifestTracker internal constructor(
         for (entry in sortedQueryParameters.entries) {
             steeringManifestUrlBuilder.appendQueryParameter(entry.key, entry.value)
         }
-        val dataSpec =
-            DataSpec.Builder()
-                .setUri(steeringManifestUrlBuilder.build()!!)
-                .build()
+        val dataSpec = DataSpec(uri = steeringManifestUrlBuilder.build()!!)
         val steeringManifestLoadable =
             ParsingLoadable<SteeringManifest>(
                 dataSourceFactory.createDataSource(),

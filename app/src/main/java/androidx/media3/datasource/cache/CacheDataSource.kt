@@ -33,11 +33,11 @@ class CacheDataSource private constructor(
     eventListener: EventListener?
 ) : DataSource {
     class Factory : DataSource.Factory {
-        var cache:Cache? = null
+        var cache: Cache? = null
             private set
-        private var cacheReadDataSourceFactory: DataSource.Factory=FileDataSource.Factory()
+        private var cacheReadDataSourceFactory: DataSource.Factory = FileDataSource.Factory()
         private var cacheWriteDataSinkFactory: DataSink.Factory? = null
-        var cacheKeyFactory: CacheKeyFactory =  CacheKeyFactory.DEFAULT
+        var cacheKeyFactory: CacheKeyFactory = CacheKeyFactory.DEFAULT
             private set
         private var cacheIsReadOnly = false
         private var upstreamDataSourceFactory: DataSource.Factory? = null
@@ -86,6 +86,7 @@ class CacheDataSource private constructor(
         fun getUpstreamPriorityTaskManager(): PriorityTaskManager? {
             return upstreamPriorityTaskManager
         }
+
         fun setUpstreamPriority(upstreamPriority: @C.Priority Int): Factory {
             this.upstreamPriority = upstreamPriority
             return this
@@ -118,7 +119,7 @@ class CacheDataSource private constructor(
         }
 
         fun createDataSourceForRemovingDownload(): CacheDataSource {
-            return createDataSourceInternal( 
+            return createDataSourceInternal(
                 null, flags or FLAG_BLOCK_ON_CACHE, C.PRIORITY_DOWNLOAD
             )
         }
@@ -213,7 +214,7 @@ class CacheDataSource private constructor(
         upstreamDataSource,
         FileDataSource(),
         CacheDataSink(cache, CacheDataSink.DEFAULT_FRAGMENT_SIZE),
-        flags,  
+        flags,
         null
     )
 
@@ -231,8 +232,8 @@ class CacheDataSource private constructor(
         cacheReadDataSource,
         cacheWriteDataSink,
         cacheKeyFactory,
-        flags,  
-        null,  
+        flags,
+        null,
         C.PRIORITY_PLAYBACK,
         eventListener
     )
@@ -276,9 +277,9 @@ class CacheDataSource private constructor(
     override fun open(dataSpec: DataSpec): Long {
         try {
             val key = cacheKeyFactory.buildCacheKey(dataSpec)
-            val requestDataSpec: DataSpec = dataSpec.buildUpon().setKey(key).build()
+            val requestDataSpec: DataSpec = dataSpec.copy(key = key)
             this.requestDataSpec = requestDataSpec
-            actualUri = getRedirectedUriOrDefault(cache, key,  requestDataSpec.uri)
+            actualUri = getRedirectedUriOrDefault(cache, key, requestDataSpec.uri)
             readPosition = dataSpec.position
 
             val reason = shouldIgnoreCacheForRequest(dataSpec)
@@ -410,9 +411,7 @@ class CacheDataSource private constructor(
             // The data is locked in the cache, or we're ignoring the cache. Bypass the cache and read
             // from upstream.
             nextDataSource = upstreamDataSource
-            nextDataSpec =
-                requestDataSpec.buildUpon().setPosition(readPosition).setLength(bytesRemaining)
-                    .build()
+            nextDataSpec = requestDataSpec.copy(position = readPosition, length = bytesRemaining)
         } else if (nextSpan.isCached) {
             // Data is cached in a span file starting at nextSpan.position.
             val fileUri = Uri.fromFile(nextSpan.file)
@@ -423,13 +422,12 @@ class CacheDataSource private constructor(
                 length = min(length, bytesRemaining)
             }
             nextDataSpec =
-                requestDataSpec
-                    .buildUpon()
-                    .setUri(fileUri)
-                    .setUriPositionOffset(filePositionOffset)
-                    .setPosition(positionInFile)
-                    .setLength(length)
-                    .build()
+                requestDataSpec.copy(
+                    uri = fileUri,
+                    uriPositionOffset = filePositionOffset,
+                    position = positionInFile,
+                    length = length
+                )
             nextDataSource = cacheReadDataSource
         } else {
             // Data is not cached, and data is not locked, read from upstream with cache backing.
@@ -442,8 +440,7 @@ class CacheDataSource private constructor(
                     length = min(length, bytesRemaining)
                 }
             }
-            nextDataSpec =
-                requestDataSpec.buildUpon().setPosition(readPosition).setLength(length).build()
+            nextDataSpec =requestDataSpec.copy(position = readPosition, length = length)
             if (cacheWriteDataSource != null) {
                 nextDataSource = cacheWriteDataSource
             } else {
@@ -575,8 +572,8 @@ class CacheDataSource private constructor(
 
     companion object {
         const val FLAG_BLOCK_ON_CACHE: Int = 1
-        const  val FLAG_IGNORE_CACHE_ON_ERROR: Int = 1 shl 1 // 2
-        const  val FLAG_IGNORE_CACHE_FOR_UNSET_LENGTH_REQUESTS: Int = 1 shl 2 // 4
+        const val FLAG_IGNORE_CACHE_ON_ERROR: Int = 1 shl 1 // 2
+        const val FLAG_IGNORE_CACHE_FOR_UNSET_LENGTH_REQUESTS: Int = 1 shl 2 // 4
         private const val CACHE_NOT_IGNORED = -1
         const val CACHE_IGNORED_REASON_ERROR: Int = 0
         const val CACHE_IGNORED_REASON_UNSET_LENGTH: Int = 1

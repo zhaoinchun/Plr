@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.offline
 
 import androidx.media3.common.C
@@ -23,13 +22,13 @@ class ProgressiveDownloader(
     length: Long = C.LENGTH_UNSET.toLong()
 ) : Downloader {
     private val executor: Executor = executor
-    val dataSpec: DataSpec = DataSpec.Builder()
-        .setUri(mediaItem.localConfiguration!!.uri)
-        .setKey(mediaItem.localConfiguration.customCacheKey)
-        .setFlags(DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION)
-        .setPosition(position)
-        .setLength(length)
-        .build()
+    val dataSpec: DataSpec = DataSpec(
+        uri = mediaItem.localConfiguration!!.uri,
+        key = mediaItem.localConfiguration.customCacheKey,
+        flags = DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION,
+        position = position,
+        length = length
+    )
 
     private val dataSource = cacheDataSourceFactory.createDataSourceForDownloading()
     private val cacheWriter: CacheWriter
@@ -37,7 +36,7 @@ class ProgressiveDownloader(
     private var progressListener: Downloader.ProgressListener? = null
 
     @Volatile
-    private var downloadRunnable:RunnableFutureTask<Void?, IOException?>? = null
+    private var downloadRunnable: RunnableFutureTask<Void?, IOException?>? = null
 
     @Volatile
     private var isCanceled = false
@@ -48,7 +47,7 @@ class ProgressiveDownloader(
         position: Long,
         length: Long
     ) : this(
-        mediaItem, cacheDataSourceFactory,  
+        mediaItem, cacheDataSourceFactory,
         Executor { obj: Runnable? -> obj!!.run() }, position, length
     )
 
@@ -62,7 +61,7 @@ class ProgressiveDownloader(
                 )
             }
         cacheWriter =
-            CacheWriter(dataSource, dataSpec,  null, progressListener)
+            CacheWriter(dataSource, dataSpec, null, progressListener)
         priorityTaskManager = cacheDataSourceFactory.getUpstreamPriorityTaskManager()
     }
 
@@ -99,7 +98,7 @@ class ProgressiveDownloader(
                         throw cause
                     } else {
                         // The cause must be an uncaught Throwable type.
-                       throw  cause
+                        throw cause
                     }
                 }
             }
@@ -114,7 +113,7 @@ class ProgressiveDownloader(
     override fun cancel() {
         isCanceled = true
         val downloadRunnable = this.downloadRunnable
-        downloadRunnable?.cancel( true)
+        downloadRunnable?.cancel(true)
     }
 
     override fun remove() {

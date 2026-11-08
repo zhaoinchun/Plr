@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.drm
 
 import android.media.DeniedByServerException
@@ -8,6 +7,7 @@ import android.media.NotProvisionedException
 import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.IntDef
+import androidx.core.net.toUri
 import androidx.media3.common.PlaybackException
 
 import androidx.media3.common.util.Util.closeQuietly
@@ -84,13 +84,13 @@ object DrmUtil {
         val statsDataSource = StatsDataSource(dataSource)
         var manualRedirectCount = 0
         var dataSpec =
-            DataSpec.Builder()
-                .setUri(url)
-                .setHttpRequestHeaders(requestProperties)
-                .setHttpMethod(DataSpec.HTTP_METHOD_POST)
-                .setHttpBody(httpBody)
-                .setFlags(DataSpec.FLAG_ALLOW_GZIP)
-                .build()
+            DataSpec(
+                uri = url.toUri(),
+                headers = requestProperties,
+                httpMethod = DataSpec.HTTP_METHOD_POST,
+                body = httpBody,
+                flags = DataSpec.FLAG_ALLOW_GZIP
+            )
         val originalDataSpec = dataSpec
         try {
             while (true) {
@@ -106,14 +106,14 @@ object DrmUtil {
                             responseHeaders = statsDataSource.lastResponseHeaders,
                             bytesLoaded = response.size.toLong()
                         )
-                    return MediaDrmCallback.Response(response,loadEventInfo)
+                    return MediaDrmCallback.Response(response, loadEventInfo)
                 } catch (e: InvalidResponseCodeException) {
                     val redirectUrl = getRedirectUrl(e, manualRedirectCount)
                     if (redirectUrl == null) {
                         throw e
                     }
                     manualRedirectCount++
-                    dataSpec = dataSpec.buildUpon().setUri(redirectUrl).build()
+                    dataSpec = dataSpec.copy(uri = redirectUrl.toUri())
                 } finally {
                     closeQuietly(inputStream)
                 }
@@ -123,7 +123,7 @@ object DrmUtil {
                 originalDataSpec,
                 statsDataSource.lastOpenedUri,
                 statsDataSource.responseHeaders,
-                statsDataSource.bytesRead,  
+                statsDataSource.bytesRead,
                 e
             )
         }
@@ -150,7 +150,7 @@ object DrmUtil {
         return null
     }
 
-     // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
+    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
     // with Kotlin usages from before TYPE_USE was added.
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)

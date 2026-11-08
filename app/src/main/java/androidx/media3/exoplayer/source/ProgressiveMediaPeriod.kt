@@ -1228,16 +1228,13 @@ internal class ProgressiveMediaPeriod
                     put(HttpHeaders.IF_RANGE, etag)
                 }
             }
-            return DataSpec.Builder()
-                .setUri(uri)
-                .setPosition(position)
-                .setKey(customCacheKey) // Disable caching if the content length cannot be resolved, since this is indicative of a
-                // progressive live stream.
-                .setFlags(
-                    DataSpec.FLAG_DONT_CACHE_IF_LENGTH_UNKNOWN or DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION
-                )
-                .setHttpRequestHeaders(requestHeaders)
-                .build()
+            return DataSpec(
+                uri = uri,
+                position = position,
+                key = customCacheKey,
+                flags = DataSpec.FLAG_DONT_CACHE_IF_LENGTH_UNKNOWN or DataSpec.FLAG_ALLOW_CACHE_FRAGMENTATION,
+                headers = requestHeaders
+            )
         }
 
         fun setLoadPosition(position: Long, timeUs: Long) {
