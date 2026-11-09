@@ -58,8 +58,7 @@ class ClippingMediaSource(
 
     private val mediaPeriods = mutableListOf<ClippingMediaPeriod>()
     private val window: Timeline.Window = Timeline.Window()
-    var config: MediaItem.ClippingConfiguration =
-        MediaItem.ClippingConfiguration.Builder().build()
+    var config: MediaItem.ClippingConfiguration = MediaItem.ClippingConfiguration()
     private var clippingTimeline: ClippingTimeline? = null
     private var clippingError: IllegalClippingException? = null
     private var periodStartUs: Long = 0

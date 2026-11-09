@@ -15,7 +15,7 @@ import java.util.UUID
 
 class MediaItem private constructor(
     val mediaId: String,
-    clippingConfiguration: ClippingProperties,
+    clippingConfiguration: ClippingConfiguration,
     val localConfiguration: LocalConfiguration?,
     liveConfiguration: LiveConfiguration,
     mediaMetadata: MediaMetadata,
@@ -26,8 +26,7 @@ class MediaItem private constructor(
         private var mediaId: String? = null
         private var uri: Uri? = null
         private var mimeType: String? = null
-        private var clippingConfiguration: ClippingConfiguration.Builder =
-            ClippingConfiguration.Builder()
+        private var clippingConfiguration: ClippingConfiguration = ClippingConfiguration()
         private var drmConfiguration: DrmConfiguration = DrmConfiguration()
         private var streamKeys: List<StreamKey> = mutableListOf()
         private var customCacheKey: String? = null
@@ -40,7 +39,7 @@ class MediaItem private constructor(
         private var requestMetadata: RequestMetadata = RequestMetadata.EMPTY
 
         constructor(mediaItem: MediaItem) : this() {
-            clippingConfiguration = mediaItem.clippingConfiguration.buildUpon()
+            clippingConfiguration = mediaItem.clippingConfiguration.copy()
             mediaId = mediaItem.mediaId
             mediaMetadata = mediaItem.mediaMetadata
             liveConfiguration = mediaItem.liveConfiguration.copy()
@@ -83,7 +82,7 @@ class MediaItem private constructor(
         }
 
         fun setClippingConfiguration(clippingConfiguration: ClippingConfiguration): Builder {
-            this.clippingConfiguration = clippingConfiguration.buildUpon()
+            this.clippingConfiguration = clippingConfiguration.copy()
             return this
         }
 
@@ -162,7 +161,7 @@ class MediaItem private constructor(
             }
             return MediaItem(
                 (if (mediaId != null) mediaId else DEFAULT_MEDIA_ID)!!,
-                clippingConfiguration.buildClippingProperties(),
+                clippingConfiguration.copy(),
                 localConfiguration,
                 liveConfiguration.copy(),
                 (if (mediaMetadata != null) mediaMetadata else MediaMetadata.EMPTY)!!,
@@ -611,125 +610,16 @@ class MediaItem private constructor(
     }
 
     // TODO: Mark this final when ClippingProperties is deleted.
-    open class ClippingConfiguration constructor(builder: Builder) {
-        class Builder {
-            var startPositionUs: Long = 0
-            var endPositionUs: Long
-            var relativeToLiveWindow = false
-            var relativeToDefaultPosition = false
-            var startsAtKeyFrame = false
-            var allowUnseekableMedia = false
-
-            constructor() {
-                endPositionUs = C.TIME_END_OF_SOURCE
-            }
-
-            constructor(clippingConfiguration: ClippingConfiguration) {
-                startPositionUs = clippingConfiguration.startPositionUs
-                endPositionUs = clippingConfiguration.endPositionUs
-                relativeToLiveWindow = clippingConfiguration.relativeToLiveWindow
-                relativeToDefaultPosition = clippingConfiguration.relativeToDefaultPosition
-                startsAtKeyFrame = clippingConfiguration.startsAtKeyFrame
-                allowUnseekableMedia = clippingConfiguration.allowUnseekableMedia
-            }
-
-            fun setStartPositionMs(@IntRange(from = 0) startPositionMs: Long): Builder {
-                return setStartPositionUs(Util.msToUs(startPositionMs))
-            }
-
-            fun setStartPositionUs(@IntRange(from = 0) startPositionUs: Long): Builder {
-                Preconditions.checkArgument(startPositionUs >= 0)
-                this.startPositionUs = startPositionUs
-                return this
-            }
-
-            fun setEndPositionMs(endPositionMs: Long): Builder {
-                return setEndPositionUs(Util.msToUs(endPositionMs))
-            }
-
-            fun setEndPositionUs(endPositionUs: Long): Builder {
-                Preconditions.checkArgument(endPositionUs == C.TIME_END_OF_SOURCE || endPositionUs >= 0)
-                this.endPositionUs = endPositionUs
-                return this
-            }
-
-            fun setRelativeToLiveWindow(relativeToLiveWindow: Boolean): Builder {
-                this.relativeToLiveWindow = relativeToLiveWindow
-                return this
-            }
-
-            fun setRelativeToDefaultPosition(relativeToDefaultPosition: Boolean): Builder {
-                this.relativeToDefaultPosition = relativeToDefaultPosition
-                return this
-            }
-
-            fun setStartsAtKeyFrame(startsAtKeyFrame: Boolean): Builder {
-                this.startsAtKeyFrame = startsAtKeyFrame
-                return this
-            }
-
-            fun setAllowUnseekableMedia(allowUnseekableMedia: Boolean): Builder {
-                this.allowUnseekableMedia = allowUnseekableMedia
-                return this
-            }
-
-            fun build(): ClippingConfiguration {
-                return ClippingConfiguration(this)
-            }
-
-            @Deprecated("")
-            fun buildClippingProperties(): ClippingProperties {
-                return ClippingProperties(this)
-            }
-        }
-
-        @IntRange(from = 0)
-        val startPositionMs: Long = Util.usToMs(builder.startPositionUs)
-
-        @IntRange(from = 0)
-        val startPositionUs: Long
-        val endPositionMs: Long = Util.usToMs(builder.endPositionUs)
-        val endPositionUs: Long
-        val relativeToLiveWindow: Boolean
-        val relativeToDefaultPosition: Boolean
-        val startsAtKeyFrame: Boolean
-        val allowUnseekableMedia: Boolean
-
-        fun buildUpon(): Builder {
-            return ClippingConfiguration.Builder(this)
-        }
-
-        override fun equals(obj: Any?): Boolean {
-            if (this === obj) {
-                return true
-            }
-            if (obj !is ClippingConfiguration) {
-                return false
-            }
-
-            val other = obj
-
-            return startPositionUs == other.startPositionUs && endPositionUs == other.endPositionUs && relativeToLiveWindow == other.relativeToLiveWindow && relativeToDefaultPosition == other.relativeToDefaultPosition && startsAtKeyFrame == other.startsAtKeyFrame && allowUnseekableMedia == other.allowUnseekableMedia
-        }
-
-        override fun hashCode(): Int {
-            var result = (startPositionUs xor (startPositionUs ushr 32)).toInt()
-            result = 31 * result + (endPositionUs xor (endPositionUs ushr 32)).toInt()
-            result = 31 * result + (if (relativeToLiveWindow) 1 else 0)
-            result = 31 * result + (if (relativeToDefaultPosition) 1 else 0)
-            result = 31 * result + (if (startsAtKeyFrame) 1 else 0)
-            result = 31 * result + (if (allowUnseekableMedia) 1 else 0)
-            return result
-        }
-
-        init {
-            this.startPositionUs = builder.startPositionUs
-            this.endPositionUs = builder.endPositionUs
-            this.relativeToLiveWindow = builder.relativeToLiveWindow
-            this.relativeToDefaultPosition = builder.relativeToDefaultPosition
-            this.startsAtKeyFrame = builder.startsAtKeyFrame
-            this.allowUnseekableMedia = builder.allowUnseekableMedia
-        }
+    data class ClippingConfiguration(
+        var startPositionUs: Long = 0,
+        var endPositionUs: Long = C.TIME_END_OF_SOURCE,
+        var relativeToLiveWindow: Boolean = false,
+        var relativeToDefaultPosition: Boolean = false,
+        var startsAtKeyFrame: Boolean = false,
+        var allowUnseekableMedia: Boolean = false,
+    ) {
+        val startPositionMs: Long = Util.usToMs(startPositionUs)
+        val endPositionMs: Long = Util.usToMs(endPositionUs)
 
         fun toBundle(): Bundle {
             val bundle = Bundle()
@@ -761,7 +651,7 @@ class MediaItem private constructor(
         }
 
         companion object {
-            val UNSET: ClippingConfiguration = Builder().build()
+            val UNSET: ClippingConfiguration = ClippingConfiguration()
 
             private val FIELD_START_POSITION_MS: String = Util.intToStringMaxRadix(0)
             private val FIELD_END_POSITION_MS: String = Util.intToStringMaxRadix(1)
@@ -777,141 +667,57 @@ class MediaItem private constructor(
             private val FIELD_ALLOW_UNSEEKABLE_MEDIA: String = Util.intToStringMaxRadix(7)
 
             @Suppress("deprecation") // Building deprecated type for backwards compatibility
-            fun fromBundle(bundle: Bundle): ClippingProperties {
-                val clippingConfiguration =
-                    Builder()
-                        .setStartPositionMs(
-                            bundle.getLong(
-                                FIELD_START_POSITION_MS, UNSET.startPositionMs
-                            )
-                        )
-                        .setEndPositionMs(
-                            bundle.getLong(
-                                FIELD_END_POSITION_MS,
-                                UNSET.endPositionMs
-                            )
-                        )
-                        .setRelativeToLiveWindow(
-                            bundle.getBoolean(
-                                FIELD_RELATIVE_TO_LIVE_WINDOW,
-                                UNSET.relativeToLiveWindow
-                            )
-                        )
-                        .setRelativeToDefaultPosition(
-                            bundle.getBoolean(
-                                FIELD_RELATIVE_TO_DEFAULT_POSITION,
-                                UNSET.relativeToDefaultPosition
-                            )
-                        )
-                        .setStartsAtKeyFrame(
-                            bundle.getBoolean(
-                                FIELD_STARTS_AT_KEY_FRAME,
-                                UNSET.startsAtKeyFrame
-                            )
-                        )
-                        .setAllowUnseekableMedia(
-                            bundle.getBoolean(
-                                FIELD_ALLOW_UNSEEKABLE_MEDIA,
-                                UNSET.allowUnseekableMedia
-                            )
-                        )
-                val startPositionUs =
+            fun fromBundle(bundle: Bundle): ClippingConfiguration {
+                var startPositionUs =
                     bundle.getLong(
                         FIELD_START_POSITION_US,
                         UNSET.startPositionUs
                     )
-                if (startPositionUs != UNSET.startPositionUs) {
-                    clippingConfiguration.setStartPositionUs(startPositionUs)
+                if (startPositionUs == UNSET.startPositionUs) {
+                    startPositionUs = Util.msToUs(
+                        bundle.getLong(
+                            FIELD_START_POSITION_MS, UNSET.startPositionMs
+                        )
+                    )
                 }
-                val endPositionUs =
+                var endPositionUs =
                     bundle.getLong(FIELD_END_POSITION_US, UNSET.endPositionUs)
-                if (endPositionUs != UNSET.endPositionUs) {
-                    clippingConfiguration.setEndPositionUs(endPositionUs)
+                if (endPositionUs == UNSET.endPositionUs) {
+                    endPositionUs = Util.msToUs(
+                        bundle.getLong(
+                            FIELD_END_POSITION_MS, UNSET.endPositionMs
+                        )
+                    )
                 }
-                return clippingConfiguration.buildClippingProperties()
+                return ClippingConfiguration(
+                    startPositionUs = startPositionUs,
+                    endPositionUs = endPositionUs,
+                    relativeToLiveWindow = bundle.getBoolean(
+                        FIELD_RELATIVE_TO_LIVE_WINDOW,
+                        UNSET.relativeToLiveWindow
+                    ),
+                    relativeToDefaultPosition = bundle.getBoolean(
+                        FIELD_RELATIVE_TO_DEFAULT_POSITION,
+                        UNSET.relativeToDefaultPosition
+                    ),
+                    startsAtKeyFrame = bundle.getBoolean(
+                        FIELD_STARTS_AT_KEY_FRAME,
+                        UNSET.startsAtKeyFrame
+                    ),
+                    allowUnseekableMedia = bundle.getBoolean(
+                        FIELD_ALLOW_UNSEEKABLE_MEDIA,
+                        UNSET.allowUnseekableMedia
+                    ),
+                )
             }
         }
     }
 
-    @Deprecated("")
-    class ClippingProperties constructor(builder: ClippingConfiguration.Builder) :
-        ClippingConfiguration(builder) {
-        companion object {
-            val UNSET: ClippingProperties =
-                ClippingConfiguration.Builder().buildClippingProperties()
-        }
-    }
-
-    class RequestMetadata private constructor(builder: Builder) {
-        class Builder {
-            var mediaUri: Uri? = null
-            var searchQuery: String? = null
-            var extras: Bundle? = null
-
-            constructor()
-
-            constructor(requestMetadata: RequestMetadata) {
-                this.mediaUri = requestMetadata.mediaUri
-                this.searchQuery = requestMetadata.searchQuery
-                this.extras = requestMetadata.extras
-            }
-
-            fun setMediaUri(mediaUri: Uri?): Builder {
-                this.mediaUri = mediaUri
-                return this
-            }
-
-            fun setSearchQuery(searchQuery: String?): Builder {
-                this.searchQuery = searchQuery
-                return this
-            }
-
-            fun setExtras(extras: Bundle?): Builder {
-                this.extras = extras
-                return this
-            }
-
-            fun build(): RequestMetadata {
-                return RequestMetadata(this)
-            }
-        }
-
-        val mediaUri: Uri?
-
-        val searchQuery: String?
-
-        val extras: Bundle?
-
-        fun buildUpon(): Builder {
-            return RequestMetadata.Builder(this)
-        }
-
-        override fun equals(o: Any?): Boolean {
-            if (this === o) {
-                return true
-            }
-            if (o !is RequestMetadata) {
-                return false
-            }
-            val that = o
-            return mediaUri == that.mediaUri
-                    && searchQuery == that.searchQuery
-                    && ((extras == null) == (that.extras == null))
-        }
-
-        override fun hashCode(): Int {
-            var result = if (mediaUri == null) 0 else mediaUri.hashCode()
-            result = 31 * result + (if (searchQuery == null) 0 else searchQuery.hashCode())
-            result = 31 * result + (if (extras == null) 0 else 1)
-            return result
-        }
-
-        init {
-            this.mediaUri = builder.mediaUri
-            this.searchQuery = builder.searchQuery
-            this.extras = builder.extras
-        }
-
+    data class RequestMetadata(
+        var mediaUri: Uri? = null,
+        var searchQuery: String? = null,
+        var extras: Bundle? = null,
+    ) {
         fun toBundle(): Bundle {
             val bundle = Bundle()
             if (mediaUri != null) {
@@ -927,18 +733,18 @@ class MediaItem private constructor(
         }
 
         companion object {
-            val EMPTY: RequestMetadata = Builder().build()
+            val EMPTY: RequestMetadata = RequestMetadata()
 
             private val FIELD_MEDIA_URI: String = Util.intToStringMaxRadix(0)
             private val FIELD_SEARCH_QUERY: String = Util.intToStringMaxRadix(1)
             private val FIELD_EXTRAS: String = Util.intToStringMaxRadix(2)
 
             fun fromBundle(bundle: Bundle): RequestMetadata {
-                return Builder()
-                    .setMediaUri(bundle.getParcelable<Uri?>(FIELD_MEDIA_URI))
-                    .setSearchQuery(bundle.getString(FIELD_SEARCH_QUERY))
-                    .setExtras(Util.convertToNullIfInvalid(bundle.getBundle(FIELD_EXTRAS)))
-                    .build()
+                return RequestMetadata(
+                    mediaUri = bundle.getParcelable<Uri?>(FIELD_MEDIA_URI),
+                    searchQuery = bundle.getString(FIELD_SEARCH_QUERY),
+                    extras = Util.convertToNullIfInvalid(bundle.getBundle(FIELD_EXTRAS))
+                )
             }
         }
     }
@@ -950,7 +756,7 @@ class MediaItem private constructor(
     val clippingConfiguration: ClippingConfiguration
 
     @Deprecated("")
-    val clippingProperties: ClippingProperties?
+    val clippingProperties: ClippingConfiguration?
     val requestMetadata: RequestMetadata
 
     fun buildUpon(): Builder {
@@ -1075,9 +881,9 @@ class MediaItem private constructor(
                 mediaMetadata = MediaMetadata.fromBundle(mediaMetadataBundle, interfaceVersion)
             }
             val clippingConfigurationBundle = bundle.getBundle(FIELD_CLIPPING_PROPERTIES)
-            val clippingConfiguration: ClippingProperties?
+            val clippingConfiguration: ClippingConfiguration?
             if (clippingConfigurationBundle == null) {
-                clippingConfiguration = ClippingProperties.UNSET
+                clippingConfiguration = ClippingConfiguration.UNSET
             } else {
                 clippingConfiguration =
                     ClippingConfiguration.fromBundle(clippingConfigurationBundle)

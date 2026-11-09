@@ -633,7 +633,7 @@ class DefaultMediaSourceFactory(
                 mediaSource,
                 enableClippingInMediaPeriod = enableClippingInMediaPeriod
             ).apply {
-                config = mediaItem.clippingConfiguration.buildUpon().build()
+                config = mediaItem.clippingConfiguration.copy()
             }
         }
 
