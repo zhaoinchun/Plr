@@ -415,7 +415,7 @@ class DownloadHelper(
         val requestBuilder =
             DownloadRequest(id, localConfiguration.uri,
                 mimeType = localConfiguration.mimeType,
-                keySetId = localConfiguration.drmConfiguration?.getKeySetId(),
+                keySetId = localConfiguration.drmConfiguration?.keySetId,
                 customCacheKey = localConfiguration.customCacheKey,
                 data = data)
         if (mode == MODE_PREPARE_NON_PROGRESSIVE_SOURCE_AND_SELECT_TRACKS) {

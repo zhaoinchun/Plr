@@ -68,7 +68,7 @@ class DefaultDrmSessionManagerProvider : DrmSessionManagerProvider {
         }
         val drmSessionManager =
             DefaultDrmSessionManager(
-                uuid = drmConfiguration.scheme,
+                uuid = drmConfiguration.scheme!!,
                 exoMediaDrmProvider = FrameworkMediaDrm.DEFAULT_PROVIDER,
                 callback = httpDrmCallback,
                 multiSession = drmConfiguration.multiSession,
@@ -79,7 +79,7 @@ class DefaultDrmSessionManagerProvider : DrmSessionManagerProvider {
             )
         drmSessionManager.setMode(
             DefaultDrmSessionManager.MODE_PLAYBACK,
-            drmConfiguration.getKeySetId()
+            drmConfiguration.keySetId
         )
         return drmSessionManager
     }

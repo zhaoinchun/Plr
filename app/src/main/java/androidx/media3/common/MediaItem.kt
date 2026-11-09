@@ -10,17 +10,8 @@ import androidx.media3.common.util.BundleCollectionUtil
 import androidx.media3.common.util.Util
 import com.google.common.base.Function
 import com.google.common.base.Preconditions
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 import java.util.Collections
 import java.util.UUID
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.ByteArray
-import kotlin.Deprecated
-import kotlin.Int
-import kotlin.Long
-import kotlin.String
-import kotlin.Suppress
 
 class MediaItem private constructor(
     val mediaId: String,
@@ -35,24 +26,24 @@ class MediaItem private constructor(
         private var mediaId: String? = null
         private var uri: Uri? = null
         private var mimeType: String? = null
-        private var clippingConfiguration: ClippingConfiguration.Builder
-                = ClippingConfiguration.Builder()
-        private var drmConfiguration: DrmConfiguration.Builder= DrmConfiguration.Builder()
-        private var streamKeys: List<StreamKey>  = mutableListOf()
+        private var clippingConfiguration: ClippingConfiguration.Builder =
+            ClippingConfiguration.Builder()
+        private var drmConfiguration: DrmConfiguration = DrmConfiguration()
+        private var streamKeys: List<StreamKey> = mutableListOf()
         private var customCacheKey: String? = null
         private var subtitleConfigurations: List<SubtitleConfiguration> = listOf()
         private var adsConfiguration: AdsConfiguration? = null
         private var tag: Any? = null
         private var imageDurationMs: Long = C.TIME_UNSET
         private var mediaMetadata: MediaMetadata? = null
-        private var liveConfiguration: LiveConfiguration.Builder = LiveConfiguration.Builder()
-        private var requestMetadata: RequestMetadata= RequestMetadata.EMPTY
+        private var liveConfiguration: LiveConfiguration = LiveConfiguration()
+        private var requestMetadata: RequestMetadata = RequestMetadata.EMPTY
 
-        internal constructor(mediaItem: MediaItem) : this() {
+        constructor(mediaItem: MediaItem) : this() {
             clippingConfiguration = mediaItem.clippingConfiguration.buildUpon()
             mediaId = mediaItem.mediaId
             mediaMetadata = mediaItem.mediaMetadata
-            liveConfiguration = mediaItem.liveConfiguration.buildUpon()
+            liveConfiguration = mediaItem.liveConfiguration.copy()
             requestMetadata = mediaItem.requestMetadata
             val localConfiguration = mediaItem.localConfiguration
             if (localConfiguration != null) {
@@ -64,9 +55,9 @@ class MediaItem private constructor(
                 tag = localConfiguration.tag
                 drmConfiguration =
                     if (localConfiguration.drmConfiguration != null)
-                        localConfiguration.drmConfiguration.buildUpon()
+                        localConfiguration.drmConfiguration.copy()
                     else
-                        DrmConfiguration.Builder()
+                        DrmConfiguration()
                 adsConfiguration = localConfiguration.adsConfiguration
                 imageDurationMs = localConfiguration.imageDurationMs
             }
@@ -97,8 +88,7 @@ class MediaItem private constructor(
         }
 
         fun setDrmConfiguration(drmConfiguration: DrmConfiguration?): Builder {
-            this.drmConfiguration =
-                drmConfiguration?.buildUpon() ?: DrmConfiguration.Builder()
+            this.drmConfiguration = drmConfiguration?.copy() ?: DrmConfiguration()
             return this
         }
 
@@ -116,7 +106,7 @@ class MediaItem private constructor(
         }
 
         fun setLiveConfiguration(liveConfiguration: LiveConfiguration): Builder {
-            this.liveConfiguration = liveConfiguration.buildUpon()
+            this.liveConfiguration = liveConfiguration.copy()
             return this
         }
 
@@ -161,7 +151,7 @@ class MediaItem private constructor(
                     LocalConfiguration(
                         uri,
                         mimeType,
-                        if (drmConfiguration.scheme != null) drmConfiguration.build() else null,
+                        if (drmConfiguration.scheme != null) drmConfiguration else null,
                         adsConfiguration,
                         streamKeys,
                         customCacheKey,
@@ -174,177 +164,32 @@ class MediaItem private constructor(
                 (if (mediaId != null) mediaId else DEFAULT_MEDIA_ID)!!,
                 clippingConfiguration.buildClippingProperties(),
                 localConfiguration,
-                liveConfiguration.build(),
+                liveConfiguration.copy(),
                 (if (mediaMetadata != null) mediaMetadata else MediaMetadata.EMPTY)!!,
                 requestMetadata
             )
         }
     }
 
-    class DrmConfiguration
-    internal constructor(builder: Builder) {
-        class Builder {
-            // TODO remove @Nullable annotation when the deprecated zero-arg constructor is removed.
-            internal var scheme: UUID? = null
-            internal var licenseUri: Uri? = null
-            internal var licenseRequestHeaders = mapOf<String, String>()
-            internal var multiSession = false
-            internal var playClearContentWithoutKey: Boolean
-            internal var forceDefaultLicenseUri = false
-            internal var forcedSessionTrackTypes: List<Int?>
-            internal var keySetId: ByteArray? = null
-
-            @Deprecated("")
-            internal constructor() {
-                this.playClearContentWithoutKey = true
-                this.forcedSessionTrackTypes = listOf<@C.TrackType Int?>()
-            }
-
-            constructor(scheme: UUID?) : this() {
-                this.scheme = scheme
-            }
-
-            internal constructor(drmConfiguration: DrmConfiguration) {
-                this.scheme = drmConfiguration.scheme
-                this.licenseUri = drmConfiguration.licenseUri
-                this.licenseRequestHeaders = drmConfiguration.licenseRequestHeaders
-                this.multiSession = drmConfiguration.multiSession
-                this.playClearContentWithoutKey = drmConfiguration.playClearContentWithoutKey
-                this.forceDefaultLicenseUri = drmConfiguration.forceDefaultLicenseUri
-                this.forcedSessionTrackTypes = drmConfiguration.forcedSessionTrackTypes
-                this.keySetId = drmConfiguration.keySetId
-            }
-
-            fun setScheme(scheme: UUID?): Builder {
-                this.scheme = scheme
-                return this
-            }
-
-            fun setLicenseUri(licenseUri: Uri?): Builder {
-                this.licenseUri = licenseUri
-                return this
-            }
-
-            fun setLicenseUri(licenseUri: String?): Builder {
-                this.licenseUri = if (licenseUri == null) null else Uri.parse(licenseUri)
-                return this
-            }
-
-            fun setLicenseRequestHeaders(licenseRequestHeaders: Map<String, String>): Builder {
-                this.licenseRequestHeaders = licenseRequestHeaders.toMap()
-                return this
-            }
-
-            fun setMultiSession(multiSession: Boolean): Builder {
-                this.multiSession = multiSession
-                return this
-            }
-
-            fun setForceDefaultLicenseUri(forceDefaultLicenseUri: Boolean): Builder {
-                this.forceDefaultLicenseUri = forceDefaultLicenseUri
-                return this
-            }
-
-            fun setPlayClearContentWithoutKey(playClearContentWithoutKey: Boolean): Builder {
-                this.playClearContentWithoutKey = playClearContentWithoutKey
-                return this
-            }
-
-            fun setForceSessionsForAudioAndVideoTracks(
-                forceSessionsForAudioAndVideoTracks: Boolean
-            ): Builder {
-                this.setForcedSessionTrackTypes(
-                    if (forceSessionsForAudioAndVideoTracks)
-                        listOf<@C.TrackType Int?>(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
-                    else
-                       listOf<@C.TrackType Int?>()
-                )
-                return this
-            }
-
-            fun setForcedSessionTrackTypes(
-                forcedSessionTrackTypes: List<Int?>
-            ): Builder {
-                this.forcedSessionTrackTypes =forcedSessionTrackTypes.toList()
-                return this
-            }
-
-            fun setKeySetId(keySetId: ByteArray?): Builder {
-                this.keySetId = if (keySetId != null) keySetId.copyOf(keySetId.size) else null
-                return this
-            }
-
-            fun build(): DrmConfiguration {
-                return DrmConfiguration(this)
-            }
-        }
-
-        val scheme: UUID
-
-        @Deprecated("")
-        val uuid: UUID
-        val licenseUri: Uri?
-
-        @Deprecated("")
-        val requestHeaders = builder.licenseRequestHeaders
-        val licenseRequestHeaders = builder.licenseRequestHeaders
-        val multiSession: Boolean
-        val playClearContentWithoutKey: Boolean
-        val forceDefaultLicenseUri: Boolean
-
-        @Deprecated("")
-        val sessionForClearTypes: List<Int?>?
-        val forcedSessionTrackTypes: List<Int?>
-        private val keySetId: ByteArray?
-
-        fun getKeySetId(): ByteArray? {
-            return keySetId?.copyOf(keySetId.size)
-        }
-
-        fun buildUpon(): Builder {
-            return DrmConfiguration.Builder(this)
-        }
-
-        override fun equals(obj: Any?): Boolean {
-            if (this === obj) {
-                return true
-            }
-            if (obj !is DrmConfiguration) {
-                return false
-            }
-            val other = obj
-            return scheme == other.scheme
-                    && licenseUri == other.licenseUri
-                    && licenseRequestHeaders == other.licenseRequestHeaders
-                    && multiSession == other.multiSession && forceDefaultLicenseUri == other.forceDefaultLicenseUri && playClearContentWithoutKey == other.playClearContentWithoutKey && forcedSessionTrackTypes == other.forcedSessionTrackTypes
-                    && keySetId.contentEquals(other.keySetId)
-        }
-
-        override fun hashCode(): Int {
-            var result = scheme.hashCode()
-            result = 31 * result + (licenseUri?.hashCode() ?: 0)
-            result = 31 * result + licenseRequestHeaders.hashCode()
-            result = 31 * result + (if (multiSession) 1 else 0)
-            result = 31 * result + (if (forceDefaultLicenseUri) 1 else 0)
-            result = 31 * result + (if (playClearContentWithoutKey) 1 else 0)
-            result = 31 * result + forcedSessionTrackTypes.hashCode()
-            result = 31 * result + keySetId.contentHashCode()
-            return result
-        }
-
-        init {
-            Preconditions.checkState(!(builder.forceDefaultLicenseUri && builder.licenseUri == null))
-            this.scheme = builder.scheme!!
-            this.uuid = scheme
-            this.licenseUri = builder.licenseUri
-            this.multiSession = builder.multiSession
-            this.forceDefaultLicenseUri = builder.forceDefaultLicenseUri
-            this.playClearContentWithoutKey = builder.playClearContentWithoutKey
-            this.sessionForClearTypes = builder.forcedSessionTrackTypes
-            this.forcedSessionTrackTypes = builder.forcedSessionTrackTypes
-            this.keySetId =
-                if (builder.keySetId != null) builder.keySetId!!.copyOf(builder.keySetId!!.size) else
-                    null
+    data class DrmConfiguration(
+        var scheme: UUID? = null,
+        val uuid: UUID? = scheme,
+        var licenseUri: Uri? = null,
+        var licenseRequestHeaders: Map<String, String> = mapOf<String, String>(),
+        var multiSession: Boolean = false,
+        var playClearContentWithoutKey: Boolean = true,
+        var forceDefaultLicenseUri: Boolean = false,
+        var forcedSessionTrackTypes: List<Int?> = listOf<@C.TrackType Int?>(),
+        val keySetId: ByteArray? = null,
+    ) {
+        fun setForceSessionsForAudioAndVideoTracks(
+            forceSessionsForAudioAndVideoTracks: Boolean
+        ) {
+            this.forcedSessionTrackTypes =
+                if (forceSessionsForAudioAndVideoTracks)
+                    listOf<@C.TrackType Int?>(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
+                else
+                    listOf<@C.TrackType Int?>()
         }
 
         fun toBundle(): Bundle {
@@ -412,70 +257,26 @@ class MediaItem private constructor(
                     BundleCollectionUtil.getIntegerArrayListWithDefault(
                         bundle, FIELD_FORCED_SESSION_TRACK_TYPES, ArrayList<Int?>()
                     )
-                val forcedSessionTrackTypes =forcedSessionTrackTypesArray.toList()
+                val forcedSessionTrackTypes = forcedSessionTrackTypesArray.toList()
                 val keySetId = bundle.getByteArray(FIELD_KEY_SET_ID)
 
-                val builder = Builder(scheme)
-                return builder
-                    .setLicenseUri(licenseUri)
-                    .setLicenseRequestHeaders(licenseRequestHeaders)
-                    .setMultiSession(multiSession)
-                    .setForceDefaultLicenseUri(forceDefaultLicenseUri)
-                    .setPlayClearContentWithoutKey(playClearContentWithoutKey)
-                    .setForcedSessionTrackTypes(forcedSessionTrackTypes)
-                    .setKeySetId(keySetId)
-                    .build()
+                return DrmConfiguration(
+                    licenseUri = licenseUri,
+                    licenseRequestHeaders = licenseRequestHeaders,
+                    multiSession = multiSession,
+                    forceDefaultLicenseUri = forceDefaultLicenseUri,
+                    playClearContentWithoutKey = playClearContentWithoutKey,
+                    forcedSessionTrackTypes = forcedSessionTrackTypes,
+                    keySetId = keySetId
+                )
             }
         }
     }
 
-    class AdsConfiguration private constructor(builder: Builder) {
-        class Builder(internal var adTagUri: Uri) {
-            internal var adsId: Any? = null
-
-            fun setAdTagUri(adTagUri: Uri): Builder {
-                this.adTagUri = adTagUri
-                return this
-            }
-
-            fun setAdsId(adsId: Any?): Builder {
-                this.adsId = adsId
-                return this
-            }
-
-            fun build(): AdsConfiguration {
-                return AdsConfiguration(this)
-            }
-        }
-
-        val adTagUri: Uri
-        val adsId: Any?
-
-        fun buildUpon(): Builder {
-            return Builder(adTagUri).setAdsId(adsId)
-        }
-
-        override fun equals(obj: Any?): Boolean {
-            if (this === obj) {
-                return true
-            }
-            if (obj !is AdsConfiguration) {
-                return false
-            }
-            val other = obj
-            return adTagUri == other.adTagUri && adsId == other.adsId
-        }
-
-        override fun hashCode(): Int {
-            var result = adTagUri.hashCode()
-            result = 31 * result + (if (adsId != null) adsId.hashCode() else 0)
-            return result
-        }
-
-        init {
-            this.adTagUri = builder.adTagUri
-            this.adsId = builder.adsId
-        }
+    data class AdsConfiguration(
+        var adTagUri: Uri,
+        var adsId: Any? = null
+    ) {
 
         fun toBundle(): Bundle {
             val bundle = Bundle()
@@ -488,12 +289,12 @@ class MediaItem private constructor(
 
             fun fromBundle(bundle: Bundle): AdsConfiguration {
                 val adTagUri = bundle.getParcelable<Uri?>(FIELD_AD_TAG_URI)
-                return Builder(adTagUri!!).build()
+                return AdsConfiguration(adTagUri!!)
             }
         }
     }
 
-    class LocalConfiguration internal constructor(
+    class LocalConfiguration(
         val uri: Uri,
         mimeType: String?,
         val drmConfiguration: DrmConfiguration?,
@@ -647,7 +448,7 @@ class MediaItem private constructor(
                     adsConfiguration,
                     streamKeys,
                     bundle.getString(FIELD_CUSTOM_CACHE_KEY),
-                    subtitleConfiguration,  
+                    subtitleConfiguration,
                     null,
                     imageDurationMs
                 )
@@ -655,102 +456,13 @@ class MediaItem private constructor(
         }
     }
 
-    class LiveConfiguration @Deprecated("") constructor(
-        val targetOffsetMs: Long,
-        val minOffsetMs: Long,
-        val maxOffsetMs: Long,
-        val minPlaybackSpeed: Float,
-        val maxPlaybackSpeed: Float
+    data class LiveConfiguration @Deprecated("") constructor(
+        val targetOffsetMs: Long = C.TIME_UNSET,
+        val minOffsetMs: Long = C.TIME_UNSET,
+        val maxOffsetMs: Long = C.TIME_UNSET,
+        val minPlaybackSpeed: Float = C.RATE_UNSET,
+        val maxPlaybackSpeed: Float = C.RATE_UNSET
     ) {
-        class Builder {
-            internal var targetOffsetMs: Long
-            internal var minOffsetMs: Long
-            internal var maxOffsetMs: Long
-            internal var minPlaybackSpeed: Float
-            internal var maxPlaybackSpeed: Float
-
-            constructor() {
-                this.targetOffsetMs = C.TIME_UNSET
-                this.minOffsetMs = C.TIME_UNSET
-                this.maxOffsetMs = C.TIME_UNSET
-                this.minPlaybackSpeed = C.RATE_UNSET
-                this.maxPlaybackSpeed = C.RATE_UNSET
-            }
-
-            internal constructor(liveConfiguration: LiveConfiguration) {
-                this.targetOffsetMs = liveConfiguration.targetOffsetMs
-                this.minOffsetMs = liveConfiguration.minOffsetMs
-                this.maxOffsetMs = liveConfiguration.maxOffsetMs
-                this.minPlaybackSpeed = liveConfiguration.minPlaybackSpeed
-                this.maxPlaybackSpeed = liveConfiguration.maxPlaybackSpeed
-            }
-
-            fun setTargetOffsetMs(targetOffsetMs: Long): Builder {
-                this.targetOffsetMs = targetOffsetMs
-                return this
-            }
-
-            fun setMinOffsetMs(minOffsetMs: Long): Builder {
-                this.minOffsetMs = minOffsetMs
-                return this
-            }
-
-            fun setMaxOffsetMs(maxOffsetMs: Long): Builder {
-                this.maxOffsetMs = maxOffsetMs
-                return this
-            }
-
-            fun setMinPlaybackSpeed(minPlaybackSpeed: Float): Builder {
-                this.minPlaybackSpeed = minPlaybackSpeed
-                return this
-            }
-
-            fun setMaxPlaybackSpeed(maxPlaybackSpeed: Float): Builder {
-                this.maxPlaybackSpeed = maxPlaybackSpeed
-                return this
-            }
-
-            fun build(): LiveConfiguration {
-                return LiveConfiguration(this)
-            }
-        }
-
-        // Using the deprecated constructor while it exists.
-        private constructor(builder: Builder) : this(
-            builder.targetOffsetMs,
-            builder.minOffsetMs,
-            builder.maxOffsetMs,
-            builder.minPlaybackSpeed,
-            builder.maxPlaybackSpeed
-        )
-
-        fun buildUpon(): Builder {
-            return LiveConfiguration.Builder(this)
-        }
-
-        override fun equals(obj: Any?): Boolean {
-            if (this === obj) {
-                return true
-            }
-            if (obj !is LiveConfiguration) {
-                return false
-            }
-            val other = obj
-
-            return targetOffsetMs == other.targetOffsetMs && minOffsetMs == other.minOffsetMs && maxOffsetMs == other.maxOffsetMs && minPlaybackSpeed == other.minPlaybackSpeed && maxPlaybackSpeed == other.maxPlaybackSpeed
-        }
-
-        override fun hashCode(): Int {
-            var result = (targetOffsetMs xor (targetOffsetMs ushr 32)).toInt()
-            result = 31 * result + (minOffsetMs xor (minOffsetMs ushr 32)).toInt()
-            result = 31 * result + (maxOffsetMs xor (maxOffsetMs ushr 32)).toInt()
-            result =
-                31 * result + (if (minPlaybackSpeed != 0f) minPlaybackSpeed.toBits() else 0)
-            result =
-                31 * result + (if (maxPlaybackSpeed != 0f) maxPlaybackSpeed.toBits() else 0)
-            return result
-        }
-
         fun toBundle(): Bundle {
             val bundle = Bundle()
             if (targetOffsetMs != UNSET.targetOffsetMs) {
@@ -772,63 +484,53 @@ class MediaItem private constructor(
         }
 
         companion object {
-            val UNSET: LiveConfiguration = Builder().build()
+            val UNSET: LiveConfiguration = LiveConfiguration()
             private val FIELD_TARGET_OFFSET_MS: String = Util.intToStringMaxRadix(0)
             private val FIELD_MIN_OFFSET_MS: String = Util.intToStringMaxRadix(1)
             private val FIELD_MAX_OFFSET_MS: String = Util.intToStringMaxRadix(2)
             private val FIELD_MIN_PLAYBACK_SPEED: String = Util.intToStringMaxRadix(3)
             private val FIELD_MAX_PLAYBACK_SPEED: String = Util.intToStringMaxRadix(4)
 
-                    fun fromBundle(bundle: Bundle): LiveConfiguration {
-                return Builder()
-                    .setTargetOffsetMs(
-                        bundle.getLong(
-                            FIELD_TARGET_OFFSET_MS,  
-                            UNSET.targetOffsetMs
-                        )
+            fun fromBundle(bundle: Bundle): LiveConfiguration {
+                return LiveConfiguration(
+                    targetOffsetMs = bundle.getLong(
+                        FIELD_TARGET_OFFSET_MS,
+                        UNSET.targetOffsetMs
+                    ),
+                    minOffsetMs = bundle.getLong(FIELD_MIN_OFFSET_MS, UNSET.minOffsetMs),
+                    maxOffsetMs = bundle.getLong(FIELD_MAX_OFFSET_MS, UNSET.maxOffsetMs),
+                    minPlaybackSpeed = bundle.getFloat(
+                        FIELD_MIN_PLAYBACK_SPEED,
+                        UNSET.minPlaybackSpeed
+                    ),
+                    maxPlaybackSpeed = bundle.getFloat(
+                        FIELD_MAX_PLAYBACK_SPEED,
+                        UNSET.maxPlaybackSpeed
                     )
-                    .setMinOffsetMs(
-                        bundle.getLong(FIELD_MIN_OFFSET_MS,  UNSET.minOffsetMs)
-                    )
-                    .setMaxOffsetMs(
-                        bundle.getLong(FIELD_MAX_OFFSET_MS,  UNSET.maxOffsetMs)
-                    )
-                    .setMinPlaybackSpeed(
-                        bundle.getFloat(
-                            FIELD_MIN_PLAYBACK_SPEED,  
-                            UNSET.minPlaybackSpeed
-                        )
-                    )
-                    .setMaxPlaybackSpeed(
-                        bundle.getFloat(
-                            FIELD_MAX_PLAYBACK_SPEED,  
-                            UNSET.maxPlaybackSpeed
-                        )
-                    )
-                    .build()
+                )
             }
         }
     }
 
     open class SubtitleConfiguration {
         class Builder {
-            internal var uri: Uri
-            internal var mimeType: String? = null
-            internal var language: String? = null
+            var uri: Uri
+            var mimeType: String? = null
+            var language: String? = null
 
             @SelectionFlags
-            internal var selectionFlags: @SelectionFlags Int = 0
+            var selectionFlags: @SelectionFlags Int = 0
 
             @RoleFlags
-            internal var roleFlags: @RoleFlags Int = 0
-            internal var label: String? = null
-            internal var id: String? = null
+            var roleFlags: @RoleFlags Int = 0
+            var label: String? = null
+            var id: String? = null
 
             constructor(uri: Uri) {
                 this.uri = uri
             }
 
-            internal constructor(subtitleConfiguration: SubtitleConfiguration) {
+            constructor(subtitleConfiguration: SubtitleConfiguration) {
                 this.uri = subtitleConfiguration.uri
                 this.mimeType = subtitleConfiguration.mimeType
                 this.language = subtitleConfiguration.language
@@ -838,7 +540,7 @@ class MediaItem private constructor(
                 this.id = subtitleConfiguration.id
             }
 
-            
+
             fun setUri(uri: Uri): Builder {
                 this.uri = uri
                 return this
@@ -879,7 +581,7 @@ class MediaItem private constructor(
             }
 
             // Building deprecated type to support deprecated builder
-            internal fun buildSubtitle(): Subtitle {
+            fun buildSubtitle(): Subtitle {
                 return Subtitle(this)
             }
         }
@@ -896,7 +598,7 @@ class MediaItem private constructor(
         val label: String?
         val id: String?
 
-        internal constructor(
+        constructor(
             uri: Uri,
             mimeType: String?,
             language: String?,
@@ -914,7 +616,7 @@ class MediaItem private constructor(
             this.id = id
         }
 
-        internal constructor(builder: Builder) {
+        constructor(builder: Builder) {
             this.uri = builder.uri
             this.mimeType = builder.mimeType
             this.language = builder.language
@@ -1019,7 +721,7 @@ class MediaItem private constructor(
         constructor(uri: Uri, mimeType: String?, language: String?) : this(
             uri,
             mimeType,
-            language,  
+            language,
             0
         )
 
@@ -1029,7 +731,7 @@ class MediaItem private constructor(
             mimeType: String?,
             language: String?,
             @SelectionFlags selectionFlags: @SelectionFlags Int
-        ) : this(uri, mimeType, language, selectionFlags,  0,  null)
+        ) : this(uri, mimeType, language, selectionFlags, 0, null)
 
         @Deprecated("")
         constructor(
@@ -1039,20 +741,20 @@ class MediaItem private constructor(
             @SelectionFlags selectionFlags: @SelectionFlags Int,
             @RoleFlags roleFlags: @RoleFlags Int,
             label: String?
-        ) : super(uri, mimeType, language, selectionFlags, roleFlags, label,  null)
+        ) : super(uri, mimeType, language, selectionFlags, roleFlags, label, null)
 
-        internal constructor(builder: SubtitleConfiguration.Builder) : super(builder)
+        constructor(builder: SubtitleConfiguration.Builder) : super(builder)
     }
 
     // TODO: Mark this final when ClippingProperties is deleted.
-    open class ClippingConfiguration internal constructor(builder: Builder) {
+    open class ClippingConfiguration constructor(builder: Builder) {
         class Builder {
-            internal var startPositionUs: Long = 0
-            internal var endPositionUs: Long
-            internal var relativeToLiveWindow = false
-            internal var relativeToDefaultPosition = false
-            internal var startsAtKeyFrame = false
-            internal var allowUnseekableMedia = false
+            var startPositionUs: Long = 0
+            var endPositionUs: Long
+            var relativeToLiveWindow = false
+            var relativeToDefaultPosition = false
+            var startsAtKeyFrame = false
+            var allowUnseekableMedia = false
 
             constructor() {
                 endPositionUs = C.TIME_END_OF_SOURCE
@@ -1216,49 +918,49 @@ class MediaItem private constructor(
                     Builder()
                         .setStartPositionMs(
                             bundle.getLong(
-                                FIELD_START_POSITION_MS,  UNSET.startPositionMs
+                                FIELD_START_POSITION_MS, UNSET.startPositionMs
                             )
                         )
                         .setEndPositionMs(
                             bundle.getLong(
-                                FIELD_END_POSITION_MS,  
+                                FIELD_END_POSITION_MS,
                                 UNSET.endPositionMs
                             )
                         )
                         .setRelativeToLiveWindow(
                             bundle.getBoolean(
-                                FIELD_RELATIVE_TO_LIVE_WINDOW,  
+                                FIELD_RELATIVE_TO_LIVE_WINDOW,
                                 UNSET.relativeToLiveWindow
                             )
                         )
                         .setRelativeToDefaultPosition(
                             bundle.getBoolean(
-                                FIELD_RELATIVE_TO_DEFAULT_POSITION,  
+                                FIELD_RELATIVE_TO_DEFAULT_POSITION,
                                 UNSET.relativeToDefaultPosition
                             )
                         )
                         .setStartsAtKeyFrame(
                             bundle.getBoolean(
-                                FIELD_STARTS_AT_KEY_FRAME,  
+                                FIELD_STARTS_AT_KEY_FRAME,
                                 UNSET.startsAtKeyFrame
                             )
                         )
                         .setAllowUnseekableMedia(
                             bundle.getBoolean(
-                                FIELD_ALLOW_UNSEEKABLE_MEDIA,  
+                                FIELD_ALLOW_UNSEEKABLE_MEDIA,
                                 UNSET.allowUnseekableMedia
                             )
                         )
                 val startPositionUs =
                     bundle.getLong(
-                        FIELD_START_POSITION_US,  
+                        FIELD_START_POSITION_US,
                         UNSET.startPositionUs
                     )
                 if (startPositionUs != UNSET.startPositionUs) {
                     clippingConfiguration.setStartPositionUs(startPositionUs)
                 }
                 val endPositionUs =
-                    bundle.getLong(FIELD_END_POSITION_US,  UNSET.endPositionUs)
+                    bundle.getLong(FIELD_END_POSITION_US, UNSET.endPositionUs)
                 if (endPositionUs != UNSET.endPositionUs) {
                     clippingConfiguration.setEndPositionUs(endPositionUs)
                 }
@@ -1278,13 +980,13 @@ class MediaItem private constructor(
 
     class RequestMetadata private constructor(builder: Builder) {
         class Builder {
-            internal var mediaUri: Uri? = null
-            internal var searchQuery: String? = null
-            internal var extras: Bundle? = null
+            var mediaUri: Uri? = null
+            var searchQuery: String? = null
+            var extras: Bundle? = null
 
             constructor()
 
-            internal constructor(requestMetadata: RequestMetadata) {
+            constructor(requestMetadata: RequestMetadata) {
                 this.mediaUri = requestMetadata.mediaUri
                 this.searchQuery = requestMetadata.searchQuery
                 this.extras = requestMetadata.extras
@@ -1457,7 +1159,7 @@ class MediaItem private constructor(
     }
 
     fun toBundle(interfaceVersion: Int): Bundle {
-        return toBundle( false, interfaceVersion)
+        return toBundle(false, interfaceVersion)
     }
 
     @Deprecated("")
@@ -1466,7 +1168,7 @@ class MediaItem private constructor(
     }
 
     fun toBundleIncludeLocalConfiguration(interfaceVersion: Int): Bundle {
-        return toBundle( true, interfaceVersion)
+        return toBundle(true, interfaceVersion)
     }
 
     companion object {
@@ -1474,7 +1176,7 @@ class MediaItem private constructor(
             return Builder().setUri(uri).build()
         }
 
-            fun fromUri(uri: Uri?): MediaItem {
+        fun fromUri(uri: Uri?): MediaItem {
             return Builder().setUri(uri).build()
         }
 
@@ -1493,7 +1195,7 @@ class MediaItem private constructor(
             return fromBundle(bundle, MediaLibraryInfo.INTERFACE_VERSION)
         }
 
-            fun fromBundle(bundle: Bundle, interfaceVersion: Int): MediaItem {
+        fun fromBundle(bundle: Bundle, interfaceVersion: Int): MediaItem {
             val mediaId = bundle.getString(FIELD_MEDIA_ID, DEFAULT_MEDIA_ID)
             val liveConfigurationBundle = bundle.getBundle(FIELD_LIVE_CONFIGURATION)
             val liveConfiguration = if (liveConfigurationBundle == null) {

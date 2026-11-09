@@ -233,24 +233,33 @@ class DefaultMediaSourceFactory(
         } catch (e: ClassNotFoundException) {
             throw IllegalStateException(e)
         }
-        val liveConfigurationBuilder =
-            mediaItem.liveConfiguration.buildUpon()
+        var targetOffsetMs = C.TIME_UNSET
+        var minPlaybackSpeed = C.RATE_UNSET
+        var maxPlaybackSpeed = C.RATE_UNSET
+        var minOffsetMs = C.TIME_UNSET
+        var maxOffsetMs = C.TIME_UNSET
         if (mediaItem.liveConfiguration.targetOffsetMs == C.TIME_UNSET) {
-            liveConfigurationBuilder.setTargetOffsetMs(liveTargetOffsetMs)
+            targetOffsetMs = liveTargetOffsetMs
         }
         if (mediaItem.liveConfiguration.minPlaybackSpeed == C.RATE_UNSET) {
-            liveConfigurationBuilder.setMinPlaybackSpeed(liveMinSpeed)
+            minPlaybackSpeed = liveMinSpeed
         }
         if (mediaItem.liveConfiguration.maxPlaybackSpeed == C.RATE_UNSET) {
-            liveConfigurationBuilder.setMaxPlaybackSpeed(liveMaxSpeed)
+            maxPlaybackSpeed = liveMaxSpeed
         }
         if (mediaItem.liveConfiguration.minOffsetMs == C.TIME_UNSET) {
-            liveConfigurationBuilder.setMinOffsetMs(liveMinOffsetMs)
+            minOffsetMs = liveMinOffsetMs
         }
         if (mediaItem.liveConfiguration.maxOffsetMs == C.TIME_UNSET) {
-            liveConfigurationBuilder.setMaxOffsetMs(liveMaxOffsetMs)
+            maxOffsetMs = liveMaxOffsetMs
         }
-        val liveConfiguration = liveConfigurationBuilder.build()
+        val liveConfiguration = mediaItem.liveConfiguration.copy(
+            targetOffsetMs = targetOffsetMs,
+            minPlaybackSpeed = minPlaybackSpeed,
+            maxPlaybackSpeed = maxPlaybackSpeed,
+            minOffsetMs = minOffsetMs,
+            maxOffsetMs = maxOffsetMs,
+        )
         // Make sure to retain the very same media item instance, if no value needs to be overridden.
         if (liveConfiguration != mediaItem.liveConfiguration) {
             mediaItem = mediaItem.buildUpon().setLiveConfiguration(liveConfiguration).build()
