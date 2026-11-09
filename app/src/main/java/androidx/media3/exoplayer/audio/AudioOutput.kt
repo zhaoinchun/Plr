@@ -10,7 +10,6 @@ import androidx.media3.exoplayer.audio.AudioOutputProvider.OutputConfig
 import java.nio.ByteBuffer
 
 interface AudioOutput {
-
     interface Listener {
         fun onPositionAdvancing(playoutStartSystemTimeMs: Long)
         fun onOffloadDataRequest()
@@ -22,7 +21,7 @@ interface AudioOutput {
     class WriteException(
         val errorCode: Int,
         val isRecoverable: Boolean
-    ) : Exception("AudioOutput write failed: " + errorCode)
+    ) : Exception("AudioOutput write failed: $errorCode")
 
     fun play()
     fun pause()
