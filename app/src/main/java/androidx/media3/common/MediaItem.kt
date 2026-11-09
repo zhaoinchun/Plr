@@ -308,7 +308,7 @@ class MediaItem private constructor(
         val mimeType: String?
 
         @Deprecated("")
-        val subtitles: List<Subtitle?>
+        val subtitles: List<SubtitleConfiguration?>
         val tag: Any?
         val imageDurationMs: Long
 
@@ -349,9 +349,9 @@ class MediaItem private constructor(
 
         init {
             this.mimeType = MimeTypes.normalizeMimeType(mimeType)
-            val subtitles = mutableListOf<Subtitle?>()
+            val subtitles = mutableListOf<SubtitleConfiguration?>()
             for (i in subtitleConfigurations.indices) {
-                subtitles.add(subtitleConfigurations[i]!!.buildUpon().buildSubtitle())
+                subtitles.add(subtitleConfigurations[i]!!.copy())
             }
             this.subtitles = subtitles.toList()
             this.tag = tag
@@ -512,122 +512,17 @@ class MediaItem private constructor(
         }
     }
 
-    open class SubtitleConfiguration {
-        class Builder {
-            var uri: Uri
-            var mimeType: String? = null
-            var language: String? = null
-
-            @SelectionFlags
-            var selectionFlags: @SelectionFlags Int = 0
-
-            @RoleFlags
-            var roleFlags: @RoleFlags Int = 0
-            var label: String? = null
-            var id: String? = null
-
-            constructor(uri: Uri) {
-                this.uri = uri
-            }
-
-            constructor(subtitleConfiguration: SubtitleConfiguration) {
-                this.uri = subtitleConfiguration.uri
-                this.mimeType = subtitleConfiguration.mimeType
-                this.language = subtitleConfiguration.language
-                this.selectionFlags = subtitleConfiguration.selectionFlags
-                this.roleFlags = subtitleConfiguration.roleFlags
-                this.label = subtitleConfiguration.label
-                this.id = subtitleConfiguration.id
-            }
-
-
-            fun setUri(uri: Uri): Builder {
-                this.uri = uri
-                return this
-            }
-
-            fun setMimeType(mimeType: String?): Builder {
-                this.mimeType = MimeTypes.normalizeMimeType(mimeType)
-                return this
-            }
-
-            fun setLanguage(language: String?): Builder {
-                this.language = language
-                return this
-            }
-
-            fun setSelectionFlags(@SelectionFlags selectionFlags: @SelectionFlags Int): Builder {
-                this.selectionFlags = selectionFlags
-                return this
-            }
-
-            fun setRoleFlags(@RoleFlags roleFlags: @RoleFlags Int): Builder {
-                this.roleFlags = roleFlags
-                return this
-            }
-
-            fun setLabel(label: String?): Builder {
-                this.label = label
-                return this
-            }
-
-            fun setId(id: String?): Builder {
-                this.id = id
-                return this
-            }
-
-            fun build(): SubtitleConfiguration {
-                return SubtitleConfiguration(this)
-            }
-
-            // Building deprecated type to support deprecated builder
-            fun buildSubtitle(): Subtitle {
-                return Subtitle(this)
-            }
-        }
-
-        val uri: Uri
-        val mimeType: String?
-        val language: String?
-
-        @SelectionFlags
-        val selectionFlags: @SelectionFlags Int
-
-        @RoleFlags
-        val roleFlags: @RoleFlags Int
-        val label: String?
-        val id: String?
-
-        constructor(
-            uri: Uri,
-            mimeType: String?,
-            language: String?,
-            selectionFlags: Int,
-            roleFlags: Int,
-            label: String?,
-            id: String?
-        ) {
-            this.uri = uri
-            this.mimeType = MimeTypes.normalizeMimeType(mimeType)
-            this.language = language
-            this.selectionFlags = selectionFlags
-            this.roleFlags = roleFlags
-            this.label = label
-            this.id = id
-        }
-
-        constructor(builder: Builder) {
-            this.uri = builder.uri
-            this.mimeType = builder.mimeType
-            this.language = builder.language
-            this.selectionFlags = builder.selectionFlags
-            this.roleFlags = builder.roleFlags
-            this.label = builder.label
-            this.id = builder.id
-        }
-
-        fun buildUpon(): Builder {
-            return SubtitleConfiguration.Builder(this)
+    data class SubtitleConfiguration(
+        var uri: Uri,
+        var mimeType: String? = null,
+        var language: String? = null,
+        var selectionFlags: @SelectionFlags Int = 0,
+        var roleFlags: @RoleFlags Int = 0,
+        var label: String? = null,
+        var id: String? = null,
+    ) {
+        init {
+            mimeType = MimeTypes.normalizeMimeType(mimeType)
         }
 
         override fun equals(obj: Any?): Boolean {
@@ -695,55 +590,24 @@ class MediaItem private constructor(
                 val uri = bundle.getParcelable<Uri?>(FIELD_URI)!!
                 val mimeType = bundle.getString(FIELD_MIME_TYPE)
                 val language = bundle.getString(FIELD_LANGUAGE)
-                @SelectionFlags val selectionFlags: @SelectionFlags Int = bundle.getInt(
+                val selectionFlags: @SelectionFlags Int = bundle.getInt(
                     FIELD_SELECTION_FLAGS, 0
                 )
-                @RoleFlags val roleFlags: @RoleFlags Int = bundle.getInt(FIELD_ROLE_FLAGS, 0)
+                val roleFlags: @RoleFlags Int = bundle.getInt(FIELD_ROLE_FLAGS, 0)
                 val label = bundle.getString(FIELD_LABEL)
                 val id = bundle.getString(FIELD_ID)
 
-                val builder = Builder(uri)
-                return builder
-                    .setMimeType(mimeType)
-                    .setLanguage(language)
-                    .setSelectionFlags(selectionFlags)
-                    .setRoleFlags(roleFlags)
-                    .setLabel(label)
-                    .setId(id)
-                    .build()
+                return SubtitleConfiguration(
+                    uri,
+                    mimeType = mimeType,
+                    language = language,
+                    selectionFlags = selectionFlags,
+                    roleFlags = roleFlags,
+                    label = label,
+                    id = id
+                )
             }
         }
-    }
-
-    @Deprecated("")
-    class Subtitle : SubtitleConfiguration {
-        @Deprecated("")
-        constructor(uri: Uri, mimeType: String?, language: String?) : this(
-            uri,
-            mimeType,
-            language,
-            0
-        )
-
-        @Deprecated("")
-        constructor(
-            uri: Uri,
-            mimeType: String?,
-            language: String?,
-            @SelectionFlags selectionFlags: @SelectionFlags Int
-        ) : this(uri, mimeType, language, selectionFlags, 0, null)
-
-        @Deprecated("")
-        constructor(
-            uri: Uri,
-            mimeType: String?,
-            language: String?,
-            @SelectionFlags selectionFlags: @SelectionFlags Int,
-            @RoleFlags roleFlags: @RoleFlags Int,
-            label: String?
-        ) : super(uri, mimeType, language, selectionFlags, roleFlags, label, null)
-
-        constructor(builder: SubtitleConfiguration.Builder) : super(builder)
     }
 
     // TODO: Mark this final when ClippingProperties is deleted.
