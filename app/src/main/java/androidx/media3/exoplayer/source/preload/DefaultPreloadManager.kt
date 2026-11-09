@@ -2,7 +2,6 @@ package androidx.media3.exoplayer.source.preload
 
 import android.content.Context
 import android.os.HandlerThread
-import android.os.Looper
 import androidx.annotation.IntDef
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -16,8 +15,6 @@ import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.DefaultRendererCapabilitiesList
-import androidx.media3.exoplayer.DefaultRenderersFactory
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.LoadControl
 import androidx.media3.exoplayer.PlaybackLooperProvider
 import androidx.media3.exoplayer.RenderersFactory
@@ -38,193 +35,30 @@ import java.util.concurrent.Executor
 import kotlin.math.abs
 
 class DefaultPreloadManager(
+    context: Context,
     rankingDataComparator: RankingDataComparator<Int>,
     targetPreloadStatusControl: TargetPreloadStatusControl<Int, PreloadStatus>,
     mediaSourceFactory: MediaSource.Factory,
     var dataSourceFactory: DataSource.Factory? = null,
     var preloadLooperProvider: PlaybackLooperProvider= PlaybackLooperProvider(),
     var trackSelectorFactory: TrackSelector.Factory
-    =TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) },
-    var bandwidthMeterSupplier: Supplier<BandwidthMeter> = Supplier {
-        DefaultBandwidthMeter.getSingletonInstance(
-            context
-        )
-    },
+      =TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) },
+    var bandwidthMeterSupplier: BandwidthMeter = DefaultBandwidthMeter.getSingletonInstance(
+        context
+    ),
     var renderersFactorySupplier: Supplier<RenderersFactory>,
-    var loadControlSupplier: Supplier<LoadControl> = Suppliers.memoize<LoadControl>(Supplier { DefaultLoadControl() }),
+    var loadControlSupplier: LoadControl = DefaultLoadControl(),
     var cache: Cache? = null,
     var cachingExecutor: Executor = Executor { obj: Runnable? -> obj!!.run() },
     var clock: Clock = Clock.DEFAULT,
-    var buildCalled = false,
-    var buildExoPlayerCalled = false,
+    var buildCalled: Boolean = false,
+    var buildExoPlayerCalled: Boolean = false,
 ) :
     BasePreloadManager<Int, PreloadStatus>(
         rankingDataComparator,
         targetPreloadStatusControl,
         mediaSourceFactory
     ) {
-
-    class Builder(
-        val context: Context,
-        rankingDataComparator: SimpleRankingDataComparator,
-        targetPreloadStatusControl: TargetPreloadStatusControl<Int, PreloadStatus>
-    ) : BuilderBase<Int, PreloadStatus>(
-        rankingDataComparator,
-        targetPreloadStatusControl,
-        DefaultMediaSourceFactorySupplier(context)
-    ) {
-        var dataSourceFactory: DataSource.Factory? = null
-        var preloadLooperProvider: PlaybackLooperProvider= PlaybackLooperProvider()
-        var trackSelectorFactory: TrackSelector.Factory=TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) }
-        var bandwidthMeterSupplier: Supplier<BandwidthMeter> = Supplier {
-            DefaultBandwidthMeter.getSingletonInstance(
-                context
-            )
-        }
-        var renderersFactorySupplier: Supplier<RenderersFactory>
-        var loadControlSupplier: Supplier<LoadControl> = Suppliers.memoize<LoadControl>(Supplier { DefaultLoadControl() })
-        var cache: Cache? = null
-        var cachingExecutor: Executor = Executor { obj: Runnable? -> obj!!.run() }
-        var clock: Clock = Clock.DEFAULT
-        var buildCalled = false
-        var buildExoPlayerCalled = false
-
-        constructor(
-            context: Context,
-            targetPreloadStatusControl: TargetPreloadStatusControl<Int, PreloadStatus>
-        ) : this(context, SimpleRankingDataComparator(), targetPreloadStatusControl)
-
-        init {
-            this.preloadLooperProvider = PlaybackLooperProvider()
-            this.trackSelectorFactory =
-                TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) }
-            this.bandwidthMeterSupplier = Supplier {
-                DefaultBandwidthMeter.getSingletonInstance(
-                    context
-                )
-            }
-            this.renderersFactorySupplier = Suppliers.memoize<RenderersFactory>(Supplier {
-                DefaultRenderersFactory(
-                    context
-                )
-            })
-            this.loadControlSupplier =
-                Suppliers.memoize<LoadControl>(Supplier { DefaultLoadControl() })
-            this.cachingExecutor = Executor { obj: Runnable? -> obj!!.run() }
-            this.clock = Clock.DEFAULT
-        }
-
-        @Deprecated(
-            """Use {@link #setMediaSourceFactorySupplier(MediaSourceFactorySupplier)} instead.
-          If an app still uses this method, it should be aware that the set {@link
-     *     MediaSource.Factory} may not have the {@link #setCache(Cache) set Cache} and {@link
-     *     #setDataSourceFactory(DataSource.Factory) set DataSource.Factory} injected."""
-        )
-        fun setMediaSourceFactory(mediaSourceFactory: MediaSource.Factory): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.mediaSourceFactorySupplier =
-                object : MediaSourceFactorySupplier {
-
-                    override fun setCache(cache: Cache?): MediaSourceFactorySupplier {
-                        return this
-                    }
-
-                    override fun setDataSourceFactory(
-                        dataSourceFactory: DataSource.Factory?
-                    ): MediaSourceFactorySupplier {
-                        return this
-                    }
-
-                    override fun get(): MediaSource.Factory {
-                        return mediaSourceFactory
-                    }
-                }
-            return this
-        }
-
-        fun setMediaSourceFactorySupplier(
-            mediaSourceFactorySupplier: MediaSourceFactorySupplier
-        ): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.mediaSourceFactorySupplier =
-                mediaSourceFactorySupplier.setCache(cache).setDataSourceFactory(dataSourceFactory)
-            return this
-        }
-
-        fun setDataSourceFactory(dataSourceFactory: DataSource.Factory?): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.dataSourceFactory = dataSourceFactory
-            this.mediaSourceFactorySupplier.setDataSourceFactory(dataSourceFactory)
-            return this
-        }
-
-        fun setRenderersFactory(renderersFactory: RenderersFactory): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.renderersFactorySupplier = Supplier { renderersFactory }
-            return this
-        }
-
-        fun setTrackSelectorFactory(trackSelectorFactory: TrackSelector.Factory): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.trackSelectorFactory = trackSelectorFactory
-            return this
-        }
-
-        fun setLoadControl(loadControl: LoadControl): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.loadControlSupplier = Supplier { loadControl }
-            return this
-        }
-
-        fun setBandwidthMeter(bandwidthMeter: BandwidthMeter): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            Preconditions.checkArgument(bandwidthMeter !== BandwidthMeter.NO_OP)
-            this.bandwidthMeterSupplier = Supplier { bandwidthMeter }
-            return this
-        }
-
-        fun setPreloadLooper(preloadLooper: Looper): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled && preloadLooper != Looper.getMainLooper())
-            this.preloadLooperProvider = PlaybackLooperProvider(preloadLooper)
-            return this
-        }
-
-        fun setCache(cache: Cache?): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.cache = cache
-            this.mediaSourceFactorySupplier.setCache(cache)
-            return this
-        }
-
-        fun setCachingExecutor(executor: Executor): Builder {
-            Preconditions.checkState(!buildCalled && !buildExoPlayerCalled)
-            this.cachingExecutor = executor
-            return this
-        }
-
-        fun setClock(clock: Clock): Builder {
-            this.clock = clock
-            return this
-        }
-
-//        fun buildExoPlayer(exoPlayerBuilder: ExoPlayer.Builder = ExoPlayer.Builder(context)): ExoPlayer {
-//            buildExoPlayerCalled = true
-//            return exoPlayerBuilder
-//                .setMediaSourceFactory(mediaSourceFactorySupplier.get())
-//                .setBandwidthMeter(bandwidthMeterSupplier.get())
-//                .setRenderersFactory(renderersFactorySupplier.get())
-//                .setLoadControl(loadControlSupplier.get())
-//                .setPlaybackLooperProvider(preloadLooperProvider)
-//                .setTrackSelector(trackSelectorFactory.createTrackSelector(context))
-//                .build()
-//        }
-
-        override fun build(): DefaultPreloadManager {
-            Preconditions.checkState(!buildCalled)
-            buildCalled = true
-            return DefaultPreloadManager(this)
-        }
-    }
 
     class PreloadStatus private constructor(
         stage: @Stage Int,
@@ -239,11 +73,9 @@ class DefaultPreloadManager(
             value = [STAGE_NOT_PRELOADED, STAGE_SPECIFIED_RANGE_CACHED, STAGE_SOURCE_PREPARED, STAGE_TRACKS_SELECTED, STAGE_SPECIFIED_RANGE_LOADED]
         )
         annotation class Stage
-
         val stage: @Stage Int
 
         val startPositionMs: Long
-
         val durationMs: Long
 
         init {
@@ -348,11 +180,10 @@ class DefaultPreloadManager(
     }
 
     private val rendererCapabilitiesList =
-        DefaultRendererCapabilitiesList.Factory(builder.renderersFactorySupplier.get())
+        DefaultRendererCapabilitiesList.Factory(renderersFactorySupplier.get())
             .createRendererCapabilitiesList()
     private val trackSelector: TrackSelector =
-        builder.trackSelectorFactory.createTrackSelector(builder.context)
-    private val preloadLooperProvider: PlaybackLooperProvider
+        trackSelectorFactory.createTrackSelector(context)
     private val preloadMediaSourceFactory: PreloadMediaSource.Factory
     private val preCacheThread: HandlerThread?
     private val preCacheHelperFactory: PreCacheHelper.Factory?
@@ -360,45 +191,43 @@ class DefaultPreloadManager(
     private var releaseCalled = false
 
     init {
-        preloadLooperProvider = builder.preloadLooperProvider
-        val bandwidthMeter = builder.bandwidthMeterSupplier.get()
         trackSelector.init({ parameters: TrackSelectionParameters? ->
             trackSelector.onParametersActivated(
                 parameters
             )
-        }, bandwidthMeter)
+        }, bandwidthMeterSupplier)
         val preloadLooper = preloadLooperProvider.obtainLooper()
         preloadMediaSourceFactory =
             PreloadMediaSource.Factory(
-                builder.mediaSourceFactorySupplier.get(),
+                mediaSourceFactory,
                 PreloadMediaSourceControl(),
                 trackSelector,
-                bandwidthMeter,
+                bandwidthMeterSupplier,
                 rendererCapabilitiesList.rendererCapabilities,
-                builder.loadControlSupplier.get(),
+                loadControlSupplier,
                 preloadLooper
             )
-                .setClock(builder.clock)
-        val cache = builder.cache
+                .setClock(clock)
+        val cache = cache
         if (cache != null) {
             preCacheThread = HandlerThread("DefaultPreloadManager:PreCacheHelper")
             preCacheThread.start()
             val upstreamDataSourceFactory: DataSource.Factory =
-                (if (builder.dataSourceFactory != null)
-                    builder.dataSourceFactory
+                (if (dataSourceFactory != null)
+                    dataSourceFactory
                 else
-                    androidx.media3.datasource.DefaultDataSource.Factory(builder.context))!!
+                    androidx.media3.datasource.DefaultDataSource.Factory(context))!!
             preCacheHelperFactory =
                 PreCacheHelper.Factory(
-                    builder.context, cache, upstreamDataSourceFactory, preCacheThread.getLooper()
+                   context, cache, upstreamDataSourceFactory, preCacheThread.getLooper()
                 )
-                    .setDownloadExecutor(builder.cachingExecutor)
+                    .setDownloadExecutor(cachingExecutor)
                     .setListener(PreCacheHelperListener())
         } else {
             preCacheThread = null
             preCacheHelperFactory = null
         }
-        preloadHandler = builder.clock.createHandler(preloadLooper, null)
+        preloadHandler = clock.createHandler(preloadLooper, null)
     }
 
     fun setCurrentPlayingIndex(currentPlayingIndex: Int) {
