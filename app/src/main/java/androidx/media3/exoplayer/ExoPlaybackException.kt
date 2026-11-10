@@ -173,31 +173,6 @@ class ExoPlaybackException private constructor(
             return ExoPlaybackException(TYPE_SOURCE, cause, errorCode)
         }
 
-        @Deprecated(
-            """Use {@link #createForRenderer(Throwable, String, int, Format, int, MediaPeriodId,
-   *     boolean, int)} instead."""
-        )
-        fun createForRenderer(
-            cause: Throwable?,
-            rendererName: String?,
-            rendererIndex: Int,
-            rendererFormat: Format?,
-            @C.FormatSupport rendererFormatSupport: @C.FormatSupport Int,
-            isRecoverable: Boolean,
-            @ErrorCode errorCode: @ErrorCode Int
-        ): ExoPlaybackException {
-            return createForRenderer(
-                cause,
-                rendererName,
-                rendererIndex,
-                rendererFormat,
-                rendererFormatSupport,  
-                null,
-                isRecoverable,
-                errorCode
-            )
-        }
-
         fun createForRenderer(
             cause: Throwable?,
             rendererName: String?,
@@ -220,14 +195,6 @@ class ExoPlaybackException private constructor(
                 mediaPeriodId,
                 isRecoverable
             )
-        }
-
-        @Deprecated(
-            """Use {@link #createForUnexpected(RuntimeException, int)
-   *     createForUnexpected(RuntimeException, ERROR_CODE_UNSPECIFIED)} instead."""
-        )
-        fun createForUnexpected(cause: java.lang.RuntimeException?): ExoPlaybackException {
-            return createForUnexpected(cause, ERROR_CODE_UNSPECIFIED)
         }
 
         fun createForUnexpected(

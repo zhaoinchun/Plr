@@ -25,14 +25,6 @@ class DefaultMediaCodecAdapterFactory : MediaCodecAdapter.Factory {
     private var asyncCryptoFlagEnabled = false
     private var asyncCryptoSynchronizationEnabled = false
 
-    @Deprecated("Use {@link #DefaultMediaCodecAdapterFactory(Context)} instead.")
-    constructor() {
-        asynchronousMode = MODE_DEFAULT
-        context = null
-        callbackThreadSupplier = null
-        queueingThreadSupplier = null
-    }
-
     constructor(
         context: Context?,
         callbackThreadSupplier: Supplier<HandlerThread>? = null,

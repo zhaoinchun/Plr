@@ -191,15 +191,6 @@ object MediaCodecUtil {
         return profileLevel
     }
 
-    @InlineMe(
-        replacement = "CodecSpecificDataUtil.getCodecProfileAndLevel(format)",
-        imports = ["androidx.media3.common.util.CodecSpecificDataUtil"]
-    )
-    @Deprecated("Use {@link CodecSpecificDataUtil#getCodecProfileAndLevel(Format)}.")
-    fun getCodecProfileAndLevel(format: Format): Pair<Int?, Int?>? {
-        return CodecSpecificDataUtil.getCodecProfileAndLevel(format)
-    }
-
     fun getHevcBaseLayerCodecProfileAndLevel(format: Format): CodecSpecificDataUtil.MediaCodecProfileAndLevel? {
         val codecs = getH265BaseLayerCodecsString(format.initializationData) ?: return null
         val parts: Array<String> = split(codecs.trim { it <= ' ' }, "\\.")

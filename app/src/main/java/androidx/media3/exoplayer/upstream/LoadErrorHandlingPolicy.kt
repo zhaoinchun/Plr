@@ -27,20 +27,6 @@ interface LoadErrorHandlingPolicy {
         val numberOfExcludedTracks: Int,
         val locationSteeringActive: Boolean
     ) {
-        @Deprecated("Use {@link #FallbackOptions(int, int, int, int, boolean)} instead.")
-        constructor(
-            numberOfLocations: Int,
-            numberOfExcludedLocations: Int,
-            numberOfTracks: Int,
-            numberOfExcludedTracks: Int
-        ) : this(
-            numberOfLocations,
-            numberOfExcludedLocations,
-            numberOfTracks,
-            numberOfExcludedTracks,
-            false
-        )
-
         fun isFallbackAvailable(type: @FallbackType Int): Boolean {
             return if (type == FALLBACK_TYPE_LOCATION)
                 numberOfLocations - numberOfExcludedLocations > 1

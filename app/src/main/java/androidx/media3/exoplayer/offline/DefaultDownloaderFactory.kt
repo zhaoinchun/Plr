@@ -13,11 +13,6 @@ class DefaultDownloaderFactory(
 ) : DownloaderFactory {
     private val segmentDownloaderFactories = SparseArray<SegmentDownloaderFactory>()
 
-    @Deprecated("Use {@link #DefaultDownloaderFactory(CacheDataSource.Factory, Executor)}.")
-    constructor(cacheDataSourceFactory: CacheDataSource.Factory) : this(
-        cacheDataSourceFactory,
-        Executor { obj: Runnable? -> obj!!.run() })
-
     override fun createDownloader(request: DownloadRequest): Downloader {
         @C.ContentType val contentType: @C.ContentType Int =
             inferContentTypeForUriAndMimeType(request.uri, request.mimeType)

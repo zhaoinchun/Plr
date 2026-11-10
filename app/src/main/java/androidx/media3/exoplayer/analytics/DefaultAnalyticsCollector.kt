@@ -48,12 +48,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
     private var handler: HandlerWrapper? = null
     private var isSeeking = false
 
-    @Suppress("deprecation") // Calling deprecated method.
-    @Deprecated("Do not use this method and ensure all calls are made from the correct thread.")
-    fun setThrowsWhenUsingWrongThread(throwsWhenUsingWrongThread: Boolean) {
-        listeners.setThrowsWhenUsingWrongThread(throwsWhenUsingWrongThread)
-    }
-
     @CallSuper
     override fun addListener(listener: AnalyticsListener) {
         listeners.add(listener)

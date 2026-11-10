@@ -97,10 +97,6 @@ class DefaultTrackSelector private constructor(
                 init()
             }
 
-            @InlineMe(replacement = "this()")
-            @Deprecated("Use {@link #Builder()} instead.")
-            constructor(context: Context?) : this()
-
             constructor(initialValues: Parameters) : super(initialValues) {
                 // Video
                 exceedVideoConstraintsIfNecessary = initialValues.exceedVideoConstraintsIfNecessary
@@ -316,14 +312,6 @@ class DefaultTrackSelector private constructor(
                 return this
             }
 
-            @Deprecated("")
-            override fun setViewportSizeToPhysicalDisplaySize(
-                context: Context?, viewportOrientationMayChange: Boolean
-            ): Builder {
-                super.setViewportSizeToPhysicalDisplaySize(context, viewportOrientationMayChange)
-                return this
-            }
-
             override fun clearViewportSizeConstraints(): Builder {
                 super.clearViewportSizeConstraints()
                 return this
@@ -497,14 +485,6 @@ class DefaultTrackSelector private constructor(
 
             override fun setSelectUndeterminedTextLanguage(selectUndeterminedTextLanguage: Boolean): Builder {
                 super.setSelectUndeterminedTextLanguage(selectUndeterminedTextLanguage)
-                return this
-            }
-
-            @Deprecated("Use {@link #setIgnoredTextSelectionFlags}.")
-            open fun setDisabledTextTrackSelectionFlags(
-                @C.SelectionFlags disabledTextTrackSelectionFlags: @C.SelectionFlags Int
-            ): Builder {
-                disabledTextTrackSelectionFlags.also { ignoredTextSelectionFlags = it }
                 return this
             }
 

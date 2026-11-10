@@ -427,12 +427,6 @@ class MediaCodecInfo private constructor(
         return true
     }
 
-    @InlineMe(replacement = "this.isVideoSizeAndRateSupported(width, height, frameRate)")
-    @Deprecated("Use {@link #isVideoSizeAndRateSupported(int, int, double)} instead.")
-    fun isVideoSizeAndRateSupportedV21(width: Int, height: Int, frameRate: Double): Boolean {
-        return isVideoSizeAndRateSupported(width, height, frameRate)
-    }
-
     fun getMaxSupportedFrameRate(width: Int, height: Int): Float {
         if (!isVideo) {
             return C.RATE_UNSET
@@ -471,12 +465,6 @@ class MediaCodecInfo private constructor(
         return alignVideoSize(videoCapabilities, width, height)
     }
 
-    @InlineMe(replacement = "this.alignVideoSize(width, height)")
-    @Deprecated("Use {@link #alignVideoSize(int, int)} instead.")
-    fun alignVideoSizeV21(width: Int, height: Int): Point? {
-        return alignVideoSize(width, height)
-    }
-
     fun isAudioSampleRateSupported(sampleRate: Int): Boolean {
         if (capabilities == null) {
             logNoSupport("sampleRate.caps")
@@ -492,12 +480,6 @@ class MediaCodecInfo private constructor(
             return false
         }
         return true
-    }
-
-    @InlineMe(replacement = "this.isAudioSampleRateSupported(sampleRate)")
-    @Deprecated("Use {@link #isAudioSampleRateSupported(int)} instead.")
-    fun isAudioSampleRateSupportedV21(sampleRate: Int): Boolean {
-        return isAudioSampleRateSupported(sampleRate)
     }
 
     fun isAudioChannelCountSupported(channelCount: Int): Boolean {
@@ -517,12 +499,6 @@ class MediaCodecInfo private constructor(
             return false
         }
         return true
-    }
-
-    @InlineMe(replacement = "this.isAudioChannelCountSupported(channelCount)")
-    @Deprecated("Use {@link #isAudioChannelCountSupported(int)} instead.")
-    fun isAudioChannelCountSupportedV21(channelCount: Int): Boolean {
-        return isAudioChannelCountSupported(channelCount)
     }
 
     private fun logNoSupport(message: String?) {

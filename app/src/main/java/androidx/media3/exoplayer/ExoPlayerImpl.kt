@@ -1746,14 +1746,6 @@ class ExoPlayerImpl(
         videoListenerManager.removeListener(listener!!)
     }
 
-    fun setThrowsWhenUsingWrongThread(throwsWhenUsingWrongThread: Boolean) {
-        this.throwsWhenUsingWrongThread = throwsWhenUsingWrongThread
-        listeners.setThrowsWhenUsingWrongThread(throwsWhenUsingWrongThread)
-        (_analyticsCollector as? DefaultAnalyticsCollector)?.setThrowsWhenUsingWrongThread(
-            throwsWhenUsingWrongThread
-        )
-    }
-
     private fun stopInternal(error: ExoPlaybackException?) {
         var playbackInfo = playbackInfo.copyWithLoadingMediaPeriodId(playbackInfo.periodId)
         playbackInfo.bufferedPositionUs = playbackInfo.positionUs

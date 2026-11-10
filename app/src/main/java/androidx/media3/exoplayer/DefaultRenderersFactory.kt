@@ -108,13 +108,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return this
     }
 
-    @Deprecated("Use {@link #setEnableAudioOutputPlaybackParameters(boolean)} instead.")
-    fun setEnableAudioTrackPlaybackParams(
-        enableAudioTrackPlaybackParams: Boolean
-    ): DefaultRenderersFactory {
-        return setEnableAudioOutputPlaybackParameters(enableAudioTrackPlaybackParams)
-    }
-
     fun setEnableAudioOutputPlaybackParameters(
         enableAudioOutputPlaybackParameters: Boolean
     ): DefaultRenderersFactory {

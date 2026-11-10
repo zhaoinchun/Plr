@@ -25,17 +25,7 @@ interface LoadControl {
         val lastRebufferRealtimeMs: Long
     )
 
-    @Suppress("deprecation") // Calling deprecated version of this method.
-    fun onPrepared(playerId: PlayerId) {
-        onPrepared()
-    }
-
-    @Deprecated("Use {@link #onPrepared(PlayerId)} instead.")
-    fun onPrepared() {
-        // Media3 ExoPlayer will never call this method. This default implementation provides an
-        // implementation to please the compiler only.
-        throw IllegalStateException("onPrepared not implemented")
-    }
+    fun onPrepared(playerId: PlayerId) {}
 
     fun onTracksSelected(
         parameters: Parameters,
@@ -47,45 +37,8 @@ interface LoadControl {
         throw IllegalStateException("onTracksSelected not implemented")
     }
 
-    @Suppress("deprecation") // Calling deprecated version of this method.
-    @Deprecated(
-        """Implement {@link #onTracksSelected(Parameters, TrackGroupArray,
-   *     ExoTrackSelection[])} instead."""
-    )
-    fun onTracksSelected(
-        renderers: Array<Renderer>?,
-        trackGroups: TrackGroupArray?,
-        trackSelections: Array<ExoTrackSelection?>?
-    ) {
-        // Media3 ExoPlayer will never call this method. This default implementation provides an
-        // implementation to please the compiler only.
-        throw IllegalStateException("onTracksSelected not implemented")
-    }
-
-    @Suppress("deprecation") // Calling deprecated version of this method.
-    fun onStopped(playerId: PlayerId) {
-        onStopped()
-    }
-
-    @Deprecated("Implement {@link #onStopped(PlayerId)} instead.")
-    fun onStopped() {
-        // Media3 ExoPlayer will never call this method. This default implementation provides an
-        // implementation to please the compiler only.
-        throw IllegalStateException("onStopped not implemented")
-    }
-
-    @Suppress("deprecation") // Calling deprecated version of this method.
-    fun onReleased(playerId: PlayerId) {
-        onReleased()
-    }
-
-    @Deprecated("Implement {@link #onReleased(PlayerId)} instead.")
-    fun onReleased() {
-        // Media3 ExoPlayer will never call this method. This default implementation provides an
-        // implementation to please the compiler only.
-        throw IllegalStateException("onReleased not implemented")
-    }
-
+    fun onStopped(playerId: PlayerId) {}
+    fun onReleased(playerId: PlayerId) {}
     fun getAllocator(playerId: PlayerId): Allocator
 
     @Suppress("deprecation") // Calling deprecated version of this method.
@@ -101,33 +54,10 @@ interface LoadControl {
             throw IllegalStateException("getBackBufferDurationUs not implemented")
         }
 
-    @Suppress("deprecation") // Calling deprecated version of this method.
-    fun retainBackBufferFromKeyframe(playerId: PlayerId?): Boolean {
-        return retainBackBufferFromKeyframe()
-    }
-
-    @Deprecated("Implements {@link #retainBackBufferFromKeyframe(PlayerId)} instead.")
-    fun retainBackBufferFromKeyframe(): Boolean {
-        // Media3 ExoPlayer will never call this method. This default implementation provides an
-        // implementation to please the compiler only.
-        throw IllegalStateException("retainBackBufferFromKeyframe not implemented")
-    }
+    fun retainBackBufferFromKeyframe(playerId: PlayerId?): Boolean
 
     @Suppress("deprecation")
-    fun shouldContinueLoading(parameters: Parameters): Boolean {
-        return shouldContinueLoading(
-            parameters.playbackPositionUs, parameters.bufferedDurationUs, parameters.playbackSpeed
-        )
-    }
-
-    @Deprecated("Implement {@link #shouldContinueLoading(Parameters)} instead.")
-    fun shouldContinueLoading(
-        playbackPositionUs: Long, bufferedDurationUs: Long, playbackSpeed: Float
-    ): Boolean {
-        // Media3 ExoPlayer will never call this method. This default implementation provides an
-        // implementation to please the compiler only.
-        throw IllegalStateException("shouldContinueLoading not implemented")
-    }
+    fun shouldContinueLoading(parameters: Parameters): Boolean
 
     fun shouldContinuePreloading(
         playerId: PlayerId?,

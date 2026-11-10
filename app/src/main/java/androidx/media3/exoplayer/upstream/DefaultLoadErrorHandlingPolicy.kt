@@ -107,9 +107,6 @@ class DefaultLoadErrorHandlingPolicy(private val minimumLoadableRetryCount: Int 
         const val DEFAULT_MIN_LOADABLE_RETRY_COUNT: Int = 3
         const val DEFAULT_MIN_LOADABLE_RETRY_COUNT_PROGRESSIVE_LIVE: Int = 6
         const val DEFAULT_TRACK_EXCLUSION_MS: Long = 60000
-
-        @Deprecated("Use {@link #DEFAULT_TRACK_EXCLUSION_MS} instead.")
-        val DEFAULT_TRACK_BLACKLIST_MS: Long = DEFAULT_TRACK_EXCLUSION_MS
         val DEFAULT_LOCATION_EXCLUSION_MS: Long = (5 * 60000).toLong()
         private val DEFAULT_BEHAVIOR_MIN_LOADABLE_RETRY_COUNT = -1
     }

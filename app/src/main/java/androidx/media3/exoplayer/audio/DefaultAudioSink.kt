@@ -76,14 +76,11 @@ class DefaultAudioSink(
     audioCapabilities: AudioCapabilities? = null
 ) : AudioSink {
 
-    @Deprecated("Use {@link androidx.media3.common.audio.AudioProcessorChain}.")
-    interface AudioProcessorChain : androidx.media3.common.audio.AudioProcessorChain
-
     class DefaultAudioProcessorChain(
         audioProcessors: Array<AudioProcessor>,
         silenceSkippingAudioProcessor: SilenceSkippingAudioProcessor,
         sonicAudioProcessor: SonicAudioProcessor
-    ) : AudioProcessorChain {
+    ) : androidx.media3.common.audio.AudioProcessorChain {
         // The passed-in type may be more specialized than AudioProcessor[], so allocate a new array
         // rather than using Arrays.copyOf.
         override val audioProcessors: Array<AudioProcessor> = audioProcessors.toMutableList()
