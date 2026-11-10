@@ -1,7 +1,6 @@
 package androidx.media3.exoplayer.audio
 
 import androidx.media3.common.C
-
 import androidx.media3.common.util.Util.constrainValue
 import java.lang.Double
 import java.lang.Float
@@ -66,10 +65,10 @@ object PcmAudioUtil {
 
             C.ENCODING_PCM_FLOAT -> {
                 val floatValue = constrainValue(buffer.getFloat(),  -1f,  1f)
-                if (floatValue < 0) {
-                    return (-floatValue * Int.MIN_VALUE).toInt()
+                return if (floatValue < 0) {
+                    (-floatValue * Int.MIN_VALUE).toInt()
                 } else {
-                    return (floatValue * Int.MAX_VALUE).toInt()
+                    (floatValue * Int.MAX_VALUE).toInt()
                 }
             }
 
@@ -121,25 +120,21 @@ object PcmAudioUtil {
                 buffer.put((pcm32bit shr 8).toByte())
                 buffer.put((pcm32bit shr 16).toByte())
                 buffer.put((pcm32bit shr 24).toByte())
-                return
             }
 
             C.ENCODING_PCM_24BIT -> {
                 buffer.put((pcm32bit shr 8).toByte())
                 buffer.put((pcm32bit shr 16).toByte())
                 buffer.put((pcm32bit shr 24).toByte())
-                return
             }
 
             C.ENCODING_PCM_16BIT -> {
                 buffer.put((pcm32bit shr 16).toByte())
                 buffer.put((pcm32bit shr 24).toByte())
-                return
             }
 
             C.ENCODING_PCM_8BIT -> {
                 buffer.put((pcm32bit shr 24).toByte())
-                return
             }
 
             C.ENCODING_PCM_32BIT_BIG_ENDIAN -> {
@@ -147,20 +142,17 @@ object PcmAudioUtil {
                 buffer.put((pcm32bit shr 16).toByte())
                 buffer.put((pcm32bit shr 8).toByte())
                 buffer.put(pcm32bit.toByte())
-                return
             }
 
             C.ENCODING_PCM_24BIT_BIG_ENDIAN -> {
                 buffer.put((pcm32bit shr 24).toByte())
                 buffer.put((pcm32bit shr 16).toByte())
                 buffer.put((pcm32bit shr 8).toByte())
-                return
             }
 
             C.ENCODING_PCM_16BIT_BIG_ENDIAN -> {
                 buffer.put((pcm32bit shr 24).toByte())
                 buffer.put((pcm32bit shr 16).toByte())
-                return
             }
 
             C.ENCODING_PCM_FLOAT -> {
@@ -169,7 +161,6 @@ object PcmAudioUtil {
                 } else {
                     buffer.putFloat(pcm32bit.toFloat() / Int.MAX_VALUE)
                 }
-                return
             }
 
             C.ENCODING_PCM_FLOAT_BIG_ENDIAN -> {
@@ -179,7 +170,6 @@ object PcmAudioUtil {
                     pcm32bit.toFloat() / Int.MAX_VALUE
                 }
                 buffer.putInt(Integer.reverseBytes(Float.floatToIntBits(floatValue)))
-                return
             }
 
             C.ENCODING_PCM_DOUBLE -> {
@@ -188,7 +178,6 @@ object PcmAudioUtil {
                 } else {
                     buffer.putDouble(pcm32bit.toDouble() / Int.MAX_VALUE)
                 }
-                return
             }
 
             C.ENCODING_PCM_DOUBLE_BIG_ENDIAN -> {
@@ -198,7 +187,6 @@ object PcmAudioUtil {
                     pcm32bit.toDouble() / Int.MAX_VALUE
                 }
                 buffer.putLong(Long.reverseBytes(Double.doubleToLongBits(doubleValue)))
-                return
             }
 
             else -> throw IllegalStateException()

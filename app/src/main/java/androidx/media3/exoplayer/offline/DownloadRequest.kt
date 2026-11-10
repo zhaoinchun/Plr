@@ -111,7 +111,7 @@ class DownloadRequest(
     }
 
     override fun toString(): String {
-        return mimeType + ":" + id
+        return "$mimeType:$id"
     }
 
     override fun equals(o: Any?): Boolean {
@@ -131,13 +131,13 @@ class DownloadRequest(
     override fun hashCode(): Int {
         var result = 31 * id.hashCode()
         result = 31 * result + uri.hashCode()
-        result = 31 * result + (if (mimeType != null) mimeType.hashCode() else 0)
+        result = 31 * result + (mimeType?.hashCode() ?: 0)
         result = 31 * result + streamKeys.hashCode()
         result = 31 * result + keySetId.contentHashCode()
-        result = 31 * result + (if (customCacheKey != null) customCacheKey.hashCode() else 0)
+        result = 31 * result + (customCacheKey?.hashCode() ?: 0)
         result = 31 * result + data.contentHashCode()
-        result = 31 * result + (if (byteRange != null) byteRange.hashCode() else 0)
-        result = 31 * result + (if (timeRange != null) timeRange.hashCode() else 0)
+        result = 31 * result + (byteRange?.hashCode() ?: 0)
+        result = 31 * result + (timeRange?.hashCode() ?: 0)
         return result
     }
 

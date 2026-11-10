@@ -5,7 +5,6 @@ import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.BaseAudioProcessor
 import androidx.media3.common.util.Log.e
 import androidx.media3.common.util.Log.w
-
 import androidx.media3.common.util.Util.createReadOnlyByteBuffer
 import androidx.media3.common.util.Util.formatInvariant
 import androidx.media3.common.util.Util.getPcmFrameSize
@@ -155,7 +154,6 @@ class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudi
                 // The file may still be playable, so just log a warning.
                 w(TAG, "Error updating file size", e)
             }
-
             try {
                 randomAccessFile.close()
             } finally {

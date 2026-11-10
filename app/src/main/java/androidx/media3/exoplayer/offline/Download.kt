@@ -3,7 +3,7 @@ package androidx.media3.exoplayer.offline
 import androidx.annotation.IntDef
 import com.google.common.base.Preconditions
 
-class Download  constructor(
+class Download(
     val request: DownloadRequest,
     val state: @State Int,
     val startTimeMs: Long,
@@ -29,8 +29,7 @@ class Download  constructor(
         AnnotationTarget.TYPE_PARAMETER
     )
     @IntDef(
-        value = [STATE_QUEUED, STATE_STOPPED, STATE_DOWNLOADING, STATE_COMPLETED, STATE_FAILED, STATE_REMOVING, STATE_RESTARTING
-        ]
+        value = [STATE_QUEUED, STATE_STOPPED, STATE_DOWNLOADING, STATE_COMPLETED, STATE_FAILED, STATE_REMOVING, STATE_RESTARTING]
     )
     annotation class State
 

@@ -48,18 +48,19 @@ class MediaCodecInfo private constructor(
     private val isVideo = isVideo(mimeType)
 
     // Memoization for getMaxSupportedFrameRate
-    private var maxFrameRateWidth= C.LENGTH_UNSET
-    private var maxFrameRateHeight= C.LENGTH_UNSET
+    private var maxFrameRateWidth = C.LENGTH_UNSET
+    private var maxFrameRateHeight = C.LENGTH_UNSET
     private var maxFrameRate = C.RATE_UNSET
 
     override fun toString(): String {
         return name
     }
 
-    val profileLevels: Array<out CodecProfileLevel> = if (capabilities == null || capabilities.profileLevels == null)
-        arrayOf()
-    else
-        capabilities.profileLevels
+    val profileLevels: Array<out CodecProfileLevel> =
+        if (capabilities == null || capabilities.profileLevels == null)
+            arrayOf()
+        else
+            capabilities.profileLevels
 
     val maxSupportedInstances: Int
         get() {
@@ -74,7 +75,7 @@ class MediaCodecInfo private constructor(
             return false
         }
 
-        if (!isCodecProfileAndLevelSupported(context, format,true)) {
+        if (!isCodecProfileAndLevelSupported(context, format, true)) {
             return false
         }
         if (!isCompressedAudioBitDepthSupported(format)) {
@@ -271,7 +272,8 @@ class MediaCodecInfo private constructor(
                     // DolbyVision profiles convey specific base encodings and decoders may not be able
                     // to be reused across profiles.
                     // See b/446011738.
-                    discardReasons = discardReasons or DecoderReuseEvaluation.DISCARD_REASON_WORKAROUND
+                    discardReasons =
+                        discardReasons or DecoderReuseEvaluation.DISCARD_REASON_WORKAROUND
                 }
             }
 
@@ -283,7 +285,7 @@ class MediaCodecInfo private constructor(
                     if (oldFormat.initializationDataEquals(newFormat))
                         DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION
                     else
-                        DecoderReuseEvaluation.REUSE_RESULT_YES_WITH_RECONFIGURATION,  
+                        DecoderReuseEvaluation.REUSE_RESULT_YES_WITH_RECONFIGURATION,
                     0
                 )
             }
@@ -321,7 +323,7 @@ class MediaCodecInfo private constructor(
                             name,
                             oldFormat,
                             newFormat,
-                            DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION,  
+                            DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION,
                             0
                         )
                     }
@@ -334,7 +336,7 @@ class MediaCodecInfo private constructor(
                             name,
                             oldFormat,
                             newFormat,
-                            DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION,  
+                            DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION,
                             0
                         )
                     }
@@ -350,7 +352,7 @@ class MediaCodecInfo private constructor(
                     name,
                     oldFormat,
                     newFormat,
-                    DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION,  
+                    DecoderReuseEvaluation.REUSE_RESULT_YES_WITHOUT_RECONFIGURATION,
                     0
                 )
             }
@@ -368,7 +370,7 @@ class MediaCodecInfo private constructor(
                     name,
                     oldFormat,
                     newFormat,
-                    DecoderReuseEvaluation.REUSE_RESULT_YES_WITH_FLUSH,  
+                    DecoderReuseEvaluation.REUSE_RESULT_YES_WITH_FLUSH,
                     0
                 )
             }
@@ -524,33 +526,11 @@ class MediaCodecInfo private constructor(
     }
 
     private fun logNoSupport(message: String?) {
-        d(
-            TAG,
-            ("NoSupport ["
-                    + message
-                    + "] ["
-                    + name
-                    + ", "
-                    + mimeType
-                    + "] ["
-                    + Util.DEVICE_DEBUG_INFO
-                    + "]")
-        )
+        d(TAG, ("NoSupport [$$message] [$name, $mimeType] [${Util.DEVICE_DEBUG_INFO}]"))
     }
 
     private fun logAssumedSupport(message: String?) {
-        d(
-            TAG,
-            ("AssumedSupport ["
-                    + message
-                    + "] ["
-                    + name
-                    + ", "
-                    + mimeType
-                    + "] ["
-                    + Util.DEVICE_DEBUG_INFO
-                    + "]")
-        )
+        d(TAG, ("AssumedSupport [$$message] [$name, $mimeType] [${Util.DEVICE_DEBUG_INFO}]"))
     }
 
     companion object {
@@ -580,9 +560,9 @@ class MediaCodecInfo private constructor(
                 capabilities,
                 hardwareAccelerated,
                 softwareOnly,
-                vendor,  
-                !forceDisableAdaptive && capabilities != null && isAdaptive(capabilities),  
-                capabilities != null && isTunneling(capabilities),  
+                vendor,
+                !forceDisableAdaptive && capabilities != null && isAdaptive(capabilities),
+                capabilities != null && isTunneling(capabilities),
                 forceSecure || (capabilities != null && isSecure(capabilities)),
                 isDetachedSurfaceSupported(capabilities)
             )
@@ -637,13 +617,7 @@ class MediaCodecInfo private constructor(
             }
             w(
                 TAG,
-                ("AssumedMaxChannelAdjustment: "
-                        + name
-                        + ", ["
-                        + maxChannelCount
-                        + " to "
-                        + assumedMaxChannelCount
-                        + "]")
+                ("AssumedMaxChannelAdjustment: $name, [$maxChannelCount to $assumedMaxChannelCount]")
             )
             return assumedMaxChannelCount
         }
@@ -737,9 +711,9 @@ class MediaCodecInfo private constructor(
         ): Array<CodecProfileLevel> {
             var maxBitrate = 0
             if (capabilities != null) {
-                val videoCapabilities = capabilities.getVideoCapabilities()
+                val videoCapabilities = capabilities.videoCapabilities
                 if (videoCapabilities != null) {
-                    maxBitrate = videoCapabilities.getBitrateRange().getUpper()
+                    maxBitrate = videoCapabilities.bitrateRange.getUpper()
                 }
             }
 

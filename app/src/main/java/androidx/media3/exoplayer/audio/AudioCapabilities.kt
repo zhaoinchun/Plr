@@ -28,13 +28,13 @@ import androidx.media3.common.util.Util.isEncodingLinearPcm
 import androidx.media3.common.util.Util.isTv
 import com.google.common.primitives.Ints
 
-data class AudioCapabilities private constructor(
+data class AudioCapabilities(
     val encodingToAudioProfile: SparseArray<AudioProfile>,
     val speakerLayoutChannelMasks: List<Int>,
     val spatializerChannelMasks: List<Int>,
     val maxChannelCount: Int
 ) {
-    private constructor(
+    constructor(
         audioProfiles: List<AudioProfile>,
         speakerLayoutChannelMasks: List<Int>,
         spatializerChannelMasks: List<Int>,
@@ -401,7 +401,7 @@ data class AudioCapabilities private constructor(
                     getAudioProfiles(
                         Ints.toArray(supportedEncodings),
                         intent.getIntExtra(
-                            AudioManager.EXTRA_MAX_CHANNEL_COUNT,  
+                            AudioManager.EXTRA_MAX_CHANNEL_COUNT,
                             DEFAULT_MAX_CHANNEL_COUNT
                         )
                     ),

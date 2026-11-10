@@ -85,7 +85,7 @@ class OggOpusAudioPacketizer {
             buffer,
             granulePosition.toLong(),
             pageSequenceNumber,
-            numSegments,  
+            numSegments,
             false
         )
 
@@ -113,11 +113,11 @@ class OggOpusAudioPacketizer {
         if (pageSequenceNumber == FIRST_AUDIO_SAMPLE_PAGE_SEQUENCE_NUMBER) {
             checksum =
                 crc32(
-                    buffer.array(),  
+                    buffer.array(),
                     (buffer.arrayOffset()
                             + oggIdHeaderPageSize
-                            + OGG_DEFAULT_COMMENT_HEADER_PAGE.size),  
-                    buffer.limit() - buffer.position(),  
+                            + OGG_DEFAULT_COMMENT_HEADER_PAGE.size),
+                    buffer.limit() - buffer.position(),
                     0
                 )
             buffer.putInt(
@@ -127,9 +127,9 @@ class OggOpusAudioPacketizer {
         } else {
             checksum =
                 crc32(
-                    buffer.array(),  
-                    buffer.arrayOffset(),  
-                    buffer.limit() - buffer.position(),  
+                    buffer.array(),
+                    buffer.arrayOffset(),
+                    buffer.limit() - buffer.position(),
                     0
                 )
             buffer.putInt(CHECKSUM_INDEX, checksum)
@@ -151,7 +151,7 @@ class OggOpusAudioPacketizer {
                 OGG_PACKET_HEADER_LENGTH + idHeaderPayloadBytes.size,
                 0
             )
-        buffer.putInt( CHECKSUM_INDEX, checksum)
+        buffer.putInt(CHECKSUM_INDEX, checksum)
         buffer.position(OGG_PACKET_HEADER_LENGTH + idHeaderPayloadBytes.size)
     }
 
@@ -202,59 +202,12 @@ class OggOpusAudioPacketizer {
 
     companion object {
         private const val CHECKSUM_INDEX = 22
-
         private const val FIRST_AUDIO_SAMPLE_PAGE_SEQUENCE_NUMBER = 2
-
         private const val OGG_PACKET_HEADER_LENGTH = 28
         private const val SERIAL_NUMBER = 0
         private val OGG_DEFAULT_ID_HEADER_PAGE = byteArrayOf(
-            79,
-            103,
-            103,
-            83,
-            0,
-            2,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            28,
-            -43,
-            -59,
-            -9,
-            1,
-            19,
-            79,
-            112,
-            117,
-            115,
-            72,
-            101,
-            97,
-            100,
-            1,
-            2,
-            56,
-            1,
-            -128,
-            -69,
-            0,
-            0,
-            0,
-            0,
-            0
+            79, 103, 103, 83, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, -43, -59,
+            -9, 1, 19, 79, 112, 117, 115, 72, 101, 97, 100, 1, 2, 56, 1, -128, -69, 0, 0, 0, 0, 0
         )
         private val OGG_DEFAULT_COMMENT_HEADER_PAGE = byteArrayOf(
             79, 103, 103, 83, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 11, -103, 87,

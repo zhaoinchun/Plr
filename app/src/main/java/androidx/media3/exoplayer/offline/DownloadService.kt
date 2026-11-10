@@ -83,9 +83,9 @@ abstract class DownloadService protected constructor(
             downloadManager.resumeDownloads()
             downloadManagerHelper =
                 DownloadManagerHelper(
-                    getApplicationContext(), downloadManager, foregroundAllowed, scheduler, clazz
+                    applicationContext, downloadManager, foregroundAllowed, scheduler, clazz
                 )
-            downloadManagerHelpers.put(clazz, downloadManagerHelper)
+            downloadManagerHelpers[clazz] = downloadManagerHelper
         }
         this.downloadManagerHelper = downloadManagerHelper
         downloadManagerHelper.attachService(this)

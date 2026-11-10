@@ -151,7 +151,7 @@ object IamfUtil {
                 else -> {}
             }
         }
-        throw IllegalArgumentException("Unsupported channel mask: " + channelMask)
+        throw IllegalArgumentException("Unsupported channel mask: $channelMask")
     }
 
     fun getChannelMaskForOutputLayout(outputLayout: @OutputLayout Int): Int {

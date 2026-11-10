@@ -553,7 +553,7 @@ class DownloadManager(
                         // Set the stop reason if the download is in a terminal state.
                         downloadIndex.setStopReason(id, stopReason)
                     } catch (e: IOException) {
-                        e(TAG, "Failed to set manual stop reason: " + id, e)
+                        e(TAG, "Failed to set manual stop reason: $id", e)
                     }
                 }
             }
@@ -1132,9 +1132,7 @@ class DownloadManager(
                 finalException = e
             }
             val internalHandler: Handler? = this.internalHandler
-            if (internalHandler != null) {
-                internalHandler.obtainMessage(MSG_TASK_STOPPED, this).sendToTarget()
-            }
+            internalHandler?.obtainMessage(MSG_TASK_STOPPED, this)?.sendToTarget()
         }
 
         override fun onProgress(

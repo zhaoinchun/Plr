@@ -16,8 +16,7 @@ import java.util.concurrent.CancellationException
 import java.util.concurrent.ExecutionException
 import androidx.core.net.toUri
 
-class ExternallyLoadedImageDecoder private constructor(private val bitmapResolver: BitmapResolver) :
-    ImageDecoder {
+class ExternallyLoadedImageDecoder(private val bitmapResolver: BitmapResolver) : ImageDecoder {
     class ExternalImageRequest(val uri: Uri?)
 
     interface BitmapResolver {

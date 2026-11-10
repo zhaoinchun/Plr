@@ -57,15 +57,15 @@ import java.nio.ByteOrder
 import kotlin.math.max
 import kotlin.math.min
 
-class MediaCodecAudioRenderer constructor(
+class MediaCodecAudioRenderer(
     context: Context,
-    codecAdapterFactory: MediaCodecAdapter.Factory,
+    codecAdapterFactory: MediaCodecAdapter.Factory = MediaCodecAdapter.Factory.getDefault(context),
     mediaCodecSelector: MediaCodecSelector?,
-    enableDecoderFallback: Boolean,
+    enableDecoderFallback: Boolean = false,
     eventHandler: Handler?,
     eventListener: AudioRendererEventListener,
-    audioSink: AudioSink,
-    loudnessCodecController: LoudnessCodecController? = if (Build.VERSION.SDK_INT >= 35) LoudnessCodecController() else null
+    private val audioSink: AudioSink = DefaultAudioSink(context),
+    private val loudnessCodecController: LoudnessCodecController? = if (Build.VERSION.SDK_INT >= 35) LoudnessCodecController() else null
 ) : MediaCodecRenderer(
     context.applicationContext,
     C.TRACK_TYPE_AUDIO,
@@ -74,100 +74,24 @@ class MediaCodecAudioRenderer constructor(
     enableDecoderFallback,
     0f
 ), MediaClock {
-    private val context: Context
-    private val eventDispatcher: AudioRendererEventListener.EventDispatcher
-    private val audioSink: AudioSink
-    private val loudnessCodecController: LoudnessCodecController?
-
+    private val context: Context = context.applicationContext
+    private val eventDispatcher =
+        AudioRendererEventListener.EventDispatcher(eventHandler, eventListener)
     private var codecMaxInputSize = 0
     private var codecNeedsDiscardChannelsWorkaround = false
     private var codecNeedsVorbisToAndroidChannelMappingWorkaround = false
     private var inputFormat: Format? = null
-
     private var decryptOnlyCodecFormat: Format? = null
-
     private var currentPositionUs: Long = 0
     private var allowPositionDiscontinuity = false
     private var audioSinkNeedsReset = false
     private var hasPendingReportedSkippedSilence = false
     private var hasReportedAudioPositionAdvancing = false
-    private var rendererPriority = 0
+    private var rendererPriority = C.PRIORITY_PLAYBACK
     private var isStarted = false
-    private var nextBufferToWritePresentationTimeUs: Long = 0
-    private var firstNotReadyTimeMs: Long = 0
+    private var nextBufferToWritePresentationTimeUs: Long = C.TIME_UNSET
+    private var firstNotReadyTimeMs: Long = C.TIME_UNSET
     private var hasBeenReady = false
-
-    @Deprecated(
-        """Use a constructor without {@link AudioCapabilities}. These are obtained
-        automatically from the {@link Context}."""
-    )
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?,
-        eventHandler: Handler?,
-        eventListener: AudioRendererEventListener,
-        audioCapabilities: AudioCapabilities?,
-        audioProcessors: Array<AudioProcessor>
-    ) : this(
-        context,
-        mediaCodecSelector,
-        eventHandler,
-        eventListener,
-        DefaultAudioSink(
-            audioCapabilities = MoreObjects.firstNonNull<AudioCapabilities?>(
-                audioCapabilities,
-                AudioCapabilities.DEFAULT_AUDIO_CAPABILITIES
-            )
-        ).apply {
-            setAudioProcessors(audioProcessors)
-        }
-    )
-
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?,
-        eventHandler: Handler? = null,
-        eventListener: AudioRendererEventListener,
-        audioSink: AudioSink = DefaultAudioSink(context)
-    ) : this(
-        context,
-        MediaCodecAdapter.Factory.getDefault(context),
-        mediaCodecSelector,
-        false,
-        eventHandler,
-        eventListener,
-        audioSink
-    )
-
-    constructor(
-        context: Context,
-        mediaCodecSelector: MediaCodecSelector?,
-        enableDecoderFallback: Boolean,
-        eventHandler: Handler?,
-        eventListener: AudioRendererEventListener,
-        audioSink: AudioSink
-    ) : this(
-        context,
-        MediaCodecAdapter.Factory.getDefault(context),
-        mediaCodecSelector,
-        enableDecoderFallback,
-        eventHandler,
-        eventListener,
-        audioSink
-    )
-
-    init {
-        var context = context
-        context = context.getApplicationContext()
-        this.context = context
-        this.audioSink = audioSink
-        this.loudnessCodecController = loudnessCodecController
-        rendererPriority = C.PRIORITY_PLAYBACK
-        eventDispatcher = AudioRendererEventListener.EventDispatcher(eventHandler, eventListener)
-        nextBufferToWritePresentationTimeUs = C.TIME_UNSET
-        firstNotReadyTimeMs = C.TIME_UNSET
-        hasBeenReady = false
-    }
 
     override val name: String
         get() = TAG
@@ -242,7 +166,7 @@ class MediaCodecAudioRenderer constructor(
                 }
             }
         }
-        @C.FormatSupport val formatSupport: @C.FormatSupport Int =
+        val formatSupport: @C.FormatSupport Int =
             if (isFormatSupported) C.FORMAT_HANDLED else C.FORMAT_EXCEEDS_CAPABILITIES
         val adaptiveSupport: @AdaptiveSupport Int =
             if (isFormatSupported && decoderInfo.isSeamlessAdaptationSupported(format))
@@ -724,7 +648,7 @@ class MediaCodecAudioRenderer constructor(
 
         val fullyConsumed: Boolean
         try {
-            fullyConsumed = audioSink.handleBuffer(buffer!!, bufferPresentationTimeUs, sampleCount)
+            fullyConsumed = audioSink.handleBuffer(buffer, bufferPresentationTimeUs, sampleCount)
         } catch (e: AudioSink.InitializationException) {
             throw createRendererException(
                 e,
@@ -842,7 +766,7 @@ class MediaCodecAudioRenderer constructor(
     }
 
     override fun handleInputBufferSupplementalData(buffer: DecoderInputBuffer) {
-        if (Build.VERSION.SDK_INT >= 29 && buffer!!.format != null && buffer.format!!.sampleMimeType == MimeTypes.AUDIO_OPUS
+        if (Build.VERSION.SDK_INT >= 29 && buffer.format != null && buffer.format!!.sampleMimeType == MimeTypes.AUDIO_OPUS
             && isBypassEnabled
         ) {
             val data = buffer.supplementalData!!

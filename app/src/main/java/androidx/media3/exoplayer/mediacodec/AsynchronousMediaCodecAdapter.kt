@@ -261,7 +261,7 @@ internal class AsynchronousMediaCodecAdapter private constructor(
         bufferEnqueuer.setParameters(params)
     }
 
-    override fun setVideoScalingMode(@C.VideoScalingMode scalingMode: @C.VideoScalingMode Int) {
+    override fun setVideoScalingMode(scalingMode: @C.VideoScalingMode Int) {
         codec.setVideoScalingMode(scalingMode)
     }
 

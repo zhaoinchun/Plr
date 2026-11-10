@@ -15,17 +15,11 @@ class TrimmingAudioProcessor : BaseAudioProcessor() {
     private var trimStartFrames = 0
     private var trimEndFrames = 0
     private var reconfigurationPending = false
-
     private var pendingTrimStartBytes = 0
-    private var endBuffer: ByteArray
+    private var endBuffer: ByteArray = Util.EMPTY_BYTE_ARRAY
     private var endBufferSize = 0
-
     var trimmedFrameCount: Long = 0
         private set
-
-    init {
-        endBuffer = Util.EMPTY_BYTE_ARRAY
-    }
 
     fun setTrimFrameCount(trimStartFrames: Int, trimEndFrames: Int) {
         this.trimStartFrames = trimStartFrames

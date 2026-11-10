@@ -12,14 +12,15 @@ import androidx.media3.decoder.CryptoInfo
 import java.util.ArrayDeque
 import java.util.concurrent.atomic.AtomicReference
 
-internal class AsynchronousMediaCodecBufferEnqueuer (
+internal class AsynchronousMediaCodecBufferEnqueuer(
     private val codec: MediaCodec,
     private val handlerThread: HandlerThread,
     private val conditionVariable: ConditionVariable,
     private val asyncCryptoSynchronizationEnabled: Boolean
 ) : MediaCodecBufferEnqueuer {
     private var handler: Handler? = null
-    private val pendingRuntimeException: AtomicReference<RuntimeException?> = AtomicReference<RuntimeException?>()
+    private val pendingRuntimeException: AtomicReference<RuntimeException?> =
+        AtomicReference<RuntimeException?>()
     private var started = false
 
     constructor(
@@ -28,7 +29,7 @@ internal class AsynchronousMediaCodecBufferEnqueuer (
         enableAsyncCryptoSynchronization: Boolean
     ) : this(
         codec,
-        queueingThread,  
+        queueingThread,
         ConditionVariable(),
         enableAsyncCryptoSynchronization
     )
@@ -36,12 +37,11 @@ internal class AsynchronousMediaCodecBufferEnqueuer (
     override fun start() {
         if (!started) {
             handlerThread.start()
-            handler =
-                object : Handler(handlerThread.getLooper()) {
-                    override fun handleMessage(msg: Message) {
-                        doHandleMessage(msg)
-                    }
+            handler = object : Handler(handlerThread.getLooper()) {
+                override fun handleMessage(msg: Message) {
+                    doHandleMessage(msg)
                 }
+            }
             started = true
         }
     }
@@ -64,7 +64,7 @@ internal class AsynchronousMediaCodecBufferEnqueuer (
         maybeThrowException()
         val messageParams: MessageParams =
             messageParams
-        messageParams.setQueueParams(index, offset,  0, presentationTimeUs, flags)
+        messageParams.setQueueParams(index, offset, 0, presentationTimeUs, flags)
         copy(info, messageParams.cryptoInfo)
         val message: Message =
             handler!!.obtainMessage(MSG_QUEUE_SECURE_INPUT_BUFFER, messageParams)
@@ -111,7 +111,7 @@ internal class AsynchronousMediaCodecBufferEnqueuer (
 
     @Throws(InterruptedException::class)
     private fun flushHandlerThread() {
-        this.handler!! .removeCallbacksAndMessages(null)
+        this.handler!!.removeCallbacksAndMessages(null)
         blockUntilHandlerThreadIsIdle()
     }
 
@@ -268,7 +268,7 @@ internal class AsynchronousMediaCodecBufferEnqueuer (
                 cryptoInfo.key,
                 frameworkCryptoInfo.key
             )
-            frameworkCryptoInfo.iv =copy(cryptoInfo.iv, frameworkCryptoInfo.iv)!!
+            frameworkCryptoInfo.iv = copy(cryptoInfo.iv, frameworkCryptoInfo.iv)!!
             frameworkCryptoInfo.mode = cryptoInfo.mode
             if (Build.VERSION.SDK_INT >= 24) {
                 val pattern =

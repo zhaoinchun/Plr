@@ -44,7 +44,6 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector.SelectionOv
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.trackselection.MappingTrackSelector.MappedTrackInfo
 import androidx.media3.exoplayer.trackselection.TrackSelectionUtil
-import androidx.media3.exoplayer.trackselection.TrackSelector
 import androidx.media3.exoplayer.trackselection.TrackSelectorResult
 import androidx.media3.exoplayer.upstream.Allocator
 import androidx.media3.exoplayer.upstream.BandwidthMeter
@@ -54,7 +53,6 @@ import androidx.media3.extractor.ExtractorsFactory
 import androidx.media3.extractor.SeekMap
 import com.google.common.base.Preconditions
 import com.google.common.base.Supplier
-
 import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import java.io.IOException
 import java.util.Collections
@@ -413,11 +411,13 @@ class DownloadHelper(
 
     private fun getDownloadRequestBuilder(id: String, data: ByteArray?): DownloadRequest {
         val requestBuilder =
-            DownloadRequest(id, localConfiguration.uri,
+            DownloadRequest(
+                id, localConfiguration.uri,
                 mimeType = localConfiguration.mimeType,
                 keySetId = localConfiguration.drmConfiguration?.keySetId,
                 customCacheKey = localConfiguration.customCacheKey,
-                data = data)
+                data = data
+            )
         if (mode == MODE_PREPARE_NON_PROGRESSIVE_SOURCE_AND_SELECT_TRACKS) {
             assertPreparedWithNonProgressiveSourceAndTracksSelected()
             val streamKeys: MutableList<StreamKey> = ArrayList()
@@ -672,16 +672,13 @@ class DownloadHelper(
                 mediaPreparer!!.timeline!!
             )
         for (i in 0..<trackSelectorResult.length) {
-            val newSelection = trackSelectorResult.selections[i]
-            if (newSelection == null) {
-                continue
-            }
+            val newSelection = trackSelectorResult.selections[i] ?: continue
             val existingSelectionList =
                 trackSelectionsByPeriodAndRenderer!![periodIndex]!![i]
             var mergedWithExistingSelection = false
             for (j in existingSelectionList.indices) {
-                val existingSelection = existingSelectionList.get(j)
-                if (existingSelection.trackGroup!!.equals(newSelection.trackGroup)) {
+                val existingSelection = existingSelectionList[j]
+                if (existingSelection.trackGroup == newSelection.trackGroup) {
                     // Merge with existing selection.
                     scratchSet.clear()
                     for (k in 0..<existingSelection.length()) {
@@ -694,9 +691,8 @@ class DownloadHelper(
                     for (k in 0..<scratchSet.size()) {
                         mergedTracks[k] = scratchSet.keyAt(k)
                     }
-                    existingSelectionList.set(
-                        j, DownloadTrackSelection(existingSelection.trackGroup!!, mergedTracks)
-                    )
+                    existingSelectionList[j] =
+                        DownloadTrackSelection(existingSelection.trackGroup, mergedTracks)
                     mergedWithExistingSelection = true
                     break
                 }
@@ -711,32 +707,25 @@ class DownloadHelper(
         return trackSelectorResult
     }
 
-    private class MediaPreparer
-        (private val mediaSource: MediaSource, private val downloadHelper: DownloadHelper) :
-        MediaSourceCaller, ProgressiveMediaSource.Listener, MediaPeriod.Callback, Handler.Callback {
-        private val allocator: Allocator
-        private val pendingMediaPeriods: ArrayList<MediaPeriod?>
-        private val downloadHelperHandler: Handler
-        private val mediaSourceThread: HandlerThread
+    private class MediaPreparer(
+        private val mediaSource: MediaSource,
+        private val downloadHelper: DownloadHelper
+    ) : MediaSourceCaller, ProgressiveMediaSource.Listener,
+        MediaPeriod.Callback, Handler.Callback {
+        private val allocator: Allocator = DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE)
+        private val pendingMediaPeriods = ArrayList<MediaPeriod?>()
+        private val downloadHelperHandler: Handler =
+            Util.createHandlerForCurrentOrMainLooper(Handler.Callback { msg: Message? ->
+                this.handleDownloadHelperCallbackMessage(msg!!)
+            })
+        private val mediaSourceThread: HandlerThread = HandlerThread("ExoPlayer:DownloadHelper")
         private val mediaSourceHandler: Handler
-
         var timeline: Timeline? = null
         var seekMap: SeekMap? = null
         var mediaPeriods: Array<MediaPeriod>? = null
-
         private var released = false
 
         init {
-            allocator = DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE)
-            pendingMediaPeriods = ArrayList<MediaPeriod?>()
-            val downloadThreadHandler =
-                Util.createHandlerForCurrentOrMainLooper(Handler.Callback { msg: Message? ->
-                    this.handleDownloadHelperCallbackMessage(
-                        msg!!
-                    )
-                })
-            this.downloadHelperHandler = downloadThreadHandler
-            mediaSourceThread = HandlerThread("ExoPlayer:DownloadHelper")
             mediaSourceThread.start()
             mediaSourceHandler = Util.createHandler(mediaSourceThread.getLooper(), this)
             mediaSourceHandler.sendEmptyMessage(MESSAGE_PREPARE_SOURCE)
@@ -834,18 +823,18 @@ class DownloadHelper(
             }
             this.timeline = timeline
             val mediaPeriods = arrayOfNulls<MediaPeriod>(timeline.periodCount)
-            for (i in mediaPeriods!!.indices) {
+            for (i in mediaPeriods.indices) {
                 val mediaPeriod =
                     mediaSource.createPeriod(
                         MediaPeriodId(timeline.getUidOfPeriod(i)),
                         allocator,
                         0
                     )
-                mediaPeriods!![i] = mediaPeriod!!
+                mediaPeriods[i] = mediaPeriod
                 pendingMediaPeriods.add(mediaPeriod)
             }
             this.mediaPeriods = mediaPeriods as Array<MediaPeriod>
-            for (mediaPeriod in mediaPeriods!!) {
+            for (mediaPeriod in mediaPeriods) {
                 mediaPeriod.prepare(this, 0)
             }
         }

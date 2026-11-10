@@ -19,22 +19,22 @@ internal object SpeakerLayoutUtil {
     fun getLoudspeakerLayoutChannelMasks(
         audioDeviceInfo: AudioDeviceInfo
     ): List<Int> {
-        if (DeviceTypeUtil.isBluetoothDevice(audioDeviceInfo.getType())) {
+        if (DeviceTypeUtil.isBluetoothDevice(audioDeviceInfo.type)) {
             return channelMasksForBluetooth
         }
-        if (DeviceTypeUtil.isBuiltInEarpiece(audioDeviceInfo.getType())) {
+        if (DeviceTypeUtil.isBuiltInEarpiece(audioDeviceInfo.type)) {
             return listOf(AudioFormat.CHANNEL_OUT_MONO)
         }
-        if (DeviceTypeUtil.isBuiltInSpeaker(audioDeviceInfo.getType())) {
+        if (DeviceTypeUtil.isBuiltInSpeaker(audioDeviceInfo.type)) {
             return getChannelMasksForBuiltInSpeakers(audioDeviceInfo)
         }
-        if (Build.VERSION.SDK_INT >= 31 && DeviceTypeUtil.isHdmiArc(audioDeviceInfo.getType())) {
+        if (Build.VERSION.SDK_INT >= 31 && DeviceTypeUtil.isHdmiArc(audioDeviceInfo.type)) {
             return getChannelMasksForHdmiArc(audioDeviceInfo)
         }
-        if (Build.VERSION.SDK_INT >= 31 && DeviceTypeUtil.isHdmiEarc(audioDeviceInfo.getType())) {
+        if (Build.VERSION.SDK_INT >= 31 && DeviceTypeUtil.isHdmiEarc(audioDeviceInfo.type)) {
             return getChannelMasksForHdmiEarc(audioDeviceInfo)
         }
-        if (Build.VERSION.SDK_INT >= 31 && DeviceTypeUtil.isUsbDevice(audioDeviceInfo.getType())) {
+        if (Build.VERSION.SDK_INT >= 31 && DeviceTypeUtil.isUsbDevice(audioDeviceInfo.type)) {
             return getChannelMasksForUsb(audioDeviceInfo)
         }
 

@@ -71,10 +71,7 @@ class CameraMotionRenderer : BaseRenderer(C.TRACK_TYPE_CAMERA_MOTION) {
             }
 
             buffer.flip()
-            val rotation = parseMetadata(buffer.data!!)
-            if (rotation == null) {
-                continue
-            }
+            val rotation = parseMetadata(buffer.data!!) ?: continue
 
             listener!!.onCameraMotion(lastTimestampUs - streamOffsetUs, rotation)
         }

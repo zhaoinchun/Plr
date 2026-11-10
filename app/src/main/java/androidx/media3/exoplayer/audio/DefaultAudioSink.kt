@@ -87,10 +87,6 @@ class DefaultAudioSink(
         fun getAudioTrackChannelConfig(channelCount: Int): Int {
             return Util.getAudioTrackChannelConfig(channelCount)
         }
-
-        companion object {
-            val DEFAULT: AudioTrackProvider = DefaultAudioTrackProvider()
-        }
     }
 
     @Deprecated("Use {@link androidx.media3.common.audio.AudioProcessorChain}.")

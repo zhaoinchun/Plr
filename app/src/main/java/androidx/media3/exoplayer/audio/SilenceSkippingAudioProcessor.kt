@@ -5,21 +5,20 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.audio.AudioProcessor
 import androidx.media3.common.audio.BaseAudioProcessor
-
 import androidx.media3.common.util.Util
 import com.google.common.base.Preconditions
 import java.nio.ByteBuffer
 import kotlin.math.abs
 import kotlin.math.min
 
-class SilenceSkippingAudioProcessor  constructor(
+class SilenceSkippingAudioProcessor(
     minimumSilenceDurationUs: Long = DEFAULT_MINIMUM_SILENCE_DURATION_US,
     silenceRetentionRatio: Float = DEFAULT_SILENCE_RETENTION_RATIO,
     maxSilenceToKeepDurationUs: Long = DEFAULT_MAX_SILENCE_TO_KEEP_DURATION_US,
     minVolumeToKeepPercentageWhenMuting: Int = DEFAULT_MIN_VOLUME_TO_KEEP_PERCENTAGE,
     silenceThresholdLevel: Short = DEFAULT_SILENCE_THRESHOLD_LEVEL
 ) : BaseAudioProcessor() {
-    
+
     @MustBeDocumented
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
@@ -32,7 +31,7 @@ class SilenceSkippingAudioProcessor  constructor(
     @Retention(AnnotationRetention.SOURCE)
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
     @IntDef(
-        value =  [FADE_OUT, MUTE, FADE_IN, DO_NOT_CHANGE_VOLUME]
+        value = [FADE_OUT, MUTE, FADE_IN, DO_NOT_CHANGE_VOLUME]
     )
     private annotation class VolumeChangeType
 
@@ -60,9 +59,9 @@ class SilenceSkippingAudioProcessor  constructor(
         paddingSilenceUs: Long,
         silenceThresholdLevel: Short
     ) : this(
-        minimumSilenceDurationUs,  
-        paddingSilenceUs.toFloat() / minimumSilenceDurationUs,  
-        minimumSilenceDurationUs,  
+        minimumSilenceDurationUs,
+        paddingSilenceUs.toFloat() / minimumSilenceDurationUs,
+        minimumSilenceDurationUs,
         0,
         silenceThresholdLevel
     )
@@ -112,7 +111,7 @@ class SilenceSkippingAudioProcessor  constructor(
         if (maybeSilenceBufferContentsSize > 0) {
             // There's bytes in the buffer. So the final chunk of shortened silence will be output to
             // simulate a transition back to the noisy state and the end of output.
-            outputShortenedSilenceBuffer( true)
+            outputShortenedSilenceBuffer(true)
             outputSilenceFramesSinceNoise = 0
         }
     }
@@ -192,7 +191,7 @@ class SilenceSkippingAudioProcessor  constructor(
 
         val shouldTransitionToNoisyState =
             noiseFound
-                    &&  
+                    &&
                     silenceInputSize < contiguousBufferRemaining
 
         outputShortenedSilenceBuffer(shouldTransitionToNoisyState)
@@ -423,10 +422,10 @@ class SilenceSkippingAudioProcessor  constructor(
             val volumeModificationPercentage: Int
             if (volumeChangeType == FADE_OUT) {
                 volumeModificationPercentage =
-                    calculateFadeOutPercentage( idx,  size - 1)
+                    calculateFadeOutPercentage(idx, size - 1)
             } else if (volumeChangeType == FADE_IN) {
                 volumeModificationPercentage =
-                    calculateFadeInPercentage( idx,  size - 1)
+                    calculateFadeInPercentage(idx, size - 1)
             } else {
                 volumeModificationPercentage = minVolumeToKeepPercentageWhenMuting
             }

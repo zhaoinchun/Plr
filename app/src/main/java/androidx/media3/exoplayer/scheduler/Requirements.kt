@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.scheduler
 
 import android.content.Context
@@ -14,7 +13,7 @@ import android.os.PowerManager
 import androidx.annotation.IntDef
 
 class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parcelable {
-    
+
     // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
     // with Kotlin usages from before TYPE_USE was added.
     @MustBeDocumented
@@ -47,16 +46,12 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
 
     val isNetworkRequired: Boolean
         get() = (requirements and NETWORK) != 0
-
     val isUnmeteredNetworkRequired: Boolean
         get() = (requirements and NETWORK_UNMETERED) != 0
-
     val isChargingRequired: Boolean
         get() = (requirements and DEVICE_CHARGING) != 0
-
     val isIdleRequired: Boolean
         get() = (requirements and DEVICE_IDLE) != 0
-
     val isStorageNotLowRequired: Boolean
         get() = (requirements and DEVICE_STORAGE_NOT_LOW) != 0
 
@@ -86,7 +81,8 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
             return 0
         }
 
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.getActiveNetworkInfo()
         if (networkInfo == null || !networkInfo.isConnected() || !isInternetConnectivityValidated(
                 connectivityManager
@@ -104,7 +100,7 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
 
     private fun isDeviceCharging(context: Context): Boolean {
         val batteryStatus =
-            context.registerReceiver( 
+            context.registerReceiver(
                 null, IntentFilter(Intent.ACTION_BATTERY_CHANGED)
             )
         if (batteryStatus == null) {
@@ -121,7 +117,7 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
     }
 
     private fun isStorageNotLow(context: Context): Boolean {
-        return (context.registerReceiver( 
+        return (context.registerReceiver(
             null, IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW)
         )
                 == null)
@@ -161,10 +157,10 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
 
     companion object {
         const val NETWORK: Int = 1
-        const  val NETWORK_UNMETERED: Int = 1 shl 1
-        const  val DEVICE_IDLE: Int = 1 shl 2
-        const  val DEVICE_CHARGING: Int = 1 shl 3
-        const  val DEVICE_STORAGE_NOT_LOW: Int = 1 shl 4
+        const val NETWORK_UNMETERED: Int = 1 shl 1
+        const val DEVICE_IDLE: Int = 1 shl 2
+        const val DEVICE_CHARGING: Int = 1 shl 3
+        const val DEVICE_STORAGE_NOT_LOW: Int = 1 shl 4
 
         private fun isInternetConnectivityValidated(connectivityManager: ConnectivityManager): Boolean {
             // It's possible to check NetworkCapabilities.NET_CAPABILITY_VALIDATED from API level 23, but

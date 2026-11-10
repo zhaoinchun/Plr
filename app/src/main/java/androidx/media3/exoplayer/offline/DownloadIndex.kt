@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.offline
 
 import androidx.annotation.WorkerThread
@@ -6,7 +5,7 @@ import java.io.IOException
 
 @WorkerThread
 interface DownloadIndex {
-    
+
     @Throws(IOException::class)
     fun getDownload(id: String?): Download?
 

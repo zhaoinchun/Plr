@@ -52,7 +52,6 @@ import androidx.media3.exoplayer.source.SampleStream
 import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
 import androidx.media3.exoplayer.source.SampleStream.ReadFlags
 import com.google.common.base.Preconditions
-
 import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -320,9 +319,8 @@ abstract class MediaCodecRenderer(
             return
         }
         val inputFormat = this.inputFormat!!
-
         if (isBypassPossible(inputFormat)) {
-            initBypass(inputFormat!!)
+            initBypass(inputFormat)
             return
         }
 
@@ -333,7 +331,7 @@ abstract class MediaCodecRenderer(
                     codecDrmSession != null && (codecDrmSession!!.state === DrmSession.STATE_OPENED
                             || codecDrmSession!!.state === DrmSession.STATE_OPENED_WITH_KEYS)
                             && codecDrmSession!!.requiresSecureDecoder(
-                        inputFormat!!.sampleMimeType!!
+                        inputFormat.sampleMimeType!!
                     )
                 maybeInitCodecWithFallback(mediaCrypto, mediaCryptoRequiresSecureDecoder)
             } catch (e: DecoderInitializationException) {
@@ -1018,29 +1016,27 @@ abstract class MediaCodecRenderer(
     private fun initCodec(codecInfo: MediaCodecInfo, crypto: MediaCrypto?) {
         this.codecInfo = codecInfo
         val inputFormat = this.inputFormat!!
-        val codecInitializingTimestamp: Long
-        val codecInitializedTimestamp: Long
         val codecName = codecInfo.name
         var codecOperatingRate =
             getCodecOperatingRateV23(targetPlaybackSpeed, inputFormat, getStreamFormats())
         if (codecOperatingRate <= assumedMinimumCodecOperatingRate) {
             codecOperatingRate = CODEC_OPERATING_RATE_UNSET
         }
-        codecInitializingTimestamp = getClock().elapsedRealtime()
+        val codecInitializingTimestamp = getClock().elapsedRealtime()
         val configuration =
             getMediaCodecConfiguration(codecInfo, inputFormat, crypto, codecOperatingRate)
         if (Build.VERSION.SDK_INT >= 31) {
             Api31.setLogSessionIdToMediaCodecFormat(configuration, getPlayerId())
         }
         try {
-            beginSection("createCodec:" + codecName)
+            beginSection("createCodec:$codecName")
             codec = codecAdapterFactory.createAdapter(configuration)
             codecRegisteredOnBufferAvailableListener =
                 codec!!.registerOnBufferAvailableListener(MediaCodecRendererCodecAdapterListener())
         } finally {
             endSection()
         }
-        codecInitializedTimestamp = getClock().elapsedRealtime()
+        val codecInitializedTimestamp = getClock().elapsedRealtime()
 
         if (!codecInfo.isFormatSupported(context!!, inputFormat)) {
             w(
@@ -2104,7 +2100,6 @@ abstract class MediaCodecRenderer(
                             && !outputFormat!!.initializationData.isEmpty()
                         ) {
                             // Format mimetype is Opus so format should be updated with preSkip data.
-                            // TODO(b/298634018): Adjust encoderDelay value based on starting position.
                             val numberPreSkipSamples =
                                 getPreSkipSamples(outputFormat!!.initializationData[0])
                             outputFormat =
@@ -2150,9 +2145,6 @@ abstract class MediaCodecRenderer(
     }
 
     private fun haveBypassBatchBufferAndNewSampleSameDecodeOnlyState(): Boolean {
-        // TODO: b/295800114 - Splitting the batch buffer by decode-only state isn't safe for formats
-        // where not every sample is a keyframe because the downstream component may receive encoded
-        // data starting from a non-keyframe sample.
         if (!bypassBatchBuffer.hasSamples()) {
             return true
         }
@@ -2201,16 +2193,9 @@ abstract class MediaCodecRenderer(
         var durationUs: Long,
         var streamFlags: @SampleStream.Flags Int
     ) {
-        val formatQueue: TimedValueQueue<Format>
-
+        val formatQueue =TimedValueQueue<Format>()
         var queuedBufferAfterReset = false
-        var lastBufferTimeUs: Long
-
-        init {
-            this.formatQueue = TimedValueQueue<Format>()
-            this.lastBufferTimeUs = C.TIME_UNSET
-        }
-
+        var lastBufferTimeUs: Long= C.TIME_UNSET
         val isDurationStrict: Boolean
             get() = (streamFlags and SampleStream.FLAG_STRICT_DURATION) != 0
 
@@ -2232,109 +2217,47 @@ abstract class MediaCodecRenderer(
         ) {
             val logSessionId = playerId.logSessionId
             if (logSessionId != LogSessionId.LOG_SESSION_ID_NONE) {
-                codecConfiguration.mediaFormat!!.setString(
-                    "log-session-id",
-                    logSessionId.getStringId()
+                codecConfiguration.mediaFormat.setString(
+                    "log-session-id", logSessionId.stringId
                 )
             }
         }
     }
 
     private inner class MediaCodecRendererCodecAdapterListener
-
         : MediaCodecAdapter.OnBufferAvailableListener {
         override fun onInputBufferAvailable() {
-            if (wakeupListener != null) {
-                wakeupListener!!.onWakeup()
-            }
+            wakeupListener?.onWakeup()
         }
 
         override fun onOutputBufferAvailable() {
-            if (wakeupListener != null) {
-                wakeupListener!!.onWakeup()
-            }
+            wakeupListener?.onWakeup()
         }
     }
 
     companion object {
-
         protected const val DEBUG_LOG_ENABLED: Boolean = false
-
         protected const val DEBUG_LOG_TAG: String = "MCRdebug"
-
         protected const val CODEC_OPERATING_RATE_UNSET: Float = -1f
-
         private const val TAG = "MediaCodecRenderer"
-
         private const val MAX_CODEC_HOTSWAP_TIME_MS: Long = 1000
-
         private const val RECONFIGURATION_STATE_NONE = 0
-
         private const val RECONFIGURATION_STATE_WRITE_PENDING = 1
-
         private const val RECONFIGURATION_STATE_QUEUE_PENDING = 2
-
         private const val DRAIN_STATE_NONE = 0
-
         private const val DRAIN_STATE_SIGNAL_END_OF_STREAM = 1
-
         private const val DRAIN_STATE_WAIT_END_OF_STREAM = 2
-
         private const val DRAIN_ACTION_NONE = 0
-
         private const val DRAIN_ACTION_FLUSH = 1
-
         private const val DRAIN_ACTION_FLUSH_AND_UPDATE_DRM_SESSION = 2
-
         private const val DRAIN_ACTION_REINITIALIZE = 3
-
         private const val ADAPTATION_WORKAROUND_MODE_NEVER = 0
-
         private const val ADAPTATION_WORKAROUND_MODE_SAME_RESOLUTION = 1
-
         private const val ADAPTATION_WORKAROUND_MODE_ALWAYS = 2
-
         private val ADAPTATION_WORKAROUND_BUFFER = byteArrayOf(
-            0,
-            0,
-            1,
-            103,
-            66,
-            -64,
-            11,
-            -38,
-            37,
-            -112,
-            0,
-            0,
-            1,
-            104,
-            -50,
-            15,
-            19,
-            32,
-            0,
-            0,
-            1,
-            101,
-            -120,
-            -124,
-            13,
-            -50,
-            113,
-            24,
-            -96,
-            0,
-            47,
-            -65,
-            28,
-            49,
-            -61,
-            39,
-            93,
-            120
+            0, 0, 1, 103, 66, -64, 11, -38, 37, -112, 0, 0, 1, 104, -50, 15, 19, 32, 0, 0, 1, 101,
+            -120, -124, 13, -50, 113, 24, -96, 0, 47, -65, 28, 49, -61, 39, 93, 120
         )
-
         private const val ADAPTATION_WORKAROUND_SLICE_WIDTH_HEIGHT = 32
 
         fun supportsFormatDrm(format: Format): Boolean {
@@ -2345,8 +2268,8 @@ abstract class MediaCodecRenderer(
             if (error is CodecException) {
                 return true
             }
-            val stackTrace = error.getStackTrace()
-            return stackTrace.size > 0 && stackTrace[0]!!.getClassName() == "android.media.MediaCodec"
+            val stackTrace = error.stackTrace
+            return stackTrace.size > 0 && stackTrace[0]!!.className == "android.media.MediaCodec"
         }
 
         private fun codecNeedsSosFlushWorkaround(name: String?): Boolean {
@@ -2356,7 +2279,6 @@ abstract class MediaCodecRenderer(
             return Build.VERSION.SDK_INT == 29 && "c2.android.aac.decoder" == name
         }
 
-        // TODO: b/416719590 - Remove this suppression when the false positive is fixed.
         private fun codecNeedsEosPropagationWorkaround(codecInfo: MediaCodecInfo): Boolean {
             if (!enableWorkarounds()) {
                 return false

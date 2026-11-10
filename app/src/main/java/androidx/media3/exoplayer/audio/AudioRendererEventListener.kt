@@ -54,17 +54,14 @@ interface AudioRendererEventListener {
         ) {
             handler?.post {
                 listener!!.onAudioInputFormatChanged(
-                    format,
-                    decoderReuseEvaluation
+                    format, decoderReuseEvaluation
                 )
             }
         }
 
         fun positionAdvancing(playoutStartSystemTimeMs: Long) {
             handler?.post {
-                listener!!.onAudioPositionAdvancing(
-                    playoutStartSystemTimeMs
-                )
+                listener!!.onAudioPositionAdvancing(playoutStartSystemTimeMs)
             }
         }
 

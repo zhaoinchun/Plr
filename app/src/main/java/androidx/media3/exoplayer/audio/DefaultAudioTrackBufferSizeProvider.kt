@@ -2,7 +2,6 @@ package androidx.media3.exoplayer.audio
 
 import androidx.media3.common.C
 import androidx.media3.common.Format
-import androidx.media3.common.util.Util.constrainValue
 import androidx.media3.exoplayer.audio.DefaultAudioSink.AudioTrackBufferSizeProvider
 import androidx.media3.extractor.ExtractorUtil.getMaximumEncodedRateBytesPerSecond
 import com.google.common.base.Preconditions
@@ -12,32 +11,11 @@ import java.math.RoundingMode
 import kotlin.math.max
 
 class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
-
-    @Deprecated(
-        """This constraint does not apply to the new default fixed buffer size logic. Use
-        {@link #targetPcmBufferDurationUs} to configure a fixed buffer size instead. This is only
-        used if {@link #pcmBufferMultiplicationFactor} is set to enable deprecated dynamic logic."""
-    )
-    private val minPcmBufferDurationUs = MIN_PCM_BUFFER_DURATION_US
-
-    @Deprecated(
-        """This constraint does not apply to the new default fixed buffer size logic. Use
-        {@link #targetPcmBufferDurationUs} to configure a fixed buffer size instead. This is only
-        used if {@link #pcmBufferMultiplicationFactor} is set to enable deprecated dynamic logic."""
-    )
-    private val maxPcmBufferDurationUs = MAX_PCM_BUFFER_DURATION_US
-
-    @Deprecated(
-        """Use the default fixed buffer size logic instead, or {@link C#LENGTH_UNSET} to not
-        use this factor."""
-    )
-    var pcmBufferMultiplicationFactor = PCM_BUFFER_MULTIPLICATION_FACTOR
     var passthroughBufferDurationUs = PASSTHROUGH_BUFFER_DURATION_US
     var offloadBufferDurationUs = OFFLOAD_BUFFER_DURATION_US
     var ac3BufferMultiplicationFactor = AC3_BUFFER_MULTIPLICATION_FACTOR
     var dtshdBufferMultiplicationFactor = DTSHD_BUFFER_MULTIPLICATION_FACTOR
     var targetPcmBufferDurationUs = DEFAULT_PCM_BUFFER_DURATION_US
-
 
     override fun getBufferSizeInBytes(
         minBufferSizeInBytes: Int,
@@ -93,16 +71,7 @@ class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
         samplingRate: Int,
         frameSize: Int
     ): Int {
-        if (pcmBufferMultiplicationFactor != C.LENGTH_UNSET) {
-            val targetBufferSize = minBufferSizeInBytes * pcmBufferMultiplicationFactor
-            val minAppBufferSize: Int =
-                durationUsToBytes(minPcmBufferDurationUs, samplingRate, frameSize)
-            val maxAppBufferSize: Int =
-                durationUsToBytes(maxPcmBufferDurationUs, samplingRate, frameSize)
-            return constrainValue(targetBufferSize, minAppBufferSize, maxAppBufferSize)
-        } else {
-            return durationUsToBytes(targetPcmBufferDurationUs, samplingRate, frameSize)
-        }
+        return durationUsToBytes(targetPcmBufferDurationUs, samplingRate, frameSize)
     }
 
     private fun getPassthroughBufferSizeInBytes(encoding: @C.Encoding Int, bitrate: Int): Int {
