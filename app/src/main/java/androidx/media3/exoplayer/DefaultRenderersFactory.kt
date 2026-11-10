@@ -666,7 +666,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     }
 
     @ForOverride
-    protected fun getImageDecoderFactory(context: Context?): ImageDecoder.Factory {
+    protected fun getImageDecoderFactory(context: Context): ImageDecoder.Factory {
         return BitmapFactoryImageDecoder.Factory(context)
     }
 

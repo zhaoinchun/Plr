@@ -150,11 +150,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             AnalyticsListener.EVENT_AUDIO_DECODER_INITIALIZED
         ) { listener: AnalyticsListener ->
             listener.onAudioDecoderInitialized(
-                eventTime,
-                decoderName,
-                initializationDurationMs
-            )
-            listener.onAudioDecoderInitialized(
                 eventTime, decoderName, initializedTimestampMs, initializationDurationMs
             )
         }
@@ -777,8 +772,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
         // Do nothing. Handled by non-deprecated onPositionDiscontinuity.
     }
 
-    // Calling deprecated callback.
-    @Suppress("deprecation")
     override fun onPositionDiscontinuity(
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,
@@ -793,7 +786,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             eventTime,
             AnalyticsListener.EVENT_POSITION_DISCONTINUITY
         ) { listener: AnalyticsListener ->
-            listener.onPositionDiscontinuity(eventTime, reason)
             listener.onPositionDiscontinuity(eventTime, oldPosition, newPosition, reason)
         }
     }
@@ -885,20 +877,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             listener.onMetadata(
                 eventTime,
                 metadata
-            )
-        }
-    }
-
-    @Suppress("deprecation") // Implementing and calling deprecated listener method.
-    override fun onCues(cues: List<Cue>) {
-        val eventTime = generateCurrentPlayerMediaPeriodEventTime()
-        sendEvent(
-            eventTime,
-            AnalyticsListener.EVENT_CUES
-        ) { listener: AnalyticsListener ->
-            listener.onCues(
-                eventTime,
-                cues
             )
         }
     }

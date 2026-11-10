@@ -21,22 +21,11 @@ private constructor(private val context: Context?, private val maxOutputSize: In
     SimpleDecoder<DecoderInputBuffer, ImageOutputBuffer, ImageDecoderException>(
         1, 1
     ), ImageDecoder {
-    
-    class Factory : ImageDecoder.Factory {
-        private val context: Context?
-        private var maxOutputSize: Int
 
-        @Deprecated("Use {@link Factory#Factory(Context)} instead.")
-        constructor() {
-            this.context = null
-            this.maxOutputSize = C.LENGTH_UNSET
-        }
-
-        constructor(context: Context?) {
-            this.context = context!!
-            this.maxOutputSize = C.LENGTH_UNSET
-        }
-
+    class Factory(
+        private val context: Context,
+        private var maxOutputSize: Int = C.LENGTH_UNSET
+    ) : ImageDecoder.Factory {
         fun setMaxOutputSize(maxOutputSize: Int): Factory {
             Preconditions.checkArgument(maxOutputSize == C.LENGTH_UNSET || maxOutputSize > 0)
             this.maxOutputSize = maxOutputSize
@@ -111,7 +100,7 @@ private constructor(private val context: Context?, private val maxOutputSize: In
                 decode(
                     inputData.array(),
                     inputData.remaining(),
-                    null,  
+                    null,
                     maxSize
                 )
         } catch (e: ParserException) {

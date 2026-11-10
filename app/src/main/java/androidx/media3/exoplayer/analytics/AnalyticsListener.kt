@@ -166,16 +166,6 @@ interface AnalyticsListener {
     ) {
     }
 
-    @Deprecated(
-        """Use {@link #onPositionDiscontinuity(EventTime, Player.PositionInfo,
-   *     Player.PositionInfo, int)} instead."""
-    )
-    fun onPositionDiscontinuity(
-        eventTime: EventTime,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
-    ) {
-    }
-
     fun onPositionDiscontinuity(
         eventTime: EventTime,
         oldPosition: Player.PositionInfo,
@@ -273,11 +263,6 @@ interface AnalyticsListener {
     }
 
     fun onMetadata(eventTime: EventTime, metadata: Metadata) {}
-
-    @Deprecated("Use {@link #onCues(EventTime, CueGroup)} instead.")
-    fun onCues(eventTime: EventTime, cues: List<Cue>) {
-    }
-
     fun onCues(eventTime: EventTime, cueGroup: CueGroup) {}
     fun onAudioEnabled(eventTime: EventTime, decoderCounters: DecoderCounters) {}
 
@@ -286,12 +271,6 @@ interface AnalyticsListener {
         decoderName: String,
         initializedTimestampMs: Long,
         initializationDurationMs: Long
-    ) {
-    }
-
-    @Deprecated("Use {@link #onAudioDecoderInitialized(EventTime, String, long, long)}.")
-    fun onAudioDecoderInitialized(
-        eventTime: EventTime, decoderName: String, initializationDurationMs: Long
     ) {
     }
 
