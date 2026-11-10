@@ -27,7 +27,6 @@ import androidx.media3.exoplayer.audio.AudioOutputProvider.SupportLevel
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
 import androidx.media3.exoplayer.audio.DefaultAudioSink.AudioOffloadSupportProvider
 import androidx.media3.exoplayer.audio.DefaultAudioSink.AudioTrackBufferSizeProvider
-import androidx.media3.exoplayer.audio.DefaultAudioSink.AudioTrackProvider
 import androidx.media3.extractor.DtsUtil
 import com.google.common.base.Preconditions
 import com.google.common.base.Supplier
@@ -36,9 +35,6 @@ import java.util.function.BiConsumer
 
 class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
     private val context: Context? = context?.applicationContext
-
-    @Suppress("deprecation") // Supporting deprecated AudioTrack customization path.
-    var audioTrackProvider: AudioTrackProvider? = null
     private val builderModifier: BiConsumer<AudioTrack.Builder?, OutputConfig?>? =
         null
     var audioTrackBufferSizeProvider = AudioTrackBufferSizeProvider.DEFAULT
@@ -192,16 +188,6 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
                 contextForAudioTrack = contextWithDeviceId
                 audioSessionId = AudioManager.AUDIO_SESSION_ID_GENERATE
             }
-            if (audioTrackProvider != null) {
-                val audioTrackConfig = getAudioTrackConfig(config)
-                audioTrack = audioTrackProvider!!.getAudioTrack(
-                    audioTrackConfig,
-                    config.audioAttributes,
-                    audioSessionId,
-                    contextForAudioTrack
-                )
-            } else {
-                // Using C.Encoding as AudioFormat encoding
                 val format = AudioFormat.Builder()
                     .setSampleRate(config.sampleRate)
                     .setChannelMask(config.channelMask)
@@ -226,7 +212,6 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
                     builderModifier.accept(audioTrackBuilder, config)
                 }
                 audioTrack = audioTrackBuilder.build()
-            }
         } catch (e: UnsupportedOperationException) {
             throw AudioOutputProvider.InitializationException(e)
         } catch (e: IllegalArgumentException) {
@@ -293,8 +278,7 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
     }
 
     private fun getAudioOutputChannelConfig(format: Format): Int {
-        return audioTrackProvider?.getAudioTrackChannelConfig(format.channelCount)
-            ?: getAudioTrackChannelConfig(format)
+        return getAudioTrackChannelConfig(format)
     }
 
     private fun getAudioTrackMinBufferSize(

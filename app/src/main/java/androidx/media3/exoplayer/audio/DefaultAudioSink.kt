@@ -75,19 +75,6 @@ class DefaultAudioSink(
     audioTrackBufferSizeProvider: AudioTrackBufferSizeProvider? = null,
     audioCapabilities: AudioCapabilities? = null
 ) : AudioSink {
-    @Deprecated("Use {@link AudioTrackAudioOutputProvider} instead.")
-    interface AudioTrackProvider {
-        fun getAudioTrack(
-            audioTrackConfig: AudioTrackConfig,
-            audioAttributes: AudioAttributes,
-            audioSessionId: Int,
-            context: Context?
-        ): AudioTrack
-
-        fun getAudioTrackChannelConfig(channelCount: Int): Int {
-            return Util.getAudioTrackChannelConfig(channelCount)
-        }
-    }
 
     @Deprecated("Use {@link androidx.media3.common.audio.AudioProcessorChain}.")
     interface AudioProcessorChain : androidx.media3.common.audio.AudioProcessorChain
@@ -191,7 +178,6 @@ class DefaultAudioSink(
     private var pendingConfiguration: Configuration? = null
     private var configuration: Configuration? = null
     private var audioProcessingPipeline: AudioProcessingPipeline? = null
-    var audioTrackProvider: AudioTrackProvider? = null
     private var audioOutputProvider: AudioOutputProvider = run {
         if (audioOutputProvider == null) {
             val audioOffloadSupportProvider =
@@ -203,12 +189,10 @@ class DefaultAudioSink(
                     if (context != null) null else this@DefaultAudioSink.audioCapabilities
                 this.audioOffloadSupportProvider = audioOffloadSupportProvider
                 this.audioTrackBufferSizeProvider = audioTrackBufferSizeProvider
-                this.audioTrackProvider = this@DefaultAudioSink.audioTrackProvider
             }
         } else {
             Preconditions.checkState(audioOffloadSupportProvider == null)
             Preconditions.checkState(audioTrackBufferSizeProvider == null)
-            Preconditions.checkState(audioTrackProvider == null)
             audioOutputProvider
         }
     }
