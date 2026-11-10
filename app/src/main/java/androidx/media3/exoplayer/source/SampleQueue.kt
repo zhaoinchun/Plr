@@ -883,8 +883,6 @@ class SampleQueue(
     )
 
     companion object {
-        @VisibleForTesting
-
         const val SAMPLE_CAPACITY_INCREMENT: Int = 1000
         private const val TAG = "SampleQueue"
         private const val DEFAULT_MAX_NUM_REORDER_SAMPLES = 16

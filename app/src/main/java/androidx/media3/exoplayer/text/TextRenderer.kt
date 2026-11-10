@@ -487,9 +487,7 @@ class TextRenderer(
         }
     }
 
-    @Suppress("deprecation") // We need to call both onCues method for backward compatibility.
     private fun invokeUpdateOutputInternal(cueGroup: CueGroup) {
-        output.onCues(cueGroup.cues)
         output.onCues(cueGroup)
     }
 

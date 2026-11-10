@@ -3070,12 +3070,6 @@ class ExoPlayerImpl(
             videoListenerManager.onParametersChanged(codecParameters)
         }
 
-        override fun onCues(cues: List<Cue>) {
-            listeners.sendEvent(Player.EVENT_CUES) { listener: Player.Listener ->
-                listener.onCues(cues)
-            }
-        }
-
         override fun onCues(cueGroup: CueGroup) {
             currentCueGroup = cueGroup
             listeners.sendEvent(Player.EVENT_CUES) { listener: Player.Listener ->

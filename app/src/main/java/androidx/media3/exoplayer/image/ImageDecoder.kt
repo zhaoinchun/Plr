@@ -9,11 +9,6 @@ interface ImageDecoder : Decoder<DecoderInputBuffer, ImageOutputBuffer, ImageDec
     interface Factory {
         fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int
         fun createImageDecoder(): ImageDecoder
-
-        companion object {
-            @Deprecated("Instantiate a {@link BitmapFactoryImageDecoder.Factory} directly.")
-            val DEFAULT: Factory = BitmapFactoryImageDecoder.Factory()
-        }
     }
 
     @Throws(ImageDecoderException::class)

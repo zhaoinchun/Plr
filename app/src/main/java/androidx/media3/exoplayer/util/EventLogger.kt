@@ -43,16 +43,6 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
     private val period = Timeline.Period()
     private val startTimeMs = SystemClock.elapsedRealtime()
 
-    @Suppress("unused") // Maintain backwards compatibility for callers.
-    @Deprecated("Use {@link #EventLogger()}")
-    constructor(trackSelector: MappingTrackSelector?) : this(DEFAULT_TAG)
-
-    @Suppress("unused") // Maintain backwards compatibility for callers.
-    @Deprecated("Use {@link #EventLogger(String)}")
-    constructor(trackSelector: MappingTrackSelector?, tag: String?) : this(tag)
-
-    // AnalyticsListener
-
     override fun onIsLoadingChanged(eventTime: EventTime, isLoading: Boolean) {
         logd(eventTime, "loading", isLoading.toString())
     }

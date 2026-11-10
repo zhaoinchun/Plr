@@ -202,11 +202,5 @@ class MediaParserChunkExtractor @SuppressLint("WrongConstant") constructor(
     companion object {
         // Maximum TAG length is 23 characters.
         private const val TAG = "MediaPrsrChunkExtractor"
-
-        @Deprecated(
-            """{@link ChunkExtractor.Factory} is mutable, so a static instance is not safe.
-        Instantiate a new {@link Factory} instead."""
-        )
-        val FACTORY: ChunkExtractor.Factory = Factory()
     }
 }
