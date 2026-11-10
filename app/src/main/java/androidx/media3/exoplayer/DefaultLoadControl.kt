@@ -607,7 +607,6 @@ class DefaultLoadControl protected constructor(
             ContentResolver.SCHEME_CONTENT,
             DataSchemeDataSource.SCHEME_DATA,
             ContentResolver.SCHEME_ANDROID_RESOURCE,
-            RawResourceDataSource.RAW_RESOURCE_SCHEME,
             "asset"
         )
 

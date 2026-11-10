@@ -205,19 +205,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
     }
 
     companion object {
-        @Suppress("deprecation") // Using deprecated scheme
-        @Deprecated(
-            """Use {@code new
-   *     Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE).path(Integer.toString(rawResourceId)).build()}
-        instead."""
-        )
-        fun buildRawResourceUri(rawResourceId: Int): Uri? {
-            return Uri.parse(RAW_RESOURCE_SCHEME + ":///" + rawResourceId)
-        }
-
-        @Deprecated("Use {@link ContentResolver#SCHEME_ANDROID_RESOURCE} instead.")
-        const val RAW_RESOURCE_SCHEME: String = "rawresource"
-
         @Suppress("deprecation") // Accepting deprecated scheme
         @Throws(RawResourceDataSourceException::class)
         private fun openAssetFileDescriptor(
@@ -226,14 +213,14 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             val normalizedUri = dataSpec.uri.normalizeScheme()
             val resources: Resources
             val resourceId: Int
-            if (TextUtils.equals(RAW_RESOURCE_SCHEME, normalizedUri.getScheme())) {
+            if (TextUtils.equals(ContentResolver.SCHEME_ANDROID_RESOURCE, normalizedUri.getScheme())) {
                 resources = applicationContext.getResources()
                 val pathSegments = normalizedUri.getPathSegments()
                 if (pathSegments.size == 1) {
                     resourceId = Companion.parseResourceId(pathSegments[0]!!)
                 } else {
                     throw RawResourceDataSourceException(
-                        (RAW_RESOURCE_SCHEME
+                        (ContentResolver.SCHEME_ANDROID_RESOURCE
                                 + ":// URI must have exactly one path element, found "
                                 + pathSegments.size)
                     )

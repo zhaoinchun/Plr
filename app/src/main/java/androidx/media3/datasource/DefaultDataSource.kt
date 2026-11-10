@@ -240,7 +240,7 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
         private val SCHEME_DATA: String = DataSchemeDataSource.SCHEME_DATA
 
         @Suppress("deprecation") // Detecting deprecated scheme.
-        private val SCHEME_RAW: String = RawResourceDataSource.RAW_RESOURCE_SCHEME
+        private val SCHEME_RAW: String = ContentResolver.SCHEME_ANDROID_RESOURCE
 
         private val SCHEME_ANDROID_RESOURCE = ContentResolver.SCHEME_ANDROID_RESOURCE
     }
