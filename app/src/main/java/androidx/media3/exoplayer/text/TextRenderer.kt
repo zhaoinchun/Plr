@@ -157,14 +157,6 @@ class TextRenderer(
         }
     }
 
-    @Deprecated(
-        """This method (and all support for 'legacy' subtitle decoding during rendering) will
-        be removed in a future release."""
-    )
-    fun experimentalSetLegacyDecodingEnabled(legacyDecodingEnabled: Boolean) {
-        this.legacyDecodingEnabled = legacyDecodingEnabled
-    }
-
     @RequiresNonNull("this.cuesResolver")
     private fun renderFromCuesWithTiming(positionUs: Long) {
         var outputNeedsUpdating = readAndDecodeCuesWithTiming(positionUs)

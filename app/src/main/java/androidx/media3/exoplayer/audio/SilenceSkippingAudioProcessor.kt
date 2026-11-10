@@ -53,19 +53,6 @@ class SilenceSkippingAudioProcessor(
     //  modifyVolume() can be applied to a non-contiguous contents, the code is just more complex.
     private var contiguousOutputBuffer: ByteArray
 
-    @Deprecated("Use {@link #SilenceSkippingAudioProcessor(long, float, long, int, short)} instead.")
-    constructor(
-        minimumSilenceDurationUs: Long,
-        paddingSilenceUs: Long,
-        silenceThresholdLevel: Short
-    ) : this(
-        minimumSilenceDurationUs,
-        paddingSilenceUs.toFloat() / minimumSilenceDurationUs,
-        minimumSilenceDurationUs,
-        0,
-        silenceThresholdLevel
-    )
-
     init {
         Preconditions.checkArgument(silenceRetentionRatio in 0f..1f)
         this.minimumSilenceDurationUs = minimumSilenceDurationUs
@@ -498,8 +485,6 @@ class SilenceSkippingAudioProcessor(
         const val DEFAULT_MINIMUM_SILENCE_DURATION_US: Long = 100000
         const val DEFAULT_MAX_SILENCE_TO_KEEP_DURATION_US: Long = 2000000
 
-        @Deprecated("Specify silence behaviour via {@code silenceRetentionRatio} instead.")
-        const val DEFAULT_PADDING_SILENCE_US: Long = 20000
         private const val STATE_NOISY = 0
         private const val STATE_SHORTENING_SILENCE = 1
         private const val FADE_OUT = 0

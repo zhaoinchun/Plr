@@ -14,10 +14,6 @@ interface DrmSessionEventListener {
     ) {
     }
 
-    @Deprecated("Implement {@link #onDrmKeysLoaded(int, MediaPeriodId, KeyRequestInfo)} instead")
-    fun onDrmKeysLoaded(windowIndex: Int, mediaPeriodId: MediaPeriodId?) {
-    }
-
     fun onDrmKeysLoaded(
         windowIndex: Int, mediaPeriodId: MediaPeriodId?, keyRequestInfo: KeyRequestInfo
     ) {
@@ -76,7 +72,6 @@ interface DrmSessionEventListener {
                 postOrRun(
                     listenerAndHandler.handler
                 ) {
-                    listener.onDrmKeysLoaded(windowIndex, mediaPeriodId)
                     listener.onDrmKeysLoaded(windowIndex, mediaPeriodId, keyRequestInfo)
                 }
             }

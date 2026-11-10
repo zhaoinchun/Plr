@@ -24,15 +24,6 @@ class DefaultDrmSessionManagerProvider : DrmSessionManagerProvider {
         this.drmHttpDataSourceFactory = drmDataSourceFactory
     }
 
-    @Deprecated(
-        """Pass a custom {@link DataSource.Factory} to {@link
-   *     #setDrmHttpDataSourceFactory(DataSource.Factory)} which sets the desired user agent on
-        outgoing requests."""
-    )
-    fun setDrmUserAgent(userAgent: String?) {
-        this.userAgent = userAgent
-    }
-
     fun setDrmLoadErrorHandlingPolicy(drmLoadErrorHandlingPolicy: LoadErrorHandlingPolicy?) {
         this.drmLoadErrorHandlingPolicy = drmLoadErrorHandlingPolicy
     }

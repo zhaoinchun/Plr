@@ -149,15 +149,6 @@ class PlaceholderSurface private constructor(
             return secureMode != EGLSurfaceTexture.SECURE_MODE_NONE
         }
 
-        @InlineMe(
-            replacement = "PlaceholderSurface.newInstance(context, secure)",
-            imports = ["androidx.media3.exoplayer.video.PlaceholderSurface"]
-        )
-        @Deprecated("Use {@link #newInstance(Context, boolean)} instead.")
-        fun newInstanceV17(context: Context, secure: Boolean): PlaceholderSurface {
-            return newInstance(context, secure)
-        }
-
         fun newInstance(context: Context, secure: Boolean): PlaceholderSurface {
             Preconditions.checkState(!secure || isSecureSupported(context))
             val thread = PlaceholderSurfaceThread()
