@@ -49,9 +49,6 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
     private val mediaParser: MediaParser = MediaParser.create(outputConsumerAdapter)
     private var parserName = MediaParser.PARSER_NAME_UNKNOWN
 
-    @Deprecated("Use {@link Factory} instead.")
-    constructor(playerId: PlayerId) : this(playerId, mapOf())
-
     init {
         mediaParser.setParameter(MediaParserUtil.PARAMETER_EAGERLY_EXPOSE_TRACK_TYPE, true)
         mediaParser.setParameter(MediaParserUtil.PARAMETER_IN_BAND_CRYPTO_INFO, true)

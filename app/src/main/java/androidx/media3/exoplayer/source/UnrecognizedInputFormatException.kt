@@ -16,9 +16,6 @@ class UnrecognizedInputFormatException(
 ) {
     val sniffFailures: List<SniffFailure?> = sniffFailures.toList()
 
-    @Deprecated("Use {@link #UnrecognizedInputFormatException(String, Uri, List)} instead.")
-    constructor(message: String?, uri: Uri?) : this(message, uri, listOf<SniffFailure?>())
-
     override val message: String?
         get() {
             val superMessage = super.message

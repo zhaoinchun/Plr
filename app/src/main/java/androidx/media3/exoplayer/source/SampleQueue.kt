@@ -907,25 +907,6 @@ class SampleQueue(
             )
         }
 
-        @Deprecated(
-            """Use {@link #createWithDrm(Allocator, DrmSessionManager, EventDispatcher)} instead.
-        The {@code playbackLooper} should be configured on the {@link DrmSessionManager} with
-        {@link DrmSessionManager#setPlayer(Looper, PlayerId)}."""
-        )
-        fun createWithDrm(
-            allocator: Allocator,
-            playbackLooper: Looper,
-            drmSessionManager: DrmSessionManager,
-            drmEventDispatcher: DrmSessionEventListener.EventDispatcher?
-        ): SampleQueue {
-            drmSessionManager.setPlayer(playbackLooper, PlayerId.UNSET)
-            return SampleQueue(
-                allocator,
-                drmSessionManager,
-                drmEventDispatcher!!
-            )
-        }
-
         private fun canDiscardAllSamplesToStartTime(
             mimeType: String?, codec: String?
         ): Boolean {
