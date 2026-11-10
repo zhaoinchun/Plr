@@ -17,10 +17,7 @@ class ContentDataSource(context: Context) : BaseDataSource( false) {
     class ContentDataSourceException(
         cause: IOException?,
         @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
-    ) : DataSourceException(cause, errorCode) {
-        @Deprecated("Use {@link #ContentDataSourceException(IOException, int)}.")
-        constructor(cause: IOException?) : this(cause, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
-    }
+    ) : DataSourceException(cause, errorCode)
 
     private val resolver: ContentResolver = context.contentResolver
 

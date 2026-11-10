@@ -38,17 +38,6 @@ class SimpleCache internal constructor(
     private var released = false
     private var initializationException:CacheException? = null
 
-    @Suppress("deprecation")
-    @Deprecated("Use a constructor that takes a {@link DatabaseProvider} for improved performance.")
-    constructor(cacheDir: File, evictor: CacheEvictor) : this(
-        cacheDir,
-        evictor,  
-        null,  
-        null,  
-        false,  
-        true
-    )
-
     constructor(
         cacheDir: File,
         evictor: CacheEvictor,
