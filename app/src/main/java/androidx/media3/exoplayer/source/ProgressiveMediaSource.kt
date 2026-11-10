@@ -50,7 +50,7 @@ class ProgressiveMediaSource private constructor(
         private var drmSessionManagerProvider: DrmSessionManagerProvider = DefaultDrmSessionManagerProvider(),
         private var loadErrorHandlingPolicy: LoadErrorHandlingPolicy = DefaultLoadErrorHandlingPolicy(),
         private var continueLoadingCheckIntervalBytes: Int = DEFAULT_LOADING_CHECK_INTERVAL_BYTES
-    ) : MediaSourceFactory {
+    ) : MediaSource.Factory {
         private var downloadExecutorSupplier: Supplier<ReleasableExecutor>? = null
         private var singleTrackId = 0
         private var singleTrackFormat: Format? = null

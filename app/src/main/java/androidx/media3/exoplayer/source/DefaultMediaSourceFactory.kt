@@ -38,7 +38,7 @@ class DefaultMediaSourceFactory(
     private var dataSourceFactory: DataSource.Factory,
     extractorsFactory: ExtractorsFactory,
     private var subtitleParserFactory: SubtitleParser.Factory
-) : MediaSourceFactory {
+) : MediaSource.Factory {
     @Deprecated("Use {@link AdsLoader.Provider} instead.")
     interface AdsLoaderProvider : AdsLoader.Provider
 
