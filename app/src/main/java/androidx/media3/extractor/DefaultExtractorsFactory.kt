@@ -64,7 +64,6 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     private var tsSubtitleFormats: List<Format>? = null
     private var tsTimestampSearchBytes: Int
-    private var textTrackTranscodingEnabled: Boolean
     private var subtitleParserFactory: SubtitleParser.Factory
     private var codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
     private var jpegFlags: @JpegExtractor.Flags Int = 0
@@ -74,7 +73,6 @@ class DefaultExtractorsFactory : ExtractorsFactory {
         tsMode = TsExtractor.MODE_SINGLE_PMT
         tsTimestampSearchBytes = TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES
         subtitleParserFactory = DefaultSubtitleParserFactory()
-        textTrackTranscodingEnabled = true
         codecsToParseWithinGopSampleDependencies =
             C.VIDEO_CODEC_FLAG_H264 or C.VIDEO_CODEC_FLAG_H265
     }
@@ -181,26 +179,6 @@ class DefaultExtractorsFactory : ExtractorsFactory {
         return this
     }
 
-    @Deprecated(
-        """This method (and all support for 'legacy' subtitle decoding during rendering) will
-        be removed in a future release."""
-    )
-    @Synchronized
-    fun setTextTrackTranscodingEnabled(
-        textTrackTranscodingEnabled: Boolean
-    ): DefaultExtractorsFactory {
-        return experimentalSetTextTrackTranscodingEnabled(textTrackTranscodingEnabled)
-    }
-
-    @Deprecated("")
-    @Synchronized
-    override fun experimentalSetTextTrackTranscodingEnabled(
-        textTrackTranscodingEnabled: Boolean
-    ): DefaultExtractorsFactory {
-        this.textTrackTranscodingEnabled = textTrackTranscodingEnabled
-        return this
-    }
-
     @Synchronized
     override fun setSubtitleParserFactory(
         subtitleParserFactory: SubtitleParser.Factory
@@ -243,7 +221,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
         uri: Uri, responseHeaders: MutableMap<String, List<String>>
     ): Array<Extractor> {
         val extractors: MutableList<Extractor> =
-            ArrayList<Extractor>( DEFAULT_EXTRACTOR_ORDER.size)
+            ArrayList<Extractor>(DEFAULT_EXTRACTOR_ORDER.size)
 
         val responseHeadersInferredFileType: Int =
             inferFileTypeFromResponseHeaders(responseHeaders)
@@ -317,11 +295,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
             FileTypes.MATROSKA -> extractors.add(
                 MatroskaExtractor(
                     subtitleParserFactory,
-                    matroskaFlags
-                            or (if (textTrackTranscodingEnabled)
-                        0
-                    else
-                        MatroskaExtractor.FLAG_EMIT_RAW_SUBTITLE_DATA)
+                    matroskaFlags or 0
                 )
             )
 
@@ -349,10 +323,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
                                 or FragmentedMp4Extractor.codecsToParseWithinGopSampleDependenciesAsFlags(
                             codecsToParseWithinGopSampleDependencies
                         )
-                                or (if (textTrackTranscodingEnabled)
-                            0
-                        else
-                            FragmentedMp4Extractor.FLAG_EMIT_RAW_SUBTITLE_DATA)
+                                or 0
                                 or (if (disableArtworkMetadata)
                             FragmentedMp4Extractor.FLAG_DISABLE_ARTWORK_METADATA
                         else
@@ -366,7 +337,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
                                 or Mp4Extractor.codecsToParseWithinGopSampleDependenciesAsFlags(
                             codecsToParseWithinGopSampleDependencies
                         )
-                                or (if (textTrackTranscodingEnabled) 0 else Mp4Extractor.FLAG_EMIT_RAW_SUBTITLE_DATA)
+                                or 0
                                 or (if (disableArtworkMetadata) Mp4Extractor.FLAG_DISABLE_ARTWORK_METADATA else 0))
                     )
                 )
@@ -381,7 +352,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
                 extractors.add(
                     TsExtractor(
                         tsMode,
-                        (if (textTrackTranscodingEnabled) 0 else TsExtractor.FLAG_EMIT_RAW_SUBTITLE_DATA),
+                        0,
                         subtitleParserFactory,
                         TimestampAdjuster(0),
                         DefaultTsPayloadReaderFactory(tsFlags, tsSubtitleFormats!!),
@@ -401,7 +372,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
             FileTypes.AVI -> extractors.add(
                 AviExtractor(
-                    (if (textTrackTranscodingEnabled) 0 else AviExtractor.FLAG_EMIT_RAW_SUBTITLE_DATA),
+                    0,
                     subtitleParserFactory
                 )
             )
@@ -531,7 +502,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
                 val isFlacNativeLibraryAvailable =
                     true == Class.forName("androidx.media3.decoder.flac.FlacLibrary")
                         .getMethod("isAvailable")
-                        .invoke( null)
+                        .invoke(null)
                 if (isFlacNativeLibraryAvailable) {
                     return Class.forName("androidx.media3.decoder.flac.FlacExtractor")
                         .asSubclass<Extractor?>(Extractor::class.java)

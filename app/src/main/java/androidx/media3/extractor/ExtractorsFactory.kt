@@ -4,14 +4,6 @@ import androidx.media3.common.C
 import androidx.media3.extractor.text.SubtitleParser
 
 fun interface ExtractorsFactory {
-    @com.google.errorprone.annotations.CanIgnoreReturnValue
-    @kotlin.Deprecated("")
-    fun experimentalSetTextTrackTranscodingEnabled(
-        textTrackTranscodingEnabled: kotlin.Boolean
-    ): ExtractorsFactory {
-        return this
-    }
-
     fun setSubtitleParserFactory(subtitleParserFactory: SubtitleParser.Factory): ExtractorsFactory {
         return this
     }

@@ -39,9 +39,6 @@ class DefaultMediaSourceFactory(
     extractorsFactory: ExtractorsFactory,
     private var subtitleParserFactory: SubtitleParser.Factory
 ) : MediaSource.Factory {
-    @Deprecated("Use {@link AdsLoader.Provider} instead.")
-    interface AdsLoaderProvider : AdsLoader.Provider
-
     private val delegateFactoryLoader: DelegateFactoryLoader =
         DelegateFactoryLoader(extractorsFactory, subtitleParserFactory)
     private var serverSideAdInsertionMediaSourceFactory: MediaSource.Factory? = null
@@ -77,15 +74,6 @@ class DefaultMediaSourceFactory(
 
     init {
         delegateFactoryLoader.setDataSourceFactory(dataSourceFactory)
-    }
-
-    @Deprecated("")
-    override fun experimentalParseSubtitlesDuringExtraction(
-        parseSubtitlesDuringExtraction: Boolean
-    ): DefaultMediaSourceFactory {
-        this.parseSubtitlesDuringExtraction = parseSubtitlesDuringExtraction
-        delegateFactoryLoader.setParseSubtitlesDuringExtraction(parseSubtitlesDuringExtraction)
-        return this
     }
 
     override fun setSubtitleParserFactory(subtitleParserFactory: SubtitleParser.Factory): DefaultMediaSourceFactory {
@@ -390,7 +378,6 @@ class DefaultMediaSourceFactory(
         private val mediaSourceFactories: MutableMap<Int, MediaSource.Factory> = mutableMapOf()
 
         private var dataSourceFactory: DataSource.Factory? = null
-        private var parseSubtitlesDuringExtraction = true
         private var codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int =
             C.VIDEO_CODEC_FLAG_H264 or C.VIDEO_CODEC_FLAG_H265
         private var loadOnlySelectedTracks = false
@@ -422,9 +409,6 @@ class DefaultMediaSourceFactory(
             downloadExecutorSupplier?.also { mediaSourceFactory.setDownloadExecutor(it) }
 
             mediaSourceFactory.setSubtitleParserFactory(subtitleParserFactory)
-            mediaSourceFactory.experimentalParseSubtitlesDuringExtraction(
-                parseSubtitlesDuringExtraction
-            )
             mediaSourceFactory.experimentalSetCodecsToParseWithinGopSampleDependencies(
                 codecsToParseWithinGopSampleDependencies
             )
@@ -437,18 +421,6 @@ class DefaultMediaSourceFactory(
                 this.dataSourceFactory = dataSourceFactory
                 mediaSourceFactorySuppliers.clear()
                 mediaSourceFactories.clear()
-            }
-        }
-
-        fun setParseSubtitlesDuringExtraction(parseSubtitlesDuringExtraction: Boolean) {
-            this.parseSubtitlesDuringExtraction = parseSubtitlesDuringExtraction
-            extractorsFactory.experimentalSetTextTrackTranscodingEnabled(
-                parseSubtitlesDuringExtraction
-            )
-            for (mediaSourceFactory in mediaSourceFactories.values) {
-                mediaSourceFactory.experimentalParseSubtitlesDuringExtraction(
-                    parseSubtitlesDuringExtraction
-                )
             }
         }
 

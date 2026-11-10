@@ -29,15 +29,6 @@ interface MediaSource {
 
         fun setLoadErrorHandlingPolicy(loadErrorHandlingPolicy: LoadErrorHandlingPolicy): Factory
 
-        @Deprecated(
-            """This method (and all support for 'legacy' subtitle decoding during rendering)
-          will be removed in a future release.
-      """
-        )
-        fun experimentalParseSubtitlesDuringExtraction(parseSubtitlesDuringExtraction: Boolean): Factory {
-            return this
-        }
-
         fun setSubtitleParserFactory(subtitleParserFactory: SubtitleParser.Factory): Factory {
             return this
         }
