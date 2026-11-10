@@ -294,11 +294,6 @@ class BundledChunkExtractor(
     }
 
     companion object {
-        @Deprecated(
-            """{@link Factory} is mutable, so a static instance is not safe. Instantiate a new
-        {@link Factory} instead."""
-        )
-        val FACTORY: Factory = Factory()
         private val POSITION_HOLDER = PositionHolder()
     }
 }

@@ -117,25 +117,11 @@ interface MediaSource {
         return false
     }
 
-    fun updateMediaItem(mediaItem: MediaItem) {
-    }
-
-    @Deprecated("Use {@link #prepareSource(MediaSourceCaller, PlayerId, BandwidthMeter)} instead.")
-    fun prepareSource(
-        caller: MediaSourceCaller,
-        mediaTransferListener: TransferListener,
-        playerId: PlayerId
-    ) {
-        throw IllegalStateException(
-            "prepareSource(MediaSourceCaller, TransferListener, PlayerId) not implemented"
-        )
-    }
+    fun updateMediaItem(mediaItem: MediaItem) {}
 
     fun prepareSource(
         caller: MediaSourceCaller, playerId: PlayerId, bandwidthMeter: BandwidthMeter
-    ) {
-        prepareSource(caller, bandwidthMeter.transferListener!!, playerId)
-    }
+    )
 
     @Throws(IOException::class)
     fun maybeThrowSourceInfoRefreshError()

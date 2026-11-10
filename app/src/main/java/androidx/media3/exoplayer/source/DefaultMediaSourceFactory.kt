@@ -51,7 +51,6 @@ class DefaultMediaSourceFactory(
     private var liveMaxOffsetMs: Long = C.TIME_UNSET
     private var liveMinSpeed: Float = C.RATE_UNSET
     private var liveMaxSpeed: Float = C.RATE_UNSET
-    private var parseSubtitlesDuringExtraction: Boolean = true
     private var loadOnlySelectedTracks = false
     private var enableClippingInMediaPeriod = false
 
@@ -261,64 +260,50 @@ class DefaultMediaSourceFactory(
             val mediaSources = arrayOfNulls<MediaSource>(subtitleConfigurations.size + 1)
             mediaSources[0] = mediaSource
             for (i in subtitleConfigurations.indices) {
-                if (parseSubtitlesDuringExtraction) {
-                    val config = subtitleConfigurations[i]
-                    val format =
-                        Format(
-                            sampleMimeType = config.mimeType,
-                            language = config.language,
-                            selectionFlags = config.selectionFlags,
-                            roleFlags = config.roleFlags,
-                            label = config.label,
-                            id = config.id,
-                        )
-                    val extractorsFactory =
-                        ExtractorsFactory {
-                            arrayOf(
-                                if (subtitleParserFactory.supportsFormat(format))
-                                    SubtitleExtractor(
-                                        subtitleParserFactory.create(format)!!, null
-                                    )
-                                else
-                                    UnknownSubtitlesExtractor(format)
-                            )
-                        }
-                    val progressiveMediaSourceFactory =
-                        ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
-                            .enableLazyLoadingWithSingleTrack(
-                                SubtitleExtractor.TRACK_ID,
-                                if (subtitleParserFactory.supportsFormat(format))
-                                    format.copy(
-                                        sampleMimeType = MimeTypes.APPLICATION_MEDIA3_CUES,
-                                        codecs = format.sampleMimeType,
-                                        cueReplacementBehavior = subtitleParserFactory.getCueReplacementBehavior(
-                                            format
-                                        ),
-                                    )
-                                else
-                                    format
-                            )
-                            .setLoadOnlySelectedTracks(loadOnlySelectedTracks)
-                    loadErrorHandlingPolicy?.also {
-                        progressiveMediaSourceFactory.setLoadErrorHandlingPolicy(it)
-                    }
-                    mediaSources[i + 1] =
-                        progressiveMediaSourceFactory.createMediaSource(
-                            MediaItem.fromUri(subtitleConfigurations[i].uri.toString())
-                        )
-                } else {
-                    val singleSampleMediaSourceFactory =
-                        SingleSampleMediaSource.Factory(dataSourceFactory)
-                    if (loadErrorHandlingPolicy != null) {
-                        singleSampleMediaSourceFactory.setLoadErrorHandlingPolicy(
-                            loadErrorHandlingPolicy
+                val config = subtitleConfigurations[i]
+                val format =
+                    Format(
+                        sampleMimeType = config.mimeType,
+                        language = config.language,
+                        selectionFlags = config.selectionFlags,
+                        roleFlags = config.roleFlags,
+                        label = config.label,
+                        id = config.id,
+                    )
+                val extractorsFactory =
+                    ExtractorsFactory {
+                        arrayOf(
+                            if (subtitleParserFactory.supportsFormat(format))
+                                SubtitleExtractor(
+                                    subtitleParserFactory.create(format)!!, null
+                                )
+                            else
+                                UnknownSubtitlesExtractor(format)
                         )
                     }
-                    mediaSources[i + 1] =
-                        singleSampleMediaSourceFactory.createMediaSource(
-                            subtitleConfigurations[i], C.TIME_UNSET
+                val progressiveMediaSourceFactory =
+                    ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
+                        .enableLazyLoadingWithSingleTrack(
+                            SubtitleExtractor.TRACK_ID,
+                            if (subtitleParserFactory.supportsFormat(format))
+                                format.copy(
+                                    sampleMimeType = MimeTypes.APPLICATION_MEDIA3_CUES,
+                                    codecs = format.sampleMimeType,
+                                    cueReplacementBehavior = subtitleParserFactory.getCueReplacementBehavior(
+                                        format
+                                    ),
+                                )
+                            else
+                                format
                         )
+                        .setLoadOnlySelectedTracks(loadOnlySelectedTracks)
+                loadErrorHandlingPolicy?.also {
+                    progressiveMediaSourceFactory.setLoadErrorHandlingPolicy(it)
                 }
+                mediaSources[i + 1] =
+                    progressiveMediaSourceFactory.createMediaSource(
+                        MediaItem.fromUri(subtitleConfigurations[i].uri.toString())
+                    )
             }
 
             mediaSource = MergingMediaSource(mediaSources as Array<MediaSource>)
