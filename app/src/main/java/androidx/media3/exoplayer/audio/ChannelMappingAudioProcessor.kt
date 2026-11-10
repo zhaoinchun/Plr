@@ -15,11 +15,6 @@ class ChannelMappingAudioProcessor : BaseAudioProcessor() {
     private var pendingOutputChannels: ImmutableIntArray? = null
     private var outputChannels: ImmutableIntArray? = null
 
-    @Deprecated("Use {@link #setChannelMap(ImmutableIntArray)} instead.")
-    fun setChannelMap(outputChannels: IntArray?) {
-        setChannelMap(if (outputChannels == null) null else ImmutableIntArray.copyOf(outputChannels))
-    }
-
     fun setChannelMap(outputChannels: ImmutableIntArray?) {
         pendingOutputChannels = outputChannels
     }
