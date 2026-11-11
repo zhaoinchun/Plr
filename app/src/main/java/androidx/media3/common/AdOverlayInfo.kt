@@ -1,7 +1,6 @@
 package androidx.media3.common
 
 import android.view.View
-import androidx.annotation.IntDef
 
 class AdOverlayInfo(
     val view: View?,

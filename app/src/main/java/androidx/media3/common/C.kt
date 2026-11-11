@@ -1,6 +1,5 @@
 package androidx.media3.common
 
-import android.annotation.SuppressLint
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
@@ -10,7 +9,6 @@ import android.opengl.GLES20
 import android.os.Build
 import android.os.IBinder
 import android.view.Surface
-import androidx.annotation.IntDef
 import java.util.UUID
 
 object C {
@@ -30,7 +28,7 @@ object C {
     const val SANS_SERIF_NAME: String = "sans-serif"
     const val SSAI_SCHEME: String = "ssai"
     const val CSAI_SCHEME: String = "csai"
-    
+
     val SUGGESTED_MAX_IPC_SIZE: Int =
         if (Build.VERSION.SDK_INT >= 30) IBinder.getSuggestedMaxIpcSizeBytes() else 64 * 1024
 
@@ -38,7 +36,6 @@ object C {
     const val CRYPTO_TYPE_UNSUPPORTED: Int = 1
     const val CRYPTO_TYPE_FRAMEWORK: Int = 2
     const val CRYPTO_TYPE_CUSTOM_BASE: Int = 10000
-
     const val CRYPTO_MODE_UNENCRYPTED: Int = MediaCodec.CRYPTO_MODE_UNENCRYPTED
     const val CRYPTO_MODE_AES_CTR: Int = MediaCodec.CRYPTO_MODE_AES_CTR
     const val CRYPTO_MODE_AES_CBC: Int = MediaCodec.CRYPTO_MODE_AES_CBC
@@ -75,7 +72,6 @@ object C {
     const val ENCODING_DSD: Int = AudioFormat.ENCODING_DSD
 
     const val SPATIALIZATION_BEHAVIOR_AUTO: Int = AudioAttributes.SPATIALIZATION_BEHAVIOR_AUTO
-
     const val SPATIALIZATION_BEHAVIOR_NEVER: Int = AudioAttributes.SPATIALIZATION_BEHAVIOR_NEVER
 
     const val STREAM_TYPE_ALARM: Int = AudioManager.STREAM_ALARM
@@ -211,15 +207,11 @@ object C {
     const val CENC_TYPE_cbc1: String = "cbc1"
     const val CENC_TYPE_cens: String = "cens"
     const val CENC_TYPE_cbcs: String = "cbcs"
-    
+
     val UUID_NIL: UUID = UUID(0L, 0L)
-    
     val COMMON_PSSH_UUID: UUID = UUID(0x1077EFECC0B24D02L, -0x531cc3e1ad1d04b5L)
-    
     val CLEARKEY_UUID: UUID = UUID(-0x1d8e62a7567a4c37L, 0x781AB030AF78D30EL)
-    
     val WIDEVINE_UUID: UUID = UUID(-0x121074568629b532L, -0x5c37d8232ae2de13L)
-    
     val PLAYREADY_UUID: UUID = UUID(-0x65fb0f8667bfbd7aL, -0x546d19a41f77a06bL)
 
     const val STEREO_MODE_MONO: Int = 0
