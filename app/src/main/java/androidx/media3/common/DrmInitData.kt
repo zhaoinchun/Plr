@@ -12,12 +12,8 @@ import java.util.UUID
 
 class DrmInitData : Comparator<SchemeData>, Parcelable {
     private var schemeDatas: Array<SchemeData>? = null
-
-    // Lazily initialized hashcode.
     private var hashCode = 0
-
     var schemeType: String? = null
-
     var schemeDataCount: Int = 0
 
     constructor(schemeDatas: List<SchemeData>) : this(
@@ -40,10 +36,10 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
         schemeDatas
     )
 
-     constructor(
+    constructor(
         schemeType: String?,
         cloneSchemeDatas: Boolean,
-         schemeDatas: Array<SchemeData>
+        schemeDatas: Array<SchemeData>
     ) {
         var schemeDatas = schemeDatas
         this.schemeType = schemeType
@@ -63,7 +59,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
         schemeDataCount = schemeDatas!!.size
     }
 
-    fun get(index: Int): SchemeData? {
+    fun get(index: Int): SchemeData {
         return schemeDatas!![index]
     }
 
@@ -86,7 +82,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
             drmInitData.schemeDatas?.also {
                 addAll(it)
             }
-        }?.toTypedArray()?: emptyArray<SchemeData>()
+        }?.toTypedArray() ?: emptyArray<SchemeData>()
         return DrmInitData(mergedSchemeType, mergedSchemeDatas)
     }
 
@@ -139,7 +135,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
             uuid: UUID?,
             mimeType: String?,
             data: ByteArray?
-        ) : this(uuid,  null, mimeType, data)
+        ) : this(uuid, null, mimeType, data)
 
         constructor(uuid: UUID?, licenseServerUrl: String?, mimeType: String?, data: ByteArray?) {
             this.uuid = uuid!!
@@ -189,7 +185,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
             if (hashCode == 0) {
                 var result = uuid.hashCode()
                 result =
-                    31 * result + (if (licenseServerUrl == null) 0 else licenseServerUrl.hashCode())
+                    31 * result + (licenseServerUrl?.hashCode() ?: 0)
                 result = 31 * result + mimeType.hashCode()
                 result = 31 * result + data.contentHashCode()
                 hashCode = result
@@ -203,8 +199,8 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
         }
 
         override fun writeToParcel(dest: Parcel, flags: Int) {
-            dest.writeLong(uuid.getMostSignificantBits())
-            dest.writeLong(uuid.getLeastSignificantBits())
+            dest.writeLong(uuid.mostSignificantBits)
+            dest.writeLong(uuid.leastSignificantBits)
             dest.writeString(licenseServerUrl)
             dest.writeString(mimeType)
             dest.writeByteArray(data)
@@ -226,7 +222,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
     }
 
     companion object {
-        
+
         fun createSessionCreationData(
             manifestData: DrmInitData?, mediaData: DrmInitData?
         ): DrmInitData? {

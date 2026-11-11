@@ -5,19 +5,16 @@ import androidx.media3.common.util.Util.percentInt
 import com.google.errorprone.annotations.ForOverride
 import kotlin.math.max
 import kotlin.math.min
-abstract class BasePlayer protected constructor() : Player {
-    protected val window: Timeline.Window
 
-    init {
-        window = Timeline.Window()
-    }
+abstract class BasePlayer() : Player {
+    protected val window = Timeline.Window()
 
     override fun setMediaItem(mediaItem: MediaItem) {
         setMediaItems(listOf(mediaItem))
     }
 
     override fun setMediaItem(mediaItem: MediaItem, startPositionMs: Long) {
-        setMediaItems(listOf(mediaItem),  0, startPositionMs)
+        setMediaItems(listOf(mediaItem), 0, startPositionMs)
     }
 
     override fun setMediaItem(mediaItem: MediaItem, resetPosition: Boolean) {
@@ -25,7 +22,7 @@ abstract class BasePlayer protected constructor() : Player {
     }
 
     override fun setMediaItems(mediaItems: List<MediaItem>) {
-        setMediaItems(mediaItems,  true)
+        setMediaItems(mediaItems, true)
     }
 
     override fun addMediaItem(index: Int, mediaItem: MediaItem) {
@@ -37,27 +34,27 @@ abstract class BasePlayer protected constructor() : Player {
     }
 
     override fun addMediaItems(mediaItems: List<MediaItem>) {
-        addMediaItems( Int.MAX_VALUE, mediaItems)
+        addMediaItems(Int.MAX_VALUE, mediaItems)
     }
 
     override fun moveMediaItem(currentIndex: Int, newIndex: Int) {
         if (currentIndex != newIndex) {
-            moveMediaItems( currentIndex,  currentIndex + 1, newIndex)
+            moveMediaItems(currentIndex, currentIndex + 1, newIndex)
         }
     }
 
     override fun replaceMediaItem(index: Int, mediaItem: MediaItem) {
-        replaceMediaItems( 
-            index,  index + 1, listOf(mediaItem)
+        replaceMediaItems(
+            index, index + 1, listOf(mediaItem)
         )
     }
 
     override fun removeMediaItem(index: Int) {
-        removeMediaItems( index,  index + 1)
+        removeMediaItems(index, index + 1)
     }
 
     override fun clearMediaItems() {
-        removeMediaItems( 0,  Int.MAX_VALUE)
+        removeMediaItems(0, Int.MAX_VALUE)
     }
 
     override fun isCommandAvailable(command: Int): Boolean {
@@ -122,7 +119,7 @@ abstract class BasePlayer protected constructor() : Player {
         } else if (hasPreviousMediaItem && currentPosition <= maxSeekToPreviousPosition) {
             seekToPreviousMediaItemInternal(Player.COMMAND_SEEK_TO_PREVIOUS)
         } else {
-            seekToCurrentItem( 0, Player.COMMAND_SEEK_TO_PREVIOUS)
+            seekToCurrentItem(0, Player.COMMAND_SEEK_TO_PREVIOUS)
         }
     }
 
@@ -157,7 +154,7 @@ abstract class BasePlayer protected constructor() : Player {
         seekTo(
             mediaItemIndex,
             positionMs,
-            Player.COMMAND_SEEK_TO_MEDIA_ITEM,  
+            Player.COMMAND_SEEK_TO_MEDIA_ITEM,
             false
         )
     }
@@ -312,7 +309,7 @@ abstract class BasePlayer protected constructor() : Player {
                 timeline.getWindow(currentMediaItemIndex, window).durationMs
         }
 
-    
+
     private val repeatModeForNavigation: Int
         get() {
             val repeatMode: Int =
@@ -321,10 +318,10 @@ abstract class BasePlayer protected constructor() : Player {
         }
 
     private fun ignoreSeek(seekCommand: Int) {
-        seekTo( 
-            C.INDEX_UNSET,  
+        seekTo(
+            C.INDEX_UNSET,
             C.TIME_UNSET,
-            seekCommand,  
+            seekCommand,
             false
         )
     }
@@ -334,7 +331,7 @@ abstract class BasePlayer protected constructor() : Player {
         seekCommand: Int
     ) {
         seekTo(
-            currentMediaItemIndex, positionMs, seekCommand,  false
+            currentMediaItemIndex, positionMs, seekCommand, false
         )
     }
 
@@ -353,9 +350,9 @@ abstract class BasePlayer protected constructor() : Player {
         seekCommand: Int
     ) {
         seekTo(
-            mediaItemIndex,  
+            mediaItemIndex,
             C.TIME_UNSET,
-            seekCommand,  
+            seekCommand,
             false
         )
     }
@@ -388,9 +385,9 @@ abstract class BasePlayer protected constructor() : Player {
 
     private fun repeatCurrentMediaItem(seekCommand: Int) {
         seekTo(
-            currentMediaItemIndex,  
+            currentMediaItemIndex,
             C.TIME_UNSET,
-            seekCommand,  
+            seekCommand,
             true
         )
     }

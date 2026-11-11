@@ -34,8 +34,7 @@ class ToInt16PcmAudioProcessor : BaseAudioProcessor() {
         val position = inputBuffer.position()
         val limit = inputBuffer.limit()
         val size = limit - position
-        val resampledSize: Int
-        resampledSize = when (inputAudioFormat.encoding) {
+        val resampledSize = when (inputAudioFormat.encoding) {
             C.ENCODING_PCM_8BIT -> size * 2
             C.ENCODING_PCM_16BIT_BIG_ENDIAN -> size
             C.ENCODING_PCM_24BIT, C.ENCODING_PCM_24BIT_BIG_ENDIAN -> (size / 3) * 2

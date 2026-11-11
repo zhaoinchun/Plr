@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.media3.common.util.Util.intToStringMaxRadix
 
-class AudioAttributes private constructor(
+data class AudioAttributes(
     var contentType: Int = C.AUDIO_CONTENT_TYPE_UNKNOWN,
     var flags: Int = 0,
     var usage: Int = C.USAGE_MEDIA,
@@ -17,14 +17,13 @@ class AudioAttributes private constructor(
     var hapticChannelsMuted: Boolean = true,
 ) {
     var platformAudioAttributes: android.media.AudioAttributes? = null
+        private set
         get() {
             if (field == null) {
-                @SuppressLint("WrongConstant") val builder// Setting C.AudioContentType and C.AudioUsage to platform API.
-                        =
-                    android.media.AudioAttributes.Builder()
-                        .setContentType(contentType)
-                        .setFlags(flags)
-                        .setUsage(usage)
+                val builder = android.media.AudioAttributes.Builder()
+                    .setContentType(contentType)
+                    .setFlags(flags)
+                    .setUsage(usage)
                 if (Build.VERSION.SDK_INT >= 29) {
                     Api29.setAllowedCapturePolicy(
                         builder,
@@ -43,39 +42,9 @@ class AudioAttributes private constructor(
             }
             return field
         }
-        private set
 
-    
     val volumeControlStream: Int
         get() = this.streamTypeInternal
-
-    @get:Deprecated("Use {@link #getVolumeControlStream()} instead.")
-    
-    val streamType: Int
-        get() = this.streamTypeInternal
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        val other = obj as AudioAttributes
-        return this.contentType == other.contentType && this.flags == other.flags && this.usage == other.usage && this.allowedCapturePolicy == other.allowedCapturePolicy && this.spatializationBehavior == other.spatializationBehavior && this.isContentSpatialized == other.isContentSpatialized && this.hapticChannelsMuted == other.hapticChannelsMuted
-    }
-
-    override fun hashCode(): Int {
-        var result = 17
-        result = 31 * result + contentType
-        result = 31 * result + flags
-        result = 31 * result + usage
-        result = 31 * result + allowedCapturePolicy
-        result = 31 * result + spatializationBehavior
-        result = 31 * result + (if (isContentSpatialized) 1 else 0)
-        result = 31 * result + (if (hapticChannelsMuted) 1 else 0)
-        return result
-    }
 
     fun toBundle(): Bundle {
         val bundle = Bundle()
@@ -103,14 +72,14 @@ class AudioAttributes private constructor(
         return bundle
     }
 
-    
+
     private val streamTypeInternal: Int
         get() {
             if (Build.VERSION.SDK_INT >= 26) {
                 val platformStreamType: Int
                 try {
                     platformStreamType = this.platformAudioAttributes!!.volumeControlStream
-                } catch (e: RuntimeException) {
+                } catch (_: RuntimeException) {
                     // The platform method may throw if it doesn't recognize the configured values.
                     return C.STREAM_TYPE_MUSIC
                 }
@@ -124,16 +93,16 @@ class AudioAttributes private constructor(
                 return C.STREAM_TYPE_SYSTEM
             }
             // Usage to stream type mapping
-            when (usage) {
-                C.USAGE_ASSISTANCE_SONIFICATION -> return C.STREAM_TYPE_SYSTEM
-                C.USAGE_VOICE_COMMUNICATION -> return C.STREAM_TYPE_VOICE_CALL
-                C.USAGE_VOICE_COMMUNICATION_SIGNALLING -> return C.STREAM_TYPE_DTMF
-                C.USAGE_ALARM -> return C.STREAM_TYPE_ALARM
-                C.USAGE_NOTIFICATION_RINGTONE -> return C.STREAM_TYPE_RING
-                C.USAGE_NOTIFICATION, C.USAGE_NOTIFICATION_COMMUNICATION_REQUEST, C.USAGE_NOTIFICATION_COMMUNICATION_INSTANT, C.USAGE_NOTIFICATION_COMMUNICATION_DELAYED, C.USAGE_NOTIFICATION_EVENT -> return C.STREAM_TYPE_NOTIFICATION
-                C.USAGE_ASSISTANCE_ACCESSIBILITY -> return C.STREAM_TYPE_ACCESSIBILITY
-                C.USAGE_MEDIA, C.USAGE_GAME, C.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE, C.USAGE_ASSISTANT, C.USAGE_UNKNOWN -> return C.STREAM_TYPE_MUSIC
-                else -> return C.STREAM_TYPE_MUSIC
+            return when (usage) {
+                C.USAGE_ASSISTANCE_SONIFICATION -> C.STREAM_TYPE_SYSTEM
+                C.USAGE_VOICE_COMMUNICATION -> C.STREAM_TYPE_VOICE_CALL
+                C.USAGE_VOICE_COMMUNICATION_SIGNALLING -> C.STREAM_TYPE_DTMF
+                C.USAGE_ALARM -> C.STREAM_TYPE_ALARM
+                C.USAGE_NOTIFICATION_RINGTONE -> C.STREAM_TYPE_RING
+                C.USAGE_NOTIFICATION, C.USAGE_NOTIFICATION_COMMUNICATION_REQUEST, C.USAGE_NOTIFICATION_COMMUNICATION_INSTANT, C.USAGE_NOTIFICATION_COMMUNICATION_DELAYED, C.USAGE_NOTIFICATION_EVENT -> C.STREAM_TYPE_NOTIFICATION
+                C.USAGE_ASSISTANCE_ACCESSIBILITY -> C.STREAM_TYPE_ACCESSIBILITY
+                C.USAGE_MEDIA, C.USAGE_GAME, C.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE, C.USAGE_ASSISTANT, C.USAGE_UNKNOWN -> C.STREAM_TYPE_MUSIC
+                else -> C.STREAM_TYPE_MUSIC
             }
         }
 
@@ -141,15 +110,13 @@ class AudioAttributes private constructor(
     private object Api29 {
         @SuppressLint("WrongConstant") // Setting C.AudioAllowedCapturePolicy to platform API.
         fun setAllowedCapturePolicy(
-            builder: android.media.AudioAttributes.Builder,
-            allowedCapturePolicy: Int
+            builder: android.media.AudioAttributes.Builder, allowedCapturePolicy: Int
         ) {
             builder.setAllowedCapturePolicy(allowedCapturePolicy)
         }
 
         fun setHapticChannelsMuted(
-            builder: android.media.AudioAttributes.Builder,
-            hapticChannelsMuted: Boolean
+            builder: android.media.AudioAttributes.Builder, hapticChannelsMuted: Boolean
         ) {
             builder.setHapticChannelsMuted(hapticChannelsMuted)
         }
@@ -157,17 +124,14 @@ class AudioAttributes private constructor(
 
     @RequiresApi(32)
     private object Api32 {
-        @SuppressLint("WrongConstant") // Setting C.SpatializationBehavior to platform API.
         fun setSpatializationBehavior(
-            builder: android.media.AudioAttributes.Builder,
-            spatializationBehavior: Int
+            builder: android.media.AudioAttributes.Builder, spatializationBehavior: Int
         ) {
             builder.setSpatializationBehavior(spatializationBehavior)
         }
 
         fun setIsContentSpatialized(
-            builder: android.media.AudioAttributes.Builder,
-            isContentSpatialized: Boolean
+            builder: android.media.AudioAttributes.Builder, isContentSpatialized: Boolean
         ) {
             builder.setIsContentSpatialized(isContentSpatialized)
         }
@@ -176,14 +140,12 @@ class AudioAttributes private constructor(
     companion object {
         val DEFAULT: AudioAttributes = AudioAttributes()
 
-        @SuppressLint("WrongConstant") // Assigning platform constants as C.AudioAllowedCapturePolicy
         fun fromPlatformAudioAttributes(audioAttributes: AudioAttributes): AudioAttributes {
-            val builder =
-                AudioAttributes(
-                    contentType = audioAttributes.contentType,
-                    flags = audioAttributes.flags,
-                    usage = audioAttributes.usage
-                )
+            val builder = AudioAttributes(
+                contentType = audioAttributes.contentType,
+                flags = audioAttributes.flags,
+                usage = audioAttributes.usage
+            )
             if (Build.VERSION.SDK_INT >= 29) {
                 builder.allowedCapturePolicy = audioAttributes.allowedCapturePolicy
                 builder.hapticChannelsMuted = audioAttributes.hapticChannelsMuted

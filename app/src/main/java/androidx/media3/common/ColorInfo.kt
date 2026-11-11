@@ -36,7 +36,7 @@ data class ColorInfo(
             else
                 "NA/NA/NA"
         val bitdepthsString =
-            if (this.isBitdepthValid) lumaBitdepth.toString() + "/" + chromaBitdepth else "NA/NA"
+            if (this.isBitdepthValid) "$lumaBitdepth/$chromaBitdepth" else "NA/NA"
         return "$dataspaceString/$bitdepthsString"
     }
 

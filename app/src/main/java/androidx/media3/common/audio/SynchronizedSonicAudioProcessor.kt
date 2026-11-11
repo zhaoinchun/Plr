@@ -6,11 +6,7 @@ internal class SynchronizedSonicAudioProcessor(
     private val lock: Any,
     keepActiveWithDefaultParameters: Boolean
 ) : AudioProcessor {
-    private val sonicAudioProcessor: SonicAudioProcessor
-
-    init {
-        sonicAudioProcessor = SonicAudioProcessor(keepActiveWithDefaultParameters)
-    }
+    private val sonicAudioProcessor = SonicAudioProcessor(keepActiveWithDefaultParameters)
 
     fun setSpeed(speed: Float) {
         synchronized(lock) {

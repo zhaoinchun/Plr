@@ -22,7 +22,6 @@ import java.util.Queue
 import kotlin.math.min
 
 class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) constructor(
-    
     val speedProvider: SpeedProvider,
     areInputTimestampsAdjusted: Boolean,
     shouldMaintainPitch: Boolean
@@ -187,7 +186,6 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
         sonicAudioProcessor.reset()
     }
 
-    // TODO(b/381553948): Accept an executor on which to dispatch the callback.
     fun getSpeedAdjustedTimeAsync(inputTimeUs: Long, callback: TimestampConsumer) {
         val sampleRate: Int
         synchronized(lock) {
@@ -198,7 +196,6 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
                 return
             }
         }
-        // TODO(b/381553948): Use an executor to invoke callback.
         callback.onTimestamp(
             getDurationUsAfterProcessorApplied(speedProvider, sampleRate, inputTimeUs)
         )
@@ -232,7 +229,6 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
             while (!pendingCallbacks.isEmpty()) {
                 val inputTimeUs = pendingCallbackInputTimesUs.remove()
                 val consumer = pendingCallbacks.remove()
-                // TODO(b/381553948): Use an executor to invoke callback.
                 consumer.onTimestamp(
                     getDurationUsAfterProcessorApplied(
                         speedProvider, inputAudioFormat.sampleRate, inputTimeUs
@@ -264,7 +260,6 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
     }
 
     companion object {
-        
         fun getSampleCountAfterProcessorApplied(
             speedProvider: SpeedProvider,
             @IntRange(from = 1) inputSampleRateHz: Int,

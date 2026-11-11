@@ -12,23 +12,17 @@ import androidx.media3.common.util.Util.ceilDivide
 import androidx.media3.common.util.Util.intToStringMaxRadix
 import com.google.common.collect.Iterables
 import java.nio.ByteBuffer
-import java.util.Arrays
 import kotlin.math.min
 
 class BundleableByteArray(private val byteArray: ByteArray) {
-    private val inProcessBinder: InProcessBinder
-
+    private val inProcessBinder= InProcessBinder()
     var sharedMemoryApi27: SharedMemoryApi27? = null
     var splitArrayRetriever: SplitArrayRetriever? = null
-
-    init {
-        this.inProcessBinder = InProcessBinder()
-    }
 
     fun toBundle(): Bundle {
         val bundle = Bundle()
         bundle.putBinder(FIELD_IN_PROCESS_BINDER, inProcessBinder)
-        if (Build.VERSION.SDK_INT >= 27 && byteArray.size > 0) {
+        if (Build.VERSION.SDK_INT >= 27 && byteArray.isNotEmpty()) {
             if (sharedMemoryApi27 == null) {
                 sharedMemoryApi27 = SharedMemoryApi27.create(byteArray)
             }
@@ -66,18 +60,14 @@ class BundleableByteArray(private val byteArray: ByteArray) {
                         "Failed to allocate shared memory for byte array, size=" + byteArray.size,
                         e
                     )
-                    if (sharedMemory != null) {
-                        sharedMemory.close()
-                    }
+                    sharedMemory?.close()
                     return null
                 }
             }
 
             internal fun readFromBundle(bundle: Bundle): ByteArray? {
-                val sharedMemory = bundle.getParcelable<SharedMemory?>(FIELD_SHARED_MEMORY)
-                if (sharedMemory == null) {
-                    return null
-                }
+                val sharedMemory =
+                    bundle.getParcelable<SharedMemory?>(FIELD_SHARED_MEMORY) ?: return null
                 var byteBuffer: ByteBuffer? = null
                 try {
                     byteBuffer = sharedMemory.mapReadOnly()
@@ -133,17 +123,15 @@ class BundleableByteArray(private val byteArray: ByteArray) {
                 if (list.isEmpty()) {
                     return EMPTY_BYTE_ARRAY
                 }
-                val lastByteArray = Iterables.getLast<Bundle?>(list)!!.getByteArray(BUNDLE_KEY)
-                if (lastByteArray == null) {
-                    return null
-                }
+                val lastByteArray =
+                    Iterables.getLast<Bundle?>(list)!!.getByteArray(BUNDLE_KEY) ?: return null
                 val fullChunkCount = list.size - 1
                 val outArray = ByteArray(fullChunkCount * CHUNK_SIZE + lastByteArray.size)
                 System.arraycopy(
                     lastByteArray, 0, outArray, fullChunkCount * CHUNK_SIZE, lastByteArray.size
                 )
                 for (i in 0..<fullChunkCount) {
-                    val chunk = list[i]!!.getByteArray(BUNDLE_KEY)
+                    val chunk = list[i].getByteArray(BUNDLE_KEY)
                     if (chunk == null || chunk.size != CHUNK_SIZE) {
                         return null
                     }
@@ -168,10 +156,7 @@ class BundleableByteArray(private val byteArray: ByteArray) {
         private val FIELD_SPLIT_ARRAY_RETRIEVER = intToStringMaxRadix(2)
 
         fun fromBundle(bundle: Bundle): ByteArray? {
-            val inProcessBinder = bundle.getBinder(FIELD_IN_PROCESS_BINDER)
-            if (inProcessBinder == null) {
-                return null
-            }
+            val inProcessBinder = bundle.getBinder(FIELD_IN_PROCESS_BINDER) ?: return null
             val isLocal = inProcessBinder is InProcessBinder
             if (isLocal) {
                 return inProcessBinder.getByteArray()
