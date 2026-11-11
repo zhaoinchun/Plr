@@ -136,7 +136,7 @@ class CacheDataSource private constructor(
             } else if (cacheWriteDataSinkFactory != null) {
                 cacheWriteDataSink = cacheWriteDataSinkFactory!!.createDataSink()
             } else {
-                cacheWriteDataSink = CacheDataSink.Factory().setCache(cache).createDataSink()
+                cacheWriteDataSink = CacheDataSink.Factory(cache=cache).createDataSink()
             }
             return CacheDataSource(
                 cache,

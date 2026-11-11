@@ -8,32 +8,24 @@ import java.util.NavigableSet
 interface Cache {
     interface Listener {
         fun onSpanAdded(cache: Cache, span: CacheSpan)
-
         fun onSpanRemoved(cache: Cache, span: CacheSpan)
-
         fun onSpanTouched(cache: Cache, oldSpan: CacheSpan, newSpan: CacheSpan)
     }
 
     open class CacheException : IOException {
         constructor(message: String?) : super(message)
-
         constructor(cause: Throwable?) : super(cause)
-
         constructor(message: String?, cause: Throwable?) : super(message, cause)
     }
 
     val uid: Long
+
     @WorkerThread
     fun release()
-
     fun addListener(key: String, listener: Listener): NavigableSet<CacheSpan>
-
     fun removeListener(key: String, listener: Listener)
-
     fun getCachedSpans(key: String): NavigableSet<CacheSpan>
-
     val keys: MutableSet<String?>?
-
     val cacheSpace: Long
 
     @WorkerThread
@@ -61,9 +53,7 @@ interface Cache {
     fun removeSpan(span: CacheSpan)
 
     fun isCached(key: String, position: Long, length: Long): Boolean
-
     fun getCachedLength(key: String, position: Long, length: Long): Long
-
     fun getCachedBytes(key: String, position: Long, length: Long): Long
 
     @WorkerThread

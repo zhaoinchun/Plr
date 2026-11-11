@@ -7,65 +7,24 @@ import androidx.media3.datasource.DataSink
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.cache.Cache.CacheException
 import com.google.common.base.Preconditions
-
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 import kotlin.math.min
 
-class CacheDataSink  constructor(
-    cache: Cache?,
-    fragmentSize: Long,
-    bufferSize: Int = DEFAULT_BUFFER_SIZE
+class CacheDataSink(
+    private val cache: Cache,
+    private var fragmentSize: Long,
+    private val bufferSize: Int = DEFAULT_BUFFER_SIZE
 ) : DataSink {
-    class Factory : DataSink.Factory {
-        private var cache:Cache? = null
-        private var fragmentSize: Long
-        private var bufferSize: Int
-
-        init {
-            fragmentSize = DEFAULT_FRAGMENT_SIZE
-            bufferSize = DEFAULT_BUFFER_SIZE
-        }
-
-        fun setCache(cache: Cache?): Factory {
-            this.cache = cache
-            return this
-        }
-
-        fun setFragmentSize(fragmentSize: Long): Factory {
-            this.fragmentSize = fragmentSize
-            return this
-        }
-
-        fun setBufferSize(bufferSize: Int): Factory {
-            this.bufferSize = bufferSize
-            return this
-        }
-
-        override fun createDataSink(): DataSink {
-            return CacheDataSink(
-                cache,
-                fragmentSize,
-                bufferSize
-            )
-        }
-    }
-
-    class CacheDataSinkException(cause: IOException?) : CacheException(cause)
-
-    private val cache: Cache
-    private val fragmentSize: Long
-    private val bufferSize: Int
-
     private var dataSpec: DataSpec? = null
     private var dataSpecFragmentSize: Long = 0
     private var file: File? = null
     private var outputStream: OutputStream? = null
     private var outputStreamBytesWritten: Long = 0
     private var dataSpecBytesWritten: Long = 0
-    private var bufferedOutputStream:ReusableBufferedOutputStream? = null
+    private var bufferedOutputStream: ReusableBufferedOutputStream? = null
 
     init {
         Preconditions.checkState(
@@ -80,13 +39,26 @@ class CacheDataSink  constructor(
                         + ". This may cause poor cache performance.")
             )
         }
-        this.cache = cache!!
         this.fragmentSize =
             if (fragmentSize == C.LENGTH_UNSET.toLong()) Long.MAX_VALUE else fragmentSize
-        this.bufferSize = bufferSize
     }
 
-    @Throws(CacheDataSinkException::class)
+    class Factory(
+        var cache: Cache,
+        var fragmentSize: Long = DEFAULT_FRAGMENT_SIZE,
+        var bufferSize: Int = DEFAULT_BUFFER_SIZE
+    ) : DataSink.Factory {
+        override fun createDataSink(): DataSink {
+            return CacheDataSink(
+                cache,
+                fragmentSize,
+                bufferSize
+            )
+        }
+    }
+
+    class CacheDataSinkException(cause: IOException?) : CacheException(cause)
+
     override fun open(dataSpec: DataSpec) {
         dataSpec.key!!
         if (dataSpec.length == C.LENGTH_UNSET.toLong()
@@ -108,10 +80,7 @@ class CacheDataSink  constructor(
 
     @Throws(CacheDataSinkException::class)
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
-        val dataSpec = this.dataSpec
-        if (dataSpec == null) {
-            return
-        }
+        val dataSpec = this.dataSpec ?: return
         try {
             var bytesWritten = 0
             while (bytesWritten < length) {
@@ -133,7 +102,6 @@ class CacheDataSink  constructor(
         }
     }
 
-    @Throws(CacheDataSinkException::class)
     override fun close() {
         if (dataSpec == null) {
             return
@@ -145,7 +113,6 @@ class CacheDataSink  constructor(
         }
     }
 
-    @Throws(IOException::class)
     private fun openNextOutputStream(dataSpec: DataSpec) {
         val length =
             if (dataSpec.length == C.LENGTH_UNSET.toLong())
@@ -172,19 +139,15 @@ class CacheDataSink  constructor(
         outputStreamBytesWritten = 0
     }
 
-    @Throws(IOException::class)
     private fun closeCurrentOutputStream() {
-        if (outputStream == null) {
-            return
-        }
-
+        val outputStream = outputStream ?: return
         var success = false
         try {
-            outputStream!!.flush()
+            outputStream.flush()
             success = true
         } finally {
             closeQuietly(outputStream)
-            outputStream = null
+            this.outputStream = null
             val fileToCommit: File = file!!
             file = null
             if (success) {
@@ -196,10 +159,9 @@ class CacheDataSink  constructor(
     }
 
     companion object {
-        val DEFAULT_FRAGMENT_SIZE: Long = (5 * 1024 * 1024).toLong()
-        val DEFAULT_BUFFER_SIZE: Int = 20 * 1024
-
-        private val MIN_RECOMMENDED_FRAGMENT_SIZE = (2 * 1024 * 1024).toLong()
+        const val DEFAULT_FRAGMENT_SIZE: Long = (5 * 1024 * 1024).toLong()
+        const val DEFAULT_BUFFER_SIZE: Int = 20 * 1024
+        private const val MIN_RECOMMENDED_FRAGMENT_SIZE = (2 * 1024 * 1024).toLong()
         private const val TAG = "CacheDataSink"
     }
 }

@@ -3,18 +3,14 @@ package androidx.media3.datasource.cache
 import androidx.media3.common.C
 import java.io.File
 
-open class CacheSpan  constructor(
+open class CacheSpan(
     val key: String,
     val position: Long,
     val length: Long,
     val lastTouchTimestamp: Long = C.TIME_UNSET,
     val file: File? = null
 ) : Comparable<CacheSpan> {
-    val isCached: Boolean
-
-    init {
-        this.isCached = file != null
-    }
+    val isCached: Boolean = file != null
 
     val isOpenEnded: Boolean
         get() = length == C.LENGTH_UNSET.toLong()
@@ -31,6 +27,6 @@ open class CacheSpan  constructor(
     }
 
     override fun toString(): String {
-        return "[" + position + ", " + length + "]"
+        return "[$position, $length]"
     }
 }
