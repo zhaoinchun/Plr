@@ -114,7 +114,7 @@ internal class AsynchronousMediaCodecAdapter private constructor(
     private val asynchronousMediaCodecCallback = AsynchronousMediaCodecCallback(callbackThread)
     private val bufferEnqueuer: MediaCodecBufferEnqueuer by lazy { bufferEnqueuer }
     private var codecReleased = false
-    private var state: @State Int = STATE_CREATED
+    private var state:  Int = STATE_CREATED
 
     private fun initialize(
         mediaFormat: MediaFormat?,

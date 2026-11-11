@@ -124,7 +124,7 @@ interface AnalyticsListener {
         }
     }
 
-    fun onPlaybackStateChanged(eventTime: EventTime, @Player.State state: @Player.State Int) {
+    fun onPlaybackStateChanged(eventTime: EventTime,  state:  Int) {
     }
 
     fun onPlayWhenReadyChanged(

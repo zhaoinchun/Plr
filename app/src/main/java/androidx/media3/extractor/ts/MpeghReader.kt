@@ -28,7 +28,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
     private val headerScratchBits: ParsableBitArray
     private val dataScratchBytes: ParsableByteArray
 
-    private var state: @State Int
+    private var state:  Int
 
     private var formatId: String? = null
     private var output: TrackOutput? = null

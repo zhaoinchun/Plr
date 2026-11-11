@@ -24,7 +24,7 @@ class SingleSampleExtractor(
     private annotation class State
 
     private var size = 0
-    private var state: @State Int = 0
+    private var state:  Int = 0
     private var extractorOutput: ExtractorOutput? = null
     private var trackOutput: TrackOutput? = null
 

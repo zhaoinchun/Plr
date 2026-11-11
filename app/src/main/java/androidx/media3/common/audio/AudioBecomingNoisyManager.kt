@@ -1,4 +1,3 @@
-
 package androidx.media3.common.audio
 
 import android.annotation.SuppressLint
@@ -20,10 +19,10 @@ class AudioBecomingNoisyManager(
 ) {
     private val context: Context = context.applicationContext
     private val receiver = AudioBecomingNoisyReceiver(
-            clock.createHandler(eventLooper,  null), listener
-        )
+        clock.createHandler(eventLooper, null), listener
+    )
     private val backgroundHandler: HandlerWrapper =
-        clock.createHandler(backgroundLooper,  null)
+        clock.createHandler(backgroundLooper, null)
     private var isEnabled = false
 
     interface Listener {
@@ -41,11 +40,10 @@ class AudioBecomingNoisyManager(
                     receiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
                 )
             }
-            isEnabled = true
         } else {
             backgroundHandler.post { context.unregisterReceiver(receiver) }
-            isEnabled = false
         }
+        isEnabled = enabled
     }
 
     private inner class AudioBecomingNoisyReceiver(
@@ -54,7 +52,7 @@ class AudioBecomingNoisyManager(
     ) : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY == intent.action) {
-                eventHandler.post { this.callListenerIfEnabled() }
+                eventHandler.post { callListenerIfEnabled() }
             }
         }
 

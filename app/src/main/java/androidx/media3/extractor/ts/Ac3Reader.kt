@@ -39,7 +39,7 @@ class Ac3Reader(
     private var formatId: String? = null
     private var output: TrackOutput? = null
 
-    private var state: @State Int
+    private var state:  Int
     private var bytesRead = 0
 
     // Used to find the header.

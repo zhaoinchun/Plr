@@ -42,7 +42,7 @@ class SilenceSkippingAudioProcessor(
     private val maxSilenceToKeepDurationUs: Long
     private var bytesPerFrame = 0
     private var enabled = false
-    private var state: @State Int = 0
+    private var state:  Int = 0
     var skippedFrames: Long = 0
         private set
     private var outputSilenceFramesSinceNoise = 0

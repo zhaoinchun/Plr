@@ -31,7 +31,7 @@ interface DrmSession {
     annotation class State
 
     @get:State
-    val state: @State Int
+    val state:  Int
 
     fun playClearSamplesWithoutKeys(): Boolean {
         return false

@@ -413,7 +413,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
     }
 
     private fun resolveNewPlaybackState(player: Player): Int {
-        @Player.State val playerPlaybackState: @Player.State Int = player.playbackState
+         val playerPlaybackState:  Int = player.playbackState
         if (isSeeking) {
             // Seeking takes precedence over errors such that we report a seek while in error state.
             return PlaybackStateEvent.STATE_SEEKING

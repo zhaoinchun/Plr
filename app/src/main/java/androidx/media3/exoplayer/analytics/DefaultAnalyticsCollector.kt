@@ -624,7 +624,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
         }
     }
 
-    override fun onPlaybackStateChanged(@Player.State playbackState: @Player.State Int) {
+    override fun onPlaybackStateChanged( playbackState:  Int) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
         sendEvent(
             eventTime,

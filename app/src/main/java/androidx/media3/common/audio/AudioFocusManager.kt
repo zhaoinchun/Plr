@@ -5,14 +5,11 @@ import android.media.AudioManager
 import android.media.AudioManager.OnAudioFocusChangeListener
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.IntDef
-import androidx.annotation.VisibleForTesting
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.audio.AudioManagerCompat.AUDIOFOCUS_GAIN
 import androidx.media3.common.audio.AudioManagerCompat.AUDIOFOCUS_NONE
-import androidx.media3.common.audio.AudioManagerCompat.AudioFocusGain
 import androidx.media3.common.audio.AudioManagerCompat.getAudioManager
 import androidx.media3.common.util.Log.w
 import com.google.common.base.Preconditions
@@ -25,32 +22,16 @@ class AudioFocusManager(
 ) {
     interface PlayerControl {
         fun setVolumeMultiplier(volumeMultiplier: Float)
-        fun executePlayerCommand(playerCommand: @PlayerCommand Int)
+        fun executePlayerCommand(playerCommand: Int)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [PLAYER_COMMAND_DO_NOT_PLAY, PLAYER_COMMAND_WAIT_FOR_CALLBACK, PLAYER_COMMAND_PLAY_WHEN_READY]
-    )
-    annotation class PlayerCommand
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [AUDIO_FOCUS_STATE_NOT_REQUESTED, AUDIO_FOCUS_STATE_NO_FOCUS, AUDIO_FOCUS_STATE_HAVE_FOCUS, AUDIO_FOCUS_STATE_LOSS_TRANSIENT, AUDIO_FOCUS_STATE_LOSS_TRANSIENT_DUCK]
-    )
-    private annotation class AudioFocusState
 
     private val audioManager =
         Suppliers.memoize<AudioManager> { getAudioManager(context) }
     private val eventHandler: Handler = Handler(eventLooper)
     private var audioAttributes: AudioAttributes? = null
 
-    private var audioFocusState: @AudioFocusState Int = AUDIO_FOCUS_STATE_NOT_REQUESTED
-    private var focusGainToRequest: @AudioFocusGain Int = 0
+    private var audioFocusState: Int = AUDIO_FOCUS_STATE_NOT_REQUESTED
+    private var focusGainToRequest: Int = 0
     var volumeMultiplier: Float = VOLUME_MULTIPLIER_DEFAULT
         private set
     private var audioFocusRequest: AudioFocusRequestCompat? = null
@@ -68,8 +49,8 @@ class AudioFocusManager(
     }
 
     fun updateAudioFocus(
-        playWhenReady: Boolean, @Player.State playbackState: @Player.State Int
-    ): @PlayerCommand Int {
+        playWhenReady: Boolean, playbackState: Int
+    ): Int {
         if (!shouldHandleAudioFocus(playbackState)) {
             abandonAudioFocusIfHeld()
             setAudioFocusState(AUDIO_FOCUS_STATE_NOT_REQUESTED)
@@ -91,18 +72,17 @@ class AudioFocusManager(
         setAudioFocusState(AUDIO_FOCUS_STATE_NOT_REQUESTED)
     }
 
-    @get:VisibleForTesting
     val focusListener: OnAudioFocusChangeListener
         // Internal methods.
         get() = OnAudioFocusChangeListener { focusChange: Int ->
             handlePlatformAudioFocusChange(focusChange)
         }
 
-    private fun shouldHandleAudioFocus(@Player.State playbackState: @Player.State Int): Boolean {
+    private fun shouldHandleAudioFocus(playbackState: Int): Boolean {
         return playbackState != Player.STATE_IDLE && focusGainToRequest == AUDIOFOCUS_GAIN
     }
 
-    private fun requestAudioFocus(): @PlayerCommand Int {
+    private fun requestAudioFocus(): Int {
         if (audioFocusState == AUDIO_FOCUS_STATE_HAVE_FOCUS) {
             return PLAYER_COMMAND_PLAY_WHEN_READY
         }
@@ -161,7 +141,7 @@ class AudioFocusManager(
         return audioAttributes != null && audioAttributes!!.contentType == C.AUDIO_CONTENT_TYPE_SPEECH
     }
 
-    private fun setAudioFocusState(audioFocusState: @AudioFocusState Int) {
+    private fun setAudioFocusState(audioFocusState: Int) {
         if (this.audioFocusState == audioFocusState) {
             return
         }
@@ -208,7 +188,7 @@ class AudioFocusManager(
         }
     }
 
-    private fun executePlayerCommand(playerCommand: @PlayerCommand Int) {
+    private fun executePlayerCommand(playerCommand: Int) {
         playerControl?.executePlayerCommand(playerCommand)
     }
 
@@ -227,7 +207,7 @@ class AudioFocusManager(
 
         private fun convertAudioAttributesToFocusGain(
             audioAttributes: AudioAttributes?
-        ): @AudioFocusGain Int {
+        ): Int {
             if (audioAttributes == null) {
                 // Don't handle audio focus. It may be either video only contents or developers
                 // want to have more finer grained control. (e.g. adding audio focus listener)

@@ -602,7 +602,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
         }
 
         fun resolveNewPlaybackState(player: Player): @PlaybackStats.PlaybackState Int {
-            @Player.State val playerPlaybackState: @Player.State Int = player.playbackState
+             val playerPlaybackState:  Int = player.playbackState
             if (isSeeking && isForeground) {
                 // Seeking takes precedence over errors such that we report a seek while in error state.
                 return PlaybackStats.PLAYBACK_STATE_SEEKING

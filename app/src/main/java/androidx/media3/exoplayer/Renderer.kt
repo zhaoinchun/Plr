@@ -42,7 +42,7 @@ interface Renderer : PlayerMessage.Target {
     val capabilities: RendererCapabilities?
     fun init(index: Int, playerId: PlayerId?, clock: Clock?)
     val mediaClock: MediaClock?
-    val state: @State Int
+    val state:  Int
 
     @Throws(ExoPlaybackException::class)
     fun enable(

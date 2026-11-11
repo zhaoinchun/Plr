@@ -22,7 +22,6 @@ import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.TrackSelectionParameters
 import androidx.media3.common.audio.AudioFocusManager
-import androidx.media3.common.audio.AudioFocusManager.PlayerCommand
 import androidx.media3.common.audio.AudioFocusManager.PlayerControl
 import androidx.media3.common.util.Clock
 import androidx.media3.common.util.ConditionVariable
@@ -438,7 +437,7 @@ internal class ExoPlayerImplInternal(
     }
 
     @Throws(ExoPlaybackException::class)
-    private fun handleAudioFocusPlayerCommandInternal(playerCommand: @PlayerCommand Int) {
+    private fun handleAudioFocusPlayerCommandInternal(playerCommand:  Int) {
         updatePlayWhenReadyWithAudioFocus(
             playbackInfo.playWhenReady,
             playerCommand,
@@ -562,7 +561,7 @@ internal class ExoPlayerImplInternal(
         handler.sendEmptyMessage(MSG_AUDIO_FOCUS_VOLUME_MULTIPLIER)
     }
 
-    override fun executePlayerCommand(playerCommand: @PlayerCommand Int) {
+    override fun executePlayerCommand(playerCommand:  Int) {
         handler.obtainMessage(MSG_AUDIO_FOCUS_PLAYER_COMMAND, playerCommand, 0).sendToTarget()
     }
 
@@ -1028,7 +1027,7 @@ internal class ExoPlayerImplInternal(
         playbackSuppressionReason: @Player.PlaybackSuppressionReason Int = playbackInfo.playbackSuppressionReason,
         playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int = playbackInfo.playWhenReadyChangeReason
     ) {
-        val playerCommand: @PlayerCommand Int =
+        val playerCommand:  Int =
             audioFocusManager.updateAudioFocus(playWhenReady, playbackInfo.playbackState)
         updatePlayWhenReadyWithAudioFocus(
             playWhenReady, playerCommand, playbackSuppressionReason, playWhenReadyChangeReason
@@ -1038,7 +1037,7 @@ internal class ExoPlayerImplInternal(
     @Throws(ExoPlaybackException::class)
     private fun updatePlayWhenReadyWithAudioFocus(
         playWhenReady: Boolean,
-        playerCommand: @PlayerCommand Int,
+        playerCommand:  Int,
         playbackSuppressionReason: @Player.PlaybackSuppressionReason Int,
         playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int
     ) {
@@ -4631,7 +4630,7 @@ internal class ExoPlayerImplInternal(
         }
 
         private fun updatePlayWhenReadyChangeReason(
-            playerCommand: @PlayerCommand Int,
+            playerCommand:  Int,
             playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int
         ): Int {
             if (playerCommand == AudioFocusManager.PLAYER_COMMAND_DO_NOT_PLAY) {
@@ -4644,7 +4643,7 @@ internal class ExoPlayerImplInternal(
         }
 
         private fun updatePlaybackSuppressionReason(
-            playerCommand: @PlayerCommand Int,
+            playerCommand:  Int,
             playbackSuppressionReason: @Player.PlaybackSuppressionReason Int,
             isScrubbingModeEnabled: Boolean
         ): Int {

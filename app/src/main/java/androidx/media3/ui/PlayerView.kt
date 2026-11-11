@@ -1263,7 +1263,7 @@ class PlayerView(
             updateForCurrentTrackSelections(false)
         }
 
-        override fun onPlaybackStateChanged(@Player.State playbackState: @Player.State Int) {
+        override fun onPlaybackStateChanged( playbackState:  Int) {
             updateBuffering()
             updateErrorMessage()
             updateControllerVisibility()

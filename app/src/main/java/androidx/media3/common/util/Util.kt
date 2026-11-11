@@ -2411,7 +2411,7 @@ object Util {
         if (player == null) {
             return false
         }
-        @Player.State val playbackState: @Player.State Int = player.playbackState
+         val playbackState:  Int = player.playbackState
         val hasMediaItem =
             !(player.isCommandAvailable(Player.COMMAND_GET_CURRENT_MEDIA_ITEM)
                     && player.currentMediaItem == null)
@@ -2441,7 +2441,7 @@ object Util {
         if (player == null) {
             return false
         }
-        @Player.State val state: @Player.State Int = player.playbackState
+         val state:  Int = player.playbackState
         var methodTriggered = false
         if (state == Player.STATE_IDLE && player.isCommandAvailable(Player.COMMAND_PREPARE)) {
             player.prepare()

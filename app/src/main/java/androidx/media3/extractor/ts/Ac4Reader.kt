@@ -40,7 +40,7 @@ class Ac4Reader(
     private var formatId: String? = null
     private var output: TrackOutput? = null
 
-    private var state: @State Int
+    private var state:  Int
     private var bytesRead: Int
 
     // Used to find the header.

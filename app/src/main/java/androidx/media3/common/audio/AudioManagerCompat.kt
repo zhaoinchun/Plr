@@ -81,12 +81,10 @@ object AudioManagerCompat {
         }
     }
 
-    @IntRange(from = 0)
     fun getStreamMaxVolume(audioManager: AudioManager, streamType: @C.StreamType Int): Int {
         return audioManager.getStreamMaxVolume(streamType)
     }
 
-    @IntRange(from = 0)
     fun getStreamMinVolume(audioManager: AudioManager, streamType: @C.StreamType Int): Int {
         return if (Build.VERSION.SDK_INT >= 28) audioManager.getStreamMinVolume(streamType) else 0
     }
@@ -105,12 +103,4 @@ object AudioManagerCompat {
     fun isStreamMute(audioManager: AudioManager, streamType: @C.StreamType Int): Boolean {
         return audioManager.isStreamMute(streamType)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [AUDIOFOCUS_NONE, AUDIOFOCUS_GAIN, AUDIOFOCUS_GAIN_TRANSIENT, AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK, AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE]
-    )
-    annotation class AudioFocusGain
 }

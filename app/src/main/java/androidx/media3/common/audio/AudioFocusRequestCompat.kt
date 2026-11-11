@@ -12,7 +12,7 @@ import androidx.media3.common.util.Util.postOrRun
 import java.util.Objects
 
 data class AudioFocusRequestCompat internal constructor(
-    val focusGain: @AudioManagerCompat.AudioFocusGain Int,
+    val focusGain:  Int,
     var onAudioFocusChangeListener: OnAudioFocusChangeListener,
     val focusChangeHandler: Handler = Handler(Looper.getMainLooper()),
     val audioAttributes: AudioAttributes = AudioAttributes.DEFAULT,
@@ -76,7 +76,7 @@ data class AudioFocusRequestCompat internal constructor(
         get() = frameworkAudioFocusRequest as AudioFocusRequest
 
     companion object {
-        private fun isValidFocusGain(focusGain: @AudioManagerCompat.AudioFocusGain Int): Boolean {
+        private fun isValidFocusGain(focusGain:  Int): Boolean {
             when (focusGain) {
                 AudioManagerCompat.AUDIOFOCUS_GAIN, AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT, AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK, AudioManagerCompat.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE -> return true
                 else -> return false

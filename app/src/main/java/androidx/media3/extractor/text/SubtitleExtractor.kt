@@ -42,7 +42,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
     private var extractorOutput: ExtractorOutput? = null
     private var seekMap: IndexSeekMap? = null
     private var bytesRead = 0
-    private var state: @State Int
+    private var state:  Int
     private var timestamps: LongArray
     private var seekTimeUs: Long
 

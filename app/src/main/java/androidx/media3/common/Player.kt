@@ -308,7 +308,7 @@ interface Player {
         fun onIsLoadingChanged(isLoading: Boolean) {}
         fun onAvailableCommandsChanged(availableCommands: Commands) {}
         fun onTrackSelectionParametersChanged(parameters: TrackSelectionParameters) {}
-        fun onPlaybackStateChanged(playbackState: @State Int) {}
+        fun onPlaybackStateChanged(playbackState: Int) {}
         fun onPlayWhenReadyChanged(
             playWhenReady: Boolean, reason: @PlayWhenReadyChangeReason Int
         ) {
@@ -347,24 +347,6 @@ interface Player {
         fun onCues(cueGroup: CueGroup) {}
         fun onMetadata(metadata: Metadata) {}
     }
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [STATE_IDLE, STATE_BUFFERING, STATE_READY, STATE_ENDED])
-    annotation class State
 
     // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
     // with Kotlin usages from before TYPE_USE was added.
@@ -550,7 +532,7 @@ interface Player {
     fun canAdvertiseSession(): Boolean
     val availableCommands: Commands?
     fun prepare()
-    val playbackState: @State Int
+    val playbackState: Int
     val playbackSuppressionReason: @PlaybackSuppressionReason Int
     val isPlaying: Boolean
     val playerError: PlaybackException?

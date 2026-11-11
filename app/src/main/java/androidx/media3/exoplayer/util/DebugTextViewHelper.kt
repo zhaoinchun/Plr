@@ -124,7 +124,7 @@ class DebugTextViewHelper(private val player: ExoPlayer, private val textView: T
 
     private inner class Updater : Player.Listener, Runnable {
         // Player.Listener implementation.
-        override fun onPlaybackStateChanged(@Player.State playbackState: @Player.State Int) {
+        override fun onPlaybackStateChanged( playbackState:  Int) {
             updateAndPost()
         }
 

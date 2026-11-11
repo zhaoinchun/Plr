@@ -48,7 +48,7 @@ class AviExtractor(
     private val chunkHeaderHolder: ChunkHeaderHolder
     private val parseSubtitlesDuringExtraction: Boolean
 
-    private var state: @State Int = 0
+    private var state:  Int = 0
     private var extractorOutput: ExtractorOutput
     private var aviHeader: AviMainHeaderChunk? = null
     private var durationUs: Long

@@ -41,7 +41,7 @@ internal class HeicMotionPhotoExtractor : Extractor {
         null
     private var mp4Extractor: Mp4Extractor? = null
 
-    private var state: @State Int
+    private var state:  Int
     private var atomType = 0
     private var atomSize: Long = 0
     private var atomHeaderBytesRead = 0

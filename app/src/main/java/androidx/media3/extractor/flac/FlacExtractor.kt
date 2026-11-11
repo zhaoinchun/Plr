@@ -57,7 +57,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
     private var extractorOutput:ExtractorOutput? = null
     private var trackOutput:TrackOutput? = null
 
-    private var state: @State Int
+    private var state:  Int
     private var id3Metadata: Metadata? = null
     private var flacStreamMetadata:FlacStreamMetadata? = null
     private var minFrameSize = 0

@@ -51,7 +51,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
 
     private var extractorOutput: ExtractorOutput? = null
 
-    private var state: @State Int = 0
+    private var state:  Int = 0
     private var marker = 0
     private var segmentLength = 0
     private var mp4StartPosition: Long

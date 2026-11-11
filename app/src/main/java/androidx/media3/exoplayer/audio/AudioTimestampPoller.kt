@@ -24,7 +24,7 @@ internal class AudioTimestampPoller(
     private val audioTimestamp: AudioTimestampWrapper = AudioTimestampWrapper(audioTrack)
     private val sampleRate: Int= audioTrack.sampleRate
 
-    private var state: @State Int = 0
+    private var state:  Int = 0
     private var initializeSystemTimeUs: Long = 0
     private var sampleIntervalUs: Long = 0
     private var lastTimestampSampleTimeUs: Long = 0
@@ -118,7 +118,7 @@ internal class AudioTimestampPoller(
         audioTimestamp.expectTimestampFramePositionReset()
     }
 
-    private fun updateState(state: @State Int) {
+    private fun updateState(state:  Int) {
         this.state = state
         when (state) {
             STATE_INITIALIZING -> {

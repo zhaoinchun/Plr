@@ -49,7 +49,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
 
     override fun onPlaybackStateChanged(
         eventTime: EventTime,
-        @Player.State state: @Player.State Int
+         state:  Int
     ) {
         logd(eventTime, "state", getStateString(state))
     }

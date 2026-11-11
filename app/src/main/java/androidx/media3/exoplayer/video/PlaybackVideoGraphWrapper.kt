@@ -105,7 +105,7 @@ class PlaybackVideoGraphWrapper(
     private var outputStreamFirstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int = 0
     private var currentSurfaceAndSize: Pair<Surface?, Size>? = null
     private var pendingFlushCount = 0
-    private var state: @State Int = STATE_CREATED
+    private var state:  Int = STATE_CREATED
     private var lastOutputFramePresentationTimeUs: Long = C.TIME_UNSET
     private var finalFramePresentationTimeUs: Long = C.TIME_UNSET
     private var hasSignaledEndOfVideoGraphOutputStream = false

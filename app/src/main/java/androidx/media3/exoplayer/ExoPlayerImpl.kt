@@ -749,7 +749,7 @@ class ExoPlayerImpl(
         audioOffloadListeners.remove(listener)
     }
 
-    override val playbackState: @Player.State Int
+    override val playbackState:  Int
         get() = playbackInfo.playbackState
 
     override val playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
@@ -2732,7 +2732,7 @@ class ExoPlayerImpl(
     }
 
     private fun updateWakeAndWifiLock() {
-        val playbackState: @Player.State Int = playbackState
+        val playbackState:  Int = playbackState
         when (playbackState) {
             Player.STATE_READY, Player.STATE_BUFFERING -> {
                 val isSleeping = isSleepingForOffload

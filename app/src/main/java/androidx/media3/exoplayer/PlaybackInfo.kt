@@ -18,7 +18,7 @@ data class PlaybackInfo(
     val periodId: MediaPeriodId,
     val requestedContentPositionUs: Long,
     val discontinuityStartPositionUs: Long,
-    val playbackState: @Player.State Int,
+    val playbackState:  Int,
     val playbackError: ExoPlaybackException?,
     val isLoading: Boolean,
     val trackGroups: TrackGroupArray?,

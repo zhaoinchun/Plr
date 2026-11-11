@@ -34,7 +34,7 @@ class WavExtractor : Extractor {
 
     private lateinit var extractorOutput: ExtractorOutput
     private lateinit var trackOutput: TrackOutput
-    private var state: @State Int
+    private var state:  Int
     private var rf64SampleDataSize: Long
     private var outputWriter: OutputWriter? = null
     private var dataStartPosition: Int

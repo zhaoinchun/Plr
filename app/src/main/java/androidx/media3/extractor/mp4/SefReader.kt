@@ -48,7 +48,7 @@ internal class SefReader {
     private annotation class DataType
 
     private val dataReferences: MutableList<DataReference>
-    private var readerState: @State Int
+    private var readerState:  Int
     private var tailLength = 0
 
     init {

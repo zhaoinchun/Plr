@@ -35,7 +35,7 @@ class FlvExtractor : Extractor {
     private val metadataReader: ScriptTagPayloadReader
 
     private var extractorOutput:ExtractorOutput? = null
-    private var state: @States Int
+    private var state: Int
     private var outputFirstSample = false
     private var mediaTagTimestampOffsetUs: Long = 0
     private var bytesToNextTagHeader = 0

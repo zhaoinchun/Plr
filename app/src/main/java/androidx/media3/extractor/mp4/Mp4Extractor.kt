@@ -100,7 +100,7 @@ class Mp4Extractor constructor(
 
     override var sniffFailureDetails: List<SniffFailure>
         private set
-    private var parserState: @State Int
+    private var parserState:  Int
     private var atomType = 0
     private var atomSize: Long = 0
     private var atomHeaderBytesRead = 0

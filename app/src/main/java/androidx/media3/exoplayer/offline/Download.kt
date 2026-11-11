@@ -5,7 +5,7 @@ import com.google.common.base.Preconditions
 
 class Download(
     val request: DownloadRequest,
-    val state: @State Int,
+    val state:  Int,
     val startTimeMs: Long,
     val updateTimeMs: Long,
     val contentLength: Long,
