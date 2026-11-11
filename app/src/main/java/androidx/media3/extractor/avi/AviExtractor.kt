@@ -62,9 +62,6 @@ class AviExtractor(
     private var idx1BodySize = 0
     private var seekMapHasBeenOutput = false
 
-    @Deprecated("Use {@link #AviExtractor(int, SubtitleParser.Factory)} instead.")
-    constructor() : this(FLAG_EMIT_RAW_SUBTITLE_DATA, SubtitleParser.Factory.UNSUPPORTED)
-
     init {
         parseSubtitlesDuringExtraction = (extractorFlags and FLAG_EMIT_RAW_SUBTITLE_DATA) == 0
         scratch = ParsableByteArray(12)

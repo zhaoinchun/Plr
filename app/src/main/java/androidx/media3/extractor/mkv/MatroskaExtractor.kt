@@ -156,20 +156,6 @@ class MatroskaExtractor internal constructor(
     // Extractor outputs.
     private lateinit var extractorOutput: ExtractorOutput
 
-    @Deprecated("Use {@link #MatroskaExtractor(SubtitleParser.Factory)} instead.")
-    constructor() : this(
-        DefaultEbmlReader(),
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED
-    )
-
-    @Deprecated("Use {@link #MatroskaExtractor(SubtitleParser.Factory, int)} instead.")
-    constructor(flags: @Flags Int) : this(
-        DefaultEbmlReader(),
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED
-    )
-
     constructor(subtitleParserFactory: SubtitleParser.Factory?) : this(
         DefaultEbmlReader(),
         0,
@@ -2631,28 +2617,11 @@ class MatroskaExtractor internal constructor(
 
         const val FLAG_DISABLE_SEEK_FOR_CUES: Int = 1
         const val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1 shl 1 // 2
-
-        @Deprecated("Use {@link #newFactory(SubtitleParser.Factory)} instead.")
-        val FACTORY: ExtractorsFactory =
-            object : ExtractorsFactory {
-                override fun createExtractors(): Array<Extractor> {
-                    return arrayOf<Extractor>(
-                        MatroskaExtractor(
-                            SubtitleParser.Factory.UNSUPPORTED,
-                            FLAG_EMIT_RAW_SUBTITLE_DATA
-                        )
-                    )
-                }
-            }
-
         private const val TAG = "MatroskaExtractor"
-
         private val UNSET_ENTRY_ID = -1
-
         private const val BLOCK_STATE_START = 0
         private const val BLOCK_STATE_HEADER = 1
         private const val BLOCK_STATE_DATA = 2
-
         private const val DOC_TYPE_MATROSKA = "matroska"
         private const val DOC_TYPE_WEBM = "webm"
         private const val CODEC_ID_VP8 = "V_VP8"

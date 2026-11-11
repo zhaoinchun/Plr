@@ -18,17 +18,6 @@ class Id3Peeker {
         scratch = ParsableByteArray(Id3Decoder.ID3_HEADER_LENGTH)
     }
 
-    @InlineMe(replacement = "this.peekId3Data(input, id3FramePredicate,  0)")
-    @Deprecated("Use {@link #peekId3Data(ExtractorInput, FramePredicate, int)} instead.")
-    @Throws(
-        IOException::class
-    )
-    fun peekId3Data(
-        input: ExtractorInput, id3FramePredicate: FramePredicate?
-    ): Metadata? {
-        return peekId3Data(input, id3FramePredicate,  0)
-    }
-
     @Throws(IOException::class)
     fun peekId3Data(
         input: ExtractorInput,

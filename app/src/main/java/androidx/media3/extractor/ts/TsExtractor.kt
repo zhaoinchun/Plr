@@ -64,16 +64,6 @@ class TsExtractor(
     private var bytesSinceLastSync = 0
     private var pcrPid: Int
 
-    @Deprecated("Use {@link #TsExtractor(SubtitleParser.Factory)} instead.")
-    constructor() : this(
-        MODE_SINGLE_PMT,  
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED,
-        TimestampAdjuster(0),
-        DefaultTsPayloadReaderFactory( 0),
-        DEFAULT_TIMESTAMP_SEARCH_BYTES
-    )
-
     constructor(subtitleParserFactory: SubtitleParser.Factory) : this(
         MODE_SINGLE_PMT,  
         0,
@@ -90,71 +80,6 @@ class TsExtractor(
         TimestampAdjuster(0),
         DefaultTsPayloadReaderFactory( 0),
         DEFAULT_TIMESTAMP_SEARCH_BYTES
-    )
-
-    @Deprecated(
-        """Use {@link #TsExtractor(int, int, SubtitleParser.Factory, TimestampAdjuster,
-   *     TsPayloadReader.Factory, int)} instead."""
-    )
-    constructor(defaultTsPayloadReaderFlags: @DefaultTsPayloadReaderFactory.Flags Int) : this(
-        MODE_SINGLE_PMT,
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED,
-        TimestampAdjuster(0),
-        DefaultTsPayloadReaderFactory(defaultTsPayloadReaderFlags),
-        DEFAULT_TIMESTAMP_SEARCH_BYTES
-    )
-
-    @Deprecated(
-        """Use {@link #TsExtractor(int, int, SubtitleParser.Factory, TimestampAdjuster,
-   *     TsPayloadReader.Factory, int)} instead."""
-    )
-    constructor(
-        mode: @Mode Int,
-        defaultTsPayloadReaderFlags: @DefaultTsPayloadReaderFactory.Flags Int,
-        timestampSearchBytes: Int
-    ) : this(
-        mode,
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED,
-        TimestampAdjuster(0),
-        DefaultTsPayloadReaderFactory(defaultTsPayloadReaderFlags),
-        timestampSearchBytes
-    )
-
-    @Deprecated(
-        """Use {@link #TsExtractor(int, int, SubtitleParser.Factory, TimestampAdjuster,
-   *     TsPayloadReader.Factory, int)} instead."""
-    )
-    constructor(
-        mode: @Mode Int,
-        timestampAdjuster: TimestampAdjuster,
-        payloadReaderFactory: TsPayloadReader.Factory?
-    ) : this(
-        mode,
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED,
-        timestampAdjuster,
-        payloadReaderFactory,
-        DEFAULT_TIMESTAMP_SEARCH_BYTES
-    )
-
-    @Deprecated(
-        """Use {@link #TsExtractor(int, int, SubtitleParser.Factory, TimestampAdjuster,
-   *     TsPayloadReader.Factory, int)} instead."""
-    )
-    constructor(
-        mode: @Mode Int,
-        timestampAdjuster: TimestampAdjuster,
-        payloadReaderFactory: TsPayloadReader.Factory?,
-        timestampSearchBytes: Int
-    ) : this(
-        mode,
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        SubtitleParser.Factory.UNSUPPORTED,
-        timestampAdjuster,
-        payloadReaderFactory,
-        timestampSearchBytes
     )
 
     init {
@@ -775,21 +700,9 @@ return arrayOf<Extractor>(
         }
 
         const val MODE_MULTI_PMT: Int = 0
-
         const val MODE_SINGLE_PMT: Int = 1
-
         const val MODE_HLS: Int = 2
-
         const val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1
-
-        @Deprecated("Use {@link #newFactory(SubtitleParser.Factory)} instead.")
-        val FACTORY: ExtractorsFactory = object :ExtractorsFactory {
-            override fun createExtractors(): Array<Extractor> {
-                return arrayOf<Extractor>(
-                    TsExtractor(FLAG_EMIT_RAW_SUBTITLE_DATA, SubtitleParser.Factory.UNSUPPORTED)
-                )
-            }
-        }
 
         const val TS_PACKET_SIZE: Int = 188
         val DEFAULT_TIMESTAMP_SEARCH_BYTES: Int = 600 * TS_PACKET_SIZE

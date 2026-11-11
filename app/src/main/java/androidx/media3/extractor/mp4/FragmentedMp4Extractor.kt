@@ -129,93 +129,6 @@ class FragmentedMp4Extractor constructor(
     private var seekPositionBeforeSidxProcessing: Long
     private var seekPositionBeforeMfraProcessing: Long
 
-    @Deprecated("Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory)} instead")
-    constructor() : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        FLAG_EMIT_RAW_SUBTITLE_DATA,
-        null,
-        null,
-        listOf<Format>(),
-        null
-    )
-
-    @Deprecated("Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory, int)} instead")
-    constructor(flags: @Flags Int) : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        null,
-        null,
-        listOf(),
-        null
-    )
-
-    @Deprecated(
-        """Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory, int, TimestampAdjuster,
-   *     Track, List, TrackOutput)} instead"""
-    )
-    constructor(flags: @Flags Int, timestampAdjuster: TimestampAdjuster?) : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        timestampAdjuster,
-        null,
-        listOf(),
-        null
-    )
-
-    @Deprecated(
-        """Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory, int, TimestampAdjuster,
-   *     Track, List, TrackOutput)} instead"""
-    )
-    constructor(
-        flags: @Flags Int,
-        timestampAdjuster: TimestampAdjuster?,
-        sideloadedTrack: Track?
-    ) : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        timestampAdjuster,
-        sideloadedTrack,
-        listOf(),
-        null
-    )
-
-    @Deprecated(
-        """Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory, int, TimestampAdjuster,
-   *     Track, List, TrackOutput)} instead"""
-    )
-    constructor(
-        flags: @Flags Int,
-        timestampAdjuster: TimestampAdjuster?,
-        sideloadedTrack: Track?,
-        closedCaptionFormats: MutableList<Format>
-    ) : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        timestampAdjuster,
-        sideloadedTrack,
-        closedCaptionFormats,
-        null
-    )
-
-    @Deprecated(
-        """Use {@link #FragmentedMp4Extractor(SubtitleParser.Factory, int, TimestampAdjuster,
-   *     Track, List, TrackOutput)} instead"""
-    )
-    constructor(
-        flags: @Flags Int,
-        timestampAdjuster: TimestampAdjuster?,
-        sideloadedTrack: Track?,
-        closedCaptionFormats: MutableList<Format>,
-        additionalEmsgTrackOutput: TrackOutput?
-    ) : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        flags or FLAG_EMIT_RAW_SUBTITLE_DATA,
-        timestampAdjuster,
-        sideloadedTrack,
-        closedCaptionFormats,
-        additionalEmsgTrackOutput
-    )
-
     init {
         this.subtitleParserFactory = subtitleParserFactory
         this.flags = flags
@@ -1692,23 +1605,8 @@ class FragmentedMp4Extractor constructor(
         const val FLAG_MERGE_FRAGMENTED_SIDX: Int = 1 shl 8
         const val FLAG_READ_MFRA_FOR_SEEK_MAP: Int = 1 shl 9
         const val FLAG_DISABLE_ARTWORK_METADATA: Int = 1 shl 10
-
-        @Deprecated("Use {@link #newFactory(SubtitleParser.Factory)} instead.")
-        val FACTORY: ExtractorsFactory = object : ExtractorsFactory {
-            override fun createExtractors(): Array<Extractor> {
-                return arrayOf<Extractor>(
-                    FragmentedMp4Extractor(
-                        SubtitleParser.Factory.UNSUPPORTED, FLAG_EMIT_RAW_SUBTITLE_DATA
-                    )
-                )
-            }
-
-        }
-
         private const val TAG = "FragmentedMp4Extractor"
-
         private const val SAMPLE_GROUP_TYPE_seig = 0x73656967
-
         private val PIFF_SAMPLE_ENCRYPTION_BOX_EXTENDED_TYPE =
             byteArrayOf(-94, 57, 79, 82, 90, -101, 79, 20, -94, 68, 108, 66, 124, 100, -115, -12)
 

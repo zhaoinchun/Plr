@@ -9,29 +9,13 @@ import com.google.common.primitives.Ints
 class TextInformationFrame(id: String?, description: String?, values: List<String>) :
     Id3Frame(id!!) {
     val description: String?
-
-    @Deprecated("Use the first element of {@link #values} instead.")
-    val value: String?
-
     val values: List<String>
 
     init {
         Preconditions.checkArgument(!values.isEmpty())
-
         this.description = description
         this.values = values.toList()
-        this.value = this.values[0]
     }
-
-    @Deprecated(
-        """Use {@code TextInformationFrame(String id, String description, String[] values}
-        instead"""
-    )
-    constructor(id: String?, description: String?, value: String) : this(
-        id,
-        description,
-        listOf(value)
-    )
 
     override fun populateMediaMetadata(builder: MediaMetadata) {
         when (id) {

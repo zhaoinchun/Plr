@@ -212,20 +212,6 @@ internal object MetadataUtil {
         return null
     }
 
-    @Deprecated("Use {@link Metadata#getFirstMatchingEntry(Class, Predicate)} instead.")
-    fun findMdtaMetadataEntryWithKey(metadata: Metadata, key: String?): MdtaMetadataEntry? {
-        for (i in 0..<metadata.length()) {
-            val entry = metadata.get(i)
-            if (entry is MdtaMetadataEntry) {
-                val mdtaMetadataEntry: MdtaMetadataEntry = entry as MdtaMetadataEntry
-                if (mdtaMetadataEntry.key == key) {
-                    return mdtaMetadataEntry
-                }
-            }
-        }
-        return null
-    }
-
     private fun parseTextAttribute(
         type: Int, id: String?, data: ParsableByteArray
     ): TextInformationFrame? {

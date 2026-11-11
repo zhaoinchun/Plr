@@ -125,18 +125,8 @@ class Mp4Extractor constructor(
     // Extractor outputs.
     private var extractorOutput: ExtractorOutput
     private var tracks: Array<Mp4Track>
-
     private var accumulatedSampleSizes: Array<LongArray>? = null
     private var fileType: @FileType Int = 0
-
-    @Deprecated("Use {@link #Mp4Extractor(SubtitleParser.Factory)} instead")
-    constructor() : this(
-        SubtitleParser.Factory.UNSUPPORTED,
-        FLAG_EMIT_RAW_SUBTITLE_DATA
-    )
-
-    @Deprecated("Use {@link #Mp4Extractor(SubtitleParser.Factory, int)} instead")
-    constructor(flags: @Flags Int) : this(SubtitleParser.Factory.UNSUPPORTED, flags)
 
     init {
         omitTrackSampleTable = (flags and FLAG_OMIT_TRACK_SAMPLE_TABLE) != 0
@@ -1116,16 +1106,6 @@ class Mp4Extractor constructor(
         const val FLAG_DISABLE_ARTWORK_METADATA: Int = 1 shl 9
         private const val MAX_SYNC_SAMPLES_TO_SCAN_FOR_THUMBNAIL = 20
         private const val MAX_DURATION_US_TO_SCAN_FOR_THUMBNAIL = 10000000L
-
-        @Deprecated("Use {@link #newFactory(SubtitleParser.Factory)} instead.")
-        val FACTORY: ExtractorsFactory = object : ExtractorsFactory {
-            override fun createExtractors(): Array<Extractor> {
-                return arrayOf<Extractor>(
-                    Mp4Extractor(SubtitleParser.Factory.UNSUPPORTED, FLAG_EMIT_RAW_SUBTITLE_DATA)
-                )
-            }
-        }
-
         private const val STATE_READING_ATOM_HEADER = 0
         private const val STATE_READING_ATOM_PAYLOAD = 1
         private const val STATE_READING_SAMPLE = 2
