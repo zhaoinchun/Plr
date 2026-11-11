@@ -59,7 +59,7 @@ class DefaultLoadControl protected constructor(
     private val bufferForPlaybackAfterRebufferUs: Long
     private val bufferForPlaybackAfterRebufferForLocalPlaybackUs: Long
     private val targetBufferBytesOverwrite: Int
-    override val backBufferDurationUs: Long
+    private val backBufferDurationUs: Long
     private val playerTargetBufferBytesOverwrites: Map<String?, Int?>
     private val loadingStates: ConcurrentHashMap<PlayerId?, PlayerLoadingState>
 
@@ -347,19 +347,10 @@ class DefaultLoadControl protected constructor(
         return true
     }
 
-    @Deprecated(
-        """Overwrite {@link #calculateTargetBufferBytes(Parameters, ExoTrackSelection[])}
-        instead."""
-    )
-    protected fun calculateTargetBufferBytes(trackSelectionArray: Array<ExoTrackSelection?>?): Int {
-        return C.LENGTH_UNSET
-    }
-
-    @Suppress("deprecation") // Calling deprecated method for backwards compatibility
     protected fun calculateTargetBufferBytes(
         parameters: LoadControl.Parameters, trackSelectionArray: Array<ExoTrackSelection?>
     ): Int {
-        val deprecatedResult = calculateTargetBufferBytes(trackSelectionArray)
+        val deprecatedResult = C.LENGTH_UNSET
         if (deprecatedResult != C.LENGTH_UNSET) {
             return deprecatedResult
         }

@@ -579,13 +579,8 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         out.add(CameraMotionRenderer())
     }
 
-    @Deprecated("Override {@link #buildImageRenderers(Context, ArrayList)} instead.")
-    protected fun buildImageRenderers(out: ArrayList<Renderer>) {
+    protected fun buildImageRenderers(context: Context, out: ArrayList<Renderer>) {
         out.add(ImageRenderer(getImageDecoderFactory(context), null))
-    }
-
-    protected fun buildImageRenderers(context: Context?, out: ArrayList<Renderer>) {
-        buildImageRenderers(out)
     }
 
     protected fun buildMiscellaneousRenderers(
