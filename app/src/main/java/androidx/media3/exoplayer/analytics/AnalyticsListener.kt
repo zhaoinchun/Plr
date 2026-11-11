@@ -199,11 +199,6 @@ interface AnalyticsListener {
 
     fun onShuffleModeChanged(eventTime: EventTime, shuffleModeEnabled: Boolean) {}
     fun onIsLoadingChanged(eventTime: EventTime, isLoading: Boolean) {}
-
-    @Deprecated("Use {@link #onIsLoadingChanged(EventTime, boolean)} instead.")
-    fun onLoadingChanged(eventTime: EventTime, isLoading: Boolean) {
-    }
-
     fun onAvailableCommandsChanged(eventTime: EventTime, availableCommands: Player.Commands) {}
     fun onPlayerError(eventTime: EventTime, error: PlaybackException) {}
     fun onPlayerErrorChanged(eventTime: EventTime, error: PlaybackException?) {}
@@ -216,15 +211,6 @@ interface AnalyticsListener {
 
     fun onMediaMetadataChanged(eventTime: EventTime, mediaMetadata: MediaMetadata) {}
     fun onPlaylistMetadataChanged(eventTime: EventTime, playlistMetadata: MediaMetadata) {}
-
-    @Deprecated(
-        """Implement {@link #onLoadStarted(EventTime, LoadEventInfo, MediaLoadData, int)}
-        instead, and check for {@code retryCount == 0} for equivalent behavior."""
-    )
-    fun onLoadStarted(
-        eventTime: EventTime, loadEventInfo: LoadEventInfo, mediaLoadData: MediaLoadData
-    ) {
-    }
 
     fun onLoadStarted(
         eventTime: EventTime,
@@ -311,12 +297,6 @@ interface AnalyticsListener {
     ) {
     }
 
-    @Deprecated("Use {@link #onVideoDecoderInitialized(EventTime, String, long, long)}.")
-    fun onVideoDecoderInitialized(
-        eventTime: EventTime, decoderName: String, initializationDurationMs: Long
-    ) {
-    }
-
     fun onVideoInputFormatChanged(
         eventTime: EventTime,
         format: Format,
@@ -337,31 +317,12 @@ interface AnalyticsListener {
     fun onVideoCodecError(eventTime: EventTime, videoCodecError: Exception) {}
     fun onRenderedFirstFrame(eventTime: EventTime, output: Any, renderTimeMs: Long) {}
     fun onVideoSizeChanged(eventTime: EventTime, videoSize: VideoSize) {}
-
-    @Deprecated("Implement {@link #onVideoSizeChanged(EventTime eventTime, VideoSize)} instead.")
-    fun onVideoSizeChanged(
-        eventTime: EventTime,
-        width: Int,
-        height: Int,
-        unappliedRotationDegrees: Int,
-        pixelWidthHeightRatio: Float
-    ) {
-    }
-
     fun onSurfaceSizeChanged(eventTime: EventTime, width: Int, height: Int) {}
-
-    @Deprecated("Implement {@link #onDrmSessionAcquired(EventTime, int)} instead.")
-    fun onDrmSessionAcquired(eventTime: EventTime) {
-    }
 
     fun onDrmSessionAcquired(
         eventTime: EventTime,
         @DrmSession.State state: @DrmSession.State Int
     ) {
-    }
-
-    @Deprecated("Implement {@link #onDrmKeysLoaded(EventTime, KeyRequestInfo)} instead.")
-    fun onDrmKeysLoaded(eventTime: EventTime) {
     }
 
     fun onDrmKeysLoaded(eventTime: EventTime, keyRequestInfo: KeyRequestInfo) {}

@@ -1599,26 +1599,6 @@ class MediaCodecVideoRenderer(
         renderOutputBufferV21(codec, index, presentationTimeUs, releaseTimeNs)
     }
 
-    @Deprecated(
-        """Override {@link #renderOutputBufferV21} instead. The library has min SDK 21, so
-        this method is never called."""
-    )
-    protected fun renderOutputBuffer(
-        codec: MediaCodecAdapter,
-        index: Int,
-        presentationTimeUs: Long
-    ) {
-        beginSection("releaseOutputBuffer")
-        codec.releaseOutputBuffer(index, true)
-        endSection()
-        decoderCounters.renderedOutputBufferCount++
-        consecutiveDroppedFrameCount = 0
-        if (videoSink == null) {
-            maybeNotifyVideoSizeChanged(decodedVideoSize)
-            maybeNotifyRenderedFirstFrame()
-        }
-    }
-
     protected fun renderOutputBufferV21(
         codec: MediaCodecAdapter, index: Int, presentationTimeUs: Long, releaseTimeNs: Long
     ) {

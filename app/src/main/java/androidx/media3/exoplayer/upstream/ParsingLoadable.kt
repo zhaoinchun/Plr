@@ -19,10 +19,10 @@ class ParsingLoadable<T> : Loadable {
         fun parse(uri: Uri?, inputStream: InputStream?): T
     }
 
-    val loadTaskId: Long
+    val loadTaskId: Long= LoadEventInfo.newId
     val dataSpec: DataSpec
     val type: @C.DataType Int
-    val steeredPathwayId: String?
+    val steeredPathwayId: String?= null
     private val dataSource: StatsDataSource
     private val parser: Parser<out T?>
 
@@ -53,8 +53,6 @@ class ParsingLoadable<T> : Loadable {
         this.dataSpec = dataSpec
         this.type = type
         this.parser = parser
-        this.steeredPathwayId = null
-        loadTaskId = LoadEventInfo.newId
     }
 
     @Throws(IOException::class)

@@ -11,6 +11,7 @@ import android.util.SparseArray
 import android.util.SparseBooleanArray
 import android.view.accessibility.CaptioningManager
 import androidx.annotation.IntDef
+import androidx.core.util.size
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.ColorInfo
@@ -48,21 +49,17 @@ import com.google.common.base.Predicate
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import com.google.common.primitives.Ints
-import com.google.errorprone.annotations.InlineMe
-
 import java.util.Arrays
 import java.util.Collections
 import kotlin.concurrent.Volatile
-import androidx.core.util.size
-import androidx.core.util.isEmpty
 
-class DefaultTrackSelector private constructor(
+class DefaultTrackSelector(
     parameters: TrackSelectionParameters,
     private val trackSelectionFactory: ExoTrackSelection.Factory,
-    context: Context?
+    context: Context? = null
 ) : MappingTrackSelector(), RendererCapabilities.Listener {
 
-    class Parameters private constructor(builder: Builder) : TrackSelectionParameters(builder) {
+    class Parameters(builder: Builder) : TrackSelectionParameters(builder) {
         class Builder : TrackSelectionParameters.Builder {
             // Video
             var exceedVideoConstraintsIfNecessary = false
@@ -604,41 +601,6 @@ class DefaultTrackSelector private constructor(
                 return this
             }
 
-            @Deprecated("Use {@link TrackSelectionParameters.Builder#clearOverride(TrackGroup)}.")
-            fun clearSelectionOverride(rendererIndex: Int, groups: TrackGroupArray?): Builder {
-                val overrides = selectionOverrides.get(rendererIndex)
-                if (overrides == null || !overrides.containsKey(groups)) {
-                    // Nothing to clear.
-                    return this
-                }
-                overrides.remove(groups)
-                if (overrides.isEmpty()) {
-                    selectionOverrides.remove(rendererIndex)
-                }
-                return this
-            }
-
-            @Deprecated("Use {@link TrackSelectionParameters.Builder#clearOverridesOfType(int)}.")
-            fun clearSelectionOverrides(rendererIndex: Int): Builder {
-                val overrides = selectionOverrides.get(rendererIndex)
-                if (overrides == null || overrides.isEmpty()) {
-                    // Nothing to clear.
-                    return this
-                }
-                selectionOverrides.remove(rendererIndex)
-                return this
-            }
-
-            @Deprecated("Use {@link TrackSelectionParameters.Builder#clearOverrides()}.")
-            fun clearSelectionOverrides(): Builder {
-                if (selectionOverrides.isEmpty()) {
-                    // Nothing to clear.
-                    return this
-                }
-                selectionOverrides.clear()
-                return this
-            }
-
             override fun build(): Parameters {
                 return Parameters(this)
             }
@@ -926,15 +888,6 @@ class DefaultTrackSelector private constructor(
 
         companion object {
             val DEFAULT: Parameters = Builder().build()
-
-            @Deprecated("Use {@link #DEFAULT} instead.")
-            val DEFAULT_WITHOUT_CONTEXT: Parameters = DEFAULT
-
-            @Deprecated("Use {@link #DEFAULT} instead.")
-            fun getDefaults(context: Context?): Parameters {
-                return DEFAULT
-            }
-
             private val FIELD_EXCEED_VIDEO_CONSTRAINTS_IF_NECESSARY = intToStringMaxRadix(
                 FIELD_CUSTOM_ID_BASE
             )
@@ -1182,17 +1135,6 @@ class DefaultTrackSelector private constructor(
         context: Context?,
         trackSelectionFactory: ExoTrackSelection.Factory = AdaptiveTrackSelection.Factory()
     ) : this(context, Parameters.DEFAULT, trackSelectionFactory)
-
-    // TODO: When this constructor is deleted, this.context can be made non-null and all
-    //       null-conditional can be removed (including the warning logging when it's null).
-    @Deprecated(
-        """Use {@link #DefaultTrackSelector(Context, TrackSelectionParameters,
-   *     ExoTrackSelection.Factory)}"""
-    )
-    constructor(
-        parameters: TrackSelectionParameters,
-        trackSelectionFactory: ExoTrackSelection.Factory
-    ) : this(parameters, trackSelectionFactory, null)
 
     constructor(
         context: Context?,
@@ -2962,13 +2904,6 @@ class DefaultTrackSelector private constructor(
                 return !isGapless || isGaplessSupported
             }
             return true
-        }
-
-        @Deprecated("Use {@link RendererCapabilities#isFormatSupported} instead.")
-        protected fun isSupported(
-            formatSupport: @RendererCapabilities.Capabilities Int, allowExceedsCapabilities: Boolean
-        ): Boolean {
-            return RendererCapabilities.isFormatSupported(formatSupport, allowExceedsCapabilities)
         }
 
         protected fun normalizeUndeterminedLanguageToNull(language: String?): String? {

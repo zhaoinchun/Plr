@@ -310,11 +310,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             AnalyticsListener.EVENT_VIDEO_DECODER_INITIALIZED
         ) { listener: AnalyticsListener ->
             listener.onVideoDecoderInitialized(
-                eventTime,
-                decoderName,
-                initializationDurationMs
-            )
-            listener.onVideoDecoderInitialized(
                 eventTime, decoderName, initializedTimestampMs, initializationDurationMs
             )
         }
@@ -459,7 +454,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             eventTime,
             AnalyticsListener.EVENT_LOAD_STARTED
         ) { listener: AnalyticsListener ->
-            listener.onLoadStarted(eventTime, loadEventInfo, mediaLoadData)
             listener.onLoadStarted(eventTime, loadEventInfo, mediaLoadData, retryCount)
         }
     }
@@ -618,7 +612,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             eventTime,
             AnalyticsListener.EVENT_IS_LOADING_CHANGED
         ) { listener: AnalyticsListener ->
-            listener.onLoadingChanged(eventTime, isLoading)
             listener.onIsLoadingChanged(eventTime, isLoading)
         }
     }
@@ -935,13 +928,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             AnalyticsListener.EVENT_VIDEO_SIZE_CHANGED
         ) { listener: AnalyticsListener ->
             listener.onVideoSizeChanged(eventTime, videoSize)
-            listener.onVideoSizeChanged(
-                eventTime,
-                videoSize.width,
-                videoSize.height,  
-                0,
-                videoSize.pixelWidthHeightRatio
-            )
         }
     }
 
@@ -1021,7 +1007,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             eventTime,
             AnalyticsListener.EVENT_DRM_SESSION_ACQUIRED
         ) { listener: AnalyticsListener ->
-            listener.onDrmSessionAcquired(eventTime)
             listener.onDrmSessionAcquired(eventTime, state)
         }
     }
@@ -1035,7 +1020,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
             eventTime,
             AnalyticsListener.EVENT_DRM_KEYS_LOADED
         ) { listener: AnalyticsListener ->
-            listener.onDrmKeysLoaded(eventTime)
             listener.onDrmKeysLoaded(eventTime, keyRequestInfo)
         }
     }
