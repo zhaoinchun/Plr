@@ -124,17 +124,6 @@ interface AnalyticsListener {
         }
     }
 
-    @Deprecated(
-        """Use {@link #onPlaybackStateChanged(EventTime, int)} and {@link
-   *     #onPlayWhenReadyChanged(EventTime, boolean, int)} instead."""
-    )
-    fun onPlayerStateChanged(
-        eventTime: EventTime,
-        playWhenReady: Boolean,
-        @Player.State playbackState: @Player.State Int
-    ) {
-    }
-
     fun onPlaybackStateChanged(eventTime: EventTime, @Player.State state: @Player.State Int) {
     }
 

@@ -308,11 +308,6 @@ interface Player {
         fun onIsLoadingChanged(isLoading: Boolean) {}
         fun onAvailableCommandsChanged(availableCommands: Commands) {}
         fun onTrackSelectionParametersChanged(parameters: TrackSelectionParameters) {}
-
-        @Deprecated("")
-        fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: @State Int) {
-        }
-
         fun onPlaybackStateChanged(playbackState: @State Int) {}
         fun onPlayWhenReadyChanged(
             playWhenReady: Boolean, reason: @PlayWhenReadyChangeReason Int
@@ -329,11 +324,6 @@ interface Player {
         fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {}
         fun onPlayerError(error: PlaybackException) {}
         fun onPlayerErrorChanged(error: PlaybackException?) {}
-
-        @Deprecated("Use {@link #onPositionDiscontinuity(PositionInfo, PositionInfo, int)} instead.")
-        fun onPositionDiscontinuity(reason: @DiscontinuityReason Int) {
-        }
-
         fun onPositionDiscontinuity(
             oldPosition: PositionInfo,
             newPosition: PositionInfo,
@@ -354,11 +344,6 @@ interface Player {
         fun onVideoSizeChanged(videoSize: VideoSize) {}
         fun onSurfaceSizeChanged(width: Int, height: Int) {}
         fun onRenderedFirstFrame() {}
-
-        @Deprecated("")
-        fun onCues(cues: List<Cue>) {
-        }
-
         fun onCues(cueGroup: CueGroup) {}
         fun onMetadata(metadata: Metadata) {}
     }

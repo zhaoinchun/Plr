@@ -68,12 +68,7 @@ object MimeTypes {
     const val AUDIO_DTS: String = "$BASE_TYPE_AUDIO/vnd.dts"
     const val AUDIO_DTS_HD: String = "$BASE_TYPE_AUDIO/vnd.dts.hd"
     const val AUDIO_DTS_EXPRESS: String = "$BASE_TYPE_AUDIO/vnd.dts.hd;profile=lbr"
-
     const val AUDIO_DTS_UHD_P2: String = "$BASE_TYPE_AUDIO/vnd.dts.uhd;profile=p2"
-
-    @Deprecated("Use {@link #AUDIO_DTS_UHD_P2} instead.")
-    val AUDIO_DTS_X: String = AUDIO_DTS_UHD_P2
-
     const val AUDIO_VORBIS: String = "$BASE_TYPE_AUDIO/vorbis"
     const val AUDIO_OPUS: String = "$BASE_TYPE_AUDIO/opus"
     const val AUDIO_AMR: String = "$BASE_TYPE_AUDIO/amr"
@@ -112,13 +107,6 @@ object MimeTypes {
     const val APPLICATION_TX3G: String = "$BASE_TYPE_APPLICATION/x-quicktime-tx3g"
     const val APPLICATION_MP4VTT: String = "$BASE_TYPE_APPLICATION/x-mp4-vtt"
     const val APPLICATION_MP4CEA608: String = "$BASE_TYPE_APPLICATION/x-mp4-cea-608"
-
-    @Deprecated(
-        """RawCC is a Google-internal subtitle format that isn't supported by this version of
-        Media3. There is no replacement for this value."""
-    )
-    const val APPLICATION_RAWCC: String = "$BASE_TYPE_APPLICATION/x-rawcc"
-
     const val APPLICATION_VOBSUB: String = "$BASE_TYPE_APPLICATION/vobsub"
     const val APPLICATION_PGS: String = "$BASE_TYPE_APPLICATION/pgs"
     const val APPLICATION_SCTE35: String = "$BASE_TYPE_APPLICATION/x-scte35"
@@ -198,7 +186,6 @@ object MimeTypes {
                 || APPLICATION_TTML == mimeType
                 || APPLICATION_TX3G == mimeType
                 || APPLICATION_MP4VTT == mimeType
-                || APPLICATION_RAWCC == mimeType
                 || APPLICATION_VOBSUB == mimeType
                 || APPLICATION_PGS == mimeType
                 || APPLICATION_DVBSUBS == mimeType

@@ -96,9 +96,6 @@ data class MediaMetadata(
     )
     annotation class PictureType
 
-    @Deprecated("Use {@link #recordingYear} instead.")
-    val year: Int = 0
-
     init {
         // Handle compatibility for deprecated fields.
         var isBrowsable = isBrowsable
@@ -421,11 +418,6 @@ data class MediaMetadata(
         // than C.SUGGESTED_MAX_IPC_SIZE. We still need to enforce a maximum to stay well under the global
         // hard limit of 1MB across of concurrent binder transactions to this process.
         const val LEGACY_ARTWORK_DATA_ARRAY_SIZE_LIMIT = 500000
-
-        @Deprecated("Use {@link #fromBundle(Bundle, int)}.")
-        fun fromBundle(bundle: Bundle): MediaMetadata {
-            return fromBundle(bundle, MediaLibraryInfo.INTERFACE_VERSION)
-        }
 
         fun fromBundle(bundle: Bundle, interfaceVersion: Int): MediaMetadata {
             var artworkData: ByteArray? = null

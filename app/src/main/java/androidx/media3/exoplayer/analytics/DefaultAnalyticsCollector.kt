@@ -624,21 +624,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
         }
     }
 
-    @Suppress("deprecation") // Implementing and calling deprecated listener method.
-    override fun onPlayerStateChanged(
-        playWhenReady: Boolean,
-        @Player.State playbackState: @Player.State Int
-    ) {
-        val eventTime = generateCurrentPlayerMediaPeriodEventTime()
-        sendEvent(eventTime, C.INDEX_UNSET) { listener: AnalyticsListener ->
-            listener.onPlayerStateChanged(
-                eventTime,
-                playWhenReady,
-                playbackState
-            )
-        }
-    }
-
     override fun onPlaybackStateChanged(@Player.State playbackState: @Player.State Int) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
         sendEvent(

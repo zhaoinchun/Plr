@@ -447,7 +447,7 @@ class MediaItem private constructor(
         }
     }
 
-    data class LiveConfiguration @Deprecated("") constructor(
+    data class LiveConfiguration(
         val targetOffsetMs: Long = C.TIME_UNSET,
         val minOffsetMs: Long = C.TIME_UNSET,
         val maxOffsetMs: Long = C.TIME_UNSET,
@@ -741,14 +741,9 @@ class MediaItem private constructor(
         }
     }
 
-    @Deprecated("")
-    val playbackProperties: LocalConfiguration? = localConfiguration
     var liveConfiguration: LiveConfiguration
     val mediaMetadata: MediaMetadata
     val clippingConfiguration: ClippingConfiguration
-
-    @Deprecated("")
-    val clippingProperties: ClippingConfiguration?
     val requestMetadata: RequestMetadata
 
     fun buildUpon(): Builder {
@@ -788,7 +783,6 @@ class MediaItem private constructor(
         this.liveConfiguration = liveConfiguration
         this.mediaMetadata = mediaMetadata
         this.clippingConfiguration = clippingConfiguration
-        this.clippingProperties = clippingConfiguration
         this.requestMetadata = requestMetadata
     }
 
@@ -815,18 +809,8 @@ class MediaItem private constructor(
         return bundle
     }
 
-    @Deprecated("")
-    fun toBundle(): Bundle {
-        return toBundle(MediaLibraryInfo.INTERFACE_VERSION)
-    }
-
     fun toBundle(interfaceVersion: Int): Bundle {
         return toBundle(false, interfaceVersion)
-    }
-
-    @Deprecated("")
-    fun toBundleIncludeLocalConfiguration(): Bundle {
-        return toBundleIncludeLocalConfiguration(MediaLibraryInfo.INTERFACE_VERSION)
     }
 
     fun toBundleIncludeLocalConfiguration(interfaceVersion: Int): Bundle {

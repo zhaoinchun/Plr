@@ -1961,7 +1961,6 @@ class ExoPlayerImpl(
                 )
             val positionInfo = getPositionInfo(discontinuityWindowStartPositionUs)
             listeners.queueEvent(Player.EVENT_POSITION_DISCONTINUITY) { listener: Player.Listener ->
-                listener.onPositionDiscontinuity(positionDiscontinuityReason)
                 listener.onPositionDiscontinuity(
                     previousPositionInfo, positionInfo, positionDiscontinuityReason
                 )
@@ -2002,10 +2001,7 @@ class ExoPlayerImpl(
         }
         if (playbackStateChanged || playWhenReadyChanged) {
             listeners.queueEvent(C.INDEX_UNSET) { listener: Player.Listener ->
-                listener.onPlayerStateChanged(
-                    newPlaybackInfo.playWhenReady,
-                    newPlaybackInfo.playbackState
-                )
+                listener.onPlaybackStateChanged(newPlaybackInfo.playbackState)
             }
         }
         if (playbackStateChanged) {
