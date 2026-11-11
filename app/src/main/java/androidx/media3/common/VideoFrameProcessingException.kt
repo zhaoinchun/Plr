@@ -25,20 +25,15 @@ class VideoFrameProcessingException : Exception {
     }
 
     companion object {
-        
         fun from(
-            exception: Exception,
-            presentationTimeUs: Long = C.TIME_UNSET
+            exception: Exception, presentationTimeUs: Long = C.TIME_UNSET
         ): VideoFrameProcessingException {
-            if (exception is VideoFrameProcessingException) {
-                return exception
-            } else {
-                return VideoFrameProcessingException(exception, presentationTimeUs)
-            }
+            return exception as? VideoFrameProcessingException
+                ?: VideoFrameProcessingException(exception, presentationTimeUs)
         }
 
         private fun getPresentationTimeUsString(presentationTimeUs: Long): String {
-            return if (presentationTimeUs == C.TIME_UNSET) " @UNSET" else " @" + presentationTimeUs
+            return if (presentationTimeUs == C.TIME_UNSET) " @UNSET" else " @$presentationTimeUs"
         }
     }
 }

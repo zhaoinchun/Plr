@@ -3,17 +3,24 @@ package androidx.media3.common
 import android.os.Bundle
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.Util
-import androidx.media3.common.util.contentHashCode
 import com.google.common.base.Preconditions
 
-class TrackGroup(id: String, formats: List<Format>) {
-    val length: Int
-    val id: String
+class TrackGroup(val id: String = "", val formats: List<Format>) {
+    val length: Int = formats.size
     val type: Int
-    private val formats: List<Format>
-    private var hashCode = 0
 
     constructor(formats: List<Format>) : this("", formats)
+
+    init {
+        Preconditions.checkArgument(formats.isNotEmpty())
+        val sampleMimeType = formats[0].sampleMimeType
+        this.type =
+            if (sampleMimeType.isNullOrEmpty())
+                MimeTypes.getTrackType(formats[0].containerMimeType)
+            else
+                MimeTypes.getTrackType(sampleMimeType)
+        verifyCorrectness()
+    }
 
     fun copyWithId(id: String): TrackGroup {
         return TrackGroup(id, formats)
@@ -30,45 +37,6 @@ class TrackGroup(id: String, formats: List<Format>) {
             }
         }
         return C.INDEX_UNSET
-    }
-
-    override fun hashCode(): Int {
-        if (hashCode == 0) {
-            var result = 17
-            result = 31 * result + id.hashCode()
-            result = 31 * result + formats.contentHashCode()
-            hashCode = result
-        }
-        return hashCode
-    }
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        val other = obj as TrackGroup
-        return id == other.id && formats == other.formats
-    }
-
-    override fun toString(): String {
-        return "$id: $formats"
-    }
-
-    init {
-        Preconditions.checkArgument(formats.isNotEmpty())
-        this.id = id
-        this.formats = formats
-        this.length = formats.size
-        val sampleMimeType = formats[0].sampleMimeType
-        this.type =
-            if (sampleMimeType.isNullOrEmpty())
-                MimeTypes.getTrackType(formats[0].containerMimeType)
-            else
-                MimeTypes.getTrackType(sampleMimeType)
-        verifyCorrectness()
     }
 
     fun toBundle(): Bundle {
@@ -130,7 +98,7 @@ class TrackGroup(id: String, formats: List<Format>) {
             return if (language == null || language == C.LANGUAGE_UNDETERMINED) "" else language
         }
 
-        
+
         private fun normalizeRoleFlags(roleFlags: Int): Int {
             // Treat trick-play and non-trick-play formats as compatible.
             return roleFlags or C.ROLE_FLAG_TRICK_PLAY

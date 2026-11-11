@@ -12,7 +12,300 @@ import com.google.common.collect.Maps
 import kotlin.math.max
 import kotlin.math.min
 
-abstract class Timeline protected constructor() {
+abstract class Timeline() {
+    val isEmpty: Boolean
+        get() = this.windowCount == 0
+    abstract val windowCount: Int
+
+    open fun getNextWindowIndex(
+        windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
+    ): Int {
+        when (repeatMode) {
+            Player.REPEAT_MODE_OFF ->
+                return if (windowIndex == getLastWindowIndex(shuffleModeEnabled)
+                ) {
+                    C.INDEX_UNSET
+                } else {
+                    windowIndex + 1
+                }
+
+            Player.REPEAT_MODE_ONE -> return windowIndex
+            Player.REPEAT_MODE_ALL ->
+                return if (windowIndex == getLastWindowIndex(shuffleModeEnabled)) {
+                    getFirstWindowIndex(shuffleModeEnabled)
+                } else {
+                    windowIndex + 1
+                }
+
+            else -> throw IllegalStateException()
+        }
+    }
+
+    open fun getPreviousWindowIndex(
+        windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
+    ): Int {
+        when (repeatMode) {
+            Player.REPEAT_MODE_OFF ->
+                return if (windowIndex == getFirstWindowIndex(shuffleModeEnabled)) {
+                    C.INDEX_UNSET
+                } else {
+                    windowIndex - 1
+                }
+
+            Player.REPEAT_MODE_ONE -> return windowIndex
+            Player.REPEAT_MODE_ALL ->
+                return if (windowIndex == getFirstWindowIndex(shuffleModeEnabled)) {
+                    getLastWindowIndex(shuffleModeEnabled)
+                } else {
+                    windowIndex - 1
+                }
+
+            else -> throw IllegalStateException()
+        }
+    }
+
+    open fun getLastWindowIndex(shuffleModeEnabled: Boolean): Int {
+        return if (this.isEmpty) C.INDEX_UNSET else this.windowCount - 1
+    }
+
+    open fun getFirstWindowIndex(shuffleModeEnabled: Boolean): Int {
+        return if (this.isEmpty) C.INDEX_UNSET else 0
+    }
+
+    fun getWindow(windowIndex: Int, window: Window): Window {
+        return getWindow(windowIndex, window, 0)
+    }
+
+    abstract fun getWindow(
+        windowIndex: Int, window: Window, defaultPositionProjectionUs: Long
+    ): Window
+
+    abstract val periodCount: Int
+
+    fun getNextPeriodIndex(
+        periodIndex: Int,
+        period: Period?,
+        window: Window,
+        repeatMode: Int,
+        shuffleModeEnabled: Boolean
+    ): Int {
+        val windowIndex = getPeriod(periodIndex, period!!).windowIndex
+        if (getWindow(windowIndex, window).lastPeriodIndex == periodIndex) {
+            val nextWindowIndex = getNextWindowIndex(windowIndex, repeatMode, shuffleModeEnabled)
+            if (nextWindowIndex == C.INDEX_UNSET) {
+                return C.INDEX_UNSET
+            }
+            return getWindow(nextWindowIndex, window).firstPeriodIndex
+        }
+        return periodIndex + 1
+    }
+
+    fun isLastPeriod(
+        periodIndex: Int,
+        period: Period?,
+        window: Window,
+        repeatMode: Int,
+        shuffleModeEnabled: Boolean
+    ): Boolean {
+        return (getNextPeriodIndex(periodIndex, period, window, repeatMode, shuffleModeEnabled)
+                == C.INDEX_UNSET)
+    }
+
+    fun getPeriodPositionUs(
+        window: Window, period: Period, windowIndex: Int, windowPositionUs: Long
+    ): Pair<Any, Long> {
+        return getPeriodPositionUs(
+            window, period, windowIndex, windowPositionUs, 0
+        )!!
+    }
+
+    fun getPeriodPositionUs(
+        window: Window,
+        period: Period,
+        windowIndex: Int,
+        windowPositionUs: Long,
+        defaultPositionProjectionUs: Long
+    ): Pair<Any, Long>? {
+        var windowPositionUs = windowPositionUs
+        Preconditions.checkElementIndex(windowIndex, this.windowCount)
+        getWindow(windowIndex, window, defaultPositionProjectionUs)
+        if (windowPositionUs == C.TIME_UNSET) {
+            windowPositionUs = window.defaultPositionUs
+            if (windowPositionUs == C.TIME_UNSET) {
+                return null
+            }
+        }
+        var periodIndex = window.firstPeriodIndex
+        getPeriod(periodIndex, period)
+        while (periodIndex < window.lastPeriodIndex && period.positionInWindowUs != windowPositionUs && getPeriod(
+                periodIndex + 1,
+                period
+            ).positionInWindowUs <= windowPositionUs
+        ) {
+            periodIndex++
+        }
+        getPeriod(periodIndex, period, true)
+        var periodPositionUs = windowPositionUs - period.positionInWindowUs
+        // The period positions must be less than the period duration, if it is known.
+        if (period.durationUs != C.TIME_UNSET) {
+            periodPositionUs = min(periodPositionUs, period.durationUs - 1)
+        }
+        // Period positions cannot be negative.
+        periodPositionUs = max(0, periodPositionUs)
+        return Pair.create<Any, Long>(period.uid!!, periodPositionUs)
+    }
+
+    open fun getPeriodByUid(periodUid: Any, period: Period): Period {
+        return getPeriod(getIndexOfPeriod(periodUid), period, true)
+    }
+
+    fun getPeriod(periodIndex: Int, period: Period): Period {
+        return getPeriod(periodIndex, period, false)
+    }
+
+    abstract fun getPeriod(periodIndex: Int, period: Period, setIds: Boolean): Period
+    abstract fun getIndexOfPeriod(uid: Any): Int
+    abstract fun getUidOfPeriod(periodIndex: Int): Any
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (other !is Timeline) {
+            return false
+        }
+        if (other.windowCount != this.windowCount || other.periodCount != this.periodCount) {
+            return false
+        }
+        val window = Window()
+        val period = Period()
+        val otherWindow = Window()
+        val otherPeriod = Period()
+        for (i in 0..<this.windowCount) {
+            if (getWindow(i, window) != other.getWindow(i, otherWindow)) {
+                return false
+            }
+        }
+        for (i in 0..<this.periodCount) {
+            if (getPeriod(i, period, true)
+                != other.getPeriod(i, otherPeriod, true)
+            ) {
+                return false
+            }
+        }
+
+        // Check shuffled order
+        var windowIndex = getFirstWindowIndex(true)
+        if (windowIndex != other.getFirstWindowIndex(true)) {
+            return false
+        }
+        val lastWindowIndex = getLastWindowIndex(true)
+        if (lastWindowIndex != other.getLastWindowIndex(true)) {
+            return false
+        }
+        while (windowIndex != lastWindowIndex) {
+            val nextWindowIndex =
+                getNextWindowIndex(
+                    windowIndex,
+                    Player.REPEAT_MODE_OFF,
+                    true
+                )
+            if (nextWindowIndex
+                != other.getNextWindowIndex(
+                    windowIndex, Player.REPEAT_MODE_OFF, true
+                )
+            ) {
+                return false
+            }
+            windowIndex = nextWindowIndex
+        }
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        val window = Window()
+        val period = Period()
+        var result = 7
+        result = 31 * result + this.windowCount
+        for (i in 0..<this.windowCount) {
+            result = 31 * result + getWindow(i, window).hashCode()
+        }
+        result = 31 * result + this.periodCount
+        for (i in 0..<this.periodCount) {
+            result = 31 * result + getPeriod(i, period, true).hashCode()
+        }
+
+        var windowIndex = getFirstWindowIndex(true)
+        while (windowIndex != C.INDEX_UNSET) {
+            result = 31 * result + windowIndex
+            windowIndex = getNextWindowIndex(windowIndex, Player.REPEAT_MODE_OFF, true)
+        }
+
+        return result
+    }
+
+    fun toBundle(interfaceVersion: Int): Bundle {
+        val windowBundles = mutableListOf<Bundle>()
+        val windowCount = this.windowCount
+        val window = Window()
+        for (i in 0..<windowCount) {
+            windowBundles.add(
+                getWindow(
+                    i,
+                    window,
+                    0
+                ).toBundle(interfaceVersion)
+            )
+        }
+
+        val periodBundles = mutableListOf<Bundle>()
+        val periodCount = this.periodCount
+        val period = Period()
+        for (i in 0..<periodCount) {
+            periodBundles.add(getPeriod(i, period, true).toBundle(interfaceVersion))
+        }
+
+        val shuffledWindowIndices = IntArray(windowCount)
+        if (windowCount > 0) {
+            shuffledWindowIndices[0] = getFirstWindowIndex(true)
+        }
+        for (i in 1..<windowCount) {
+            shuffledWindowIndices[i] =
+                getNextWindowIndex(
+                    shuffledWindowIndices[i - 1],
+                    Player.REPEAT_MODE_OFF,
+                    true
+                )
+        }
+
+        val bundle = Bundle()
+        bundle.putBinder(FIELD_WINDOWS, BundleListRetriever(windowBundles))
+        bundle.putBinder(FIELD_PERIODS, BundleListRetriever(periodBundles))
+        bundle.putIntArray(FIELD_SHUFFLED_WINDOW_INDICES, shuffledWindowIndices)
+        return bundle
+    }
+
+    fun copyWithSingleWindow(windowIndex: Int): Timeline {
+        if (this.windowCount == 1) {
+            return this
+        }
+        val window = getWindow(windowIndex, Window(), 0)
+        val periods = mutableListOf<Period>()
+        for (i in window.firstPeriodIndex..window.lastPeriodIndex) {
+            val period = getPeriod(i, Period(), true)
+            period.windowIndex = 0
+            periods.add(period)
+        }
+        window.lastPeriodIndex -= window.firstPeriodIndex
+        window.firstPeriodIndex = 0
+        return RemotableTimeline(
+            listOf(window),
+            periods.toList(),
+            intArrayOf(0)
+        )
+    }
+
     class Window {
         var uid: Any
         var mediaItem: MediaItem
@@ -445,301 +738,6 @@ abstract class Timeline protected constructor() {
                 return period
             }
         }
-    }
-
-    val isEmpty: Boolean
-        get() = this.windowCount == 0
-    abstract val windowCount: Int
-
-    open fun getNextWindowIndex(
-        windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
-    ): Int {
-        when (repeatMode) {
-            Player.REPEAT_MODE_OFF ->
-                return if (windowIndex == getLastWindowIndex(shuffleModeEnabled)
-                ) {
-                    C.INDEX_UNSET
-                } else {
-                    windowIndex + 1
-                }
-
-            Player.REPEAT_MODE_ONE -> return windowIndex
-            Player.REPEAT_MODE_ALL ->
-                return if (windowIndex == getLastWindowIndex(shuffleModeEnabled)) {
-                    getFirstWindowIndex(shuffleModeEnabled)
-                } else {
-                    windowIndex + 1
-                }
-
-            else -> throw IllegalStateException()
-        }
-    }
-
-    open fun getPreviousWindowIndex(
-        windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
-    ): Int {
-        when (repeatMode) {
-            Player.REPEAT_MODE_OFF ->
-                return if (windowIndex == getFirstWindowIndex(shuffleModeEnabled)) {
-                    C.INDEX_UNSET
-                } else {
-                    windowIndex - 1
-                }
-
-            Player.REPEAT_MODE_ONE -> return windowIndex
-            Player.REPEAT_MODE_ALL ->
-                return if (windowIndex == getFirstWindowIndex(shuffleModeEnabled)) {
-                    getLastWindowIndex(shuffleModeEnabled)
-                } else {
-                    windowIndex - 1
-                }
-
-            else -> throw IllegalStateException()
-        }
-    }
-
-    open fun getLastWindowIndex(shuffleModeEnabled: Boolean): Int {
-        return if (this.isEmpty) C.INDEX_UNSET else this.windowCount - 1
-    }
-
-    open fun getFirstWindowIndex(shuffleModeEnabled: Boolean): Int {
-        return if (this.isEmpty) C.INDEX_UNSET else 0
-    }
-
-    fun getWindow(windowIndex: Int, window: Window): Window {
-        return getWindow(windowIndex, window, 0)
-    }
-
-    abstract fun getWindow(
-        windowIndex: Int, window: Window, defaultPositionProjectionUs: Long
-    ): Window
-
-    abstract val periodCount: Int
-
-    fun getNextPeriodIndex(
-        periodIndex: Int,
-        period: Period?,
-        window: Window,
-        repeatMode: Int,
-        shuffleModeEnabled: Boolean
-    ): Int {
-        val windowIndex = getPeriod(periodIndex, period!!).windowIndex
-        if (getWindow(windowIndex, window).lastPeriodIndex == periodIndex) {
-            val nextWindowIndex = getNextWindowIndex(windowIndex, repeatMode, shuffleModeEnabled)
-            if (nextWindowIndex == C.INDEX_UNSET) {
-                return C.INDEX_UNSET
-            }
-            return getWindow(nextWindowIndex, window).firstPeriodIndex
-        }
-        return periodIndex + 1
-    }
-
-    fun isLastPeriod(
-        periodIndex: Int,
-        period: Period?,
-        window: Window,
-        repeatMode: Int,
-        shuffleModeEnabled: Boolean
-    ): Boolean {
-        return (getNextPeriodIndex(periodIndex, period, window, repeatMode, shuffleModeEnabled)
-                == C.INDEX_UNSET)
-    }
-
-    fun getPeriodPositionUs(
-        window: Window, period: Period, windowIndex: Int, windowPositionUs: Long
-    ): Pair<Any, Long> {
-        return getPeriodPositionUs(
-            window, period, windowIndex, windowPositionUs, 0
-        )!!
-    }
-
-    fun getPeriodPositionUs(
-        window: Window,
-        period: Period,
-        windowIndex: Int,
-        windowPositionUs: Long,
-        defaultPositionProjectionUs: Long
-    ): Pair<Any, Long>? {
-        var windowPositionUs = windowPositionUs
-        Preconditions.checkElementIndex(windowIndex, this.windowCount)
-        getWindow(windowIndex, window, defaultPositionProjectionUs)
-        if (windowPositionUs == C.TIME_UNSET) {
-            windowPositionUs = window.defaultPositionUs
-            if (windowPositionUs == C.TIME_UNSET) {
-                return null
-            }
-        }
-        var periodIndex = window.firstPeriodIndex
-        getPeriod(periodIndex, period)
-        while (periodIndex < window.lastPeriodIndex && period.positionInWindowUs != windowPositionUs && getPeriod(
-                periodIndex + 1,
-                period
-            ).positionInWindowUs <= windowPositionUs
-        ) {
-            periodIndex++
-        }
-        getPeriod(periodIndex, period, true)
-        var periodPositionUs = windowPositionUs - period.positionInWindowUs
-        // The period positions must be less than the period duration, if it is known.
-        if (period.durationUs != C.TIME_UNSET) {
-            periodPositionUs = min(periodPositionUs, period.durationUs - 1)
-        }
-        // Period positions cannot be negative.
-        periodPositionUs = max(0, periodPositionUs)
-        return Pair.create<Any, Long>(period.uid!!, periodPositionUs)
-    }
-
-    open fun getPeriodByUid(periodUid: Any, period: Period): Period {
-        return getPeriod(getIndexOfPeriod(periodUid), period, true)
-    }
-
-    fun getPeriod(periodIndex: Int, period: Period): Period {
-        return getPeriod(periodIndex, period, false)
-    }
-
-    abstract fun getPeriod(periodIndex: Int, period: Period, setIds: Boolean): Period
-
-    abstract fun getIndexOfPeriod(uid: Any): Int
-
-    abstract fun getUidOfPeriod(periodIndex: Int): Any
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other !is Timeline) {
-            return false
-        }
-        if (other.windowCount != this.windowCount || other.periodCount != this.periodCount) {
-            return false
-        }
-        val window = Window()
-        val period = Period()
-        val otherWindow = Window()
-        val otherPeriod = Period()
-        for (i in 0..<this.windowCount) {
-            if (getWindow(i, window) != other.getWindow(i, otherWindow)) {
-                return false
-            }
-        }
-        for (i in 0..<this.periodCount) {
-            if (getPeriod(i, period, true)
-                != other.getPeriod(i, otherPeriod, true)
-            ) {
-                return false
-            }
-        }
-
-        // Check shuffled order
-        var windowIndex = getFirstWindowIndex(true)
-        if (windowIndex != other.getFirstWindowIndex(true)) {
-            return false
-        }
-        val lastWindowIndex = getLastWindowIndex(true)
-        if (lastWindowIndex != other.getLastWindowIndex(true)) {
-            return false
-        }
-        while (windowIndex != lastWindowIndex) {
-            val nextWindowIndex =
-                getNextWindowIndex(
-                    windowIndex,
-                    Player.REPEAT_MODE_OFF,
-                    true
-                )
-            if (nextWindowIndex
-                != other.getNextWindowIndex(
-                    windowIndex, Player.REPEAT_MODE_OFF, true
-                )
-            ) {
-                return false
-            }
-            windowIndex = nextWindowIndex
-        }
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        val window = Window()
-        val period = Period()
-        var result = 7
-        result = 31 * result + this.windowCount
-        for (i in 0..<this.windowCount) {
-            result = 31 * result + getWindow(i, window).hashCode()
-        }
-        result = 31 * result + this.periodCount
-        for (i in 0..<this.periodCount) {
-            result = 31 * result + getPeriod(i, period, true).hashCode()
-        }
-
-        var windowIndex = getFirstWindowIndex(true)
-        while (windowIndex != C.INDEX_UNSET) {
-            result = 31 * result + windowIndex
-            windowIndex = getNextWindowIndex(windowIndex, Player.REPEAT_MODE_OFF, true)
-        }
-
-        return result
-    }
-
-    fun toBundle(interfaceVersion: Int): Bundle {
-        val windowBundles = mutableListOf<Bundle>()
-        val windowCount = this.windowCount
-        val window = Window()
-        for (i in 0..<windowCount) {
-            windowBundles.add(
-                getWindow(
-                    i,
-                    window,
-                    0
-                ).toBundle(interfaceVersion)
-            )
-        }
-
-        val periodBundles = mutableListOf<Bundle>()
-        val periodCount = this.periodCount
-        val period = Period()
-        for (i in 0..<periodCount) {
-            periodBundles.add(getPeriod(i, period, true).toBundle(interfaceVersion))
-        }
-
-        val shuffledWindowIndices = IntArray(windowCount)
-        if (windowCount > 0) {
-            shuffledWindowIndices[0] = getFirstWindowIndex(true)
-        }
-        for (i in 1..<windowCount) {
-            shuffledWindowIndices[i] =
-                getNextWindowIndex(
-                    shuffledWindowIndices[i - 1],
-                    Player.REPEAT_MODE_OFF,
-                    true
-                )
-        }
-
-        val bundle = Bundle()
-        bundle.putBinder(FIELD_WINDOWS, BundleListRetriever(windowBundles))
-        bundle.putBinder(FIELD_PERIODS, BundleListRetriever(periodBundles))
-        bundle.putIntArray(FIELD_SHUFFLED_WINDOW_INDICES, shuffledWindowIndices)
-        return bundle
-    }
-
-    fun copyWithSingleWindow(windowIndex: Int): Timeline {
-        if (this.windowCount == 1) {
-            return this
-        }
-        val window = getWindow(windowIndex, Window(), 0)
-        val periods = mutableListOf<Period>()
-        for (i in window.firstPeriodIndex..window.lastPeriodIndex) {
-            val period = getPeriod(i, Period(), true)
-            period.windowIndex = 0
-            periods.add(period)
-        }
-        window.lastPeriodIndex -= window.firstPeriodIndex
-        window.firstPeriodIndex = 0
-        return RemotableTimeline(
-            listOf(window),
-            periods.toList(),
-            intArrayOf(0)
-        )
     }
 
     class RemotableTimeline(

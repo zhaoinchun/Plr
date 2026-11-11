@@ -24,37 +24,24 @@ interface VideoGraph {
 
     interface Listener {
         fun onOutputSizeChanged(width: Int, height: Int) {}
-
         fun onOutputFrameRateChanged(frameRate: Float) {}
-
         fun onOutputFrameAvailableForRendering(
             framePresentationTimeUs: Long, isRedrawnFrame: Boolean
         ) {
         }
 
         fun onEnded(finalFramePresentationTimeUs: Long) {}
-
         fun onError(exception: VideoFrameProcessingException) {}
     }
 
-    @Throws(VideoFrameProcessingException::class)
     fun initialize()
-
-    @Throws(VideoFrameProcessingException::class)
     fun registerInput(@IntRange(from = 0) inputIndex: Int)
-
     fun setOutputSurfaceInfo(outputSurfaceInfo: SurfaceInfo?)
-
     fun setOnInputSurfaceReadyListener(inputIndex: Int, listener: Runnable?)
-
     fun getInputSurface(inputIndex: Int): Surface
-
     fun setOnInputFrameProcessedListener(inputIndex: Int, listener: OnInputFrameProcessedListener?)
-
     fun setCompositionEffects(compositionEffects: List<Effect>)
-
     fun setCompositorSettings(videoCompositorSettings: VideoCompositorSettings)
-
     fun registerInputStream(
         inputIndex: Int,
         inputType: Int,
@@ -64,9 +51,7 @@ interface VideoGraph {
     )
 
     fun getPendingInputFrameCount(inputIndex: Int): Int
-
     fun registerInputFrame(inputIndex: Int): Boolean
-
     fun queueInputBitmap(
         inputIndex: Int,
         inputBitmap: Bitmap?,
@@ -74,16 +59,10 @@ interface VideoGraph {
     ): Boolean
 
     fun queueInputTexture(inputIndex: Int, textureId: Int, presentationTimeUs: Long): Boolean
-
     fun renderOutputFrame(renderTimeNs: Long)
-
     fun redraw()
-
     fun hasProducedFrameWithTimestampZero(): Boolean
-
     fun flush()
-
     fun signalEndOfInput(inputIndex: Int)
-
     fun release()
 }

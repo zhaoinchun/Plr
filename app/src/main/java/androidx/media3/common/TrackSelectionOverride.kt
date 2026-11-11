@@ -2,18 +2,12 @@ package androidx.media3.common
 
 import android.os.Bundle
 import androidx.media3.common.util.Util
-import com.google.common.base.Preconditions
 import com.google.common.primitives.Ints
 import java.util.Collections
 
-class TrackSelectionOverride(mediaTrackGroup: TrackGroup, trackIndices: List<Int>) {
-    val mediaTrackGroup: TrackGroup
-    val trackIndices: List<Int>
-
-    constructor(mediaTrackGroup: TrackGroup, trackIndex: Int) : this(
-        mediaTrackGroup,
-        listOf(trackIndex)
-    )
+data class TrackSelectionOverride(val mediaTrackGroup: TrackGroup, val trackIndices: List<Int>) {
+    val type: Int
+        get() = mediaTrackGroup.type
 
     init {
         if (!trackIndices.isEmpty()) {
@@ -21,26 +15,6 @@ class TrackSelectionOverride(mediaTrackGroup: TrackGroup, trackIndices: List<Int
                 throw IndexOutOfBoundsException()
             }
         }
-        this.mediaTrackGroup = mediaTrackGroup
-        this.trackIndices = trackIndices.toList()
-    }
-
-    val type: Int
-        get() = mediaTrackGroup.type
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null || javaClass != other.javaClass) {
-            return false
-        }
-        val that = other as TrackSelectionOverride
-        return mediaTrackGroup == that.mediaTrackGroup && trackIndices == that.trackIndices
-    }
-
-    override fun hashCode(): Int {
-        return mediaTrackGroup.hashCode() + 31 * trackIndices.hashCode()
     }
 
     fun toBundle(): Bundle {

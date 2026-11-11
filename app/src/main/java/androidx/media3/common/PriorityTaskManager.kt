@@ -7,18 +7,13 @@ import kotlin.math.max
 
 class PriorityTaskManager {
     class PriorityTooLowException(priority: Int, highestPriority: Int) :
-        IOException("Priority too low [priority=" + priority + ", highest=" + highestPriority + "]")
+        IOException("Priority too low [priority=$priority, highest=$highestPriority]")
 
     private val lock = Any()
 
     // Guarded by lock.
-    private val queue: PriorityQueue<Int?>
-    private var highestPriority: Int
-
-    init {
-        queue = PriorityQueue<Int?>(10, Collections.reverseOrder<Int?>())
-        highestPriority = Int.MIN_VALUE
-    }
+    private val queue: PriorityQueue<Int?> = PriorityQueue<Int?>(10, Collections.reverseOrder<Int?>())
+    private var highestPriority: Int = Int.MIN_VALUE
 
     fun add(priority: Int) {
         synchronized(lock) {

@@ -1004,7 +1004,7 @@ class PlayerControlView  constructor(
         tracks: Tracks, trackType: Int
     ): MutableList<TrackInformation> {
         val trackInfos = mutableListOf<TrackInformation>()
-        val trackGroups: MutableList<Tracks.Group> = tracks.groups
+        val trackGroups: MutableList<Tracks.Group> = tracks.groups.toMutableList()
         for (trackGroupIndex in trackGroups.indices) {
             val trackGroup = trackGroups.get(trackGroupIndex)
             if (trackGroup.type != trackType) {

@@ -6,8 +6,8 @@ import androidx.media3.common.util.Util
 import com.google.common.base.Function
 import com.google.common.base.MoreObjects
 import com.google.common.base.Preconditions
-class Tracks(groups: List<Group>) {
-    val groups: MutableList<Group> = groups.toMutableList()
+
+data class Tracks(val groups: List<Group>) {
     val isEmpty: Boolean
         get() = groups.isEmpty()
 
@@ -25,21 +25,6 @@ class Tracks(groups: List<Group>) {
 
     fun isTypeSelected(trackType: Int): Boolean {
         return groups.find { it.isSelected && it.type == trackType } != null
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null || javaClass != other.javaClass) {
-            return false
-        }
-        val that = other as Tracks
-        return groups == that.groups
-    }
-
-    override fun hashCode(): Int {
-        return groups.hashCode()
     }
 
     fun toBundle(): Bundle {

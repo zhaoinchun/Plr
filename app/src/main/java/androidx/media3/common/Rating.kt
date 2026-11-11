@@ -3,7 +3,7 @@ package androidx.media3.common
 import android.os.Bundle
 import androidx.annotation.IntDef
 
-abstract class Rating internal constructor() {
+abstract class Rating() {
     abstract val isRated: Boolean
     abstract fun toBundle(): Bundle?
 

@@ -5,46 +5,11 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.media3.common.util.Util.intToStringMaxRadix
 
-class StreamKey : Comparable<StreamKey>, Parcelable {
-    val periodIndex: Int
-    val groupIndex: Int
-    val streamIndex: Int
+class StreamKey(val periodIndex: Int, val groupIndex: Int, val streamIndex: Int) :
+    Comparable<StreamKey>, Parcelable {
 
-    constructor(groupIndex: Int, streamIndex: Int) : this(0, groupIndex, streamIndex)
-
-    constructor(periodIndex: Int, groupIndex: Int, streamIndex: Int) {
-        this.periodIndex = periodIndex
-        this.groupIndex = groupIndex
-        this.streamIndex = streamIndex
-    }
-
-    internal constructor(`in`: Parcel) {
-        periodIndex = `in`.readInt()
-        groupIndex = `in`.readInt()
-        streamIndex = `in`.readInt()
-    }
-
-    override fun toString(): String {
-        return "$periodIndex.$groupIndex.$streamIndex"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other == null || javaClass != other.javaClass) {
-            return false
-        }
-        val that = other as StreamKey
-        return periodIndex == that.periodIndex && groupIndex == that.groupIndex && streamIndex == that.streamIndex
-    }
-
-    override fun hashCode(): Int {
-        var result = periodIndex
-        result = 31 * result + groupIndex
-        result = 31 * result + streamIndex
-        return result
-    }
+    constructor(`in`: Parcel) :
+            this(`in`.readInt(), `in`.readInt(), `in`.readInt())
 
     override fun compareTo(o: StreamKey): Int {
         var result = periodIndex - o.periodIndex
@@ -82,7 +47,6 @@ class StreamKey : Comparable<StreamKey>, Parcelable {
     }
 
     companion object {
-        
         val CREATOR: Parcelable.Creator<StreamKey> = object : Parcelable.Creator<StreamKey> {
             override fun createFromParcel(`in`: Parcel): StreamKey {
                 return StreamKey(`in`)
@@ -99,9 +63,9 @@ class StreamKey : Comparable<StreamKey>, Parcelable {
 
         fun fromBundle(bundle: Bundle): StreamKey {
             return StreamKey(
-                bundle.getInt(FIELD_PERIOD_INDEX,  0),
-                bundle.getInt(FIELD_GROUP_INDEX,  0),
-                bundle.getInt(FIELD_STREAM_INDEX,  0)
+                bundle.getInt(FIELD_PERIOD_INDEX, 0),
+                bundle.getInt(FIELD_GROUP_INDEX, 0),
+                bundle.getInt(FIELD_STREAM_INDEX, 0)
             )
         }
     }

@@ -12,14 +12,16 @@ import kotlin.Long
 import kotlin.String
 import kotlin.math.roundToInt
 
-class PlaybackParameters  constructor(
-    @FloatRange(from = 0.0, fromInclusive = false) speed: Float,
-    @FloatRange(from = 0.0, fromInclusive = false) pitch: Float = 1f
+data class PlaybackParameters(
+    @FloatRange(from = 0.0, fromInclusive = false) val speed: Float,
+    @FloatRange(from = 0.0, fromInclusive = false) val pitch: Float = 1f
 ) {
-    val speed: Float
-    val pitch: Float
+    private val scaledUsPerMs: Int = (speed * 1000f).roundToInt()
 
-    private val scaledUsPerMs: Int
+    init {
+        Preconditions.checkArgument(speed > 0)
+        Preconditions.checkArgument(pitch > 0)
+    }
 
     fun getMediaTimeUsForPlayoutTimeMs(timeMs: Long): Long {
         return timeMs * scaledUsPerMs
@@ -31,36 +33,6 @@ class PlaybackParameters  constructor(
 
     fun withPitch(@FloatRange(from = 0.0, fromInclusive = false) pitch: Float): PlaybackParameters {
         return PlaybackParameters(speed, pitch)
-    }
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-        if (obj == null || javaClass != obj.javaClass) {
-            return false
-        }
-        val other = obj as PlaybackParameters
-        return this.speed == other.speed && this.pitch == other.pitch
-    }
-
-    override fun hashCode(): Int {
-        var result = 17
-        result = 31 * result + speed.toRawBits()
-        result = 31 * result + pitch.toRawBits()
-        return result
-    }
-
-    override fun toString(): String {
-        return formatInvariant("PlaybackParameters(speed=%.2f, pitch=%.2f)", speed, pitch)
-    }
-
-    init {
-        Preconditions.checkArgument(speed > 0)
-        Preconditions.checkArgument(pitch > 0)
-        this.speed = speed
-        this.pitch = pitch
-        scaledUsPerMs = (speed * 1000f).roundToInt()
     }
 
     fun toBundle(): Bundle {

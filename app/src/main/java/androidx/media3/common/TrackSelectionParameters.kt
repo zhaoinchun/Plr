@@ -11,7 +11,7 @@ import com.google.common.base.Function
 import com.google.common.base.MoreObjects
 import com.google.common.primitives.Ints
 
-open class TrackSelectionParameters protected constructor(builder: Builder) {
+open class TrackSelectionParameters(builder: Builder) {
     val maxVideoWidth: Int
     val maxVideoHeight: Int
     val maxVideoFrameRate: Int
