@@ -11,7 +11,7 @@ import androidx.media3.extractor.TrackOutput
 import androidx.media3.extractor.ts.TsPayloadReader.TrackIdGenerator
 import com.google.common.base.Preconditions
 
-internal class UserDataReader(
+class UserDataReader(
     private val closedCaptionFormats: List<Format>,
     private val containerMimeType: String?
 ) {

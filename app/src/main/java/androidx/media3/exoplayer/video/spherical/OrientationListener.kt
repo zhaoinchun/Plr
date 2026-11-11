@@ -9,7 +9,7 @@ import android.view.Display
 import android.view.Surface
 import androidx.annotation.BinderThread
 
-internal class OrientationListener(private val display: Display, listeners: Array<Listener>) :
+class OrientationListener(private val display: Display, listeners: Array<Listener>) :
     SensorEventListener {
     interface Listener {
         fun onOrientationChange(deviceOrientationMatrix: FloatArray, deviceRoll: Float)

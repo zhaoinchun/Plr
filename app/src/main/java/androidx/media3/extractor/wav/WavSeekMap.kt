@@ -8,7 +8,7 @@ import androidx.media3.extractor.SeekMap
 import androidx.media3.extractor.SeekMap.SeekPoints
 import androidx.media3.extractor.SeekPoint
 
-internal class WavSeekMap(
+class WavSeekMap(
     private val wavFormat: WavFormat,
     private val framesPerBlock: Int,
     private val firstBlockPosition: Long,

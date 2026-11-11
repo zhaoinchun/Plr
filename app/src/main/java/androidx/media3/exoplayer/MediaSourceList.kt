@@ -32,7 +32,7 @@ import java.util.IdentityHashMap
 import kotlin.math.max
 import kotlin.math.min
 
-internal class MediaSourceList(
+class MediaSourceList(
     private val mediaSourceListInfoListener: MediaSourceListInfoRefreshListener,
     analyticsCollector: AnalyticsCollector,
     analyticsCollectorHandler: HandlerWrapper,
@@ -318,7 +318,7 @@ internal class MediaSourceList(
         }
     }
 
-    internal class MediaSourceHolder(mediaSource: MediaSource, useLazyPreparation: Boolean) :
+    class MediaSourceHolder(mediaSource: MediaSource, useLazyPreparation: Boolean) :
         MediaSourceInfoHolder {
         val mediaSource: MaskingMediaSource
         override val uid: Any

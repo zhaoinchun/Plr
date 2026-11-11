@@ -98,7 +98,7 @@ object IamfUtil {
 
     // ===== End of additionally defined Channel Masks =====
     // All channel masks can be translated to IAMF output layouts.
-    @VisibleForTesting
+    
     val IAMF_SUPPORTED_CHANNEL_MASKS: Set<Int?> = if (Build.VERSION.SDK_INT < 32)
         setOf<Int?>(
             AudioFormat.CHANNEL_OUT_STEREO,

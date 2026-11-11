@@ -9,7 +9,7 @@ import androidx.media3.extractor.ExtractorUtil.peekFullyQuietly
 import com.google.common.base.Preconditions
 import java.io.IOException
 
-internal class OggPageHeader {
+class OggPageHeader {
     var revision: Int = 0
     var type: Int = 0
 

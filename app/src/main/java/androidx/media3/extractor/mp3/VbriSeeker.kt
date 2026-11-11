@@ -10,7 +10,7 @@ import androidx.media3.extractor.SeekMap.SeekPoints
 import androidx.media3.extractor.SeekPoint
 import kotlin.math.max
 
-internal class VbriSeeker private constructor(
+class VbriSeeker private constructor(
     private val timesUs: LongArray,
     private val positions: LongArray,
     override val durationUs: Long,

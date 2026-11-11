@@ -8,7 +8,7 @@ import java.util.TreeSet
 import kotlin.math.max
 import kotlin.math.min
 
-internal class CachedContent  constructor(
+class CachedContent  constructor(
     val id: Int,
     val key: String,
     var metadata: DefaultContentMetadata = DefaultContentMetadata.EMPTY

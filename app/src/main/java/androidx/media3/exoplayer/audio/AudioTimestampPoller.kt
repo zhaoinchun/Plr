@@ -8,7 +8,7 @@ import androidx.media3.common.util.Util.getMediaDurationForPlayoutDuration
 import androidx.media3.common.util.Util.sampleCountToDurationUs
 import kotlin.math.abs
 
-internal class AudioTimestampPoller(
+class AudioTimestampPoller(
     audioTrack: AudioTrack,
     private val errorListener: AudioTrackPositionTracker.Listener
 ) {

@@ -37,7 +37,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import kotlin.math.min
 
-internal class CachedContentIndex  constructor(
+class CachedContentIndex(
     databaseProvider: DatabaseProvider?,
     legacyStorageDir: File? = null,
     legacyStorageSecretKey: ByteArray? = null,
@@ -146,8 +146,8 @@ internal class CachedContentIndex  constructor(
             } else {
                 // Keep an entry in idToKey to stop the id from being reused until the index is next stored,
                 // and add an entry to removedIds to track that it should be removed when this does happen.
-                idToKey.put(id,  null)
-                removedIds.put(id,  true)
+                idToKey.put(id, null)
+                removedIds.put(id, true)
             }
         }
     }
@@ -446,8 +446,8 @@ internal class CachedContentIndex  constructor(
         private val databaseProvider: DatabaseProvider
         private val pendingUpdates: SparseArray<CachedContent?>
 
-        private var hexUid:String? = null
-        private var tableName:String? = null
+        private var hexUid: String? = null
+        private var tableName: String? = null
 
         init {
             this.databaseProvider = databaseProvider
@@ -587,11 +587,11 @@ internal class CachedContentIndex  constructor(
                 .readableDatabase!!
                 .query(
                     tableName!!,
-                    COLUMNS,  
-                    null,  
-                    null,  
-                    null,  
-                    null,  
+                    COLUMNS,
+                    null,
+                    null,
+                    null,
+                    null,
                     null
                 )
 
@@ -625,7 +625,8 @@ internal class CachedContentIndex  constructor(
             values.put(COLUMN_ID, cachedContent.id)
             values.put(COLUMN_KEY, cachedContent.key)
             values.put(COLUMN_METADATA, data)
-            writableDatabase.replaceOrThrow(tableName!!, null, values
+            writableDatabase.replaceOrThrow(
+                tableName!!, null, values
             )
         }
 
@@ -655,7 +656,7 @@ internal class CachedContentIndex  constructor(
 
             @Throws(DatabaseIOException::class)
             fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
-                delete(databaseProvider,uid.toHexString())
+                delete(databaseProvider, uid.toHexString())
             }
 
             @Throws(DatabaseIOException::class)
@@ -689,7 +690,7 @@ internal class CachedContentIndex  constructor(
     }
 
     companion object {
-        
+
         const val FILE_NAME_ATOMIC: String = "cached_content_index.exi"
 
         private val INCREMENTAL_METADATA_READ_LENGTH = 10 * 1024 * 1024
@@ -704,6 +705,7 @@ internal class CachedContentIndex  constructor(
         fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
             DatabaseStorage.delete(databaseProvider, uid)
         }
+
         fun getNewId(idToKey: SparseArray<String>): Int {
             val size = idToKey.size()
             var id = if (size == 0) 0 else (idToKey.keyAt(size - 1) + 1)

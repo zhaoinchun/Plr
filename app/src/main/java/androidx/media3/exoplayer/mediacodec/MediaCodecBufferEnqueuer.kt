@@ -3,7 +3,7 @@ package androidx.media3.exoplayer.mediacodec
 import android.os.Bundle
 import androidx.media3.decoder.CryptoInfo
 
-internal interface MediaCodecBufferEnqueuer {
+interface MediaCodecBufferEnqueuer {
     fun start()
     fun queueInputBuffer(index: Int, offset: Int, size: Int, presentationTimeUs: Long, flags: Int)
     fun queueSecureInputBuffer(

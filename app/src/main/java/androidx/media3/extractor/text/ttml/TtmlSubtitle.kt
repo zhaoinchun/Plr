@@ -8,7 +8,7 @@ import androidx.media3.common.util.Util.binarySearchCeil
 import androidx.media3.extractor.text.Subtitle
 import java.util.Collections
 
-internal class TtmlSubtitle(
+class TtmlSubtitle(
     @get:VisibleForTesting val root: TtmlNode,
     globalStyles: MutableMap<String, TtmlStyle>?,
     private val regionMap: MutableMap<String, TtmlRegion>?,

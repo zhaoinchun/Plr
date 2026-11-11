@@ -11,7 +11,7 @@ import androidx.media3.common.util.Util.createHandler
 import androidx.media3.common.util.Util.postOrRun
 import java.util.Objects
 
-data class AudioFocusRequestCompat internal constructor(
+data class AudioFocusRequestCompat(
     val focusGain:  Int,
     var onAudioFocusChangeListener: OnAudioFocusChangeListener,
     val focusChangeHandler: Handler = Handler(Looper.getMainLooper()),

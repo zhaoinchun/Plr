@@ -871,7 +871,7 @@ class SampleQueue(
         return if (relativeIndex < capacity) relativeIndex else relativeIndex - capacity
     }
 
-    internal class SampleExtrasHolder {
+    class SampleExtrasHolder {
         var size: Int = 0
         var offset: Long = 0
         var cryptoData: TrackOutput.CryptoData? = null

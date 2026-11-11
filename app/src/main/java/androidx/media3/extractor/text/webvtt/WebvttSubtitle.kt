@@ -12,7 +12,7 @@ import kotlin.Int
 import kotlin.LongArray
 import kotlin.compareTo
 
-internal class WebvttSubtitle(cueInfos: MutableList<WebvttCueInfo>) : Subtitle {
+class WebvttSubtitle(cueInfos: MutableList<WebvttCueInfo>) : Subtitle {
     private val cueInfos: MutableList<WebvttCueInfo>
     private val cueTimesUs: LongArray
     private val sortedCueTimesUs: LongArray

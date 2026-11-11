@@ -70,7 +70,7 @@ class LongArrayQueue  constructor(minCapacity: Int = DEFAULT_INITIAL_CAPACITY) {
         size = 0
     }
 
-    @VisibleForTesting
+    
     fun capacity(): Int {
         return data.size
     }

@@ -16,7 +16,7 @@ import java.util.Arrays
 import kotlin.math.abs
 import kotlin.math.max
 
-internal class MediaPeriodQueue(
+class MediaPeriodQueue(
     private val analyticsCollector: AnalyticsCollector,
     private val analyticsCollectorHandler: HandlerWrapper,
     private val mediaPeriodHolderFactory: MediaPeriodHolder.Factory,

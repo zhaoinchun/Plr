@@ -45,7 +45,7 @@ class DownloadRequest(
         this.streamKeys = Collections.unmodifiableList(mutableKeys)
     }
 
-    internal constructor(`in`: Parcel) : this(`in`.readString()!!, (`in`.readString()!!).toUri()) {
+   constructor(`in`: Parcel) : this(`in`.readString()!!, (`in`.readString()!!).toUri()) {
         mimeType = `in`.readString()
         val streamKeyCount = `in`.readInt()
         val mutableStreamKeys = ArrayList<StreamKey?>(streamKeyCount)
@@ -161,13 +161,13 @@ class DownloadRequest(
         dest.writeParcelable(timeRange, 0)
     }
 
-    class ByteRange internal constructor(offset: Long, length: Long) : Parcelable {
+    class ByteRange(offset: Long, length: Long) : Parcelable {
 
         val offset: Long
 
         val length: Long
 
-        internal constructor(`in`: Parcel) : this(`in`.readLong(), `in`.readLong())
+        constructor(`in`: Parcel) : this(`in`.readLong(), `in`.readLong())
 
         override fun equals(o: Any?): Boolean {
             if (o !is ByteRange) {
@@ -213,11 +213,11 @@ class DownloadRequest(
         }
     }
 
-    class TimeRange internal constructor(startPositionUs: Long, durationUs: Long) : Parcelable {
+    class TimeRange(startPositionUs: Long, durationUs: Long) : Parcelable {
         val startPositionUs: Long
         val durationUs: Long
 
-        internal constructor(`in`: Parcel) : this(`in`.readLong(), `in`.readLong())
+        constructor(`in`: Parcel) : this(`in`.readLong(), `in`.readLong())
 
         override fun equals(o: Any?): Boolean {
             if (o !is TimeRange) {

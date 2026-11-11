@@ -126,7 +126,7 @@ object PsshAtomUtil {
         return PsshAtom(uuid, atomVersion, data, keyIds)
     }
 
-    class PsshAtom  internal constructor(
+    class PsshAtom (
         
         val uuid: UUID?,
         

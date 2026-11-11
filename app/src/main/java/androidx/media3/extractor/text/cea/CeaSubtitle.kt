@@ -6,7 +6,7 @@ import androidx.media3.common.text.Cue
 import androidx.media3.extractor.text.Subtitle
 import com.google.common.base.Preconditions
 
-internal class CeaSubtitle(private val cues: MutableList<Cue>?) : Subtitle {
+class CeaSubtitle(private val cues: MutableList<Cue>?) : Subtitle {
     override fun getNextEventTimeIndex(timeUs: Long): Int {
         return if (timeUs < 0) 0 else C.INDEX_UNSET
     }

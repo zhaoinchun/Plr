@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions
 import kotlin.math.cos
 import kotlin.math.sin
 
-internal class Projection(
+class Projection(
     val leftMesh: Mesh,
     val rightMesh: Mesh,
     val stereoMode:  Int

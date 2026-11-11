@@ -36,7 +36,7 @@ import com.google.common.base.Preconditions
 
 import java.io.IOException
 
-internal class JpegMotionPhotoExtractor : Extractor {
+class JpegMotionPhotoExtractor : Extractor {
     private val scratch: ParsableByteArray
 
     private var extractorOutput: ExtractorOutput? = null

@@ -53,7 +53,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
         Arrays.sort<SchemeData?>(this.schemeDatas, this)
     }
 
-    internal constructor(`in`: Parcel) {
+    constructor(`in`: Parcel) {
         schemeType = `in`.readString()
         schemeDatas = `in`.createTypedArray<SchemeData?>(SchemeData.CREATOR)
         schemeDataCount = schemeDatas!!.size
@@ -144,7 +144,7 @@ class DrmInitData : Comparator<SchemeData>, Parcelable {
             this.data = data
         }
 
-        internal constructor(`in`: Parcel) {
+        constructor(`in`: Parcel) {
             uuid = UUID(`in`.readLong(), `in`.readLong())
             licenseServerUrl = `in`.readString()
             mimeType = `in`.readString()

@@ -14,8 +14,8 @@ import androidx.media3.extractor.TrackOutput
 import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import java.io.IOException
 
-internal  abstract class StreamReader {
-    internal class SetupData {
+abstract class StreamReader {
+    class SetupData {
         var format:Format? = null
         var oggSeeker:OggSeeker? = null
     }

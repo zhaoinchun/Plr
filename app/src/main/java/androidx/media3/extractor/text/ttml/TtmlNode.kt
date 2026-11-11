@@ -13,7 +13,7 @@ import com.google.common.base.Preconditions
 import java.util.TreeMap
 import java.util.TreeSet
 
-internal class TtmlNode private constructor(
+class TtmlNode private constructor(
     val tag: String?,
     val text: String?,
     val startTimeUs: Long,

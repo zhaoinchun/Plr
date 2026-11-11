@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 import kotlin.math.min
 
-internal class IcyDataSource(
+class IcyDataSource(
     private val upstream: DataSource,
     private val metadataIntervalBytes: Int,
     private val listener: Listener

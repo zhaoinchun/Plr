@@ -325,7 +325,7 @@ class ConcatenatingMediaSource2 private constructor(
         )
     }
 
-    internal class MediaSourceHolder(
+    class MediaSourceHolder(
         mediaSource: MediaSource,
         val index: Int,
         val initialPlaceholderDurationUs: Long

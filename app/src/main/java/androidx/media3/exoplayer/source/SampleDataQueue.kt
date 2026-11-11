@@ -15,7 +15,7 @@ import java.nio.ByteBuffer
 import java.util.Arrays
 import kotlin.math.min
 
-internal class SampleDataQueue(private val allocator: Allocator) {
+class SampleDataQueue(private val allocator: Allocator) {
     private val allocationLength: Int = allocator.individualAllocationLength
     private val scratch: ParsableByteArray = ParsableByteArray(INITIAL_SCRATCH_SIZE)
 

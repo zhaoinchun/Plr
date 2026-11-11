@@ -7,7 +7,7 @@ import androidx.annotation.IntDef
 import androidx.media3.common.text.TextAnnotation
 import com.google.errorprone.annotations.CanIgnoreReturnValue
 
-internal class TtmlStyle {
+class TtmlStyle {
     var fontFamily: String? = null
         private set
     private var fontColor = 0

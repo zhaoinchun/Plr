@@ -38,7 +38,7 @@ import kotlin.math.min
 import androidx.core.net.toUri
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
-class HttpEngineDataSource internal constructor(
+class HttpEngineDataSource(
     private val httpEngine: HttpEngine,
     private val executor: Executor,
     private val requestPriority: Int,

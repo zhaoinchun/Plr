@@ -13,7 +13,7 @@ import java.util.Arrays
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-internal class WebvttCssParser {
+class WebvttCssParser {
     private val styleInput: ParsableByteArray
     private val stringBuilder: StringBuilder
 

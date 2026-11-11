@@ -188,7 +188,7 @@ class NetworkTypeObserver private constructor(context: Context) {
             return staticInstance!!
         }
 
-        @VisibleForTesting
+        
         @Synchronized
         fun resetForTests() {
             staticInstance = null

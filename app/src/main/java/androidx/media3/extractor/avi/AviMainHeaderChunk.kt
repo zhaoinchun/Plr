@@ -2,7 +2,7 @@ package androidx.media3.extractor.avi
 
 import androidx.media3.common.util.ParsableByteArray
 
-internal class AviMainHeaderChunk  constructor(
+class AviMainHeaderChunk  constructor(
     val frameDurationUs: Int,
     val flags: Int,
     val totalFrames: Int,

@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 import kotlin.math.max
 
-internal class OggPacket {
+class OggPacket {
     
     val pageHeader: OggPageHeader = OggPageHeader()
 

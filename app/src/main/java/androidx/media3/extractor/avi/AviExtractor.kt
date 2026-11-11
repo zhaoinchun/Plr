@@ -425,7 +425,7 @@ class AviExtractor(
         }
     }
 
-    // Internal classes.
+    // classes.
     private inner class AviSeekMap(override val durationUs: Long) : SeekMap {
         override val isSeekable: Boolean
             get() = true

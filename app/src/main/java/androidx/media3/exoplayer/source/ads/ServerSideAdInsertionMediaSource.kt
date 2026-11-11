@@ -1120,7 +1120,7 @@ class ServerSideAdInsertionMediaSource(
         }
     }
 
-    @VisibleForTesting
+    
     class MediaPeriodImpl(
         val sharedPeriod: SharedMediaPeriod,
         val mediaPeriodId: MediaPeriodId,

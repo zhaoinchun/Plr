@@ -12,7 +12,7 @@ import androidx.media3.decoder.CryptoInfo
 import java.util.ArrayDeque
 import java.util.concurrent.atomic.AtomicReference
 
-internal class AsynchronousMediaCodecBufferEnqueuer(
+class AsynchronousMediaCodecBufferEnqueuer(
     private val codec: MediaCodec,
     private val handlerThread: HandlerThread,
     private val conditionVariable: ConditionVariable,

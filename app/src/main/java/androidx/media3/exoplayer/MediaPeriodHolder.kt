@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 import kotlin.math.max
 
-internal class MediaPeriodHolder(
+class MediaPeriodHolder(
     private val rendererCapabilities: Array<RendererCapabilities>,
 
     var rendererOffset: Long,
@@ -306,7 +306,7 @@ internal class MediaPeriodHolder(
         return renderersInCorrectState[index]
     }
 
-    internal fun interface Factory {
+    fun interface Factory {
         fun create(info: MediaPeriodInfo?, rendererPositionOffsetUs: Long): MediaPeriodHolder?
     }
 

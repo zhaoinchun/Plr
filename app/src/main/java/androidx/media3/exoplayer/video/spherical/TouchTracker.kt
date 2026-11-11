@@ -14,7 +14,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
-internal class TouchTracker(
+class TouchTracker(
     context: Context?,
     private val listener: Listener,
     private val pxPerDegrees: Float

@@ -130,7 +130,7 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
         }
     }
 
-    // Internal classes.
+    // classes.
     @SuppressLint("HandlerLeak")
     private inner class LoadTask<T : Loadable>(
         looper: Looper,

@@ -16,7 +16,7 @@ import androidx.media3.extractor.flac.FlacConstants
 import com.google.common.base.Preconditions
 import java.util.Arrays
 
-internal class FlacReader : StreamReader() {
+class FlacReader : StreamReader() {
     private var streamMetadata: FlacStreamMetadata? = null
     private var flacOggSeeker: FlacOggSeeker? = null
 

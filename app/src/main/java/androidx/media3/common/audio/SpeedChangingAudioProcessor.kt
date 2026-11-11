@@ -305,7 +305,7 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
             return outputSamples
         }
 
-        @VisibleForTesting  fun getInputFrameCountForOutput(
+          fun getInputFrameCountForOutput(
             speedProvider: SpeedProvider,
             @IntRange(from = 1) inputSampleRate: Int,
             @IntRange(from = 0) outputFrameCount: Long

@@ -2649,7 +2649,7 @@ object BoxParser {
         fun readNextSampleSize(): Int
     }
 
-    internal class StszSampleSizeBox(stszAtom: LeafBox, trackFormat: Format) : SampleSizeBox {
+    class StszSampleSizeBox(stszAtom: LeafBox, trackFormat: Format) : SampleSizeBox {
         override val fixedSampleSize: Int
         override val sampleCount: Int
         private val data: ParsableByteArray?
@@ -2684,7 +2684,7 @@ object BoxParser {
         }
     }
 
-    internal class Stz2SampleSizeBox(stz2Atom: LeafBox) : SampleSizeBox {
+    class Stz2SampleSizeBox(stz2Atom: LeafBox) : SampleSizeBox {
         private val data: ParsableByteArray?
         override val sampleCount: Int
         private val fieldSize: Int // Can be 4, 8, or 16.

@@ -179,7 +179,7 @@ class MediaParserChunkExtractor @SuppressLint("WrongConstant") constructor(
         }
     }
 
-    // Internal classes.
+    // classes.
     private inner class TrackOutputProviderAdapter : ExtractorOutput {
         override fun track(id: Int, type: Int): TrackOutput {
             return if (trackOutputProvider != null)

@@ -1,7 +1,7 @@
 
 package androidx.media3.extractor.wav
 
-internal class WavFormat(
+class WavFormat(
     val formatType: Int,
     val numChannels: Int,
     val frameRateHz: Int,

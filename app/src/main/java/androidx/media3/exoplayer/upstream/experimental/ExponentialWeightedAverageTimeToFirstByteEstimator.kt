@@ -1,15 +1,12 @@
 package androidx.media3.exoplayer.upstream.experimental
 
-import androidx.annotation.VisibleForTesting
 import androidx.media3.common.C
 import androidx.media3.common.util.Clock
-
 import androidx.media3.common.util.Util.msToUs
 import androidx.media3.datasource.DataSpec
 import androidx.media3.exoplayer.upstream.TimeToFirstByteEstimator
 
-class ExponentialWeightedAverageTimeToFirstByteEstimator
-@VisibleForTesting internal constructor(
+class ExponentialWeightedAverageTimeToFirstByteEstimator(
     private val smoothingFactor: Double,
     private val clock: Clock
 ) : TimeToFirstByteEstimator {

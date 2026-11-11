@@ -18,7 +18,7 @@ import androidx.media3.container.VorbisUtil.verifyVorbisHeaderCapturePattern
 import androidx.media3.extractor.VorbisUtil.parseVorbisComments
 import java.io.IOException
 
-internal class VorbisReader : StreamReader() {
+class VorbisReader : StreamReader() {
     private var vorbisSetup: VorbisSetup? = null
     private var previousPacketBlockSize = 0
     private var seenFirstAudioPacket = false
@@ -108,7 +108,7 @@ internal class VorbisReader : StreamReader() {
         return true
     }
 
-    @VisibleForTesting
+    
     @Throws(IOException::class)
     fun readSetupHeaders(scratch: ParsableByteArray): VorbisSetup? {
         if (vorbisIdHeader == null) {
@@ -135,7 +135,7 @@ internal class VorbisReader : StreamReader() {
         return VorbisSetup(vorbisIdHeader, commentHeader!!, setupHeaderData, modes, iLogModes)
     }
 
-    internal class VorbisSetup(
+    class VorbisSetup(
         val idHeader: VorbisIdHeader,
         val commentHeader: CommentHeader,
         val setupHeaderData: ByteArray,
@@ -152,7 +152,7 @@ internal class VorbisReader : StreamReader() {
             }
         }
 
-        @VisibleForTesting
+        
         fun appendNumberOfSamples(
             buffer: ParsableByteArray, packetSampleCount: Long
         ) {

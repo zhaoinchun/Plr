@@ -11,7 +11,7 @@ import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import com.google.common.base.Preconditions
 import java.io.IOException
 
-internal class PreloadMediaPeriod
+class PreloadMediaPeriod
 (val mediaPeriod: MediaPeriod) : MediaPeriod {
     var prepared: Boolean = false
     private var prepareInternalCalled = false

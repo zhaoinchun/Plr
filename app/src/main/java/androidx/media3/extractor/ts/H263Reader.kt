@@ -18,7 +18,7 @@ import androidx.media3.extractor.TrackOutput
 import androidx.media3.extractor.ts.TsPayloadReader.TrackIdGenerator
 import com.google.common.base.Preconditions
 
-class H263Reader internal constructor(
+class H263Reader(
     private val userDataReader: UserDataReader?,
     private val containerMimeType: String?
 ) : ElementaryStreamReader {

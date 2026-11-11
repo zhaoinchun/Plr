@@ -15,7 +15,7 @@ import kotlin.String
 import kotlin.Throws
 import kotlin.arrayOf
 
-internal class CacheFileMetadataIndex
+class CacheFileMetadataIndex
 (private val databaseProvider: DatabaseProvider) {
     private var tableName:String? = null
 

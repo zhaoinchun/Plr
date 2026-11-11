@@ -65,7 +65,7 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 
-internal class ExoPlayerImplInternal(
+class ExoPlayerImplInternal(
     context: Context,
     renderers: Array<Renderer>,
     secondaryRenderers: Array<Renderer?>,

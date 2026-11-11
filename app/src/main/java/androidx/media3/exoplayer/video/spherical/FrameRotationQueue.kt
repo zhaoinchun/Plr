@@ -5,7 +5,7 @@ import androidx.media3.common.util.GlUtil
 import androidx.media3.common.util.TimedValueQueue
 import kotlin.math.sqrt
 
-internal class FrameRotationQueue {
+class FrameRotationQueue {
     private val recenterMatrix = FloatArray(16)
     private val rotationMatrix = FloatArray(16)
     private val rotations = TimedValueQueue<FloatArray>()

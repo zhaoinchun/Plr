@@ -12,7 +12,6 @@ import androidx.media3.common.util.Util.getPcmEncoding
 import androidx.media3.extractor.metadata.flac.PictureFrame
 
 class FlacStreamMetadata {
-
     class SeekTable(
 
         val pointSampleNumbers: LongArray?,
@@ -86,8 +85,8 @@ class FlacStreamMetadata {
         concatenateVorbisMetadata(vorbisComments, pictureFrames)
     )
 
-    @VisibleForTesting
-    internal constructor(
+
+    constructor(
         minBlockSizeSamples: Int,
         maxBlockSizeSamples: Int,
         minFrameSize: Int,

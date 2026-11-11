@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-internal class ExternallyLoadedMediaPeriod(
+class ExternallyLoadedMediaPeriod(
     private val uri: Uri,
     mimeType: String?,
     private val externalLoader: ExternalLoader

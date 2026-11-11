@@ -15,7 +15,7 @@ import kotlin.math.max
 import androidx.core.view.size
 import androidx.core.view.isVisible
 
-internal class PlayerControlViewLayoutManager(private val playerControlView: PlayerControlView) {
+class PlayerControlViewLayoutManager(private val playerControlView: PlayerControlView) {
     private val controlsBackground: View? =
         playerControlView.findViewById(R.id.exo_controls_background)
     private val topControls: ViewGroup? = playerControlView.findViewById(R.id.exo_top_controls)

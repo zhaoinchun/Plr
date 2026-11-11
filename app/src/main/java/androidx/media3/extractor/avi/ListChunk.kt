@@ -3,7 +3,7 @@ package androidx.media3.extractor.avi
 import androidx.media3.common.C
 import androidx.media3.common.util.ParsableByteArray
 
-internal class ListChunk private constructor(
+class ListChunk private constructor(
     override val type: Int,
     val children: List<AviChunk>
 ) : AviChunk {

@@ -34,7 +34,7 @@ import java.io.EOFException
 import java.io.IOException
 import kotlin.math.max
 
-internal class SubtitleTranscodingTrackOutput(
+class SubtitleTranscodingTrackOutput(
     private val delegate: TrackOutput,
     private val subtitleParserFactory: SubtitleParser.Factory
 ) : TrackOutput {

@@ -6,7 +6,7 @@ import androidx.media3.common.util.Util.sampleCountToDurationUs
 import androidx.media3.extractor.MpegAudioUtil
 import kotlin.math.max
 
-internal class XingFrame private constructor(
+class XingFrame private constructor(
     header: MpegAudioUtil.Header,
     
     val frameCount: Long,

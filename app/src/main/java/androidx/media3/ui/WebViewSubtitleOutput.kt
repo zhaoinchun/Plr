@@ -14,7 +14,7 @@ import androidx.media3.common.util.Util.formatInvariant
 import com.google.common.base.Preconditions
 import java.nio.charset.StandardCharsets
 
-internal class WebViewSubtitleOutput  constructor(
+class WebViewSubtitleOutput  constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs), SubtitleView.Output {

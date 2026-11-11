@@ -6,7 +6,7 @@ import androidx.media3.extractor.text.SubtitleParser
 
 // while we maintain dual architecture. Once we fully migrate to the pre-SampleQueue flow, it can be
 // deprecated and later deleted.
-internal class DelegatingSubtitleDecoder(
+class DelegatingSubtitleDecoder(
     name: String,
     private val subtitleParser: SubtitleParser
 ) : SimpleSubtitleDecoder(name) {

@@ -3,7 +3,7 @@ package androidx.media3.extractor.text.ttml
 
 import androidx.media3.common.text.Cue
 
-internal class TtmlRegion  constructor(
+class TtmlRegion  constructor(
     val id: String?,
     val position: Float = Cue.DIMEN_UNSET,
     val line: Float = Cue.DIMEN_UNSET,

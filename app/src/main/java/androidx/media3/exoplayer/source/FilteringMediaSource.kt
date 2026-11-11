@@ -34,8 +34,8 @@ class FilteringMediaSource(mediaSource: MediaSource, trackTypes: Set<Int>) :
         super.releasePeriod(wrappedPeriod)
     }
 
-    @VisibleForTesting
-    internal class FilteringMediaPeriod(
+    
+    class FilteringMediaPeriod(
         val mediaPeriod: MediaPeriod,
         private val trackTypes: Set<Int>
     ) : MediaPeriod, MediaPeriod.Callback {

@@ -6,7 +6,7 @@ import java.io.BufferedOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-internal class ReusableBufferedOutputStream : BufferedOutputStream {
+class ReusableBufferedOutputStream : BufferedOutputStream {
     private var closed = false
 
     constructor(out: OutputStream?) : super(out)

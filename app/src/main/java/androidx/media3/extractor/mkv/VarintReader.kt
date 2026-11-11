@@ -5,7 +5,7 @@ import androidx.media3.common.C
 import androidx.media3.extractor.ExtractorInput
 import java.io.IOException
 
-internal class VarintReader {
+class VarintReader {
     private val scratch: ByteArray
 
     private var state = 0

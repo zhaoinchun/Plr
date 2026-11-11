@@ -636,7 +636,7 @@ class ParsableByteArray {
 
         private val shouldEnforceLimitOnLegacyMethods = AtomicReference<Boolean?>()
 
-        @VisibleForTesting
+        
         fun setShouldEnforceLimitOnLegacyMethods(enforceLimit: Boolean?) {
             shouldEnforceLimitOnLegacyMethods.set(enforceLimit)
         }

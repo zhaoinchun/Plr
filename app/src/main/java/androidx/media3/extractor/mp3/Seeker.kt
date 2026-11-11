@@ -4,7 +4,7 @@ import androidx.media3.common.C
 import androidx.media3.extractor.SeekMap
 import androidx.media3.extractor.SeekMap.Unseekable
 
-internal interface Seeker : SeekMap {
+interface Seeker : SeekMap {
     fun getTimeUs(position: Long): Long
     val dataStartPosition: Long
     val dataEndPosition: Long

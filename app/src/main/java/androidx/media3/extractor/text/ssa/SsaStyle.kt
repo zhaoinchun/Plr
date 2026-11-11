@@ -16,7 +16,7 @@ import com.google.common.primitives.Ints
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-internal class SsaStyle private constructor(
+class SsaStyle private constructor(
     val name: String?,
     val alignment:  Int,
     @field:ColorInt @param:ColorInt val primaryColor: Int?,
@@ -28,7 +28,7 @@ internal class SsaStyle private constructor(
     val strikeout: Boolean,
     val borderStyle:  Int
 ) {
-    internal class Format private constructor(
+    class Format private constructor(
         val nameIndex: Int,
         val alignmentIndex: Int,
         val primaryColorIndex: Int,
@@ -93,7 +93,7 @@ internal class SsaStyle private constructor(
         }
     }
 
-    internal class Overrides private constructor(
+    class Overrides private constructor(
         val alignment:  Int,
         val position: PointF?
     ) {

@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.media3.common.text.Cue
 
-internal class CanvasSubtitleOutput(
+class CanvasSubtitleOutput(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs), SubtitleView.Output {

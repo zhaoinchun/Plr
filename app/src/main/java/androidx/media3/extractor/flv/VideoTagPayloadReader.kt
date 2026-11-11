@@ -9,7 +9,7 @@ import androidx.media3.container.NalUnitUtil
 import androidx.media3.extractor.AvcConfig
 import androidx.media3.extractor.TrackOutput
 
-internal class VideoTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
+class VideoTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
     // Temporary arrays.
     private val nalStartCode: ParsableByteArray
     private val nalLength: ParsableByteArray

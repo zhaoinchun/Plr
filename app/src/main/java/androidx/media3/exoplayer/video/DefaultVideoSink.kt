@@ -20,7 +20,7 @@ import java.util.ArrayDeque
 import java.util.Queue
 import java.util.concurrent.Executor
 
-internal class DefaultVideoSink(
+class DefaultVideoSink(
     private val videoFrameReleaseControl: VideoFrameReleaseControl,
     private val videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster,
     clock: Clock

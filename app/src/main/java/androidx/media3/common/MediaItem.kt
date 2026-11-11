@@ -227,7 +227,7 @@ class MediaItem private constructor(
             private val FIELD_LICENSE_REQUEST_HEADERS: String = Util.intToStringMaxRadix(2)
             private val FIELD_MULTI_SESSION: String = Util.intToStringMaxRadix(3)
 
-            @VisibleForTesting
+            
             val FIELD_PLAY_CLEAR_CONTENT_WITHOUT_KEY: String = Util.intToStringMaxRadix(4)
 
             private val FIELD_FORCE_DEFAULT_LICENSE_URI: String = Util.intToStringMaxRadix(5)
@@ -649,10 +649,10 @@ class MediaItem private constructor(
             private val FIELD_RELATIVE_TO_DEFAULT_POSITION: String = Util.intToStringMaxRadix(3)
             private val FIELD_STARTS_AT_KEY_FRAME: String = Util.intToStringMaxRadix(4)
 
-            @VisibleForTesting
+            
             val FIELD_START_POSITION_US: String = Util.intToStringMaxRadix(5)
 
-            @VisibleForTesting
+            
             val FIELD_END_POSITION_US: String = Util.intToStringMaxRadix(6)
             private val FIELD_ALLOW_UNSEEKABLE_MEDIA: String = Util.intToStringMaxRadix(7)
 

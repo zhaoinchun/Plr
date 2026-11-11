@@ -5,7 +5,7 @@ import androidx.media3.common.C
 import androidx.media3.decoder.DecoderInputBuffer
 import com.google.common.base.Preconditions
 
-internal class BatchBuffer : DecoderInputBuffer(BUFFER_REPLACEMENT_MODE_DIRECT) {
+class BatchBuffer : DecoderInputBuffer(BUFFER_REPLACEMENT_MODE_DIRECT) {
     var lastSampleTimeUs: Long = 0
         private set
     var sampleCount: Int = 0

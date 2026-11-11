@@ -19,7 +19,7 @@ import java.util.Random
 import java.util.TreeSet
 import kotlin.math.abs
 
-class SimpleCache internal constructor(
+class SimpleCache(
     cacheDir: File,
     evictor: CacheEvictor,
     contentIndex: CachedContentIndex,

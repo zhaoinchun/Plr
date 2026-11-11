@@ -5,7 +5,7 @@ import androidx.media3.exoplayer.source.MediaPeriod
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import com.google.common.base.Preconditions
 
-internal class MediaPeriodInfo(
+class MediaPeriodInfo(
     id: MediaPeriodId,
     startPositionUs: Long,
     liveStreamStartPositionProjectionUs: Long,

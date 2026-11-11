@@ -5,7 +5,7 @@ import androidx.media3.common.util.Log.w
 import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.common.util.Util.scaleLargeTimestamp
 
-internal class AviStreamHeaderChunk private constructor(
+class AviStreamHeaderChunk private constructor(
     val streamType: Int,
     val initialFrames: Int,
     val scale: Int,

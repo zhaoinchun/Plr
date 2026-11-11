@@ -61,7 +61,7 @@ import kotlin.concurrent.Volatile
 import kotlin.math.max
 import kotlin.math.min
 
-internal class ProgressiveMediaPeriod
+class ProgressiveMediaPeriod
     (
     private val uri: Uri,
     private val dataSource: DataSource,
@@ -82,7 +82,7 @@ internal class ProgressiveMediaPeriod
     downloadExecutor: ReleasableExecutor?
 ) : MediaPeriod, ExtractorOutput, Loader.Callback<ExtractingLoadable>, Loader.ReleaseCallback,
     UpstreamFormatChangedListener {
-    internal interface Listener {
+    interface Listener {
         fun onSourceInfoRefreshed(durationUs: Long, seekMap: SeekMap, isLive: Boolean)
     }
 

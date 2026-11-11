@@ -9,7 +9,7 @@ import com.google.common.collect.Ordering
 import kotlin.math.max
 import kotlin.math.min
 
-internal class MergingCuesResolver : CuesResolver {
+class MergingCuesResolver : CuesResolver {
     private val cuesWithTimingList: MutableList<CuesWithTiming>
 
     init {

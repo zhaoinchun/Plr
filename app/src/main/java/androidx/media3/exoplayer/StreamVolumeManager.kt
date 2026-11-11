@@ -16,7 +16,7 @@ import androidx.media3.common.util.Clock
 import androidx.media3.common.util.Log.w
 import com.google.common.base.Preconditions
 
-internal class StreamVolumeManager(
+class StreamVolumeManager(
     context: Context,
     private val listener: Listener,
     streamType: Int,

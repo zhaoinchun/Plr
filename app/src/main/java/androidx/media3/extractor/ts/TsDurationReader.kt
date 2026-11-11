@@ -10,7 +10,7 @@ import androidx.media3.extractor.PositionHolder
 import java.io.IOException
 import kotlin.math.min
 
-internal class TsDurationReader(private val timestampSearchBytes: Int) {
+class TsDurationReader(private val timestampSearchBytes: Int) {
     private val pcrTimestampAdjuster: TimestampAdjuster
     private val packetBuffer: ParsableByteArray
 

@@ -6,7 +6,7 @@ import androidx.media3.extractor.text.CuesWithTiming
 import com.google.common.base.Preconditions
 import com.google.common.collect.Iterables
 
-internal class ReplacingCuesResolver : CuesResolver {
+class ReplacingCuesResolver : CuesResolver {
     private val cuesWithTimingList: ArrayList<CuesWithTiming> = ArrayList<CuesWithTiming>()
 
     override fun addCues(cues: CuesWithTiming, currentPositionUs: Long): Boolean {

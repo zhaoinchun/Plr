@@ -8,7 +8,7 @@ import androidx.media3.exoplayer.FormatHolder
 import java.io.IOException
 import androidx.core.util.size
 
-internal class MergingMetadataSampleStream(
+class MergingMetadataSampleStream(
     val primaryStream: SampleStream,
     val metadataStream: SampleStream, videoFormat: Format
 ) : SampleStream {

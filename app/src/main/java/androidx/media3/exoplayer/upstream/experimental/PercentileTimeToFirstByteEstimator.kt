@@ -9,7 +9,7 @@ import androidx.media3.exoplayer.upstream.SlidingPercentile
 import androidx.media3.exoplayer.upstream.TimeToFirstByteEstimator
 import com.google.common.base.Preconditions
 
-class PercentileTimeToFirstByteEstimator @VisibleForTesting internal constructor(
+class PercentileTimeToFirstByteEstimator (
     numberOfSamples: Int,
     private val percentile: Float,
     private val clock: Clock

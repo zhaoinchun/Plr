@@ -8,7 +8,7 @@ import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.extractor.AacUtil.parseAudioSpecificConfig
 import androidx.media3.extractor.TrackOutput
 
-internal class AudioTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
+class AudioTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
     // State variables
     private var hasParsedAudioDataHeader = false
     private var hasOutputFormat = false

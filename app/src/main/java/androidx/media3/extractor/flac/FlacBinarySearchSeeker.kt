@@ -9,7 +9,7 @@ import androidx.media3.extractor.FlacStreamMetadata
 import java.io.IOException
 import kotlin.math.max
 
-internal class FlacBinarySearchSeeker(
+class FlacBinarySearchSeeker(
     flacStreamMetadata: FlacStreamMetadata,
     frameStartMarker: Int,
     firstFramePosition: Long,

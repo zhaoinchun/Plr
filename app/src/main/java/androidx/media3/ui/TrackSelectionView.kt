@@ -314,7 +314,7 @@ class TrackSelectionView(
         return allowMultipleOverrides && trackGroups.size > 1
     }
 
-    // Internal classes.
+    // classes.
     private inner class ComponentListener : OnClickListener {
         override fun onClick(view: View) {
             this@TrackSelectionView.onClick(view)

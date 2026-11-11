@@ -4,7 +4,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MimeTypes
 import androidx.media3.extractor.metadata.MotionPhotoMetadata
 
-internal class MotionPhotoDescription(
+class MotionPhotoDescription(
     val photoPresentationTimestampUs: Long,
     val items: MutableList<ContainerItem>
 ) {

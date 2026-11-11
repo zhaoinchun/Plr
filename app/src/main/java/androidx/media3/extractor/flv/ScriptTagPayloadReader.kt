@@ -13,7 +13,7 @@ import kotlin.LongArray
 import kotlin.String
 import kotlin.text.String
 
-internal class ScriptTagPayloadReader : TagPayloadReader(DiscardingTrackOutput()) {
+class ScriptTagPayloadReader : TagPayloadReader(DiscardingTrackOutput()) {
     var durationUs: Long
         private set
     var keyFrameTimesUs: LongArray

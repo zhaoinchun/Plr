@@ -31,7 +31,7 @@ import androidx.media3.common.text.Cue
 class SubtitleView  constructor(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs) {
 
-    internal interface Output {
+    interface Output {
         fun update(
             cues: List<Cue>,
             style: CaptionStyleCompat,

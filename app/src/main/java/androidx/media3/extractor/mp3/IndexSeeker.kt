@@ -5,7 +5,7 @@ import androidx.media3.common.util.LongArray
 import androidx.media3.extractor.IndexSeekMap
 import androidx.media3.extractor.SeekMap.SeekPoints
 
-internal class IndexSeeker(durationUs: Long, dataStartPosition: Long, dataEndPosition: Long) :
+class IndexSeeker(durationUs: Long, dataStartPosition: Long, dataEndPosition: Long) :
     Seeker {
     override val dataStartPosition: Long
     override val dataEndPosition: Long

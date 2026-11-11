@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService
 import kotlin.concurrent.Volatile
 import kotlin.math.min
 
-class PreCacheHelper internal constructor(
+class PreCacheHelper(
     private val mediaItem: MediaItem,
     private val testMediaSourceFactory: MediaSource.Factory?,
     private val downloadHelperFactory: DownloadHelper.Factory,

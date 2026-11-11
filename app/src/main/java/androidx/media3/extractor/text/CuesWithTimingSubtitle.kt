@@ -11,7 +11,7 @@ import com.google.common.collect.Iterables
 import com.google.common.collect.Ordering
 import java.util.Arrays
 
-internal class CuesWithTimingSubtitle(cuesWithTimingList: MutableList<CuesWithTiming>) : Subtitle {
+class CuesWithTimingSubtitle(cuesWithTimingList: MutableList<CuesWithTiming>) : Subtitle {
     // eventCues and eventTimesUs are parallel collections. eventTimesUs is sorted in ascending
     // order, and eventCues[i] contains the the cues for the event at time eventTimesUs[i].
     // eventTimesUs may be longer than eventCues (with padding elements at the end).

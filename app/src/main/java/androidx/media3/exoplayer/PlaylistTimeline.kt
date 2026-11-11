@@ -9,7 +9,7 @@ import androidx.media3.exoplayer.source.ForwardingTimeline
 import androidx.media3.exoplayer.source.ShuffleOrder
 import java.util.Arrays
 
-internal class PlaylistTimeline private constructor(
+class PlaylistTimeline private constructor(
     timelines: Array<Timeline?>,
     uids: Array<Any?>,
     shuffleOrder: ShuffleOrder

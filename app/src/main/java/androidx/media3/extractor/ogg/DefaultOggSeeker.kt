@@ -14,7 +14,7 @@ import java.io.EOFException
 import java.io.IOException
 import java.math.BigInteger
 
-internal class DefaultOggSeeker(
+class DefaultOggSeeker(
     streamReader: StreamReader,
     payloadStartPosition: Long,
     payloadEndPosition: Long,
@@ -173,7 +173,7 @@ internal class DefaultOggSeeker(
         input.resetPeekPosition()
     }
 
-    @VisibleForTesting
+    
     @Throws(IOException::class)
     fun readGranuleOfLastPage(input: ExtractorInput): Long {
         pageHeader.reset()

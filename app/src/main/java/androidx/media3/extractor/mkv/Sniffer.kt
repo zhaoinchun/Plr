@@ -7,7 +7,7 @@ import androidx.media3.extractor.Extractor
 import androidx.media3.extractor.ExtractorInput
 import java.io.IOException
 
-internal class Sniffer {
+class Sniffer {
     private val scratch: ParsableByteArray
     private var peekLength = 0
 

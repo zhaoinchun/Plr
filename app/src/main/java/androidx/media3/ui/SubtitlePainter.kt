@@ -28,7 +28,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
-internal class SubtitlePainter(context: Context) {
+class SubtitlePainter(context: Context) {
     // Styled dimensions.
     private val outlineWidth: Float
     private val shadowRadius: Float

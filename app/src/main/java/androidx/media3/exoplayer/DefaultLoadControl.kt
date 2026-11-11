@@ -365,7 +365,7 @@ class DefaultLoadControl protected constructor(
         return constrainValue(targetBufferSize, DEFAULT_MIN_BUFFER_SIZE, DEFAULT_MAX_BUFFER_SIZE)
     }
 
-    @VisibleForTesting
+    
     fun calculateTotalTargetBufferBytes(): Int {
         var totalTargetBufferBytes = 0
         for (state in loadingStates.values) {

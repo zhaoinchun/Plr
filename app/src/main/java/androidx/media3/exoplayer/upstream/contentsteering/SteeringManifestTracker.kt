@@ -23,7 +23,7 @@ import com.google.common.base.Supplier
 import java.io.IOException
 import java.util.TreeMap
 
-class SteeringManifestTracker internal constructor(
+class SteeringManifestTracker(
     private val dataSourceFactory: DataSource.Factory,
     private val downloadExecutorSupplier: Supplier<ReleasableExecutor?>?,
     private val clock: Clock
@@ -237,7 +237,7 @@ class SteeringManifestTracker internal constructor(
     }
 
     companion object {
-        @VisibleForTesting
+        
 
         const val FALLBACK_DELAY_UNTIL_NEXT_LOAD_MS: Long = 300000 // 5 mins.
 

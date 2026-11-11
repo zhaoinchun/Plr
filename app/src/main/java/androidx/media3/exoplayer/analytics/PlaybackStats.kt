@@ -9,7 +9,7 @@ import java.util.Collections
 import kotlin.math.max
 import kotlin.math.min
 
-class PlaybackStats internal constructor(
+class PlaybackStats(
     val playbackCount: Int,
     private val playbackStateDurationsMs: LongArray,
     val playbackStateHistory: MutableList<EventTimeAndPlaybackState>,

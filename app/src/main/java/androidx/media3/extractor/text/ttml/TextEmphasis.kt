@@ -23,7 +23,7 @@ import com.google.common.collect.Iterables
 import com.google.common.collect.Sets
 import java.util.regex.Pattern
 
-internal class TextEmphasis private constructor(
+class TextEmphasis private constructor(
     
     val markShape:  Int,
     

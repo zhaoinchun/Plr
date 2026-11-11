@@ -10,7 +10,7 @@ import androidx.media3.common.util.Log.e
 import androidx.media3.exoplayer.video.spherical.Projection.SubMesh
 import java.nio.FloatBuffer
 
-internal class ProjectionRenderer {
+class ProjectionRenderer {
     private var stereoMode = 0
     private var leftMeshData: MeshData? = null
     private var rightMeshData: MeshData? = null

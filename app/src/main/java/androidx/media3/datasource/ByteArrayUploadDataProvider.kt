@@ -10,7 +10,7 @@ import kotlin.math.min
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 
-internal class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvider() {
+class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvider() {
     private var position = 0
 
     override fun getLength(): Long {

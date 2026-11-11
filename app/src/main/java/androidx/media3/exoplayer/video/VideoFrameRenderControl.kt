@@ -11,13 +11,13 @@ import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseInfo
 
 import com.google.common.base.Preconditions
 
-internal class VideoFrameRenderControl(
+class VideoFrameRenderControl(
     private val frameRenderer: FrameRenderer,
     private val videoFrameReleaseControl: VideoFrameReleaseControl,
     private val videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster,
     private val frameRateEstimator: FixedFrameRateEstimator
 ) {
-    internal interface FrameRenderer {
+    interface FrameRenderer {
         fun onVideoSizeChanged(videoSize: VideoSize)
         fun renderFrame(renderTimeNs: Long, presentationTimeUs: Long, isFirstFrame: Boolean)
         fun dropFrame()

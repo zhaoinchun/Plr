@@ -72,12 +72,12 @@ class EventMessage
 
     companion object {
 
-        @VisibleForTesting
+        
         const val ID3_SCHEME_ID_AOM: String = "https://aomedia.org/emsg/ID3"
 
         private const val ID3_SCHEME_ID_APPLE = "https://developer.apple.com/streaming/emsg-id3"
 
-        @VisibleForTesting
+        
         const val SCTE35_SCHEME_ID: String = "urn:scte:scte35:2014:bin"
 
         private val ID3_FORMAT =

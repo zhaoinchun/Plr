@@ -7,7 +7,7 @@ import androidx.media3.extractor.SeekMap
 import androidx.media3.extractor.SeekPoint
 import androidx.media3.extractor.metadata.id3.MlltFrame
 
-internal class MlltSeeker private constructor(
+class MlltSeeker private constructor(
     private val referencePositions: LongArray,
     private val referenceTimesMs: LongArray,
     durationUs: Long

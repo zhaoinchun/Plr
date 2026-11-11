@@ -4,7 +4,7 @@ import android.media.MediaCodec
 import android.os.Bundle
 import androidx.media3.decoder.CryptoInfo
 
-internal class SynchronousMediaCodecBufferEnqueuer(private val codec: MediaCodec) :
+class SynchronousMediaCodecBufferEnqueuer(private val codec: MediaCodec) :
     MediaCodecBufferEnqueuer {
     override fun start() {
         // Do nothing.

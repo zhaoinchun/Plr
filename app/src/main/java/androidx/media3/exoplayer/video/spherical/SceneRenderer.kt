@@ -14,7 +14,7 @@ import androidx.media3.exoplayer.video.VideoFrameMetadataListener
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.Volatile
 
-internal class SceneRenderer : VideoFrameMetadataListener, CameraMotionListener {
+class SceneRenderer : VideoFrameMetadataListener, CameraMotionListener {
     private val frameAvailable = AtomicBoolean()
     private val resetRotationAtNextFrame = AtomicBoolean(true)
     private val projectionRenderer = ProjectionRenderer()

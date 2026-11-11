@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions
 import kotlin.math.min
 import androidx.core.util.size
 
-internal class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Consumer { value: V -> }) {
+class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Consumer { value: V -> }) {
     private var memoizedReadIndex: Int= C.INDEX_UNSET
     private val spans: SparseArray<V> = SparseArray<V>()
 

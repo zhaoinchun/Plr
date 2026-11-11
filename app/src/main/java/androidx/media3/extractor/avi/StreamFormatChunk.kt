@@ -8,7 +8,7 @@ import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.common.util.Util.getPcmEncoding
 import androidx.media3.common.util.Util.getTrackTypeString
 
-internal class StreamFormatChunk(val format: Format) : AviChunk {
+class StreamFormatChunk(val format: Format) : AviChunk {
     override val type = AviExtractor.FOURCC_strf
 
     companion object {

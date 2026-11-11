@@ -144,7 +144,6 @@ object WebvttCueParser {
         return builder.toCueBuilder()
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PACKAGE_PRIVATE)
     fun newCueForText(text: CharSequence?): Cue {
         val infoBuilder = WebvttCueInfoBuilder()
         infoBuilder.text = text

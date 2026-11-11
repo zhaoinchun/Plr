@@ -7,7 +7,7 @@ import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-internal class SimpleCacheSpan
+class SimpleCacheSpan
 private constructor(
     key: String,
     position: Long,

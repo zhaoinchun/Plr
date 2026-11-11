@@ -7,7 +7,7 @@ import java.util.ArrayDeque
 import java.util.Deque
 import kotlin.math.sqrt
 
-class SlidingWeightedAverageBandwidthStatistic @VisibleForTesting internal constructor(
+class SlidingWeightedAverageBandwidthStatistic (
     private val sampleEvictionFunction: SampleEvictionFunction, private val clock: Clock
 ) : BandwidthStatistic {
     class Sample(

@@ -2,7 +2,7 @@ package androidx.media3.common.audio
 
 import java.nio.ByteBuffer
 
-internal class SynchronizedSonicAudioProcessor(
+class SynchronizedSonicAudioProcessor(
     private val lock: Any,
     keepActiveWithDefaultParameters: Boolean
 ) : AudioProcessor {

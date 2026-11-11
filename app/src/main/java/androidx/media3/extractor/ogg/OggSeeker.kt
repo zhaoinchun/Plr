@@ -5,7 +5,7 @@ import androidx.media3.extractor.ExtractorInput
 import androidx.media3.extractor.SeekMap
 import java.io.IOException
 
-internal interface OggSeeker {
+interface OggSeeker {
     
     fun createSeekMap(): SeekMap?
 

@@ -166,14 +166,14 @@ class VideoFrameReleaseHelper(private val context: Context) {
         return snappedTimeNs - (vsyncDurationNs * VSYNC_OFFSET_PERCENTAGE) / 100
     }
 
-    @VisibleForTesting
+    
     fun setVsyncData(vsyncSampleTimeNs: Long, vsyncDurationNs: Long) {
         vsyncSampler!!.sampledVsyncTimeNs =
             vsyncSampleTimeNs
         vsyncSampler!!.vsyncDurationNs = vsyncDurationNs
     }
 
-    @VisibleForTesting
+    
     fun setVSyncSamplerListener(listener: VSyncSamplerListener?) {
         this.vsyncSamplerListener = listener
         if (vsyncSampler != null) {
@@ -436,7 +436,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
     companion object {
         private const val TAG = "VideoFrameReleaseHelper"
 
-        @VisibleForTesting
+        
         const val VSYNC_SAMPLE_UPDATE_PERIOD_MS: Long = 500
         private const val MAX_ALLOWED_ADJUSTMENT_NS: Long = 20000000
         private const val VSYNC_OFFSET_PERCENTAGE: Long = 80

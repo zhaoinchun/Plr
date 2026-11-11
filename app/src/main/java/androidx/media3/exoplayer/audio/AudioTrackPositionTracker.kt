@@ -17,7 +17,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-internal class AudioTrackPositionTracker(
+class AudioTrackPositionTracker(
     private val listener: Listener,
     private val clock: Clock,
     private val audioTrack: AudioTrack,

@@ -6,7 +6,7 @@ import androidx.media3.extractor.ExtractorInput
 
 import java.io.IOException
 
-internal class TrackFragment {
+class TrackFragment {
     
     var header:DefaultSampleValues? = null
 

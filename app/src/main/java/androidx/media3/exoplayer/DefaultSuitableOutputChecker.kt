@@ -22,7 +22,7 @@ import androidx.media3.common.util.Util.isWear
 
 import java.util.concurrent.Executor
 
-internal class DefaultSuitableOutputChecker : SuitableOutputChecker {
+class DefaultSuitableOutputChecker : SuitableOutputChecker {
     private val impl: SuitableOutputChecker
 
     init {

@@ -8,7 +8,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-internal class Sonic(
+class Sonic(
     private val inputSampleRateHz: Int,
     private val channelCount: Int,
     private val speed: Float,

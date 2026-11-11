@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions
 import java.util.concurrent.TimeUnit
 
 class WearUnsuitableOutputPlaybackSuppressionResolverListener
-@VisibleForTesting internal constructor(
+(
     context: Context,
     @IntRange(from = 0) autoResumeTimeoutMs: Long,
     clock: Clock

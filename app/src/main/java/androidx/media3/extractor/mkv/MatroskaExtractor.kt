@@ -56,7 +56,7 @@ import kotlin.math.min
 import androidx.core.util.size
 import androidx.media3.extractor.metadata.ChapterImpl
 
-class MatroskaExtractor internal constructor(
+class MatroskaExtractor(
     private val reader: EbmlReader,
     flags:  Int,
     subtitleParserFactory: SubtitleParser.Factory

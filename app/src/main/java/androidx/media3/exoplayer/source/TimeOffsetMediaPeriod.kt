@@ -10,7 +10,7 @@ import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import java.io.IOException
 
-internal class TimeOffsetMediaPeriod(
+class TimeOffsetMediaPeriod(
     val wrappedMediaPeriod: MediaPeriod, private val timeOffsetUs: Long
 ) : MediaPeriod, MediaPeriod.Callback {
     private var callback: MediaPeriod.Callback? = null

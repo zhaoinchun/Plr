@@ -223,9 +223,6 @@ class SubripParser : SubtitleParser {
             return timestampMs * 1000
         }
 
-        // TODO(b/289983417): Make package-private again, once it is no longer needed in
-        // DelegatingSubtitleDecoderWithSubripParserTest.java (i.e. legacy subtitle flow is removed)
-        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
         fun getFractionalPositionForAnchorType( anchorType:  Int): Float {
             when (anchorType) {
                 Cue.ANCHOR_TYPE_START -> return START_FRACTION

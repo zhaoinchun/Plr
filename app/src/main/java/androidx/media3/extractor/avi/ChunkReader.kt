@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 import java.util.Arrays
 
-internal class ChunkReader(
+class ChunkReader(
     id: Int,
     private val streamHeaderChunk: AviStreamHeaderChunk,
     trackOutput: TrackOutput,

@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.abs
 
-class SonicAudioProcessor internal constructor(keepActiveWithDefaultParameters: Boolean) :
+class SonicAudioProcessor(keepActiveWithDefaultParameters: Boolean) :
     AudioProcessor {
     private val shouldBeActiveWithDefaultParameters = keepActiveWithDefaultParameters
     private var pendingOutputSampleRate = SAMPLE_RATE_NO_CHANGE

@@ -15,7 +15,7 @@ import java.io.IOException
 import java.util.Collections
 import java.util.IdentityHashMap
 
-internal class MergingMediaPeriod(
+class MergingMediaPeriod(
     private val compositeSequenceableLoaderFactory: CompositeSequenceableLoaderFactory,
     periodTimeOffsetsUs: LongArray,
     private val periods: Array<MediaPeriod>

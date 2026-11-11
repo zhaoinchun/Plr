@@ -22,7 +22,7 @@ import java.io.IOException
 import java.util.Objects
 import kotlin.math.min
 
-internal class RendererHolder(
+class RendererHolder(
     private val primaryRenderer: Renderer,
     private val secondaryRenderer: Renderer?, // Index of renderer in renderer list held by the {@link Player}.
     private val index: Int

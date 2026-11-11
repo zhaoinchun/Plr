@@ -10,7 +10,7 @@ import androidx.media3.common.util.CircularIntArray
 import com.google.common.base.Preconditions
 import java.util.ArrayDeque
 
-internal class AsynchronousMediaCodecCallback(private val callbackThread: HandlerThread) :
+class AsynchronousMediaCodecCallback(private val callbackThread: HandlerThread) :
     MediaCodec.Callback() {
     private val lock: Any = Any()
     private var handler: Handler? = null

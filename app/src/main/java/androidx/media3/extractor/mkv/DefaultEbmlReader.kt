@@ -17,7 +17,7 @@ import kotlin.String
 import kotlin.Throws
 import kotlin.text.String
 
-internal class DefaultEbmlReader : EbmlReader {
+class DefaultEbmlReader : EbmlReader {
     private val scratch: ByteArray
     private val masterElementsStack: ArrayDeque<MasterElement>
     private val varintReader: VarintReader

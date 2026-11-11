@@ -11,7 +11,7 @@ import androidx.media3.container.OpusUtil.getPacketDurationUs
 import androidx.media3.container.VorbisUtil.readVorbisCommentHeader
 import androidx.media3.extractor.VorbisUtil.parseVorbisComments
 
-internal class OpusReader : StreamReader() {
+class OpusReader : StreamReader() {
     private var firstCommentHeaderSeen = false
 
     override fun reset(headerData: Boolean) {

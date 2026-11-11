@@ -31,7 +31,7 @@ import java.util.Collections
 import java.util.UUID
 import kotlin.math.min
 
-internal class DefaultDrmSession(
+class DefaultDrmSession(
     private val uuid: UUID,
     private val mediaDrm: ExoMediaDrm,
     private val provisioningManager: ProvisioningManager,
@@ -494,7 +494,7 @@ internal class DefaultDrmSession(
         }
     }
 
-    // Internal classes.
+    // classes.
     @SuppressLint("HandlerLeak")
     private inner class ResponseHandler(looper: Looper) : Handler(looper) {
         override fun handleMessage(msg: Message) {

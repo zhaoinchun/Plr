@@ -22,7 +22,7 @@ import com.google.common.base.Preconditions
 
 import java.io.IOException
 
-internal class HeicMotionPhotoExtractor : Extractor {
+class HeicMotionPhotoExtractor : Extractor {
     private val scratch: ParsableByteArray
     private var extractorOutput: ExtractorOutput? = null
     private var motionPhotoMetadata: MotionPhotoMetadata? = null

@@ -6,7 +6,7 @@ import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.util.Clock
 import com.google.common.base.Preconditions
 
-internal class DefaultMediaClock(private val listener: PlaybackParametersListener, clock: Clock) :
+class DefaultMediaClock(private val listener: PlaybackParametersListener, clock: Clock) :
     MediaClock {
     interface PlaybackParametersListener {
         fun onPlaybackParametersChanged(newPlaybackParameters: PlaybackParameters?)

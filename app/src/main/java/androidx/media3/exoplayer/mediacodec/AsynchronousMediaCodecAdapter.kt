@@ -23,7 +23,7 @@ import com.google.common.base.Supplier
 import java.io.IOException
 import java.nio.ByteBuffer
 
-internal class AsynchronousMediaCodecAdapter private constructor(
+class AsynchronousMediaCodecAdapter private constructor(
     private val codec: MediaCodec,
     callbackThread: HandlerThread,
     bufferEnqueuer: MediaCodecBufferEnqueuer,
@@ -273,12 +273,12 @@ internal class AsynchronousMediaCodecAdapter private constructor(
         codec.unsubscribeFromVendorParameters(names)
     }
 
-    @VisibleForTesting
+    
     fun onError(error: CodecException?) {
         asynchronousMediaCodecCallback.onError(codec, error!!)
     }
 
-    @VisibleForTesting
+    
     fun onOutputFormatChanged(format: MediaFormat?) {
         asynchronousMediaCodecCallback.onOutputFormatChanged(codec, format!!)
     }

@@ -9,7 +9,7 @@ import androidx.media3.extractor.SeekPoint
 import com.google.common.base.Preconditions
 import kotlin.math.min
 
-internal class XingSeeker private constructor(
+class XingSeeker private constructor(
     override val dataStartPosition: Long,
     private val xingFrameSize: Int,
     override val durationUs: Long,

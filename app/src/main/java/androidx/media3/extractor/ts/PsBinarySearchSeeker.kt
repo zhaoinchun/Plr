@@ -9,7 +9,7 @@ import androidx.media3.extractor.ExtractorInput
 import java.io.IOException
 import kotlin.math.min
 
-internal class PsBinarySearchSeeker(
+class PsBinarySearchSeeker(
     scrTimestampAdjuster: TimestampAdjuster,
     streamDurationUs: Long,
     inputLength: Long

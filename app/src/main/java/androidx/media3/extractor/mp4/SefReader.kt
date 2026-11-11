@@ -27,7 +27,7 @@ import androidx.media3.extractor.metadata.mp4.SlowMotionData
 import com.google.common.base.Splitter
 import java.io.IOException
 
-internal class SefReader {
+class SefReader {
     private val dataReferences: MutableList<DataReference>
     private var readerState:  Int
     private var tailLength = 0
