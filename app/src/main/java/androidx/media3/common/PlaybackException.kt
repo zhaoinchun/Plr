@@ -13,7 +13,7 @@ import androidx.media3.common.util.Util.intToStringMaxRadix
 open class PlaybackException protected constructor(
     message: String?,
     cause: Throwable?,
-      val errorCode: Int,
+    val errorCode: Int,
     val extras: Bundle?,
     val timestampMs: Long
 ) : Exception(message, cause) {
@@ -36,15 +36,15 @@ open class PlaybackException protected constructor(
         extras: Bundle?
     ) : this(message, cause, errorCode, extras, Clock.DEFAULT.elapsedRealtime())
 
-    protected constructor(bundle: Bundle) : this( 
-        bundle.getString(FIELD_STRING_MESSAGE),  
-        getCauseFromBundle(bundle),  
+    protected constructor(bundle: Bundle) : this(
+        bundle.getString(FIELD_STRING_MESSAGE),
+        getCauseFromBundle(bundle),
         bundle.getInt(
-            FIELD_INT_ERROR_CODE,  ERROR_CODE_UNSPECIFIED
-        ),  
-        getExtrasFromBundle(bundle),  
+            FIELD_INT_ERROR_CODE, ERROR_CODE_UNSPECIFIED
+        ),
+        getExtrasFromBundle(bundle),
         bundle.getLong(
-            FIELD_LONG_TIMESTAMP_MS,  SystemClock.elapsedRealtime()
+            FIELD_LONG_TIMESTAMP_MS, SystemClock.elapsedRealtime()
         )
     )
 
@@ -268,7 +268,7 @@ open class PlaybackException protected constructor(
                 try {
                     val clazz =
                         Class.forName(
-                            causeClassName,  
+                            causeClassName,
                             true,
                             PlaybackException::class.java.getClassLoader()
                         )

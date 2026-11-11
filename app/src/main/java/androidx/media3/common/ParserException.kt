@@ -11,7 +11,7 @@ open class ParserException protected constructor(
     override val message: String?
         get() {
             val superMessage = super.message
-            return ((if (superMessage != null) superMessage + " " else "")
+            return ((if (superMessage != null) "$superMessage " else "")
                     + "{contentIsMalformed="
                     + contentIsMalformed
                     + ", dataType="

@@ -3,35 +3,16 @@ package androidx.media3.common
 import android.os.Bundle
 import androidx.media3.common.util.Util
 import com.google.common.base.Preconditions
-import java.util.Objects
 
-class HeartRating : Rating {
-    private val rated: Boolean
-    val isHeart: Boolean
+class HeartRating(
+    private val rated: Boolean = false,
+    val isHeart: Boolean = false
+) : Rating() {
 
-    constructor() {
-        rated = false
-        isHeart = false
-    }
-
-    constructor(isHeart: Boolean) {
-        rated = true
-        this.isHeart = isHeart
-    }
+    constructor(isHeart: Boolean) : this(true, isHeart)
 
     override val isRated: Boolean
         get() = rated
-
-    override fun hashCode(): Int {
-        return Objects.hash(rated, isHeart)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is HeartRating) {
-            return false
-        }
-        return isHeart == other.isHeart && rated == other.rated
-    }
 
     override fun toBundle(): Bundle {
         val bundle = Bundle()
@@ -43,7 +24,6 @@ class HeartRating : Rating {
 
     companion object {
         private const val TYPE: Int = RATING_TYPE_HEART
-
         private val FIELD_RATED: String = Util.intToStringMaxRadix(1)
         private val FIELD_IS_HEART: String = Util.intToStringMaxRadix(2)
 

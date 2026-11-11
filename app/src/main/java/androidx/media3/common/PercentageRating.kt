@@ -6,34 +6,10 @@ import androidx.media3.common.util.Util.intToStringMaxRadix
 import com.google.common.base.Preconditions
 import java.util.Objects
 
-class PercentageRating : Rating {
-    val percent: Float
-
-    constructor() {
-        percent = RATING_UNSET
-    }
-
-    constructor(@FloatRange(from = 0.0, to = 100.0) percent: Float) {
-        Preconditions.checkArgument(
-            percent in 0.0f..100.0f,
-            "percent must be in the range of [0, 100]"
-        )
-        this.percent = percent
-    }
-
+data class PercentageRating(@FloatRange(from = 0.0, to = 100.0) val percent: Float = RATING_UNSET) :
+    Rating() {
     override val isRated: Boolean
         get() = percent != RATING_UNSET
-
-    override fun hashCode(): Int {
-        return Objects.hash(percent)
-    }
-
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is PercentageRating) {
-            return false
-        }
-        return percent == obj.percent
-    }
 
     override fun toBundle(): Bundle {
         val bundle = Bundle()
@@ -44,7 +20,6 @@ class PercentageRating : Rating {
 
     companion object {
         private val TYPE: Int = RATING_TYPE_PERCENTAGE
-
         private val FIELD_PERCENT = intToStringMaxRadix(1)
 
         fun fromBundle(bundle: Bundle): PercentageRating {

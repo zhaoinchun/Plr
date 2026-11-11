@@ -2,7 +2,6 @@ package androidx.media3.common
 
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.annotation.IntDef
 import androidx.media3.common.util.BundleCollectionUtil
 import androidx.media3.common.util.Util
 import com.google.common.base.Function
