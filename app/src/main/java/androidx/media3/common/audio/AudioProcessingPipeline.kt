@@ -48,11 +48,6 @@ class AudioProcessingPipeline(
         return intermediateAudioFormat.also { pendingOutputAudioFormat = it }
     }
 
-    @Deprecated("Use {@link #flush(StreamMetadata)} instead.")
-    fun flush() {
-        flush(AudioProcessor.StreamMetadata.DEFAULT)
-    }
-
     fun flush(streamMetadata: AudioProcessor.StreamMetadata) {
         activeAudioProcessors.clear()
         outputAudioFormat = pendingOutputAudioFormat

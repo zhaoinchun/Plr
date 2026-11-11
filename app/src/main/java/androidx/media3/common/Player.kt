@@ -306,11 +306,6 @@ interface Player {
         fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {}
         fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {}
         fun onIsLoadingChanged(isLoading: Boolean) {}
-
-        @Deprecated("")
-        fun onLoadingChanged(isLoading: Boolean) {
-        }
-
         fun onAvailableCommandsChanged(availableCommands: Commands) {}
         fun onTrackSelectionParametersChanged(parameters: TrackSelectionParameters) {}
 

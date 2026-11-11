@@ -213,11 +213,6 @@ class ListenerSet<T : Any> private constructor(
         listeners.clear()
     }
 
-    @Deprecated("Do not use this method and ensure all calls are made from the correct thread.")
-    fun setThrowsWhenUsingWrongThread(throwsWhenUsingWrongThread: Boolean) {
-        this.throwsWhenUsingWrongThread = throwsWhenUsingWrongThread
-    }
-
     private fun handleMessage(message: Message?): Boolean {
         val event = iterationFinishedEvent!!
         for (holder in listeners) {

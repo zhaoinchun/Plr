@@ -41,11 +41,6 @@ abstract class BaseAudioProcessor : AudioProcessor {
     override val isEnded: Boolean
         get() = inputEnded && outputBuffer === AudioProcessor.EMPTY_BUFFER
 
-    @Deprecated("")
-    override fun flush() {
-        flush(AudioProcessor.StreamMetadata.DEFAULT)
-    }
-
     override fun flush(streamMetadata: AudioProcessor.StreamMetadata) {
         outputBuffer = AudioProcessor.EMPTY_BUFFER
         inputEnded = false
@@ -88,13 +83,8 @@ abstract class BaseAudioProcessor : AudioProcessor {
         // Do nothing.
     }
 
-    @Deprecated("Use {@link #onFlush(StreamMetadata)} instead.")
-    protected fun onFlush() {
-        // Do nothing.
-    }
-
     protected open fun onFlush(streamMetadata: AudioProcessor.StreamMetadata) {
-        onFlush()
+
     }
 
     protected open fun onReset() {

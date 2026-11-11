@@ -305,9 +305,6 @@ class MediaItem private constructor(
         imageDurationMs: Long
     ) {
         val mimeType: String?
-
-        @Deprecated("")
-        val subtitles: List<SubtitleConfiguration?>
         val tag: Any?
         val imageDurationMs: Long
 
@@ -348,11 +345,6 @@ class MediaItem private constructor(
 
         init {
             this.mimeType = MimeTypes.normalizeMimeType(mimeType)
-            val subtitles = mutableListOf<SubtitleConfiguration?>()
-            for (i in subtitleConfigurations.indices) {
-                subtitles.add(subtitleConfigurations[i]!!.copy())
-            }
-            this.subtitles = subtitles.toList()
             this.tag = tag
             this.imageDurationMs = imageDurationMs
         }
@@ -859,11 +851,6 @@ class MediaItem private constructor(
         private val FIELD_CLIPPING_PROPERTIES: String = Util.intToStringMaxRadix(3)
         private val FIELD_REQUEST_METADATA: String = Util.intToStringMaxRadix(4)
         private val FIELD_LOCAL_CONFIGURATION: String = Util.intToStringMaxRadix(5)
-
-        @Deprecated("Use {@link #fromBundle(Bundle, int)} instead.")
-        fun fromBundle(bundle: Bundle): MediaItem {
-            return fromBundle(bundle, MediaLibraryInfo.INTERFACE_VERSION)
-        }
 
         fun fromBundle(bundle: Bundle, interfaceVersion: Int): MediaItem {
             val mediaId = bundle.getString(FIELD_MEDIA_ID, DEFAULT_MEDIA_ID)

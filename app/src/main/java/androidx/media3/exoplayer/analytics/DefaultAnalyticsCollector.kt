@@ -600,11 +600,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
         }
     }
 
-    @Suppress("deprecation") // Implementing deprecated method.
-    override fun onLoadingChanged(isLoading: Boolean) {
-        // Do nothing. Handled by non-deprecated onIsLoadingChanged.
-    }
-
     @Suppress("deprecation") // Calling deprecated listener method.
     override fun onIsLoadingChanged(isLoading: Boolean) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()

@@ -141,29 +141,6 @@ class ParsableByteArray {
         return peekChar(ByteOrder.BIG_ENDIAN,  0)
     }
 
-    @Deprecated("")
-    fun peekChar(charset: Charset): Char {
-        Preconditions.checkArgument(
-            SUPPORTED_CHARSETS_FOR_READLINE.contains(charset), "Unsupported charset: %s", charset
-        )
-        if (bytesLeft() == 0) {
-            return 0.toChar()
-        }
-        if (charset == StandardCharsets.US_ASCII) {
-            return peekUnsignedByte().toChar()
-        } else if (charset == StandardCharsets.UTF_8) {
-            return if ((data[position].toInt() and 0x80) == 0) peekUnsignedByte().toChar() else 0.toChar()
-        } else {
-            // UTF-16
-            if (bytesLeft() < 2) {
-                return 0.toChar()
-            }
-            val byteOrder =
-                if (charset == StandardCharsets.UTF_16LE) ByteOrder.LITTLE_ENDIAN else ByteOrder.BIG_ENDIAN
-            return peekChar(byteOrder,  0)
-        }
-    }
-
     private fun peekChar(byteOrder: ByteOrder?, offset: Int): Char {
         maybeAssertAtLeastBytesLeftForLegacyMethod(2)
         return if (byteOrder == ByteOrder.BIG_ENDIAN)

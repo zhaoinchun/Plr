@@ -89,26 +89,13 @@ interface VideoFrameProcessor {
     fun release()
 
     companion object {
-        
         const val INPUT_TYPE_SURFACE: Int = 1
-
         const val INPUT_TYPE_BITMAP: Int = 2
-
         const val INPUT_TYPE_TEXTURE_ID: Int = 3
-
         const val INPUT_TYPE_SURFACE_AUTOMATIC_FRAME_REGISTRATION: Int = 4
-
-        @Deprecated(
-            """Pass {@link SystemClock#nanoTime()} to {@link #renderOutputFrame} to render an
-        output frame immediately."""
-        )
-        val RENDER_OUTPUT_FRAME_IMMEDIATELY: Long = -1
-
         val DROP_OUTPUT_FRAME: Long = -2
-
         val RENDER_OUTPUT_FRAME_WITH_PRESENTATION_TIME:  // This is a named constant, not a time unit.
                 Long = -3
-
         val REDRAW: List<Effect?> = listOf<Effect?>(object : Effect {})
     }
 }

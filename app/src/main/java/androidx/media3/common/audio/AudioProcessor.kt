@@ -99,17 +99,7 @@ interface AudioProcessor {
     val output: ByteBuffer?
     val isEnded: Boolean
 
-    @Deprecated("Use {@link #flush(StreamMetadata)} instead.")
-    fun flush() {
-        throw IllegalStateException(
-            "AudioProcessor must implement at least one #flush() overload."
-        )
-    }
-
-    fun flush(streamMetadata: StreamMetadata) {
-        flush()
-    }
-
+    fun flush(streamMetadata: StreamMetadata) {}
     fun reset()
 
     companion object {

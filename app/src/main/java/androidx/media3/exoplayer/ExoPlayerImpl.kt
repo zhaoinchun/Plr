@@ -1997,7 +1997,6 @@ class ExoPlayerImpl(
         }
         if (isLoadingChanged) {
             listeners.queueEvent(Player.EVENT_IS_LOADING_CHANGED) { listener: Player.Listener ->
-                listener.onLoadingChanged(newPlaybackInfo.isLoading)
                 listener.onIsLoadingChanged(newPlaybackInfo.isLoading)
             }
         }

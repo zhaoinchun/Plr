@@ -55,12 +55,6 @@ class NetworkTypeObserver private constructor(context: Context) {
         replacement = "this.register(listener, new Handler(Looper.getMainLooper())::post)",
         imports = ["android.os.Handler", "android.os.Looper"]
     )
-    @Deprecated("Use {@link #register(Listener, Executor)} instead.")
-    fun register(listener: Listener) {
-        register(
-            listener,  
-            Executor { r: Runnable? -> Handler(Looper.getMainLooper()).post(r!!) })
-    }
 
     fun register(listener: Listener, executor: Executor) {
         removeClearedReferences()
