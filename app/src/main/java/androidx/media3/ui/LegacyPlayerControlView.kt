@@ -263,15 +263,6 @@ class LegacyPlayerControlView  constructor(
         updateAll()
     }
 
-    @Deprecated(
-        """Replace multi-window time bar display by merging source windows together instead,
-        for example using ExoPlayer's {@code ConcatenatingMediaSource2}."""
-    )
-    fun setShowMultiWindowTimeBar(showMultiWindowTimeBar: Boolean) {
-        this.showMultiWindowTimeBar = showMultiWindowTimeBar
-        updateTimeline()
-    }
-
     fun setShowPlayButtonIfPlaybackIsSuppressed(showPlayButtonIfSuppressed: Boolean) {
         this.showPlayButtonIfSuppressed = showPlayButtonIfSuppressed
         updatePlayPauseButton()

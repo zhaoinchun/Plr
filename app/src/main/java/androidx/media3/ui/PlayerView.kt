@@ -768,16 +768,6 @@ class PlayerView(
         controller!!.setMediaRouteButtonViewProvider(mediaRouteButtonViewProvider)
     }
 
-    @Suppress("deprecation") // Forwarding to deprecated method.
-
-    @Deprecated(
-        """Replace multi-window time bar display by merging source windows together instead,
-        for example using ExoPlayer's {@code ConcatenatingMediaSource2}."""
-    )
-    fun setShowMultiWindowTimeBar(showMultiWindowTimeBar: Boolean) {
-        controller!!.setShowMultiWindowTimeBar(showMultiWindowTimeBar)
-    }
-
     fun setTimeBarScrubbingEnabled(timeBarScrubbingEnabled: Boolean) {
         controller!!.setTimeBarScrubbingEnabled(timeBarScrubbingEnabled)
     }
