@@ -49,7 +49,5 @@ open class DataSourceException : IOException {
             return false
         }
 
-        @Deprecated("Use {@link PlaybackException#ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE}.")
-        val POSITION_OUT_OF_RANGE: Int = PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
     }
 }

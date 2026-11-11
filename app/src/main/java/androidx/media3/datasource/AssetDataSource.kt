@@ -13,9 +13,6 @@ import kotlin.math.min
 
 class AssetDataSource(context: Context) : BaseDataSource( false) {
     class AssetDataSourceException : DataSourceException {
-        @Deprecated("Use {@link #AssetDataSourceException(Throwable, int)}.")
-        constructor(cause: IOException?) : super(cause, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
-
         constructor(
             cause: Throwable?,
             @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int

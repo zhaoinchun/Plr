@@ -734,11 +734,6 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
         }
     }
 
-    @Suppress("deprecation") // Implementing deprecated method.
-    override fun onPositionDiscontinuity(@Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int) {
-        // Do nothing. Handled by non-deprecated onPositionDiscontinuity.
-    }
-
     override fun onPositionDiscontinuity(
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,

@@ -7,20 +7,27 @@ import androidx.media3.common.MediaLibraryInfo.registerModule
 import java.util.Collections
 
 data class DataSpec(
-     var uri: Uri,
-     var uriPositionOffset: Long = 0,
-     var httpMethod: @HttpMethod Int = HTTP_METHOD_GET,
-      private val body: ByteArray? = null,
-     var headers: Map<String, String> = mapOf(),
-     var position: Long = 0,
-     var length: Long = C.LENGTH_UNSET.toLong(),
-     var key: String? = null,
-     var flags: @Flags Int = 0,
-     var customData: Any? = null,
+    var uri: Uri,
+    var uriPositionOffset: Long = 0,
+    var httpMethod: @HttpMethod Int = HTTP_METHOD_GET,
+    private val body: ByteArray? = null,
+    var headers: Map<String, String> = mapOf(),
+    var position: Long = 0,
+    var length: Long = C.LENGTH_UNSET.toLong(),
+    var key: String? = null,
+    var flags: @Flags Int = 0,
+    var customData: Any? = null,
 ) {
-     val httpBody: ByteArray? = if (body != null && body.isNotEmpty()) body else null
-     val httpRequestHeaders = Collections.unmodifiableMap<String?, String?>(
+    val httpBody: ByteArray? = if (body != null && body.isNotEmpty()) body else null
+    val httpRequestHeaders = Collections.unmodifiableMap<String?, String?>(
         HashMap<String?, String?>(headers)
+    )
+
+    constructor(uri: Uri, position: Long = 0, length: Long = C.LENGTH_UNSET.toLong()) : this(
+        uri,
+        position,
+        length = length,
+        key = null
     )
 
     @MustBeDocumented
@@ -38,37 +45,6 @@ data class DataSpec(
     @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
     @IntDef(value = [HTTP_METHOD_GET, HTTP_METHOD_POST, HTTP_METHOD_HEAD])
     annotation class HttpMethod
-
-    @Deprecated(
-        """Use {@link #position} except for specific use cases where the absolute position
-        within the resource is required within a {@link DataSource} chain. Where the absolute
-        position is required, use {@code uriPositionOffset + position}."""
-    )
-    val absoluteStreamPosition: Long = uriPositionOffset + position
-
-    constructor(uri: Uri, position: Long = 0, length: Long = C.LENGTH_UNSET.toLong()) : this(
-        uri,
-        position,
-        length,
-        null
-    )
-
-    @Deprecated(
-        """Use {@link Builder}.
-    """
-    )
-    constructor(uri: Uri, position: Long, length: Long, key: String?) : this(
-        uri,
-        0,
-        HTTP_METHOD_GET,
-        null,
-        mutableMapOf<String, String>(),
-        position,
-        length,
-        key,
-        0,
-        null
-    )
 
     fun isFlagSet(flag: @Flags Int): Boolean {
         return (this.flags and flag) == flag

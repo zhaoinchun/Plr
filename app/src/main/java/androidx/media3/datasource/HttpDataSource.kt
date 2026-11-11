@@ -97,16 +97,6 @@ interface HttpDataSource : DataSource {
         val dataSpec: DataSpec?
         val type: @Type Int
 
-        @Deprecated(
-            """Use {@link #HttpDataSourceException(DataSpec, int, int)
-     *     HttpDataSourceException(DataSpec, PlaybackException.ERROR_CODE_IO_UNSPECIFIED, int)}."""
-        )
-        constructor(dataSpec: DataSpec?, type: @Type Int) : this(
-            dataSpec,
-            PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
-            type
-        )
-
         constructor(
             dataSpec: DataSpec?,
             @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
@@ -118,18 +108,6 @@ interface HttpDataSource : DataSource {
             this.type = type
         }
 
-        @Deprecated(
-            """Use {@link #HttpDataSourceException(String, DataSpec, int, int)
-     *     HttpDataSourceException(String, DataSpec, PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
-     *     int)}."""
-        )
-        constructor(message: String?, dataSpec: DataSpec?, type: @Type Int) : this(
-            message,
-            dataSpec,
-            PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
-            type
-        )
-
         constructor(
             message: String?,
             dataSpec: DataSpec?,
@@ -140,18 +118,6 @@ interface HttpDataSource : DataSource {
             this.type = type
         }
 
-        @Deprecated(
-            """Use {@link #HttpDataSourceException(IOException, DataSpec, int, int)
-     *     HttpDataSourceException(IOException, DataSpec,
-     *     PlaybackException.ERROR_CODE_IO_UNSPECIFIED, int)}."""
-        )
-        constructor(cause: IOException?, dataSpec: DataSpec?, type: @Type Int) : this(
-            cause,
-            dataSpec,
-            PlaybackException.ERROR_CODE_IO_UNSPECIFIED,
-            type
-        )
-
         constructor(
             cause: IOException?,
             dataSpec: DataSpec?,
@@ -161,18 +127,6 @@ interface HttpDataSource : DataSource {
             this.dataSpec = dataSpec
             this.type = type
         }
-
-        @Deprecated(
-            """Use {@link #HttpDataSourceException(String, IOException, DataSpec, int, int)
-     *     HttpDataSourceException(String, IOException, DataSpec,
-     *     PlaybackException.ERROR_CODE_IO_UNSPECIFIED, int)}."""
-        )
-        constructor(
-            message: String?,
-            cause: IOException?,
-            dataSpec: DataSpec?,
-            type: @Type Int
-        ) : this(message, cause, dataSpec, PlaybackException.ERROR_CODE_IO_UNSPECIFIED, type)
 
         constructor(
             message: String?,

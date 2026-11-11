@@ -26,9 +26,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             PlaybackException.ERROR_CODE_IO_UNSPECIFIED
         )
 
-        @Deprecated("Use {@link #RawResourceDataSourceException(String, Throwable, int)}.")
-        constructor(cause: Throwable?) : super(cause, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
-
         constructor(
             message: String?,
             cause: Throwable?,
