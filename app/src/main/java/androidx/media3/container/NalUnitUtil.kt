@@ -18,82 +18,34 @@ import kotlin.math.min
 
 object NalUnitUtil {
     private const val TAG = "NalUnitUtil"
-
     const val H264_NAL_UNIT_TYPE_NON_IDR: Int = 1
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_NON_IDR}")
-    val NAL_UNIT_TYPE_NON_IDR: Int = H264_NAL_UNIT_TYPE_NON_IDR
-
     const val H264_NAL_UNIT_TYPE_PARTITION_A: Int = 2
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_PARTITION_A}")
-    val NAL_UNIT_TYPE_PARTITION_A: Int = H264_NAL_UNIT_TYPE_PARTITION_A
-
     const val H264_NAL_UNIT_TYPE_IDR: Int = 5
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_IDR}")
-    val NAL_UNIT_TYPE_IDR: Int = H264_NAL_UNIT_TYPE_IDR
-
     const val H264_NAL_UNIT_TYPE_SEI: Int = 6
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_SEI}")
-    val NAL_UNIT_TYPE_SEI: Int = H264_NAL_UNIT_TYPE_SEI
-
     const val H264_NAL_UNIT_TYPE_SPS: Int = 7
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_SPS}")
-    val NAL_UNIT_TYPE_SPS: Int = H264_NAL_UNIT_TYPE_SPS
-
     const val H264_NAL_UNIT_TYPE_PPS: Int = 8
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_PPS}")
-    val NAL_UNIT_TYPE_PPS: Int = H264_NAL_UNIT_TYPE_PPS
-
     const val H264_NAL_UNIT_TYPE_AUD: Int = 9
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_AUD}")
-    val NAL_UNIT_TYPE_AUD: Int = H264_NAL_UNIT_TYPE_AUD
-
     const val H264_NAL_UNIT_TYPE_PREFIX: Int = 14
-
-    @Deprecated("Use {@link #H264_NAL_UNIT_TYPE_PREFIX}")
-    val NAL_UNIT_TYPE_PREFIX: Int = H264_NAL_UNIT_TYPE_PREFIX
-
     const val H264_NAL_UNIT_TYPE_UNSPECIFIED: Int = 24
-
     const val H265_NAL_UNIT_TYPE_RASL_R: Int = 9
-
     const val H265_NAL_UNIT_TYPE_BLA_W_LP: Int = 16
-
     const val H265_NAL_UNIT_TYPE_CRA: Int = 21
-
     const val H265_NAL_UNIT_TYPE_VPS: Int = 32
-
     const val H265_NAL_UNIT_TYPE_SPS: Int = 33
-
     const val H265_NAL_UNIT_TYPE_PPS: Int = 34
-
     const val H265_NAL_UNIT_TYPE_AUD: Int = 35
-
     const val H265_NAL_UNIT_TYPE_PREFIX_SEI: Int = 39
-
     const val H265_NAL_UNIT_TYPE_SUFFIX_SEI: Int = 40
-
     const val H265_NAL_UNIT_TYPE_UNSPECIFIED: Int = 48
 
     // VVC NAL unit types.
     // See ITU-T Rec. H.266 (09/2023) Table 5 – NAL unit type codes and NAL unit type classes.
     
     const val VVC_NAL_UNIT_TYPE_OPI: Int = 12
-
     const val VVC_NAL_UNIT_TYPE_DCI: Int = 13
-
     const val VVC_NAL_UNIT_TYPE_PREFIX_SEI: Int = 23
-
     val NAL_START_CODE: ByteArray = byteArrayOf(0, 0, 0, 1)
-
     const val EXTENDED_SAR: Int = 0xFF
-
     val ASPECT_RATIO_IDC_VALUES: FloatArray = floatArrayOf(
         1f,  
         1f,
@@ -113,11 +65,8 @@ object NalUnitUtil {
         3f / 2f,
         2f
     )
-
     private val INVALID_ID = -1 // Invalid ID.
-
     private val scratchEscapePositionsLock = Any()
-
     private var scratchEscapePositions = IntArray(10)
 
     fun unescapeStream(data: ByteArray, limit: Int): Int {
@@ -184,23 +133,6 @@ object NalUnitUtil {
         }
         // Empty the buffer if the SPS NAL unit was not found.
         data.clear()
-    }
-
-    @Deprecated(
-        """Use {@link #isNalUnitSei(Format, byte[], int)} in order to support {@link
-   *     MimeTypes#VIDEO_DOLBY_VISION} tracks with backwards compatible {@link MimeTypes#VIDEO_H264}
-        or {@link MimeTypes#VIDEO_H265} data."""
-    )
-    fun isNalUnitSei(mimeType: String?, nalUnitHeaderFirstByte: Byte): Boolean {
-        return (MimeTypes.VIDEO_H264 == mimeType
-                && (nalUnitHeaderFirstByte.toInt() and 0x1F) == H264_NAL_UNIT_TYPE_SEI)
-                || (MimeTypes.VIDEO_H265 == mimeType
-                && ((nalUnitHeaderFirstByte.toInt() and 0x7E) shr 1) == H265_NAL_UNIT_TYPE_PREFIX_SEI)
-    }
-
-    @Deprecated("Use {@link #isNalUnitSei(Format, byte[], int)} instead.")
-    fun isNalUnitSei(format: Format, nalUnitHeaderFirstByte: Byte): Boolean {
-        return isNalUnitSei(format, byteArrayOf(nalUnitHeaderFirstByte),  0)
     }
 
     fun isNalUnitSei(format: Format, data: ByteArray, offset: Int): Boolean {
