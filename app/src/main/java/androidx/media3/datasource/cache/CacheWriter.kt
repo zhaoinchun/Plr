@@ -4,50 +4,34 @@ import androidx.annotation.WorkerThread
 import androidx.media3.common.C
 import androidx.media3.datasource.DataSourceUtil
 import androidx.media3.datasource.DataSpec
-import java.io.IOException
 import java.io.InterruptedIOException
 import kotlin.concurrent.Volatile
 
 class CacheWriter(
     private val dataSource: CacheDataSource,
-    dataSpec: DataSpec,
+    private val dataSpec: DataSpec,
     temporaryBuffer: ByteArray?,
-    progressListener: ProgressListener?
+    private val progressListener: ProgressListener?
 ) {
     fun interface ProgressListener {
-
         fun onProgress(requestLength: Long, bytesCached: Long, newBytesCached: Long)
     }
 
-    private val cache: Cache
-    private val dataSpec: DataSpec
-    private val cacheKey: String
-    private val temporaryBuffer: ByteArray
-    private val progressListener: ProgressListener?
-
-    private var nextPosition: Long
+    private val cache: Cache = dataSource.cache
+    private val cacheKey: String = dataSource.cacheKeyFactory.buildCacheKey(dataSpec)
+    private val temporaryBuffer = temporaryBuffer ?: ByteArray(DEFAULT_BUFFER_SIZE_BYTES)
+    private var nextPosition: Long = dataSpec.position
     private var endPosition: Long = 0
     private var bytesCached: Long = 0
 
     @Volatile
     private var isCanceled = false
 
-    init {
-        this.cache = dataSource.cache
-        this.dataSpec = dataSpec
-        this.temporaryBuffer =
-            if (temporaryBuffer == null) ByteArray(DEFAULT_BUFFER_SIZE_BYTES) else temporaryBuffer
-        this.progressListener = progressListener
-        cacheKey = dataSource.cacheKeyFactory.buildCacheKey(dataSpec)
-        nextPosition = dataSpec.position
-    }
-
     fun cancel() {
         isCanceled = true
     }
 
     @WorkerThread
-    
     fun cache() {
         throwIfCanceled()
 
@@ -60,9 +44,7 @@ class CacheWriter(
             endPosition =
                 if (contentLength == C.LENGTH_UNSET.toLong()) C.INDEX_UNSET.toLong() else contentLength
         }
-        if (progressListener != null) {
-            progressListener.onProgress(this.length, bytesCached, 0)
-        }
+        progressListener?.onProgress(this.length, bytesCached, 0)
 
         while (endPosition == C.INDEX_UNSET.toLong() || nextPosition < endPosition) {
             throwIfCanceled()
@@ -147,16 +129,12 @@ class CacheWriter(
             return
         }
         this.endPosition = endPosition
-        if (progressListener != null) {
-            progressListener.onProgress(this.length, bytesCached, 0)
-        }
+        progressListener?.onProgress(this.length, bytesCached, 0)
     }
 
     private fun onNewBytesCached(newBytesCached: Long) {
         bytesCached += newBytesCached
-        if (progressListener != null) {
-            progressListener.onProgress(this.length, bytesCached, newBytesCached)
-        }
+        progressListener?.onProgress(this.length, bytesCached, newBytesCached)
     }
 
     private val length: Long
@@ -168,7 +146,6 @@ class CacheWriter(
     }
 
     companion object {
-
-        val DEFAULT_BUFFER_SIZE_BYTES: Int = 128 * 1024
+        const val DEFAULT_BUFFER_SIZE_BYTES: Int = 128 * 1024
     }
 }

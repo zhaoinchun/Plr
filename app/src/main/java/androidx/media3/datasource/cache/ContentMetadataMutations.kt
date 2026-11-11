@@ -1,17 +1,11 @@
 package androidx.media3.datasource.cache
 
 import android.net.Uri
-import com.google.common.base.Preconditions
 import java.util.Collections
 
 class ContentMetadataMutations {
-    private val editedValues: MutableMap<String?, Any?>
-    private val removedValues: MutableList<String?>
-
-    init {
-        editedValues = HashMap<String?, Any?>()
-        removedValues = ArrayList<String?>()
-    }
+    private val editedValues: MutableMap<String?, Any?> = HashMap<String?, Any?>()
+    private val removedValues: MutableList<String?> = ArrayList<String?>()
 
     fun set(name: String?, value: String?): ContentMetadataMutations {
         return checkAndSet(name, value)
@@ -40,8 +34,7 @@ class ContentMetadataMutations {
         for (entry in hashMap.entries) {
             val value = entry.value
             if (value is ByteArray) {
-                val bytes = value
-                entry.setValue(bytes.copyOf(bytes.size))
+                entry.setValue(value.copyOf(value.size))
             }
         }
         return Collections.unmodifiableMap<String?, Any?>(hashMap)
@@ -63,10 +56,10 @@ class ContentMetadataMutations {
         fun setRedirectedUri(
             mutations: ContentMetadataMutations, uri: Uri?
         ): ContentMetadataMutations {
-            if (uri == null) {
-                return mutations.remove(ContentMetadata.KEY_REDIRECTED_URI)
+            return if (uri == null) {
+                mutations.remove(ContentMetadata.KEY_REDIRECTED_URI)
             } else {
-                return mutations.set(ContentMetadata.KEY_REDIRECTED_URI, uri.toString())
+                mutations.set(ContentMetadata.KEY_REDIRECTED_URI, uri.toString())
             }
         }
     }

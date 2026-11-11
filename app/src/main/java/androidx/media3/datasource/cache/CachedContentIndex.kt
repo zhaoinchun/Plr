@@ -44,20 +44,15 @@ class CachedContentIndex(
     legacyStorageEncrypt: Boolean = false,
     preferLegacyStorage: Boolean = false
 ) {
-    private val keyToContent: HashMap<String, CachedContent>
-    private val idToKey: SparseArray<String>
-    private val removedIds: SparseBooleanArray
-    private val newIds: SparseBooleanArray
-
+    private val keyToContent: HashMap<String, CachedContent> = HashMap()
+    private val idToKey: SparseArray<String> = SparseArray<String>()
+    private val removedIds: SparseBooleanArray = SparseBooleanArray()
+    private val newIds: SparseBooleanArray = SparseBooleanArray()
     private var storage: Storage? = null
     private var previousStorage: Storage? = null
 
     init {
         Preconditions.checkState(databaseProvider != null || legacyStorageDir != null)
-        keyToContent = HashMap()
-        idToKey = SparseArray<String>()
-        removedIds = SparseBooleanArray()
-        newIds = SparseBooleanArray()
         val databaseStorage: Storage? =
             if (databaseProvider != null) DatabaseStorage(databaseProvider) else null
         val legacyStorage: Storage? =
@@ -79,7 +74,6 @@ class CachedContentIndex(
     }
 
     @WorkerThread
-    
     fun initialize(uid: Long) {
         storage!!.initialize(uid)
         if (previousStorage != null) {
@@ -100,7 +94,6 @@ class CachedContentIndex(
     }
 
     @WorkerThread
-    
     fun store() {
         storage!!.storeIncremental(keyToContent)
         // Make ids that were removed since the index was last stored eligible for re-use.
@@ -113,12 +106,12 @@ class CachedContentIndex(
     }
 
     fun getOrAdd(key: String): CachedContent {
-        val cachedContent = keyToContent.get(key)
-        return if (cachedContent == null) addNew(key) else cachedContent
+        val cachedContent = keyToContent[key]
+        return cachedContent ?: addNew(key)
     }
 
     fun get(key: String?): CachedContent? {
-        return keyToContent.get(key)
+        return keyToContent[key]
     }
 
     val all: MutableCollection<CachedContent>
@@ -133,7 +126,7 @@ class CachedContentIndex(
     }
 
     fun maybeRemove(key: String?) {
-        val cachedContent = keyToContent.get(key)
+        val cachedContent = keyToContent[key]
         if (cachedContent != null && cachedContent.isEmpty && cachedContent.isFullyUnlocked) {
             keyToContent.remove(key)
             val id = cachedContent.id
@@ -177,7 +170,7 @@ class CachedContentIndex(
     private fun addNew(key: String): CachedContent {
         val id: Int = getNewId(idToKey)
         val cachedContent = CachedContent(id, key)
-        keyToContent.put(key, cachedContent)
+        keyToContent[key] = cachedContent
         idToKey.put(id, key)
         newIds.put(id, true)
         storage!!.onUpdate(cachedContent)
@@ -186,34 +179,21 @@ class CachedContentIndex(
 
     private interface Storage {
         fun initialize(uid: Long)
-
-        
         fun exists(): Boolean
-
-        
         fun delete()
-
-        
         fun load(content: HashMap<String, CachedContent>, idToKey: SparseArray<String>)
-
-        
         fun storeFully(content: HashMap<String, CachedContent>)
-
-        
         fun storeIncremental(content: HashMap<String, CachedContent>)
-
         fun onUpdate(cachedContent: CachedContent)
-
         fun onRemove(cachedContent: CachedContent, neverStored: Boolean)
     }
 
     private class LegacyStorage(file: File, secretKey: ByteArray?, encrypt: Boolean) : Storage {
-        private val encrypt: Boolean
+        private val encrypt: Boolean= encrypt
         private val cipher: Cipher?
         private val secretKeySpec: SecretKeySpec?
         private val random: SecureRandom?
-        private val atomicFile: AtomicFile
-
+        private val atomicFile: AtomicFile = AtomicFile(file)
         private var changed = false
         private var bufferedOutputStream: ReusableBufferedOutputStream? = null
 
@@ -234,11 +214,9 @@ class CachedContentIndex(
             } else {
                 Preconditions.checkArgument(!encrypt)
             }
-            this.encrypt = encrypt
             this.cipher = cipher
             this.secretKeySpec = secretKeySpec
             random = if (encrypt) SecureRandom() else null
-            atomicFile = AtomicFile(file)
         }
 
         override fun initialize(uid: Long) {
@@ -330,7 +308,7 @@ class CachedContentIndex(
                 var hashCode = 0
                 for (i in 0..<count) {
                     val cachedContent = readCachedContent(version, input)
-                    content.put(cachedContent.key, cachedContent)
+                    content[cachedContent.key] = cachedContent
                     idToKey.put(cachedContent.id, cachedContent.key)
                     hashCode += hashCachedContent(cachedContent, version)
                 }
@@ -442,17 +420,10 @@ class CachedContentIndex(
         }
     }
 
-    private class DatabaseStorage(databaseProvider: DatabaseProvider) : Storage {
-        private val databaseProvider: DatabaseProvider
-        private val pendingUpdates: SparseArray<CachedContent?>
-
+    private class DatabaseStorage(private val databaseProvider: DatabaseProvider) : Storage {
+        private val pendingUpdates: SparseArray<CachedContent?> = SparseArray<CachedContent?>()
         private var hexUid: String? = null
         private var tableName: String? = null
-
-        init {
-            this.databaseProvider = databaseProvider
-            pendingUpdates = SparseArray<CachedContent?>()
-        }
 
         override fun initialize(uid: Long) {
             hexUid = uid.toHexString()
@@ -604,7 +575,7 @@ class CachedContentIndex(
                 TABLE_VERSION
             )
             dropTable(writableDatabase, tableName!!)
-            writableDatabase.execSQL("CREATE TABLE " + tableName + " " + TABLE_SCHEMA)
+            writableDatabase.execSQL("CREATE TABLE $tableName $TABLE_SCHEMA")
         }
 
         fun deleteRow(writableDatabase: SQLiteDatabase, key: Int) {
@@ -642,11 +613,11 @@ class CachedContentIndex(
             private const val COLUMN_INDEX_KEY = 1
             private const val COLUMN_INDEX_METADATA = 2
 
-            private val WHERE_ID_EQUALS = COLUMN_ID + " = ?"
+            private val WHERE_ID_EQUALS = "$COLUMN_ID = ?"
 
             private val COLUMNS: Array<String> =
                 arrayOf<String>(COLUMN_ID, COLUMN_KEY, COLUMN_METADATA)
-            private val TABLE_SCHEMA = ("("
+            private const val TABLE_SCHEMA = ("("
                     + COLUMN_ID
                     + " INTEGER PRIMARY KEY NOT NULL,"
                     + COLUMN_KEY
@@ -680,7 +651,7 @@ class CachedContentIndex(
             }
 
             private fun dropTable(writableDatabase: SQLiteDatabase, tableName: String?) {
-                writableDatabase.execSQL("DROP TABLE IF EXISTS " + tableName)
+                writableDatabase.execSQL("DROP TABLE IF EXISTS $tableName")
             }
 
             private fun getTableName(hexUid: String): String {
@@ -701,7 +672,6 @@ class CachedContentIndex(
         }
 
         @WorkerThread
-        
         fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
             DatabaseStorage.delete(databaseProvider, uid)
         }
@@ -710,7 +680,6 @@ class CachedContentIndex(
             val size = idToKey.size()
             var id = if (size == 0) 0 else (idToKey.keyAt(size - 1) + 1)
             if (id < 0) { // In case if we pass max int value.
-                // TODO optimization: defragmentation or binary search?
                 id = 0
                 while (id < size) {
                     if (id != idToKey.keyAt(id)) {
@@ -730,7 +699,7 @@ class CachedContentIndex(
                 val name = input.readUTF()
                 val valueSize = input.readInt()
                 if (valueSize < 0) {
-                    throw IOException("Invalid value size: " + valueSize)
+                    throw IOException("Invalid value size: $valueSize")
                 }
                 // Grow the array incrementally to avoid OutOfMemoryError in the case that a corrupt (and very
                 // large) valueSize was read. In such cases the implementation below is expected to throw
@@ -744,7 +713,7 @@ class CachedContentIndex(
                     bytesRead += nextBytesToRead
                     nextBytesToRead = min(valueSize - bytesRead, INCREMENTAL_METADATA_READ_LENGTH)
                 }
-                metadata.put(name, value)
+                metadata[name] = value
             }
             return DefaultContentMetadata(metadata)
         }

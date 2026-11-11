@@ -5,11 +5,8 @@ import androidx.media3.common.C
 
 interface ContentMetadata {
     fun get(key: String?, defaultValue: ByteArray?): ByteArray?
-
     fun get(key: String?, defaultValue: String?): String?
-
     fun get(key: String?, defaultValue: Long): Long
-
     fun contains(key: String?): Boolean
 
     companion object {
@@ -22,11 +19,8 @@ interface ContentMetadata {
             return if (redirectedUri == null) null else Uri.parse(redirectedUri)
         }
 
-        @Suppress("unused")
         const val KEY_CUSTOM_PREFIX: String = "custom_"
-
         const val KEY_REDIRECTED_URI: String = "exo_redir"
-
         const val KEY_CONTENT_LENGTH: String = "exo_len"
     }
 }

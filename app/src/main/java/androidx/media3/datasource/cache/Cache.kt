@@ -39,7 +39,6 @@ interface Cache {
 
     @WorkerThread
     fun commitFile(file: File, length: Long)
-
     fun releaseHoleSpan(holeSpan: CacheSpan)
 
     @WorkerThread
@@ -53,7 +52,6 @@ interface Cache {
     fun getCachedBytes(key: String, position: Long, length: Long): Long
 
     @WorkerThread
-    
     fun applyContentMetadataMutations(key: String, mutations: ContentMetadataMutations)
 
     fun getContentMetadata(key: String): ContentMetadata

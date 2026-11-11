@@ -4,15 +4,11 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.Collections
 
-class DefaultContentMetadata  constructor(metadata: MutableMap<String?, ByteArray?> = mutableMapOf<String?, ByteArray?>()) :
+class DefaultContentMetadata(metadata: MutableMap<String?, ByteArray?> = mutableMapOf<String?, ByteArray?>()) :
     ContentMetadata {
     private var hashCode = 0
-
-    private val metadata: MutableMap<String?, ByteArray?>
-
-    init {
-        this.metadata = Collections.unmodifiableMap<String?, ByteArray?>(metadata)
-    }
+    private val metadata: MutableMap<String?, ByteArray?> =
+        Collections.unmodifiableMap<String?, ByteArray?>(metadata)
 
     fun copyWithMutationsApplied(mutations: ContentMetadataMutations): DefaultContentMetadata {
         val mutatedMetadata: MutableMap<String?, ByteArray?> = applyMutations(metadata, mutations)

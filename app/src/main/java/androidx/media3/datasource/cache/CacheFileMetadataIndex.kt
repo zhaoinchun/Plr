@@ -15,12 +15,10 @@ import kotlin.String
 import kotlin.Throws
 import kotlin.arrayOf
 
-class CacheFileMetadataIndex
-(private val databaseProvider: DatabaseProvider) {
-    private var tableName:String? = null
+class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
+    private var tableName: String? = null
 
     @WorkerThread
-    
     fun initialize(uid: Long) {
         try {
             val hexUid = uid.toHexString()
@@ -41,7 +39,7 @@ class CacheFileMetadataIndex
                         TABLE_VERSION
                     )
                     Companion.dropTable(writableDatabase, tableName)
-                    writableDatabase.execSQL("CREATE TABLE " + tableName + " " + TABLE_SCHEMA)
+                    writableDatabase.execSQL("CREATE TABLE $tableName $TABLE_SCHEMA")
                     writableDatabase.setTransactionSuccessful()
                 } finally {
                     writableDatabase.endTransaction()
@@ -52,7 +50,6 @@ class CacheFileMetadataIndex
         }
     }
 
-    @get:Throws(DatabaseIOException::class)
     @get:WorkerThread
     val all: MutableMap<String?, CacheFileMetadata?>
         get() {
@@ -61,7 +58,7 @@ class CacheFileMetadataIndex
                     val fileMetadata: MutableMap<String?, CacheFileMetadata?> =
                         HashMap<String?, CacheFileMetadata?>(cursor.getCount())
                     while (cursor.moveToNext()) {
-                        val name =cursor.getString(COLUMN_INDEX_NAME)!!
+                        val name = cursor.getString(COLUMN_INDEX_NAME)!!
                         val length: kotlin.Long =
                             cursor.getLong(COLUMN_INDEX_LENGTH)
                         val lastTouchTimestamp: kotlin.Long =
@@ -76,7 +73,6 @@ class CacheFileMetadataIndex
         }
 
     @WorkerThread
-    
     fun set(name: String?, length: kotlin.Long, lastTouchTimestamp: kotlin.Long) {
         try {
             val writableDatabase = databaseProvider.writableDatabase
@@ -84,14 +80,13 @@ class CacheFileMetadataIndex
             values.put(COLUMN_NAME, name)
             values.put(COLUMN_LENGTH, length)
             values.put(COLUMN_LAST_TOUCH_TIMESTAMP, lastTouchTimestamp)
-            writableDatabase!!.replaceOrThrow(tableName!!,  null, values)
+            writableDatabase!!.replaceOrThrow(tableName!!, null, values)
         } catch (e: SQLException) {
             throw DatabaseIOException(e)
         }
     }
 
     @WorkerThread
-    
     fun remove(name: String?) {
         try {
             val writableDatabase = databaseProvider.writableDatabase
@@ -102,7 +97,6 @@ class CacheFileMetadataIndex
     }
 
     @WorkerThread
-    
     fun removeAll(names: MutableSet<String?>) {
         try {
             val writableDatabase = databaseProvider.writableDatabase
@@ -130,11 +124,11 @@ class CacheFileMetadataIndex
                 .readableDatabase!!
                 .query(
                     tableName!!,
-                    COLUMNS,  
-                    null,  
-                    null,  
-                    null,  
-                    null,  
+                    COLUMNS,
+                    null,
+                    null,
+                    null,
+                    null,
                     null
                 )
         }
@@ -151,12 +145,12 @@ class CacheFileMetadataIndex
         private const val COLUMN_INDEX_LENGTH = 1
         private const val COLUMN_INDEX_LAST_TOUCH_TIMESTAMP = 2
 
-        private val WHERE_NAME_EQUALS: String = COLUMN_NAME + " = ?"
+        private const val WHERE_NAME_EQUALS: String = "$COLUMN_NAME = ?"
 
         private val COLUMNS: Array<String> = arrayOf(
             COLUMN_NAME, COLUMN_LENGTH, COLUMN_LAST_TOUCH_TIMESTAMP,
         )
-        private val TABLE_SCHEMA = ("("
+        private const val TABLE_SCHEMA = ("("
                 + COLUMN_NAME
                 + " TEXT PRIMARY KEY NOT NULL,"
                 + COLUMN_LENGTH
@@ -165,7 +159,7 @@ class CacheFileMetadataIndex
                 + " INTEGER NOT NULL)")
 
         @WorkerThread
-        
+
         fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
             val hexUid = uid.toHexString()
             try {

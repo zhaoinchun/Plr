@@ -8,18 +8,13 @@ import java.util.TreeSet
 import kotlin.math.max
 import kotlin.math.min
 
-class CachedContent  constructor(
+class CachedContent(
     val id: Int,
     val key: String,
     var metadata: DefaultContentMetadata = DefaultContentMetadata.EMPTY
 ) {
-    val spans: TreeSet<SimpleCacheSpan>
-    private val lockedRanges: ArrayList<Range?>
-
-    init {
-        this.spans = TreeSet<SimpleCacheSpan>()
-        lockedRanges = ArrayList<Range?>()
-    }
+    val spans: TreeSet<SimpleCacheSpan> = TreeSet<SimpleCacheSpan>()
+    private val lockedRanges: ArrayList<Range?> = ArrayList<Range?>()
 
     fun applyMetadataMutations(mutations: ContentMetadataMutations): Boolean {
         val oldMetadata = metadata
@@ -137,9 +132,7 @@ class CachedContent  constructor(
 
     fun removeSpan(span: CacheSpan): Boolean {
         if (spans.remove(span)) {
-            if (span.file != null) {
-                span.file.delete()
-            }
+            span.file?.delete()
             return true
         }
         return false
