@@ -38,7 +38,7 @@ class OggPageHeader {
         bodySize = 0
     }
 
-    @Throws(IOException::class)
+    
     fun skipToNextPage(input: ExtractorInput, limit: Long = C.INDEX_UNSET.toLong()): Boolean {
         Preconditions.checkArgument(input.position === input.peekPosition)
         scratch.reset( CAPTURE_PATTERN_SIZE)
@@ -63,7 +63,7 @@ class OggPageHeader {
         return false
     }
 
-    @Throws(IOException::class)
+    
     fun populate(input: ExtractorInput, quiet: Boolean): Boolean {
         reset()
         scratch.reset( EMPTY_PAGE_HEADER_SIZE)

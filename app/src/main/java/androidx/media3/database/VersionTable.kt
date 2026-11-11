@@ -38,7 +38,7 @@ object VersionTable {
             + PRIMARY_KEY
             + ")")
 
-    @Throws(DatabaseIOException::class)
+    
     fun setVersion(
         writableDatabase: SQLiteDatabase, feature:  Int, instanceUid: String?, version: Int
     ) {
@@ -54,7 +54,7 @@ object VersionTable {
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     fun removeVersion(
         writableDatabase: SQLiteDatabase, feature:  Int, instanceUid: String?
     ) {
@@ -72,7 +72,7 @@ object VersionTable {
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     fun getVersion(database: SQLiteDatabase, feature:  Int, instanceUid: String?): Int {
         try {
             if (!tableExists(database, TABLE_NAME)) {

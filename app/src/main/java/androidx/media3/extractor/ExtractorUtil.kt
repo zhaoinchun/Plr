@@ -12,14 +12,14 @@ import java.io.IOException
 
 object ExtractorUtil {
     @Pure
-    @Throws(ParserException::class)
+    
     fun checkContainerInput(expression: Boolean, message: String?) {
         if (!expression) {
             throw ParserException.createForMalformedContainer(message,  null)
         }
     }
 
-    @Throws(IOException::class)
+    
     fun peekToLength(input: ExtractorInput, target: ByteArray, offset: Int, length: Int): Int {
         var totalBytesPeeked = 0
         while (totalBytesPeeked < length) {
@@ -33,7 +33,7 @@ object ExtractorUtil {
         return totalBytesPeeked
     }
 
-    @Throws(IOException::class)
+    
     fun readFullyQuietly(
         input: ExtractorInput, output: ByteArray, offset: Int, length: Int
     ): Boolean {
@@ -45,7 +45,7 @@ object ExtractorUtil {
         return true
     }
 
-    @Throws(IOException::class)
+    
     fun skipFullyQuietly(input: ExtractorInput, length: Int): Boolean {
         try {
             input.skipFully(length)
@@ -55,7 +55,7 @@ object ExtractorUtil {
         return true
     }
 
-    @Throws(IOException::class)
+    
     fun peekFullyQuietly(
         input: ExtractorInput,
         output: ByteArray,

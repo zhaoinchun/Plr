@@ -86,8 +86,6 @@ interface AudioProcessor {
     fun getDurationAfterProcessorApplied(durationUs: Long): Long {
         return durationUs
     }
-
-    @Throws(UnhandledAudioFormatException::class)
     fun configure(inputAudioFormat: AudioFormat): AudioFormat?
 
     val isActive: Boolean

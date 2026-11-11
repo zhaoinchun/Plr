@@ -92,7 +92,7 @@ class MediaCodecAudioRenderer(
     override val name: String
         get() = TAG
 
-    @Throws(DecoderQueryException::class)
+    
     override fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector,
         format: Format
@@ -204,7 +204,7 @@ class MediaCodecAudioRenderer(
         return audioOffloadSupport
     }
 
-    @Throws(DecoderQueryException::class)
+    
     override fun getDecoderInfos(
         mediaCodecSelector: MediaCodecSelector, format: Format, requiresSecureDecoder: Boolean
     ): List<MediaCodecInfo> {
@@ -353,7 +353,7 @@ class MediaCodecAudioRenderer(
         eventDispatcher.audioCodecError(codecError)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onInputFormatChanged(formatHolder: FormatHolder): DecoderReuseEvaluation? {
         val inputFormat = formatHolder.format!!
         this.inputFormat = inputFormat
@@ -362,7 +362,7 @@ class MediaCodecAudioRenderer(
         return evaluation
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onOutputFormatChanged(format: Format, mediaFormat: MediaFormat?) {
         val audioSinkInputFormat: Format
         var channelMap: ImmutableIntArray? = null
@@ -463,7 +463,7 @@ class MediaCodecAudioRenderer(
         allowPositionDiscontinuity = true
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         super.onEnabled(joining, mayRenderStartOfStream)
         eventDispatcher.enabled(decoderCounters)
@@ -477,7 +477,7 @@ class MediaCodecAudioRenderer(
         audioSink.setListener(AudioSinkListener())
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -596,7 +596,7 @@ class MediaCodecAudioRenderer(
         audioSink.handleDiscontinuity()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -700,7 +700,7 @@ class MediaCodecAudioRenderer(
         eventDispatcher.audioCodecParametersChanged(codecParameters!!)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun renderToEndOfStream() {
         try {
             audioSink.playToEndOfStream()
@@ -724,7 +724,7 @@ class MediaCodecAudioRenderer(
         audioSink.setOutputStreamOffsetUs(outputStreamOffsetUs)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VOLUME -> audioSink.setVolume(message as Float)
@@ -980,7 +980,7 @@ class MediaCodecAudioRenderer(
         private const val VIVO_BITS_PER_SAMPLE_KEY = "v-bits-per-sample"
         private const val READY_GRACE_PERIOD_MS: Long = 100
 
-        @Throws(DecoderQueryException::class)
+        
         private fun getDecoderInfos(
             mediaCodecSelector: MediaCodecSelector,
             format: Format,

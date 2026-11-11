@@ -641,7 +641,7 @@ object Util {
         return normalizedTag
     }
 
-    @Throws(IOException::class)
+    
     fun loadAsset(context: Context, assetPath: String): String {
         var inputStream: InputStream? = null
         try {
@@ -652,7 +652,7 @@ object Util {
         }
     }
 
-    @Throws(IOException::class)
+    
     fun loadRawResource(context: Context, resId: Int): String {
         var inputStream: InputStream? = null
         try {
@@ -997,7 +997,7 @@ object Util {
 
     // incompatible types in argument.
     // dereference of possibly-null reference matcher.group(9)
-    @Throws(ParserException::class)
+    
     fun parseXsDateTime(value: String): Long {
         val matcher = XS_DATE_TIME_PATTERN.matcher(value)
         if (!matcher.matches()) {
@@ -1861,7 +1861,7 @@ object Util {
         fileOrDirectory.delete()
     }
 
-    @Throws(IOException::class)
+    
     fun createTempDirectory(context: Context, prefix: String): File {
         val tempFile = createTempFile(context, prefix)
         tempFile.delete() // Delete the temp file.
@@ -1869,7 +1869,7 @@ object Util {
         return tempFile
     }
 
-    @Throws(IOException::class)
+    
     fun createTempFile(context: Context, prefix: String): File {
         return File.createTempFile(
             prefix,

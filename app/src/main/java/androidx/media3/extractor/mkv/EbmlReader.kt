@@ -10,6 +10,6 @@ interface EbmlReader {
 
     fun reset()
 
-    @Throws(IOException::class)
+    
     fun read(input: ExtractorInput): Boolean
 }

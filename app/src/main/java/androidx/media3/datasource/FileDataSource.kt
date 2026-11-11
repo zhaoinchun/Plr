@@ -47,8 +47,6 @@ class FileDataSource : BaseDataSource( false) {
     override var uri: Uri? = null
     private var bytesRemaining: Long = 0
     private var opened = false
-
-    @Throws(FileDataSourceException::class)
     override fun open(dataSpec: DataSpec): Long {
         val uri = dataSpec.uri
         this.uri = uri
@@ -74,8 +72,6 @@ class FileDataSource : BaseDataSource( false) {
 
         return bytesRemaining
     }
-
-    @Throws(FileDataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -101,8 +97,6 @@ class FileDataSource : BaseDataSource( false) {
             return bytesRead
         }
     }
-
-    @Throws(FileDataSourceException::class)
     override fun close() {
         uri = null
         try {
@@ -121,7 +115,6 @@ class FileDataSource : BaseDataSource( false) {
     }
 
     companion object {
-        @Throws(FileDataSourceException::class)
         private fun openLocalFile(uri: Uri): RandomAccessFile {
             try {
                 return RandomAccessFile(uri.path, "r")

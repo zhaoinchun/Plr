@@ -10,7 +10,7 @@ interface SampleStream {
 
     val isReady: Boolean
 
-    @Throws(IOException::class)
+    
     fun maybeThrowError()
 
     fun readData(

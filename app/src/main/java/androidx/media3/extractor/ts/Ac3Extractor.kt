@@ -27,7 +27,7 @@ class Ac3Extractor : Extractor {
         sampleData = ParsableByteArray(MAX_SYNC_FRAME_SIZE)
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // Skip any ID3 headers.
         val scratch = ParsableByteArray(Id3Decoder.ID3_HEADER_LENGTH)
@@ -87,7 +87,7 @@ class Ac3Extractor : Extractor {
         // Do nothing.
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         val bytesRead = input.read(sampleData.data, 0, MAX_SYNC_FRAME_SIZE)
         if (bytesRead == C.RESULT_END_OF_INPUT) {

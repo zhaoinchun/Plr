@@ -88,7 +88,7 @@ abstract class SimpleDecoder<I : DecoderInputBuffer, O : DecoderOutputBuffer, E 
         }
     }
 
-    @Throws(DecoderException::class)
+    
     override fun dequeueInputBuffer(): I? {
         synchronized(lock) {
             maybeThrowException()
@@ -102,7 +102,7 @@ abstract class SimpleDecoder<I : DecoderInputBuffer, O : DecoderOutputBuffer, E 
         }
     }
 
-    @Throws(DecoderException::class)
+    
     override fun queueInputBuffer(inputBuffer: I) {
         synchronized(lock) {
             maybeThrowException()
@@ -113,7 +113,7 @@ abstract class SimpleDecoder<I : DecoderInputBuffer, O : DecoderOutputBuffer, E 
         }
     }
 
-    @Throws(DecoderException::class)
+    
     override fun dequeueOutputBuffer(): O? {
         synchronized(lock) {
             maybeThrowException()
@@ -165,7 +165,7 @@ abstract class SimpleDecoder<I : DecoderInputBuffer, O : DecoderOutputBuffer, E 
         }
     }
 
-    @Throws(DecoderException::class)
+    
     private fun maybeThrowException() {
         val exception = this.exception
         if (exception != null) {
@@ -190,7 +190,7 @@ abstract class SimpleDecoder<I : DecoderInputBuffer, O : DecoderOutputBuffer, E 
         }
     }
 
-    @Throws(InterruptedException::class)
+
     private fun decode(): Boolean {
         val inputBuffer: I?
         val outputBuffer: O?

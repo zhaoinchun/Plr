@@ -29,7 +29,7 @@ class HeifExtractor  constructor(flags:  Int = 0) : Extractor {
         videoExtractor = if ((flags and FLAG_READ_IMAGE) != 0) null else HeicMotionPhotoExtractor()
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         if (videoExtractor != null && videoExtractor.sniff(input)) {
             return true
@@ -46,7 +46,7 @@ class HeifExtractor  constructor(flags:  Int = 0) : Extractor {
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -72,7 +72,7 @@ class HeifExtractor  constructor(flags:  Int = 0) : Extractor {
         imageExtractor.release()
     }
 
-    @Throws(IOException::class)
+    
     private fun assignActiveExtractor(input: ExtractorInput) {
         Preconditions.checkState(activeExtractor == null)
         // If activeExtractor is null it means it wasn't assigned in init(), which only happens if

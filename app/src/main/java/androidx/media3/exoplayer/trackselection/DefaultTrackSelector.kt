@@ -1232,7 +1232,7 @@ class DefaultTrackSelector(
         maybeInvalidateForRendererCapabilitiesChange(renderer)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun selectTracks(
         mappedTrackInfo: MappedTrackInfo,
         rendererFormatSupports: Array<Array<IntArray>>,
@@ -1325,7 +1325,7 @@ class DefaultTrackSelector(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectAllTracks(
         definitions: Array<ExoTrackSelection.Definition?>,
         mappedTrackInfo: MappedTrackInfo,
@@ -1410,7 +1410,7 @@ class DefaultTrackSelector(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectVideoTrack(
         mappedTrackInfo: MappedTrackInfo,
         rendererFormatSupports: Array<Array<IntArray>>,
@@ -1446,7 +1446,7 @@ class DefaultTrackSelector(
             })
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectAudioTrack(
         mappedTrackInfo: MappedTrackInfo,
         rendererFormatSupports: Array<Array<IntArray>>,
@@ -1501,7 +1501,7 @@ class DefaultTrackSelector(
                 && spatializer!!.canBeSpatialized(audioAttributes, format))
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectTextTrack(
         mappedTrackInfo: MappedTrackInfo,
         rendererFormatSupports: Array<Array<IntArray>>,
@@ -1535,7 +1535,7 @@ class DefaultTrackSelector(
             })
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectImageTrack(
         mappedTrackInfo: MappedTrackInfo,
         rendererFormatSupports: Array<Array<IntArray>>,
@@ -1561,7 +1561,7 @@ class DefaultTrackSelector(
             })
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectMetadataTracks(
         definitions: Array<ExoTrackSelection.Definition?>,
         mappedTrackInfo: MappedTrackInfo,
@@ -1627,7 +1627,7 @@ class DefaultTrackSelector(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun selectOtherTrack(
         trackType: Int, groups: TrackGroupArray, formatSupport: Array<IntArray>, params: Parameters
     ): ExoTrackSelection.Definition? {

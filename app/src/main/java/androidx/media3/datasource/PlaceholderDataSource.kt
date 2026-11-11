@@ -8,7 +8,7 @@ class PlaceholderDataSource private constructor() : DataSource {
         // Do nothing.
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         throw IOException("PlaceholderDataSource cannot be opened")
     }

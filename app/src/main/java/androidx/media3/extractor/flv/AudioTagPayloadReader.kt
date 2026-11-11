@@ -17,8 +17,6 @@ class AudioTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
     override fun seek() {
         // Do nothing.
     }
-
-    @Throws(UnsupportedFormatException::class)
     override fun parseHeader(data: ParsableByteArray): Boolean {
         if (!hasParsedAudioDataHeader) {
             val header = data.readUnsignedByte()
@@ -58,7 +56,7 @@ class AudioTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
         return true
     }
 
-    @Throws(ParserException::class)
+    
     override fun parsePayload(data: ParsableByteArray, timeUs: Long): Boolean {
         if (audioFormat == AUDIO_FORMAT_MP3) {
             val sampleSize = data.bytesLeft()

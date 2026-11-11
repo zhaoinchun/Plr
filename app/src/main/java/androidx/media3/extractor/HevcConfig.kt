@@ -51,17 +51,17 @@ class HevcConfig private constructor(
 ) {
     companion object {
         
-                @Throws(ParserException::class)
+                
         fun parse(data: ParsableByteArray): HevcConfig {
             return parseImpl(data,  false,  null)
         }
 
-                @Throws(ParserException::class)
+                
         fun parseLayered(data: ParsableByteArray, vpsData: H265VpsData?): HevcConfig {
             return parseImpl(data,  true, vpsData)
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseImpl(
             data: ParsableByteArray, layered: Boolean, vpsData: H265VpsData?
         ): HevcConfig {

@@ -117,7 +117,7 @@ class AdtsReader(
         timeUs = pesTimeUs
     }
 
-    @Throws(ParserException::class)
+    
     override fun consume(data: ParsableByteArray) {
         assertTracksCreated()
         while (data.bytesLeft() > 0) {
@@ -363,7 +363,7 @@ class AdtsReader(
     }
 
     @RequiresNonNull("output")
-    @Throws(ParserException::class)
+    
     private fun parseAdtsHeader() {
         adtsScratch.position = (0)
 

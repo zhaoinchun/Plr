@@ -15,7 +15,7 @@ interface ElementaryStreamReader {
 
     fun packetStarted(pesTimeUs: Long, flags:  Int)
 
-    @Throws(ParserException::class)
+    
     fun consume(data: ParsableByteArray)
 
     fun packetFinished() {

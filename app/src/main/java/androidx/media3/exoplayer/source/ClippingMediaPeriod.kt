@@ -72,7 +72,7 @@ class ClippingMediaPeriod(
         mediaPeriod.prepare(this, positionUs)
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowPrepareError() {
         clippingError?.also { throw it }
         mediaPeriod.maybeThrowPrepareError()
@@ -273,7 +273,7 @@ class ClippingMediaPeriod(
         override val isReady: Boolean
             get() = !isPendingInitialDiscontinuity && childStream.isReady
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowError() {
             childStream.maybeThrowError()
         }

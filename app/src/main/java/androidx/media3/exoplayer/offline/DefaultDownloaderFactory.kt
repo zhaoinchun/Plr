@@ -76,8 +76,6 @@ class DefaultDownloaderFactory(
         }
         return downloaderFactory
     }
-
-    @Throws(ClassNotFoundException::class)
     private fun loadSegmentDownloaderFactory(
          contentType:  Int,
         cacheDataSourceFactory: CacheDataSource.Factory?

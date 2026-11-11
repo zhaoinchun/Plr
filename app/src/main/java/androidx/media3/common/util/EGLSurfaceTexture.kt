@@ -35,7 +35,7 @@ class EGLSurfaceTexture  constructor(
         textureIdHolder = IntArray(1)
     }
 
-    @Throws(GlException::class)
+    
     fun init(secureMode:  Int) {
         display = defaultDisplay
         val config: EGLConfig? = chooseEGLConfig(display)
@@ -128,8 +128,7 @@ class EGLSurfaceTexture  constructor(
 
         private const val EGL_PROTECTED_CONTENT_EXT = 0x32C0
 
-        @get:Throws(GlException::class)
-        private val defaultDisplay: EGLDisplay?
+            private val defaultDisplay: EGLDisplay?
             get() {
                 val display =
                     EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
@@ -148,7 +147,7 @@ class EGLSurfaceTexture  constructor(
                 return display
             }
 
-        @Throws(GlException::class)
+        
         private fun chooseEGLConfig(display: EGLDisplay?): EGLConfig? {
             val configs = arrayOfNulls<EGLConfig>(1)
             val numConfigs = IntArray(1)
@@ -174,7 +173,7 @@ class EGLSurfaceTexture  constructor(
             return configs[0]
         }
 
-        @Throws(GlException::class)
+        
         private fun createEGLContext(
             display: EGLDisplay?, config: EGLConfig?, secureMode:  Int
         ): EGLContext? {
@@ -199,7 +198,7 @@ class EGLSurfaceTexture  constructor(
             return context
         }
 
-        @Throws(GlException::class)
+        
         private fun createEGLSurface(
             display: EGLDisplay?,
             config: EGLConfig?,
@@ -247,7 +246,7 @@ class EGLSurfaceTexture  constructor(
             return surface
         }
 
-        @Throws(GlException::class)
+        
         private fun generateTextureIds(textureIdHolder: IntArray?) {
             GLES20.glGenTextures( 1, textureIdHolder,  0)
             checkGlError()

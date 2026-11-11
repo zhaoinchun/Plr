@@ -38,7 +38,7 @@ class WavExtractor : Extractor {
         dataEndPosition = C.INDEX_UNSET.toLong()
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         return WavHeaderReader.checkFileType(input)
     }
@@ -60,7 +60,7 @@ class WavExtractor : Extractor {
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -97,7 +97,7 @@ class WavExtractor : Extractor {
         extractorOutput!!
     }
 
-    @Throws(IOException::class)
+    
     private fun readFileType(input: ExtractorInput) {
         Preconditions.checkState(input.position == 0L)
         if (dataStartPosition != C.INDEX_UNSET) {
@@ -115,14 +115,14 @@ class WavExtractor : Extractor {
         state = STATE_READING_RF64_SAMPLE_DATA_SIZE
     }
 
-    @Throws(IOException::class)
+    
     private fun readRf64SampleDataSize(input: ExtractorInput) {
         rf64SampleDataSize = WavHeaderReader.readRf64SampleDataSize(input)
         state = STATE_READING_FORMAT
     }
 
     @RequiresNonNull("extractorOutput", "trackOutput")
-    @Throws(IOException::class)
+    
     private fun readFormat(input: ExtractorInput) {
         val wavFormat = WavHeaderReader.readFormat(input)
         if (wavFormat.formatType == WavUtil.TYPE_IMA_ADPCM) {
@@ -161,7 +161,7 @@ class WavExtractor : Extractor {
         state = STATE_SKIPPING_TO_SAMPLE_DATA
     }
 
-    @Throws(IOException::class)
+    
     private fun skipToSampleData(input: ExtractorInput) {
         val dataBounds = WavHeaderReader.skipToSampleData(input)
         dataStartPosition = dataBounds.first!!.toInt()
@@ -181,7 +181,7 @@ class WavExtractor : Extractor {
         state = STATE_READING_SAMPLE_DATA
     }
 
-    @Throws(IOException::class)
+    
     private fun readSampleData(input: ExtractorInput):  Int {
         Preconditions.checkState(dataEndPosition != C.INDEX_UNSET.toLong())
         val bytesLeft: Long = dataEndPosition - input.position
@@ -195,10 +195,10 @@ class WavExtractor : Extractor {
 
         fun reset(timeUs: Long)
 
-        @Throws(ParserException::class)
+        
         fun init(dataStartPosition: Int, dataEndPosition: Long)
 
-        @Throws(IOException::class)
+        
         fun sampleData(input: ExtractorInput, bytesLeft: Long): Boolean
     }
 
@@ -269,7 +269,7 @@ class WavExtractor : Extractor {
             trackOutput.durationUs(wavSeekMap.durationUs)
         }
 
-        @Throws(IOException::class)
+        
         override fun sampleData(input: ExtractorInput, bytesLeft: Long): Boolean {
             // Write sample data until we've reached the target sample size, or the end of the data.
             var bytesLeft = bytesLeft
@@ -391,7 +391,7 @@ class WavExtractor : Extractor {
             trackOutput.durationUs(wavSeekMap.durationUs)
         }
 
-        @Throws(IOException::class)
+        
         override fun sampleData(input: ExtractorInput, bytesLeft: Long): Boolean {
             // Calculate the number of additional frames that we need on the output side to complete a
             // sample of the target size.

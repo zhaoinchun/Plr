@@ -25,7 +25,7 @@ class DefaultExtractorInput(
         scratchSpace = ByteArray(SCRATCH_SPACE_SIZE)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         var bytesRead = readFromPeekBuffer(buffer, offset, length)
         if (bytesRead == 0) {
@@ -38,7 +38,7 @@ class DefaultExtractorInput(
         return bytesRead
     }
 
-    @Throws(IOException::class)
+    
     override fun readFully(
         target: ByteArray,
         offset: Int,
@@ -53,12 +53,12 @@ class DefaultExtractorInput(
         return bytesRead != C.RESULT_END_OF_INPUT
     }
 
-    @Throws(IOException::class)
+    
     override fun readFully(target: ByteArray, offset: Int, length: Int) {
         readFully(target, offset, length, false)
     }
 
-    @Throws(IOException::class)
+    
     override fun skip(length: Int): Int {
         var bytesSkipped = skipFromPeekBuffer(length)
         if (bytesSkipped == 0) {
@@ -69,7 +69,7 @@ class DefaultExtractorInput(
         return bytesSkipped
     }
 
-    @Throws(IOException::class)
+    
     override fun skipFully(length: Int, allowEndOfInput: Boolean): Boolean {
         var bytesSkipped = skipFromPeekBuffer(length)
         while (bytesSkipped < length && bytesSkipped != C.RESULT_END_OF_INPUT) {
@@ -87,12 +87,12 @@ class DefaultExtractorInput(
         return bytesSkipped != C.RESULT_END_OF_INPUT
     }
 
-    @Throws(IOException::class)
+    
     override fun skipFully(length: Int) {
         skipFully(length, false)
     }
 
-    @Throws(IOException::class)
+    
     override fun peek(target: ByteArray, offset: Int, length: Int): Int {
         ensureSpaceForPeek(length)
         val peekBufferRemainingBytes = peekBufferLength - peekBufferPosition
@@ -118,7 +118,7 @@ class DefaultExtractorInput(
         return bytesPeeked
     }
 
-    @Throws(IOException::class)
+    
     override fun peekFully(
         target: ByteArray,
         offset: Int,
@@ -132,12 +132,12 @@ class DefaultExtractorInput(
         return true
     }
 
-    @Throws(IOException::class)
+    
     override fun peekFully(target: ByteArray, offset: Int, length: Int) {
         peekFully(target, offset, length, false)
     }
 
-    @Throws(IOException::class)
+    
     override fun advancePeekPosition(length: Int, allowEndOfInput: Boolean): Boolean {
         ensureSpaceForPeek(length)
         var bytesPeeked = peekBufferLength - peekBufferPosition
@@ -159,7 +159,7 @@ class DefaultExtractorInput(
         return true
     }
 
-    @Throws(IOException::class)
+    
     override fun advancePeekPosition(length: Int) {
         advancePeekPosition(length, false)
     }
@@ -173,8 +173,6 @@ class DefaultExtractorInput(
 
     override val length: Long
         get() = streamLength
-
-    @Throws(Throwable::class)
     override fun <E : Throwable?> setRetryPosition(position: Long, e: E?) {
         Preconditions.checkArgument(position >= 0)
         this.position = position
@@ -223,7 +221,7 @@ class DefaultExtractorInput(
         peekBuffer = newPeekBuffer
     }
 
-    @Throws(IOException::class)
+    
     private fun readFromUpstream(
         target: ByteArray, offset: Int, length: Int, bytesAlreadyRead: Int, allowEndOfInput: Boolean
     ): Int {

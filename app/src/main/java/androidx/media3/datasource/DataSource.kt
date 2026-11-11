@@ -11,7 +11,7 @@ interface DataSource : DataReader {
 
     fun addTransferListener(transferListener: TransferListener)
 
-    @Throws(IOException::class)
+    
     fun open(dataSpec: DataSpec): Long
 
     val uri: Uri?
@@ -19,6 +19,6 @@ interface DataSource : DataReader {
     val responseHeaders: MutableMap<String, List<String>>
         get() = mutableMapOf()
 
-    @Throws(IOException::class)
+    
     fun close()
 }

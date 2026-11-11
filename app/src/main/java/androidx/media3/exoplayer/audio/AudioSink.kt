@@ -115,9 +115,6 @@ interface AudioSink {
     fun getCurrentPositionUs(sourceEnded: Boolean): Long
 
     @Deprecated("Call and implement {@link #configure(AudioSinkConfig)} instead.")
-    @Throws(
-        ConfigurationException::class
-    )
     fun configure(
         inputFormat: Format, specifiedBufferSize: Int, outputChannels: IntArray?
     ) {
@@ -132,7 +129,7 @@ interface AudioSink {
         )
     }
 
-    @Throws(ConfigurationException::class)
+    
     fun configure(audioSinkConfig: AudioSinkConfig) {
         configure(
             audioSinkConfig.format,
@@ -143,15 +140,11 @@ interface AudioSink {
 
     fun play()
     fun handleDiscontinuity()
-
-    @Throws(InitializationException::class, WriteException::class)
     fun handleBuffer(
         buffer: ByteBuffer,
         presentationTimeUs: Long,
         encodedAccessUnitCount: Int
     ): Boolean
-
-    @Throws(WriteException::class)
     fun playToEndOfStream()
     val isEnded: Boolean
     fun hasPendingData(): Boolean

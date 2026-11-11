@@ -9,7 +9,7 @@ import kotlin.math.min
 
 class ByteArrayDataSource(uriResolver: UriResolver) : BaseDataSource(false) {
     interface UriResolver {
-        @Throws(IOException::class)
+        
         fun resolve(uri: Uri): ByteArray
     }
 
@@ -29,7 +29,7 @@ class ByteArrayDataSource(uriResolver: UriResolver) : BaseDataSource(false) {
         Preconditions.checkArgument(data.isNotEmpty())
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         transferInitializing(dataSpec)
         uri = dataSpec.uri

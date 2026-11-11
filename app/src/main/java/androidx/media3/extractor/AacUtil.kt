@@ -66,14 +66,14 @@ object AacUtil {
     // Extended high efficiency.
     const val AUDIO_OBJECT_TYPE_AAC_XHE: Int = 42
 
-    @Throws(ParserException::class)
+    
     fun parseAudioSpecificConfig(audioSpecificConfig: ByteArray): Config {
         return parseAudioSpecificConfig(
             ParsableBitArray(audioSpecificConfig),  false
         )
     }
 
-    @Throws(ParserException::class)
+    
     fun parseAudioSpecificConfig(bitArray: ParsableBitArray, forceReadToEnd: Boolean): Config {
         var audioObjectType = getAudioObjectType(bitArray)
         var sampleRateHz = getSamplingFrequency(bitArray)
@@ -166,7 +166,7 @@ object AacUtil {
         return audioObjectType
     }
 
-    @Throws(ParserException::class)
+    
     private fun getSamplingFrequency(bitArray: ParsableBitArray): Int {
         val samplingFrequency: Int
         val frequencyIndex = bitArray.readBits(4)

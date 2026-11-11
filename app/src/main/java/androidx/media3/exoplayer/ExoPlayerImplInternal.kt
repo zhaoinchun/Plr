@@ -435,7 +435,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handleAudioFocusPlayerCommandInternal(playerCommand:  Int) {
         updatePlayWhenReadyWithAudioFocus(
             playbackInfo.playWhenReady,
@@ -445,12 +445,12 @@ class ExoPlayerImplInternal(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handleAudioFocusVolumeMultiplierChange() {
         setVolumeInternal(volume)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setVideoFrameMetadataListenerInternal(
         videoFrameMetadataListener: VideoFrameMetadataListener?
     ) {
@@ -459,7 +459,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setImageMetadataListenerInternal(imageMetadataListener: ImageMetadataListener?) {
         for (renderer in renderers) {
             renderer.setImageMetadataListener(imageMetadataListener)
@@ -872,7 +872,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun prepareInternal() {
         playbackInfoUpdate.incrementPendingOperationAcks(1)
         resetInternal(
@@ -888,7 +888,7 @@ class ExoPlayerImplInternal(
         handler.sendEmptyMessage(MSG_DO_SOME_WORK)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setMediaItemsInternal(mediaSourceListUpdateMessage: MediaSourceListUpdateMessage) {
         playbackInfoUpdate.incrementPendingOperationAcks(1)
         if (mediaSourceListUpdateMessage.windowIndex != C.INDEX_UNSET) {
@@ -910,7 +910,7 @@ class ExoPlayerImplInternal(
         handleMediaSourceListInfoRefreshed(timeline, false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun addMediaItemsInternal(
         addMessage: MediaSourceListUpdateMessage,
         insertionIndex: Int
@@ -925,7 +925,7 @@ class ExoPlayerImplInternal(
         handleMediaSourceListInfoRefreshed(timeline, false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun moveMediaItemsInternal(moveMediaItemsMessage: MoveMediaItemsMessage) {
         playbackInfoUpdate.incrementPendingOperationAcks(1)
         val timeline =
@@ -938,7 +938,7 @@ class ExoPlayerImplInternal(
         handleMediaSourceListInfoRefreshed(timeline, false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun removeMediaItemsInternal(
         fromIndex: Int,
         toIndex: Int,
@@ -949,21 +949,21 @@ class ExoPlayerImplInternal(
         handleMediaSourceListInfoRefreshed(timeline, false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun mediaSourceListUpdateRequestedInternal() {
         handleMediaSourceListInfoRefreshed(
             mediaSourceList.createTimeline(), true
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setShuffleOrderInternal(shuffleOrder: ShuffleOrder) {
         playbackInfoUpdate.incrementPendingOperationAcks(1)
         val timeline = mediaSourceList.setShuffleOrder(shuffleOrder)
         handleMediaSourceListInfoRefreshed(timeline, false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updateMediaSourcesWithMediaItemsInternal(
         fromIndex: Int, toIndex: Int, mediaItems: List<MediaItem>
     ) {
@@ -973,7 +973,7 @@ class ExoPlayerImplInternal(
         handleMediaSourceListInfoRefreshed(timeline, false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setAudioAttributesInternal(
         audioAttributes: AudioAttributes,
         handleAudioFocus: Boolean
@@ -983,7 +983,7 @@ class ExoPlayerImplInternal(
         updatePlayWhenReadyWithAudioFocus()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setVolumeInternal(volume: Float) {
         this.volume = volume
         val scaledVolume = volume * audioFocusManager.volumeMultiplier
@@ -992,7 +992,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setAudioSessionIdInternal(audioSessionId: Int) {
         for (renderer in renderers) {
             renderer.setAudioSessionId(audioSessionId)
@@ -1009,7 +1009,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setPlayWhenReadyInternal(
         playWhenReady: Boolean,
         playbackSuppressionReason:  Int,
@@ -1020,7 +1020,7 @@ class ExoPlayerImplInternal(
         updatePlayWhenReadyWithAudioFocus(playWhenReady, playbackSuppressionReason, reason)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updatePlayWhenReadyWithAudioFocus(
         playWhenReady: Boolean = playbackInfo.playWhenReady,
         playbackSuppressionReason:  Int = playbackInfo.playbackSuppressionReason,
@@ -1033,7 +1033,7 @@ class ExoPlayerImplInternal(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updatePlayWhenReadyWithAudioFocus(
         playWhenReady: Boolean,
         playerCommand:  Int,
@@ -1078,7 +1078,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setPauseAtEndOfWindowInternal(pauseAtEndOfWindow: Boolean) {
         this.pauseAtEndOfWindow = pauseAtEndOfWindow
         resetPendingPauseAtEndOfPeriod()
@@ -1107,7 +1107,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setRepeatModeInternal(repeatMode: Int) {
         this.repeatMode = repeatMode
         val result:  Int =
@@ -1120,7 +1120,7 @@ class ExoPlayerImplInternal(
         handleLoadingMediaPeriodChanged(false)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setShuffleModeEnabledInternal(shuffleModeEnabled: Boolean) {
         this.shuffleModeEnabled = shuffleModeEnabled
         val result:  Int =
@@ -1138,7 +1138,7 @@ class ExoPlayerImplInternal(
         queue.updatePreloadConfiguration(playbackInfo.timeline, preloadConfiguration)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun seekToCurrentPosition(sendDiscontinuity: Boolean) {
         // Renderers may have read from a period that's been removed. Seek back to the current
         // position of the playing period to make sure none of the removed period is played.
@@ -1163,7 +1163,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun startRenderers() {
         val playingPeriodHolder = queue.playingPeriod ?: return
         val trackSelectorResult = playingPeriodHolder.trackSelectorResult
@@ -1175,7 +1175,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun stopRenderers() {
         mediaClock.stop()
         for (rendererHolder in renderers) {
@@ -1183,12 +1183,12 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun attemptRendererErrorRecovery() {
         reselectTracksInternalAndSeek()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updatePlaybackPositions() {
         val playingPeriodHolder = queue.playingPeriod ?: return
 
@@ -1294,8 +1294,6 @@ class ExoPlayerImplInternal(
             periodHolder = periodHolder.getNext()
         }
     }
-
-    @Throws(ExoPlaybackException::class, IOException::class)
     private fun doSomeWork() {
         val operationStartTimeMs = clock.uptimeMillis()
         // Remove other pending DO_SOME_WORK requests that are handled by this invocation.
@@ -1560,7 +1558,7 @@ class ExoPlayerImplInternal(
         else
             BUFFERING_MAXIMUM_INTERVAL_MS
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun seekToInternal(seekPosition: SeekPosition) {
         if (seekIsPendingWhileScrubbing) {
             if (queuedSeekWhileScrubbing != null) {
@@ -1715,7 +1713,7 @@ class ExoPlayerImplInternal(
         return scrubbingModeSeekParameters
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun seekToPeriodPosition(
         periodId: MediaPeriodId, periodPositionUs: Long, forceBufferingState: Boolean
     ): Long {
@@ -1726,7 +1724,7 @@ class ExoPlayerImplInternal(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun seekToPeriodPosition(
         periodId: MediaPeriodId,
         periodPositionUs: Long,
@@ -1854,7 +1852,7 @@ class ExoPlayerImplInternal(
         return adjustedCurrentPositionSyncUs == adjustedSeekPositionSyncUs
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun resetRendererPosition(
         periodPositionUs: Long,
         sampleStreamIsResetToKeyFrame: Boolean
@@ -1872,7 +1870,7 @@ class ExoPlayerImplInternal(
         notifyTrackSelectionDiscontinuity()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setPlaybackParametersInternal(playbackParameters: PlaybackParameters) {
         setMediaClockPlaybackParameters(playbackParameters)
         handlePlaybackParameters(
@@ -1884,7 +1882,7 @@ class ExoPlayerImplInternal(
         this.seekParameters = seekParameters
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setScrubbingModeEnabledInternal(scrubbingModeEnabled: Boolean) {
         if (!scrubbingModeEnabled) {
             if (queuedSeekWhileScrubbing != null && seekIsPendingWhileScrubbing
@@ -1913,13 +1911,13 @@ class ExoPlayerImplInternal(
         applyScrubbingModeParameters()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setScrubbingModeParametersInternal(scrubbingModeParameters: ScrubbingModeParameters) {
         this.scrubbingModeParameters = scrubbingModeParameters
         applyScrubbingModeParameters()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun applyScrubbingModeParameters() {
         for (renderer in renderers) {
             renderer.setScrubbingMode(if (scrubbingModeEnabled) scrubbingModeParameters else null)
@@ -1940,7 +1938,7 @@ class ExoPlayerImplInternal(
         processedCondition?.open()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setVideoOutputInternal(
         videoOutput: Any?, processedCondition: ConditionVariable?
     ) {
@@ -2124,7 +2122,7 @@ class ExoPlayerImplInternal(
         return Pair.create<MediaPeriodId?, Long?>(firstPeriodId, positionUs)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun sendMessageInternal(message: PlayerMessage) {
         if (message.positionMs == C.TIME_UNSET) {
             // If no delivery time is specified, trigger immediate message delivery.
@@ -2153,7 +2151,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun sendMessageToTarget(message: PlayerMessage) {
         if (message.looper == playbackLooper) {
             deliverMessage(message)
@@ -2185,7 +2183,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun deliverMessage(message: PlayerMessage) {
         if (message.isCanceled) {
             return
@@ -2222,7 +2220,7 @@ class ExoPlayerImplInternal(
         Collections.sort<PendingMessageInfo?>(pendingMessages)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeTriggerPendingMessages(oldPeriodPositionUs: Long, newPeriodPositionUs: Long) {
         var oldPeriodPositionUs = oldPeriodPositionUs
         if (pendingMessages.isEmpty() || playbackInfo.periodId.isAd) {
@@ -2286,7 +2284,7 @@ class ExoPlayerImplInternal(
         nextPendingMessageIndexHint = nextPendingMessageIndex
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun disableRenderers() {
         for (i in renderers.indices) {
             disableRenderer(i)
@@ -2294,7 +2292,7 @@ class ExoPlayerImplInternal(
         prewarmingMediaPeriodDiscontinuity = C.TIME_UNSET
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun disableRenderer(rendererIndex: Int) {
         val enabledRendererCountBeforeDisabling = renderers[rendererIndex].enabledRendererCount
         renderers[rendererIndex].disable(mediaClock)
@@ -2327,13 +2325,13 @@ class ExoPlayerImplInternal(
         return renderers[rendererIndex].isPrewarmingPeriod(queue.getPrewarmingPeriod(rendererIndex))
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun reselectTracksInternalAndSeek() {
         reselectTracksInternal()
         seekToCurrentPosition(true)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun reselectTracksInternal() {
         val playbackSpeed = mediaClock.playbackParameters.speed
         // Reselect tracks on each period in turn, until the selection changes.
@@ -2536,7 +2534,7 @@ class ExoPlayerImplInternal(
                     && (playingPeriodDurationUs == C.TIME_UNSET || playbackInfo.positionUs < playingPeriodDurationUs || !shouldPlayWhenReady())
         }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handleMediaSourceListInfoRefreshed(timeline: Timeline, isSourceRefresh: Boolean) {
         val positionUpdate: PositionUpdateForPlaylistChange =
             resolvePositionForPlaylistChange(
@@ -2655,7 +2653,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updatePlaybackSpeedSettingsForNewPeriod(
         newTimeline: Timeline,
         newPeriodId: MediaPeriodId,
@@ -2719,7 +2717,7 @@ class ExoPlayerImplInternal(
         return renderers[rendererIndex].getReadingPositionUs(periodHolder)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updatePeriods() {
         if (playbackInfo.timeline.isEmpty || !mediaSourceList.isPrepared) {
             // No periods available.
@@ -2740,7 +2738,7 @@ class ExoPlayerImplInternal(
         maybeUpdatePreloadPeriods(loadingPeriodChanged)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdateLoadingPeriod(): Boolean {
         var loadingPeriodChanged = false
         queue.reevaluateBuffer(rendererPositionUs)
@@ -2775,7 +2773,7 @@ class ExoPlayerImplInternal(
         return loadingPeriodChanged
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdatePrewarmingPeriods() {
         if (pendingPauseAtEndOfPeriod
             || !hasSecondaryRenderers || isPrewarmingDisabledUntilNextTransition
@@ -2790,7 +2788,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdatePrewarmingPeriod() {
         if (pendingPauseAtEndOfPeriod
             || !hasSecondaryRenderers || isPrewarmingDisabledUntilNextTransition
@@ -2814,7 +2812,7 @@ class ExoPlayerImplInternal(
         maybePrewarmRenderers()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdatePrewarmingPeriod(index: Int) {
         if (renderers[index].isPrewarming) {
             return
@@ -2838,7 +2836,7 @@ class ExoPlayerImplInternal(
         maybePrewarmRenderer(index)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybePrewarmRenderers() {
         val prewarmingPeriod = queue.earliestPrewarmingPeriod ?: return
         val trackSelectorResult = prewarmingPeriod.trackSelectorResult
@@ -2869,7 +2867,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybePrewarmRenderer(index: Int) {
         val prewarmingPeriod = queue.getPrewarmingPeriod(index) ?: return
         val trackSelectorResult = prewarmingPeriod.trackSelectorResult
@@ -2887,14 +2885,14 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdateReadingPeriods() {
         for (i in renderers.indices) {
             maybeUpdateReadingPeriod(i)
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdateReadingPeriod(index: Int) {
         var readingPeriodHolder = queue.getReadingPeriod(index)
         val renderer = renderers[index]
@@ -2997,7 +2995,7 @@ class ExoPlayerImplInternal(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdateReadingPeriod() {
         var readingPeriodHolder = queue.earliestReadingPeriod ?: return
 
@@ -3140,7 +3138,7 @@ class ExoPlayerImplInternal(
         return !currentIsLive && !nextIsLive
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdateReadingRenderers() {
         val readingPeriod = queue.earliestReadingPeriod
         if (readingPeriod == null || queue.playingPeriod == readingPeriod || areAllRenderersInCorrectState(
@@ -3157,7 +3155,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdateReadingRenderersPerStream() {
         for (i in renderers.indices) {
             val readingPeriod = queue.getReadingPeriod(i)
@@ -3175,7 +3173,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updateRenderersForTransition(): Boolean {
         val readingMediaPeriod = queue.earliestReadingPeriod
         val newTrackSelectorResult = readingMediaPeriod!!.trackSelectorResult
@@ -3216,7 +3214,7 @@ class ExoPlayerImplInternal(
         return allUpdated
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun updateRendererForTransition(index: Int): Boolean {
         val renderer = renderers[index]
         val readingMediaPeriod = queue.getReadingPeriod(index)
@@ -3309,7 +3307,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeUpdatePlayingPeriod() {
         var advancedPlayingPeriod = false
         while (shouldAdvancePlayingPeriod()) {
@@ -3436,7 +3434,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handlePeriodPrepared(mediaPeriod: MediaPeriod?) {
         if (queue.isLoading(mediaPeriod)) {
             handleLoadingPeriodPrepared(queue.loadingPeriod!!)
@@ -3456,7 +3454,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handleLoadingPeriodPrepared(loadingPeriodHolder: MediaPeriodHolder) {
         if (!loadingPeriodHolder.prepared) {
             loadingPeriodHolder.handlePrepared(
@@ -3499,7 +3497,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handlePlaybackParameters(
         playbackParameters: PlaybackParameters, acknowledgeCommand: Boolean
     ) {
@@ -3511,7 +3509,7 @@ class ExoPlayerImplInternal(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun handlePlaybackParameters(
         playbackParameters: PlaybackParameters,
         currentPlaybackSpeed: Float,
@@ -3682,7 +3680,7 @@ class ExoPlayerImplInternal(
         return if (seenNonEmptyMetadata) result else listOf()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun enableRenderers() {
         Preconditions.checkState(!this.isReadingAhead)
         enableRenderers(
@@ -3691,7 +3689,7 @@ class ExoPlayerImplInternal(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun enableRenderers(rendererWasEnabledFlags: BooleanArray, startPositionUs: Long) {
         Preconditions.checkState(!this.isReadingAhead)
         val readingMediaPeriod = queue.earliestReadingPeriod
@@ -3717,7 +3715,7 @@ class ExoPlayerImplInternal(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun enableRenderer(
         periodHolder: MediaPeriodHolder,
         rendererIndex: Int,
@@ -3879,8 +3877,6 @@ class ExoPlayerImplInternal(
         return playbackInfo.playWhenReady
                 && playbackInfo.playbackSuppressionReason == Player.PLAYBACK_SUPPRESSION_REASON_NONE
     }
-
-    @Throws(IOException::class, ExoPlaybackException::class)
     private fun maybeThrowRendererStreamError(rendererIndex: Int) {
         val renderer = renderers[rendererIndex]
         try {

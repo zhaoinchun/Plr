@@ -39,7 +39,7 @@ class TrimmingAudioProcessor : BaseAudioProcessor() {
         )
     }
 
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         if (!isEncodingLinearPcm(inputAudioFormat.encoding)) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)

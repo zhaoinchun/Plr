@@ -182,7 +182,7 @@ class DefaultHttpDataSource private constructor(
         requestProperties.clear()
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun open(dataSpec: DataSpec): Long {
         this.dataSpec = dataSpec
         bytesRead = 0
@@ -307,7 +307,7 @@ class DefaultHttpDataSource private constructor(
         return bytesToRead
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         try {
             return readInternal(buffer, offset, length)
@@ -318,7 +318,7 @@ class DefaultHttpDataSource private constructor(
         }
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun close() {
         try {
             val inputStream = this.inputStream
@@ -347,7 +347,7 @@ class DefaultHttpDataSource private constructor(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun makeConnection(dataSpec: DataSpec): HttpURLConnection {
         var url = URL(dataSpec.uri.toString())
         var httpMethod:  Int = dataSpec.httpMethod
@@ -419,7 +419,7 @@ class DefaultHttpDataSource private constructor(
         )
     }
 
-    @Throws(IOException::class)
+    
     private fun makeConnection(
         url: URL,
         httpMethod:  Int,
@@ -472,12 +472,12 @@ class DefaultHttpDataSource private constructor(
         return connection
     }
 
-    @Throws(IOException::class)
+    
     fun openConnection(url: URL): HttpURLConnection {
         return url.openConnection() as HttpURLConnection
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     private fun handleRedirect(originalUrl: URL, location: String?, dataSpec: DataSpec?): URL {
         if (location == null) {
             throw HttpDataSourceException(
@@ -540,7 +540,7 @@ class DefaultHttpDataSource private constructor(
         return url
     }
 
-    @Throws(IOException::class)
+    
     private fun skipFully(bytesToSkip: Long, dataSpec: DataSpec?) {
         var bytesToSkip = bytesToSkip
         if (bytesToSkip == 0L) {
@@ -570,7 +570,7 @@ class DefaultHttpDataSource private constructor(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readInternal(buffer: ByteArray?, offset: Int, readLength: Int): Int {
         var readLength = readLength
         if (readLength == 0) {

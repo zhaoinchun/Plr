@@ -160,7 +160,7 @@ class OutputConsumerAdapterV30(
         maybeEndTracks()
     }
 
-    @Throws(IOException::class)
+    
     override fun onSampleDataFound(trackIndex: Int, sampleData: InputReader) {
         ensureSpaceForTrackIndex(trackIndex)
         scratchDataReaderAdapter.input = sampleData
@@ -408,7 +408,7 @@ class OutputConsumerAdapterV30(
     private class DataReaderAdapter : DataReader {
         var input: InputReader? = null
 
-        @Throws(IOException::class)
+        
         override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
             return input!!.read(buffer, offset, length)
         }

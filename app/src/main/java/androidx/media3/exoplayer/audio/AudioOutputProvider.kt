@@ -59,10 +59,8 @@ interface AudioOutputProvider {
 
     fun getFormatSupport(formatConfig: FormatConfig): FormatSupport
 
-    @Throws(ConfigurationException::class)
+    
     fun getOutputConfig(formatConfig: FormatConfig): OutputConfig
-
-    @Throws(InitializationException::class)
     fun getAudioOutput(config: OutputConfig): AudioOutput?
 
     fun addListener(listener: Listener)

@@ -167,7 +167,7 @@ class ServerSideAdInsertionMediaSource(
         mediaSource.prepareSource(this, getPlayerId(), getBandwidthMeter())
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowSourceInfoRefreshError() {
         mediaSource.maybeThrowSourceInfoRefreshError()
     }
@@ -650,7 +650,7 @@ class ServerSideAdInsertionMediaSource(
             actualMediaPeriod.prepare(this, preparePositionUs)
         }
 
-        @Throws(IOException::class)
+        
         fun maybeThrowPrepareError() {
             actualMediaPeriod.maybeThrowPrepareError()
         }
@@ -884,7 +884,7 @@ class ServerSideAdInsertionMediaSource(
             return sampleStreams[streamIndex]!!.isReady
         }
 
-        @Throws(IOException::class)
+        
         fun maybeThrowError(streamIndex: Int) {
             sampleStreams[streamIndex]!!.maybeThrowError()
         }
@@ -1149,7 +1149,7 @@ class ServerSideAdInsertionMediaSource(
             sharedPeriod.prepare(this, positionUs)
         }
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowPrepareError() {
             sharedPeriod.maybeThrowPrepareError()
         }
@@ -1235,7 +1235,7 @@ class ServerSideAdInsertionMediaSource(
         override val isReady: Boolean
             get() = mediaPeriod.sharedPeriod.isReady(streamIndex)
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowError() {
             mediaPeriod.sharedPeriod.maybeThrowError(streamIndex)
         }

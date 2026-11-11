@@ -71,7 +71,7 @@ class LatmReader(
         timeUs = pesTimeUs
     }
 
-    @Throws(ParserException::class)
+    
     override fun consume(data: ParsableByteArray) {
         // Asserts that createTracks has been called.
         val output = output!!
@@ -119,7 +119,7 @@ class LatmReader(
     }
 
     @RequiresNonNull("output")
-    @Throws(ParserException::class)
+    
     private fun parseAudioMuxElement(data: ParsableBitArray) {
         val useSameStreamMux = data.readBit()
         if (!useSameStreamMux) {
@@ -151,7 +151,7 @@ class LatmReader(
     }
 
     @RequiresNonNull("output")
-    @Throws(ParserException::class)
+    
     private fun parseStreamMuxConfig(data: ParsableBitArray) {
         val audioMuxVersion = data.readBits(1)
         audioMuxVersionA = if (audioMuxVersion == 1) data.readBits(1) else 0
@@ -240,7 +240,7 @@ class LatmReader(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseAudioSpecificConfig(data: ParsableBitArray): Int {
         val bitsLeft = data.bitsLeft()
         val config = parseAudioSpecificConfig(data, true)
@@ -250,7 +250,7 @@ class LatmReader(
         return bitsLeft - data.bitsLeft()
     }
 
-    @Throws(ParserException::class)
+    
     private fun parsePayloadLengthInfo(data: ParsableBitArray): Int {
         var muxSlotLengthBytes = 0
         // Assuming single program and single layer.

@@ -277,7 +277,7 @@ class SingleSampleMediaPeriod(
         override val isReady: Boolean
             get() = loadingFinished
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowError() {
             if (!treatLoadErrorsAsEndOfStream) {
                 loader.maybeThrowError()
@@ -353,7 +353,7 @@ class SingleSampleMediaPeriod(
             // Never happens.
         }
 
-        @Throws(IOException::class)
+        
         override fun load() {
             // We always load from the beginning, so reset bytesRead to 0.
             dataSource.resetBytesRead()

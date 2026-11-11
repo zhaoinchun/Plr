@@ -41,7 +41,7 @@ class TsBinarySearchSeeker(
             packetBuffer = ParsableByteArray()
         }
 
-        @Throws(IOException::class)
+        
         override fun searchForTimestamp(
             input: ExtractorInput,
             targetTimestamp: Long

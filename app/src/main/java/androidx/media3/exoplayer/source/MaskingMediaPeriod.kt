@@ -66,7 +66,7 @@ class MaskingMediaPeriod(
         )
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowPrepareError() {
         val mediaPeriod = mediaPeriod
         val mediaSource = mediaSource

@@ -12,14 +12,14 @@ import androidx.media3.extractor.TrackOutput
 
     abstract fun seek()
 
-    @Throws(ParserException::class)
+    
     fun consume(data: ParsableByteArray, timeUs: Long): Boolean {
         return parseHeader(data) && parsePayload(data, timeUs)
     }
 
-    @Throws(ParserException::class)
+    
     protected abstract fun parseHeader(data: ParsableByteArray): Boolean
 
-    @Throws(ParserException::class)
+    
     protected abstract fun parsePayload(data: ParsableByteArray, timeUs: Long): Boolean
 }

@@ -11,6 +11,6 @@ interface OggSeeker {
 
     fun startSeek(targetGranule: Long)
 
-    @Throws(IOException::class)
+    
     fun read(input: ExtractorInput): Long
 }

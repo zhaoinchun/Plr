@@ -9,7 +9,7 @@ import java.io.IOException
 internal object HeifSniffer {
     private const val BRAND_HEIC = 0x68656963
 
-    @Throws(IOException::class)
+    
     fun sniff(input: ExtractorInput, sniffMotionPhoto: Boolean): Boolean {
         val buffer = ParsableByteArray(Mp4Box.LONG_HEADER_SIZE)
         var firstAtom = true

@@ -55,7 +55,7 @@ class OfflineLicenseHelper(
     }
 
     @Synchronized
-    @Throws(DrmSessionException::class)
+    
     fun downloadLicense(format: Format): ByteArray? {
         Preconditions.checkArgument(format.drmInitData != null)
         return acquireSessionAndGetOfflineLicenseKeySetIdOnHandlerThread(
@@ -64,7 +64,7 @@ class OfflineLicenseHelper(
     }
 
     @Synchronized
-    @Throws(DrmSessionException::class)
+    
     fun renewLicense(offlineLicenseKeySetId: ByteArray?): ByteArray? {
         return acquireSessionAndGetOfflineLicenseKeySetIdOnHandlerThread(
             DefaultDrmSessionManager.MODE_DOWNLOAD,
@@ -74,7 +74,7 @@ class OfflineLicenseHelper(
     }
 
     @Synchronized
-    @Throws(DrmSessionException::class)
+    
     fun releaseLicense(offlineLicenseKeySetId: ByteArray?) {
         acquireSessionAndGetOfflineLicenseKeySetIdOnHandlerThread(
             DefaultDrmSessionManager.MODE_RELEASE,
@@ -84,7 +84,7 @@ class OfflineLicenseHelper(
     }
 
     @Synchronized
-    @Throws(DrmSessionException::class)
+    
     fun getLicenseDurationRemainingSec(offlineLicenseKeySetId: ByteArray?): Pair<Long, Long>? {
         val drmSession: DrmSession
         try {
@@ -129,7 +129,7 @@ class OfflineLicenseHelper(
         handlerThread.quit()
     }
 
-    @Throws(DrmSessionException::class)
+    
     private fun acquireSessionAndGetOfflineLicenseKeySetIdOnHandlerThread(
         licenseMode:  Int,
         offlineLicenseKeySetId: ByteArray?,
@@ -158,7 +158,7 @@ class OfflineLicenseHelper(
         }
     }
 
-    @Throws(DrmSessionException::class)
+    
     private fun acquireFirstSessionOnHandlerThread(
         licenseMode:  Int,
         offlineLicenseKeySetId: ByteArray?,

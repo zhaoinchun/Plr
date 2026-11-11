@@ -90,8 +90,6 @@ object ObuParser {
             parsableBitArray.skipBits(leadingZeros)
         }
     }
-
-    @Throws(NotYetImplementedException::class)
     private fun throwWhenFeatureRequired(expression: Boolean) {
         if (expression) {
             throw NotYetImplementedException()

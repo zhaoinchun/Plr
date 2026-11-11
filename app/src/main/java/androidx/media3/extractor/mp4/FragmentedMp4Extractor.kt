@@ -160,7 +160,7 @@ class FragmentedMp4Extractor constructor(
         seekPositionBeforeMfraProcessing = C.INDEX_UNSET.toLong()
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         val sniffFailure: SniffFailure? = Sniffer.sniffFragmented(input)
         lastSniffFailures =
@@ -229,7 +229,7 @@ class FragmentedMp4Extractor constructor(
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         while (true) {
             when (parserState) {
@@ -279,7 +279,7 @@ class FragmentedMp4Extractor constructor(
         atomHeaderBytesRead = 0
     }
 
-    @Throws(IOException::class)
+    
     private fun readAtomHeader(input: ExtractorInput, seekPosition: PositionHolder): Boolean {
         if (atomHeaderBytesRead == 0) {
             // Read the standard length atom header.
@@ -417,7 +417,7 @@ class FragmentedMp4Extractor constructor(
         return true
     }
 
-    @Throws(IOException::class)
+    
     private fun maybeSkipRemainingMetaAtomHeaderBytes(input: ExtractorInput) {
         scratch.reset(Mp4Box.HEADER_SIZE)
         input.peekFully(scratch.data, 0, Mp4Box.HEADER_SIZE)
@@ -426,7 +426,7 @@ class FragmentedMp4Extractor constructor(
         input.resetPeekPosition()
     }
 
-    @Throws(IOException::class)
+    
     private fun readAtomPayload(input: ExtractorInput) {
         val atomPayloadSize = (atomSize - atomHeaderBytesRead).toInt()
         val atomData: ParsableByteArray? = this.atomData
@@ -439,7 +439,7 @@ class FragmentedMp4Extractor constructor(
         processAtomEnded(input.position)
     }
 
-    @Throws(ParserException::class)
+    
     private fun processAtomEnded(atomEndPosition: Long) {
         while (!containerAtoms.isEmpty() && containerAtoms.peek()!!.endPosition == atomEndPosition) {
             onContainerAtomRead(containerAtoms.pop())
@@ -447,7 +447,7 @@ class FragmentedMp4Extractor constructor(
         enterReadingAtomHeaderState()
     }
 
-    @Throws(IOException::class)
+    
     private fun onLeafAtomRead(leaf: Mp4Box.LeafBox, input: ExtractorInput) {
         if (!containerAtoms.isEmpty()) {
             containerAtoms.peek()!!.add(leaf)
@@ -469,7 +469,7 @@ class FragmentedMp4Extractor constructor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun onContainerAtomRead(container: Mp4Box.ContainerBox?) {
         if (container!!.type == Mp4Box.TYPE_moov) {
             onMoovContainerAtomRead(container)
@@ -480,7 +480,7 @@ class FragmentedMp4Extractor constructor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun onMoovContainerAtomRead(moov: Mp4Box.ContainerBox) {
         Preconditions.checkState(sideloadedTrack == null, "Unexpected moov box.")
 
@@ -613,7 +613,7 @@ class FragmentedMp4Extractor constructor(
         return defaultSampleValuesArray.get(trackId)!!
     }
 
-    @Throws(ParserException::class)
+    
     private fun onMoofContainerAtomRead(moof: Mp4Box.ContainerBox) {
         parseMoof(moof, trackBundles, sideloadedTrack != null, flags, scratchBytes)
 
@@ -761,7 +761,7 @@ class FragmentedMp4Extractor constructor(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readEncryptionData(input: ExtractorInput) {
         var nextTrackBundle: TrackBundle? = null
         var nextDataOffset = Long.MAX_VALUE
@@ -789,7 +789,7 @@ class FragmentedMp4Extractor constructor(
         nextTrackBundle.fragment.fillEncryptionData(input)
     }
 
-    @Throws(IOException::class)
+    
     private fun readSample(input: ExtractorInput): Boolean {
         var trackBundle = currentTrackBundle
         if (trackBundle == null) {
@@ -1059,7 +1059,7 @@ class FragmentedMp4Extractor constructor(
         val size: Int
     )
 
-    @Throws(IOException::class)
+    
     private fun readMfro(input: ExtractorInput, seekPosition: PositionHolder) {
         // An mfro box is always exactly 16 bytes long.
         scratch.reset(MFRO_FIXED_BOX_SIZE)
@@ -1097,7 +1097,7 @@ class FragmentedMp4Extractor constructor(
         parserState = STATE_READING_MFRA
     }
 
-    @Throws(IOException::class)
+    
     private fun readMfra(input: ExtractorInput, seekPosition: PositionHolder) {
         val mfraSize: Long = input.length - input.position
         scratch.reset(Mp4Box.HEADER_SIZE)
@@ -1655,7 +1655,7 @@ class FragmentedMp4Extractor constructor(
             return if (version == 0) mehd.readUnsignedInt() else mehd.readUnsignedLongToLong()
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseMoof(
             moof: Mp4Box.ContainerBox,
             trackBundles: SparseArray<TrackBundle>,
@@ -1673,7 +1673,7 @@ class FragmentedMp4Extractor constructor(
             }
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseTraf(
             traf: Mp4Box.ContainerBox,
             trackBundles: SparseArray<TrackBundle>,
@@ -1743,7 +1743,7 @@ class FragmentedMp4Extractor constructor(
             }
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseTruns(
             traf: Mp4Box.ContainerBox,
             trackBundle: TrackBundle,
@@ -1781,7 +1781,7 @@ class FragmentedMp4Extractor constructor(
             }
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseSaiz(
             encryptionBox: TrackEncryptionBox, saiz: ParsableByteArray, out: TrackFragment
         ) {
@@ -1829,7 +1829,7 @@ class FragmentedMp4Extractor constructor(
             }
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseSaio(saio: ParsableByteArray, out: TrackFragment) {
             saio.setPosition(Mp4Box.HEADER_SIZE)
             val fullAtom: Int = saio.readInt()
@@ -1930,7 +1930,7 @@ class FragmentedMp4Extractor constructor(
             return editListDurationUs + editListMediaTimeUs >= track.durationUs
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseTrun(
             trackBundle: TrackBundle,
             index: Int,
@@ -2020,7 +2020,7 @@ class FragmentedMp4Extractor constructor(
             return trackRunEnd
         }
 
-        @Throws(ParserException::class)
+        
         private fun checkNonNegative(value: Int): Int {
             if (value < 0) {
                 throw ParserException.createForMalformedContainer(
@@ -2030,7 +2030,7 @@ class FragmentedMp4Extractor constructor(
             return value
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseUuid(
             uuid: ParsableByteArray, out: TrackFragment, extendedTypeScratch: ByteArray?
         ) {
@@ -2048,12 +2048,12 @@ class FragmentedMp4Extractor constructor(
             parseSenc(uuid, 16, out)
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseSenc(senc: ParsableByteArray, out: TrackFragment) {
             parseSenc(senc, 0, out)
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseSenc(senc: ParsableByteArray, offset: Int, out: TrackFragment) {
             senc.setPosition(Mp4Box.HEADER_SIZE + offset)
             val fullAtom: Int = senc.readInt()
@@ -2087,7 +2087,7 @@ class FragmentedMp4Extractor constructor(
             out.fillEncryptionData(senc)
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseSampleGroups(
             traf: Mp4Box.ContainerBox, schemeType: String?, out: TrackFragment
         ) {
@@ -2172,7 +2172,7 @@ class FragmentedMp4Extractor constructor(
                 )
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseSidx(
             atom: ParsableByteArray,
             inputPosition: Long

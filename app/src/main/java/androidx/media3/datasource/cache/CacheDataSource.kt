@@ -246,7 +246,6 @@ class CacheDataSource private constructor(
         upstreamDataSource!!.addTransferListener(transferListener)
     }
 
-    @Throws(IOException::class)
     override fun open(dataSpec: DataSpec): Long {
         try {
             val key = cacheKeyFactory.buildCacheKey(dataSpec)
@@ -292,7 +291,6 @@ class CacheDataSource private constructor(
         }
     }
 
-    @Throws(IOException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -347,7 +345,6 @@ class CacheDataSource private constructor(
             else mutableMapOf()
         }
 
-    @Throws(IOException::class)
     override fun close() {
         requestDataSpec = null
         actualUri = null
@@ -361,7 +358,6 @@ class CacheDataSource private constructor(
         }
     }
 
-    @Throws(IOException::class)
     private fun openNextSource(requestDataSpec: DataSpec, checkCache: Boolean) {
         var nextSpan: CacheSpan?
         val key = requestDataSpec.key!!
@@ -475,7 +471,7 @@ class CacheDataSource private constructor(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun setNoBytesRemainingAndMaybeStoreLength(key: String) {
         bytesRemaining = 0
         if (this.isWritingToCache) {
@@ -497,7 +493,7 @@ class CacheDataSource private constructor(
     private val isWritingToCache: Boolean
         get() = currentDataSource === cacheWriteDataSource
 
-    @Throws(IOException::class)
+    
     private fun closeCurrentSource() {
         if (currentDataSource == null) {
             return

@@ -97,7 +97,7 @@ class AsynchronousMediaCodecBufferEnqueuer(
         started = false
     }
 
-    @Throws(InterruptedException::class)
+
     override fun waitUntilQueueingComplete() {
         blockUntilHandlerThreadIsIdle()
     }
@@ -109,13 +109,13 @@ class AsynchronousMediaCodecBufferEnqueuer(
         }
     }
 
-    @Throws(InterruptedException::class)
+
     private fun flushHandlerThread() {
         this.handler!!.removeCallbacksAndMessages(null)
         blockUntilHandlerThreadIsIdle()
     }
 
-    @Throws(InterruptedException::class)
+
     private fun blockUntilHandlerThreadIsIdle() {
         conditionVariable.close()
         handler!!.obtainMessage(MSG_OPEN_CV).sendToTarget()

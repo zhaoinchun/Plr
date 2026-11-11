@@ -21,7 +21,7 @@ class WebpExtractor : Extractor {
         imageExtractor = SingleSampleExtractor(C.INDEX_UNSET, C.LENGTH_UNSET, MimeTypes.IMAGE_WEBP)
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // The full file signature for the format webp is RIFF????WEBP.
         scratch.reset( FILE_SIGNATURE_SEGMENT_LENGTH)
@@ -41,7 +41,7 @@ class WebpExtractor : Extractor {
         imageExtractor.init(output)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder

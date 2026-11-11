@@ -160,7 +160,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         return audioSink.getFormatSupport(format)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (outputStreamEnded) {
             try {
@@ -260,7 +260,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         allowPositionDiscontinuity = true
     }
 
-    @Throws(DecoderException::class)
+    
     protected abstract fun createDecoder(format: Format?, cryptoConfig: CryptoConfig?): T?
 
     protected abstract fun getOutputFormat(decoder: T?): Format?
@@ -281,13 +281,6 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         )
     }
 
-    @Throws(
-        ExoPlaybackException::class,
-        DecoderException::class,
-        AudioSink.ConfigurationException::class,
-        AudioSink.InitializationException::class,
-        AudioSink.WriteException::class
-    )
     private fun drainOutputBuffer(): Boolean {
         if (outputBuffer == null) {
             outputBuffer = decoder!!.dequeueOutputBuffer()
@@ -392,8 +385,6 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
             audioSink.setOutputStreamOffsetUs(outputStreamOffsetUs)
         }
     }
-
-    @Throws(DecoderException::class, ExoPlaybackException::class)
     private fun feedInputBuffer(): Boolean {
         if (decoder == null || decoderReinitializationState == REINITIALIZATION_STATE_WAIT_END_OF_STREAM || inputStreamEnded) {
             // We need to reinitialize the decoder or the input stream has ended.
@@ -459,14 +450,14 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         }
     }
 
-    @Throws(AudioSink.WriteException::class)
+    
     private fun processEndOfStream() {
         outputStreamEnded = true
         audioSink.playToEndOfStream()
         nextBufferToWritePresentationTimeUs = lastBufferInStreamPresentationTimeUs
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun flushDecoder() {
         if (decoderReinitializationState != REINITIALIZATION_STATE_NONE) {
             releaseDecoder()
@@ -530,7 +521,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
             audioSink.playbackParameters = value
         }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         decoderCounters = DecoderCounters()
         eventDispatcher.enabled(decoderCounters!!)
@@ -544,7 +535,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         audioSink.setListener(AudioSinkListener())
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -594,7 +585,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -616,7 +607,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VOLUME -> audioSink.setVolume((message as kotlin.Float?)!!)
@@ -666,7 +657,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     protected val isReadyForDecoding: Boolean
         get() = inputFormat != null && (isSourceReady || outputBuffer != null)
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeInitDecoder() {
         decoder ?: return
         setDecoderDrmSession(sourceDrmSession)
@@ -743,7 +734,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         decoderDrmSession = session
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun onInputFormatChanged(formatHolder: FormatHolder) {
         val newFormat = formatHolder.format!!
         setSourceDrmSession(formatHolder.drmSession)

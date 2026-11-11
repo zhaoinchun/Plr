@@ -70,7 +70,7 @@ class AviExtractor(
         pendingReposition = C.INDEX_UNSET.toLong()
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         input.peekFully(scratch.data, 0, 12)
         scratch.setPosition(0)
@@ -81,7 +81,7 @@ class AviExtractor(
         return scratch.readLittleEndianInt() == FOURCC_AVI_
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         if (resolvePendingReposition(input, seekPosition)) {
             return Extractor.RESULT_SEEK
@@ -221,7 +221,7 @@ class AviExtractor(
 
     // Internal methods.
 
-    @Throws(IOException::class)
+    
     private fun resolvePendingReposition(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -244,7 +244,7 @@ class AviExtractor(
         return needSeek
     }
 
-    @Throws(IOException::class)
+    
     private fun parseHdrlBody(hrdlBody: ParsableByteArray) {
         val headerList: ListChunk = ListChunk.parseFrom(FOURCC_hdrl, hrdlBody)
         if (headerList.type != FOURCC_hdrl) {
@@ -335,7 +335,7 @@ class AviExtractor(
         return null
     }
 
-    @Throws(IOException::class)
+    
     private fun readMoviChunks(input: ExtractorInput): Int {
         if (input.position >= moviEnd) {
             return C.RESULT_END_OF_INPUT
@@ -447,7 +447,7 @@ class AviExtractor(
         var size: Int = 0
         var listType: Int = 0
 
-        @Throws(ParserException::class)
+        
         fun populateWithListHeaderFrom(headerBytes: ParsableByteArray) {
             populateFrom(headerBytes)
             if (chunkType != FOURCC_LIST) {
@@ -507,7 +507,7 @@ class AviExtractor(
         const val FLAG_EMIT_RAW_SUBTITLE_DATA: Int = 1
         private val RELOAD_MINIMUM_SEEK_DISTANCE = (256 * 1024).toLong()
 
-        @Throws(IOException::class)
+        
         private fun alignInputToEvenPosition(input: ExtractorInput) {
             if ((input.position and 1L) == 1L) {
                 input.skipFully(1)

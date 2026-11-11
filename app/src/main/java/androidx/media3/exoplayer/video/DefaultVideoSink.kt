@@ -184,7 +184,7 @@ class DefaultVideoSink(
         throw UnsupportedOperationException()
     }
 
-    @Throws(VideoSinkException::class)
+    
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         try {
             videoFrameRenderControl.render(positionUs, elapsedRealtimeUs)

@@ -18,7 +18,7 @@ class ByteArrayDataSink : DataSink {
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun close() {
         stream?.close()
     }

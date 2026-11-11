@@ -105,8 +105,6 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         0,
         C.TIME_UNSET
     )
-
-    @Throws(IOException::class, InterruptedException::class)
     override fun download(progressListener: Downloader.ProgressListener?) {
         val pendingSegments = ArrayDeque<Segment>()
         val recycledRunnables: ArrayDeque<SegmentDownloadRunnable> =
@@ -273,13 +271,9 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
     }
 
     // Internal methods.
-
-    @Throws(InterruptedException::class, IOException::class)
     protected fun getManifest(dataSource: DataSource, dataSpec: DataSpec, removing: Boolean): M {
         return getManifest(dataSource, manifestParser, dataSpec, removing)
     }
-
-    @Throws(InterruptedException::class, IOException::class)
     protected fun getManifest(
         dataSource: DataSource,
         manifestParser: ParsingLoadable.Parser<M>,
@@ -289,7 +283,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         return execute<M>(
             {
                 object : RunnableFutureTask<M, IOException>() {
-                    @Throws(IOException::class)
+                    
                     override fun doWork(): M {
                         return ParsingLoadable.load<M>(
                             dataSource, manifestParser, dataSpec, C.DATA_TYPE_MANIFEST
@@ -300,8 +294,6 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
             removing
         )
     }
-
-    @Throws(InterruptedException::class, IOException::class)
     protected fun <T> execute(
         runnable: Supplier<RunnableFutureTask<T, *>>,
         removing: Boolean
@@ -349,15 +341,13 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
             }
         }
     }
-
-    @Throws(IOException::class, InterruptedException::class)
     protected abstract fun getSegments(
         dataSource: DataSource?,
         manifest: M,
         removing: Boolean
     ): MutableList<Segment>
 
-    @Throws(InterruptedException::class)
+
     private fun <T> addActiveRunnable(runnable: RunnableFutureTask<T, *>) {
         synchronized(activeRunnables) {
             if (isCanceled) {
@@ -388,7 +378,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         private val cacheWriter: CacheWriter =
             CacheWriter(dataSource, segment.dataSpec, temporaryBuffer, progressNotifier)
 
-        @Throws(IOException::class)
+        
         override fun doWork(): Void? {
             cacheWriter.cache()
             progressNotifier?.onSegmentDownloaded()

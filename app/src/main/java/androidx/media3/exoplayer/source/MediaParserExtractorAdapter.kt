@@ -61,7 +61,7 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun init(
         dataReader: DataReader,
         uri: Uri,
@@ -107,7 +107,7 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
         mediaParser.seek((if (seekPoints.second!!.position == position) seekPoints.second else seekPoints.first)!!)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(positionHolder: PositionHolder): Int {
         val shouldContinue = mediaParser.advance(inputReaderAdapter)
         positionHolder.position = inputReaderAdapter.getAndResetSeekPosition()

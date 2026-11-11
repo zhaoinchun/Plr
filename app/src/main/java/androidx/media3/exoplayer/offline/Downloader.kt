@@ -7,8 +7,6 @@ interface Downloader {
     interface ProgressListener {
         fun onProgress(contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float)
     }
-
-    @Throws(IOException::class, InterruptedException::class)
     fun download(progressListener: ProgressListener?)
     fun cancel()
     fun remove()

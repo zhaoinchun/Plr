@@ -18,7 +18,7 @@ class Id3Peeker {
         scratch = ParsableByteArray(Id3Decoder.ID3_HEADER_LENGTH)
     }
 
-    @Throws(IOException::class)
+    
     fun peekId3Data(
         input: ExtractorInput,
         id3FramePredicate: FramePredicate?,
@@ -56,7 +56,7 @@ class Id3Peeker {
         return metadata
     }
 
-    @Throws(IOException::class)
+    
     private fun peekId3HeaderIntoScratch(input: ExtractorInput, maxTagPeekBytes: Int): Boolean {
         var tagSearchBytes = 0
         do {

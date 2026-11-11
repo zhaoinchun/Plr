@@ -4,27 +4,27 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 
 object XmlPullParserUtil {
-    @Throws(XmlPullParserException::class)
+    
     fun isEndTag(xpp: XmlPullParser, name: String?): Boolean {
         return isEndTag(xpp) && xpp.getName() == name
     }
 
-    @Throws(XmlPullParserException::class)
+    
     fun isEndTag(xpp: XmlPullParser): Boolean {
         return xpp.getEventType() == XmlPullParser.END_TAG
     }
 
-    @Throws(XmlPullParserException::class)
+    
     fun isStartTag(xpp: XmlPullParser, name: String?): Boolean {
         return isStartTag(xpp) && xpp.getName() == name
     }
 
-    @Throws(XmlPullParserException::class)
+    
     fun isStartTag(xpp: XmlPullParser): Boolean {
         return xpp.getEventType() == XmlPullParser.START_TAG
     }
 
-    @Throws(XmlPullParserException::class)
+    
     fun isStartTagIgnorePrefix(xpp: XmlPullParser, name: String?): Boolean {
         return isStartTag(xpp) && stripPrefix(xpp.getName()) == name
     }

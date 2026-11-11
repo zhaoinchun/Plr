@@ -125,7 +125,7 @@ object SntpClient {
         )
     }
 
-    @Throws(IOException::class)
+    
     private fun loadNtpTimeOffsetMs(): Long {
         DatagramSocket().use { socket ->
             socket.setSoTimeout(timeoutMs)
@@ -256,7 +256,7 @@ object SntpClient {
         return (i0.toLong() shl 24) + (i1.toLong() shl 16) + (i2.toLong() shl 8) + i3.toLong()
     }
 
-    @Throws(IOException::class)
+    
     private fun checkValidServerReply(leap: Byte, mode: Byte, stratum: Int, transmitTime: Long) {
         if (leap.toInt() == NTP_LEAP_NOSYNC) {
             throw IOException("SNTP: Unsynchronized server")
@@ -280,7 +280,7 @@ object SntpClient {
     private class NtpTimeLoadable : Loadable {
         override fun cancelLoad() {}
 
-        @Throws(IOException::class)
+        
         override fun load() {
             // Synchronized to prevent redundant parallel requests.
             synchronized(loaderLock) {

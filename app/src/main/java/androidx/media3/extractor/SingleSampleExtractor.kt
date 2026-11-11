@@ -22,7 +22,7 @@ class SingleSampleExtractor(
     private var extractorOutput: ExtractorOutput? = null
     private var trackOutput: TrackOutput? = null
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         Preconditions.checkState(fileSignature != C.INDEX_UNSET && fileSignatureLength != C.LENGTH_UNSET)
         val scratch = ParsableByteArray(fileSignatureLength)
@@ -35,7 +35,7 @@ class SingleSampleExtractor(
         outputImageTrackAndSeekMap(sampleMimeType)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -62,7 +62,7 @@ class SingleSampleExtractor(
         // Do Nothing
     }
 
-    @Throws(IOException::class)
+    
     private fun readSegment(input: ExtractorInput) {
         val result = trackOutput!!.sampleData(input, FIXED_READ_LENGTH, true)
         if (result == C.RESULT_END_OF_INPUT) {

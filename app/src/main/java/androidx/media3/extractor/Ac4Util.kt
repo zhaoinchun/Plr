@@ -61,7 +61,7 @@ object Ac4Util {
         2048
     )
 
-    @Throws(ParserException::class)
+    
     fun parseAc4AnnexEFormat(
         data: ParsableByteArray,
         trackId: String?,
@@ -381,7 +381,7 @@ object Ac4Util {
         )
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseDsiSubstream(data: ParsableBitArray, ac4Presentation: Ac4Presentation) {
         val channelMode = data.readBits(5) // channel_mode
         data.skipBits(2) // dsi_sf_multiplier
@@ -410,7 +410,7 @@ object Ac4Util {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseDsiSubstreamGroup(data: ParsableBitArray, ac4Presentation: Ac4Presentation) {
         data.skipBits(2) // b_substreams_present(1), b_hsf_ext(1)
         val channelCoded = data.readBit() // b_channel_coded
@@ -443,7 +443,7 @@ object Ac4Util {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun skipDsiLanguage(data: ParsableBitArray) {
         val languageTagBytesNumber = data.readBits(6) // n_language_tag_bytes
         if (languageTagBytesNumber < 2 || languageTagBytesNumber > 42) {

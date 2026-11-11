@@ -54,7 +54,7 @@ class DefaultMediaCodecAdapterFactory : MediaCodecAdapter.Factory {
         return this
     }
 
-    @Throws(IOException::class)
+    
     override fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
         if (asynchronousMode == MODE_ENABLED
             || (asynchronousMode == MODE_DEFAULT && shouldUseAsynchronousAdapterInDefaultMode())

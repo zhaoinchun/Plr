@@ -41,7 +41,7 @@ class FlacBinarySearchSeeker(
             sampleNumberHolder = SampleNumberHolder()
         }
 
-        @Throws(IOException::class)
+        
         override fun searchForTimestamp(
             input: ExtractorInput,
             targetSampleNumber: Long
@@ -75,7 +75,7 @@ class FlacBinarySearchSeeker(
             }
         }
 
-        @Throws(IOException::class)
+        
         fun findNextFrame(input: ExtractorInput): Long {
             while (input.peekPosition < input.length - FlacConstants.MIN_FRAME_HEADER_SIZE
                 && !checkFrameHeaderFromPeek(

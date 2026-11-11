@@ -20,7 +20,7 @@ class TimeOffsetMediaPeriod(
         wrappedMediaPeriod.prepare( this, positionUs - timeOffsetUs)
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowPrepareError() {
         wrappedMediaPeriod.maybeThrowPrepareError()
     }
@@ -151,7 +151,7 @@ class TimeOffsetMediaPeriod(
         override val isReady: Boolean
             get() = childStream.isReady
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowError() {
             childStream.maybeThrowError()
         }

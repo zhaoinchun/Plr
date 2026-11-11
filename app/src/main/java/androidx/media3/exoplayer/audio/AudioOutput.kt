@@ -25,8 +25,6 @@ interface AudioOutput {
 
     fun play()
     fun pause()
-
-    @Throws(WriteException::class)
     fun write(buffer: ByteBuffer, encodedAccessUnitCount: Int, presentationTimeUs: Long): Boolean
     fun flush()
     fun stop()

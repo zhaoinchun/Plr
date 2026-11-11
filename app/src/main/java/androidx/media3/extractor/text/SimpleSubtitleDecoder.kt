@@ -50,6 +50,6 @@ protected constructor(override val name: String) :
         }
     }
 
-    @Throws(SubtitleDecoderException::class)
+    
     protected abstract fun decode(data: ByteArray, length: Int, reset: Boolean): Subtitle?
 }

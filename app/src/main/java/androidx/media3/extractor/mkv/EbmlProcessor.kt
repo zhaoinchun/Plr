@@ -12,22 +12,22 @@ interface EbmlProcessor {
 
     fun isLevel1Element(id: Int): Boolean
 
-    @Throws(ParserException::class)
+    
     fun startMasterElement(id: Int, contentPosition: Long, contentSize: Long)
 
-    @Throws(ParserException::class)
+    
     fun endMasterElement(id: Int)
 
-    @Throws(ParserException::class)
+    
     fun integerElement(id: Int, value: Long)
 
-    @Throws(ParserException::class)
+    
     fun floatElement(id: Int, value: Double)
 
-    @Throws(ParserException::class)
+    
     fun stringElement(id: Int, value: String)
 
-    @Throws(IOException::class)
+    
     fun binaryElement(id: Int, contentsSize: Int, input: ExtractorInput)
 
     companion object {

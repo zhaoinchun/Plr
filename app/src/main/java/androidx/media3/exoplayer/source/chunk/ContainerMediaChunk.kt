@@ -60,7 +60,7 @@ class ContainerMediaChunk(
         this.isLoadCanceled = true
     }
 
-    @Throws(IOException::class)
+    
     override fun load() {
         val output = getOutput()
         if (nextLoadPosition == 0L) {

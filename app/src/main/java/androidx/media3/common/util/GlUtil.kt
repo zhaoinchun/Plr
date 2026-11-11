@@ -133,7 +133,7 @@ object GlUtil {
         return vertexBuffer
     }
 
-    @Throws(GlException::class)
+    
     fun isProtectedContentExtensionSupported(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < 24) {
             return false
@@ -157,7 +157,6 @@ object GlUtil {
         return isExtensionSupported(EXTENSION_PROTECTED_CONTENT)
     }
 
-    @get:Throws(GlException::class)
     val isSurfacelessContextExtensionSupported: Boolean
         
         get() = isExtensionSupported(EXTENSION_SURFACELESS_CONTEXT)
@@ -189,7 +188,7 @@ object GlUtil {
             return glExtensions != null && glExtensions.contains(EXTENSION_YUV_TARGET)
         }
 
-    @Throws(GlException::class)
+    
     fun isColorTransferSupported(colorTransfer:  Int): Boolean {
         if (colorTransfer == C.COLOR_TRANSFER_ST2084) {
             return isBt2020PqExtensionSupported
@@ -199,7 +198,6 @@ object GlUtil {
         return true
     }
 
-    @get:Throws(GlException::class)
     val isBt2020PqExtensionSupported: Boolean
         
         get() =// On API<33, the system cannot display PQ content correctly regardless of whether BT2020 PQ
@@ -208,12 +206,10 @@ object GlUtil {
                 EXTENSION_COLORSPACE_BT2020_PQ
             )
 
-    @get:Throws(GlException::class)
     val isBt2020HlgExtensionSupported: Boolean
         
         get() = isExtensionSupported(EXTENSION_COLORSPACE_BT2020_HLG)
 
-    @get:Throws(GlException::class)
     val defaultEglDisplay: EGLDisplay
         
         get() {
@@ -237,7 +233,7 @@ object GlUtil {
             return eglDisplay
         }
 
-    @Throws(GlException::class)
+    
     fun createEglContext(eglDisplay: EGLDisplay?): EGLContext {
         return createEglContext(
             EGL14.EGL_NO_CONTEXT,
@@ -247,7 +243,7 @@ object GlUtil {
         )
     }
 
-    @Throws(GlException::class)
+    
     fun createEglContext(
         sharedContext: EGLContext?,
         eglDisplay: EGLDisplay?,
@@ -282,7 +278,7 @@ object GlUtil {
         return eglContext
     }
 
-    @Throws(GlException::class)
+    
     fun createEglSurface(
         eglDisplay: EGLDisplay?,
         surface: Any?,
@@ -331,7 +327,7 @@ object GlUtil {
         return eglSurface
     }
 
-    @Throws(GlException::class)
+    
     private fun createPbufferSurface(
         eglDisplay: EGLDisplay?, width: Int, height: Int, configAttributes: IntArray?
     ): EGLSurface? {
@@ -352,7 +348,7 @@ object GlUtil {
         return eglSurface
     }
 
-    @Throws(GlException::class)
+    
     fun createFocusedPlaceholderEglSurface(
         eglContext: EGLContext?, eglDisplay: EGLDisplay?
     ): EGLSurface {
@@ -375,7 +371,6 @@ object GlUtil {
         return eglSurface
     }
 
-    @get:Throws(GlException::class)
     val contextMajorVersion: Long
         
         get() {
@@ -391,7 +386,7 @@ object GlUtil {
             return currentEglContextVersion[0].toLong()
         }
 
-    @Throws(GlException::class)
+    
     fun createGlSyncFence(): Long {
         if (contextMajorVersion >= 3) {
             val syncObject =
@@ -409,7 +404,7 @@ object GlUtil {
         }
     }
 
-    @Throws(GlException::class)
+    
     fun deleteSyncObject(syncObject: Long) {
         deleteSyncObjectQuietly(syncObject)
         checkGlError()
@@ -422,7 +417,7 @@ object GlUtil {
         GLES30.glDeleteSync(syncObject)
     }
 
-    @Throws(GlException::class)
+    
     fun awaitSyncObject(syncObject: Long) {
         if (syncObject == GL_FENCE_SYNC_UNSET) {
             return
@@ -440,7 +435,7 @@ object GlUtil {
         
         get() = EGL14.eglGetCurrentContext()
 
-    @Throws(GlException::class)
+    
     fun checkGlError() {
         val errorMessageBuilder = StringBuilder()
         var foundError = false
@@ -463,7 +458,7 @@ object GlUtil {
         }
     }
 
-    @Throws(GlException::class)
+    
     fun checkEglException(errorMessage: String?) {
         val error = EGL14.eglGetError()
         if (error != EGL14.EGL_SUCCESS) {
@@ -474,7 +469,7 @@ object GlUtil {
         }
     }
 
-    @Throws(GlException::class)
+    
     private fun assertValidTextureSize(width: Int, height: Int) {
         // TODO(b/201293185): Consider handling adjustments for sizes > GL_MAX_TEXTURE_SIZE
         //  (ex. downscaling appropriately) in a shader program instead of asserting incorrect
@@ -499,17 +494,17 @@ object GlUtil {
         }
     }
 
-    @Throws(GlException::class)
+    
     fun clearFocusedBuffers() {
         clearFocusedBuffersInternal( 0f,  0f,  0f,  0f)
     }
 
-    @Throws(GlException::class)
+    
     fun clearFocusedBuffersOpaque() {
         clearFocusedBuffersInternal( 0f,  0f,  0f,  1f)
     }
 
-    @Throws(GlException::class)
+    
     fun focusEglSurface(
         eglDisplay: EGLDisplay?,
         eglContext: EGLContext?,
@@ -520,7 +515,7 @@ object GlUtil {
         focusRenderTarget(eglDisplay, eglContext, eglSurface,  0, width, height)
     }
 
-    @Throws(GlException::class)
+    
     fun focusFramebuffer(
         eglDisplay: EGLDisplay?,
         eglContext: EGLContext?,
@@ -532,7 +527,7 @@ object GlUtil {
         focusRenderTarget(eglDisplay, eglContext, eglSurface, framebuffer, width, height)
     }
 
-    @Throws(GlException::class)
+    
     fun focusFramebufferUsingCurrentContext(framebuffer: Int, width: Int, height: Int) {
         val boundFramebuffer = IntArray(1)
         GLES20.glGetIntegerv(GLES20.GL_FRAMEBUFFER_BINDING, boundFramebuffer,  0)
@@ -553,21 +548,21 @@ object GlUtil {
         return byteBuffer.order(ByteOrder.nativeOrder()).asFloatBuffer()
     }
 
-    @Throws(GlException::class)
+    
     fun createExternalTexture(): Int {
         val texId = generateTexture()
         bindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texId, GLES20.GL_LINEAR)
         return texId
     }
 
-    @Throws(GlException::class)
+    
     fun createTexture(bitmap: Bitmap): Int {
         val texId = generateTexture()
         setTexture(texId, bitmap)
         return texId
     }
 
-    @Throws(GlException::class)
+    
     fun createTexture(width: Int, height: Int, useHighPrecisionColorComponents: Boolean): Int {
         // TODO(b/227624622): Implement a pixel test that confirms 16f has less posterization.
         // TODO - b/309459038: Consider renaming the method, as the created textures are uninitialized.
@@ -582,7 +577,7 @@ object GlUtil {
         return createTextureUninitialized(width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE)
     }
 
-    @Throws(GlException::class)
+    
     fun createRgb10A2Texture(width: Int, height: Int): Int {
         return createTextureUninitialized(
             width,
@@ -592,7 +587,7 @@ object GlUtil {
         )
     }
 
-    @Throws(GlException::class)
+    
     private fun createTextureUninitialized(
         width: Int,
         height: Int,
@@ -617,7 +612,7 @@ object GlUtil {
         return texId
     }
 
-    @Throws(GlException::class)
+    
     fun generateTexture(): Int {
         val texId = IntArray(1)
         GLES20.glGenTextures( 1, texId,  0)
@@ -625,7 +620,7 @@ object GlUtil {
         return texId[0]
     }
 
-    @Throws(GlException::class)
+    
     fun setTexture(texId: Int, bitmap: Bitmap) {
         assertValidTextureSize(bitmap.getWidth(), bitmap.getHeight())
         bindTexture(GLES20.GL_TEXTURE_2D, texId, GLES20.GL_LINEAR)
@@ -633,7 +628,7 @@ object GlUtil {
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun bindTexture(textureTarget: Int, texId: Int, sampleFilter: Int) {
         GLES20.glBindTexture(textureTarget, texId)
         checkGlError()
@@ -647,7 +642,7 @@ object GlUtil {
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun createFboForTexture(texId: Int): Int {
         val fboId = IntArray(1)
         GLES20.glGenFramebuffers( 1, fboId,  0)
@@ -661,13 +656,13 @@ object GlUtil {
         return fboId[0]
     }
 
-    @Throws(GlException::class)
+    
     fun deleteTexture(textureId: Int) {
         GLES20.glDeleteTextures( 1, intArrayOf(textureId),  0)
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun destroyEglContext(
         eglDisplay: EGLDisplay?, eglContext: EGLContext?
     ) {
@@ -684,7 +679,7 @@ object GlUtil {
         }
     }
 
-    @Throws(GlException::class)
+    
     fun terminate(eglDisplay: EGLDisplay?) {
         EGL14.eglReleaseThread()
         checkEglException("Error releasing thread")
@@ -692,7 +687,7 @@ object GlUtil {
         checkEglException("Error terminating display")
     }
 
-    @Throws(GlException::class)
+    
     fun destroyEglSurface(
         eglDisplay: EGLDisplay?, eglSurface: EGLSurface?
     ) {
@@ -707,13 +702,13 @@ object GlUtil {
         checkEglException("Error destroying surface")
     }
 
-    @Throws(GlException::class)
+    
     fun deleteFbo(fboId: Int) {
         GLES20.glDeleteFramebuffers( 1, intArrayOf(fboId),  0)
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun deleteRbo(rboId: Int) {
         GLES20.glDeleteRenderbuffers( 
             1,  intArrayOf(rboId),  0
@@ -721,7 +716,7 @@ object GlUtil {
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun blitFrameBuffer(readFboId: Int, readRect: GlRect, drawFboId: Int, drawRect: GlRect) {
         val boundFramebuffer = IntArray(1)
         GLES20.glGetIntegerv(GLES20.GL_FRAMEBUFFER_BINDING, boundFramebuffer,  0)
@@ -747,7 +742,7 @@ object GlUtil {
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun createPixelBufferObject(size: Int): Int {
         val ids = IntArray(1)
         GLES30.glGenBuffers( 1, ids,  0)
@@ -767,7 +762,7 @@ object GlUtil {
     }
 
     @RequiresApi(24)
-    @Throws(GlException::class)
+    
     fun schedulePixelBufferRead(readFboId: Int, width: Int, height: Int, bufferId: Int) {
         focusFramebufferUsingCurrentContext(readFboId, width, height)
         GLES30.glBindBuffer(GLES30.GL_PIXEL_PACK_BUFFER, bufferId)
@@ -790,7 +785,7 @@ object GlUtil {
     }
 
     @RequiresApi(24)
-    @Throws(GlException::class)
+    
     fun mapPixelBufferObject(bufferId: Int, size: Int): ByteBuffer? {
         GLES20.glBindBuffer(GLES30.GL_PIXEL_PACK_BUFFER, bufferId)
         checkGlError()
@@ -808,7 +803,7 @@ object GlUtil {
     }
 
     @RequiresApi(24)
-    @Throws(GlException::class)
+    
     fun unmapPixelBufferObject(bufferId: Int) {
         GLES30.glBindBuffer(GLES30.GL_PIXEL_PACK_BUFFER, bufferId)
         checkGlError()
@@ -818,20 +813,20 @@ object GlUtil {
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun deleteBuffer(bufferId: Int) {
         GLES20.glDeleteBuffers( 1, intArrayOf(bufferId),  0)
         checkGlError()
     }
 
-    @Throws(GlException::class)
+    
     fun checkGlException(expression: Boolean, errorMessage: String?) {
         if (!expression) {
             throw GlException(errorMessage)
         }
     }
 
-    @Throws(GlException::class)
+    
     private fun getEglConfig(eglDisplay: EGLDisplay?, attributes: IntArray?): EGLConfig? {
         val eglConfigs = arrayOfNulls<EGLConfig>(1)
         if (!EGL14.eglChooseConfig(
@@ -850,7 +845,7 @@ object GlUtil {
         return eglConfigs[0]
     }
 
-    @Throws(GlException::class)
+    
     private fun isExtensionSupported(extensionName: String): Boolean {
         val display: EGLDisplay =
             defaultEglDisplay
@@ -858,7 +853,7 @@ object GlUtil {
         return eglExtensions != null && eglExtensions.contains(extensionName)
     }
 
-    @Throws(GlException::class)
+    
     private fun focusRenderTarget(
         eglDisplay: EGLDisplay?,
         eglContext: EGLContext?,
@@ -882,7 +877,7 @@ object GlUtil {
         }
     }
 
-    @Throws(GlException::class)
+    
     private fun clearFocusedBuffersInternal(r: Float, g: Float, b: Float, a: Float) {
         GLES20.glClearColor(r, g, b, a)
         GLES20.glClearDepthf(1.0f)

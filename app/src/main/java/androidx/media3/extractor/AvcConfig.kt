@@ -29,7 +29,7 @@ class AvcConfig private constructor(
 ) {
     companion object {
 
-        @Throws(ParserException::class)
+        
         fun parse(data: ParsableByteArray): AvcConfig {
             try {
                 data.skipBytes(4) // Skip to the AVCDecoderConfigurationRecord (defined in 14496-15)

@@ -225,7 +225,7 @@ object DtsUtil {
         return if (uses14BitPerWord) fsize * 16 / 14 else fsize
     }
 
-    @Throws(ParserException::class)
+    
     fun parseDtsHdHeader(header: ByteArray): DtsHeader {
         val headerBits = getNormalizedFrame(header)
         headerBits.skipBits(32 + 8) // SYNCEXTSSH, UserDefinedBits
@@ -457,7 +457,7 @@ object DtsUtil {
     }
 
     // Asset descriptor: Decoder Navigation Data, see ETSI TS 102 114 V1.6.1 (2019-08) Table 7-7.
-    @Throws(ParserException::class)
+    
     private fun parseDecoderNavigationData(headerBits: ParsableBitArray): String {
         val codingMode = headerBits.readBits(2) // nuCodingMode
         when (codingMode) {
@@ -547,7 +547,7 @@ object DtsUtil {
         return headerPrefixBits.readBits(headerBits) + 1 // nuExtSSHeaderSize
     }
 
-    @Throws(ParserException::class)
+    
     fun parseDtsUhdHeader(header: ByteArray, uhdAudioChunkId: AtomicInteger): DtsHeader {
         val headerBits = getNormalizedFrame(header)
         val syncWord = headerBits.readBits(32)
@@ -672,7 +672,7 @@ object DtsUtil {
                 + 1)
     }
 
-    @Throws(IOException::class)
+    
     fun updateFormatWithDtsHdInfo(
         input: ExtractorInput, sampleSize: Int, format: Format
     ): Format {
@@ -725,7 +725,7 @@ object DtsUtil {
         return format.copy(sampleMimeType = mimeType)
     }
 
-    @Throws(ParserException::class)
+    
     private fun checkCrc(frame: ByteArray, sizeInBytes: Int) {
         val initialValue = 0xFFFF
         val extractedCrc =

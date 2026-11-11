@@ -64,7 +64,7 @@ class VideoFrameRenderControl(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         while (!presentationTimestampsUs.isEmpty) {
             val presentationTimeUs = presentationTimestampsUs.element()

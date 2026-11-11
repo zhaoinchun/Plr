@@ -77,8 +77,6 @@ class CacheDataSink(
             throw CacheDataSinkException(e)
         }
     }
-
-    @Throws(CacheDataSinkException::class)
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
         val dataSpec = this.dataSpec ?: return
         try {

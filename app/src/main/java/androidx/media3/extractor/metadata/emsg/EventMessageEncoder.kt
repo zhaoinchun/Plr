@@ -31,7 +31,7 @@ class EventMessageEncoder {
     }
 
     companion object {
-        @Throws(IOException::class)
+        
         private fun writeNullTerminatedString(dataOutputStream: DataOutputStream, value: String?) {
             dataOutputStream.writeBytes(value)
             dataOutputStream.writeByte(0)

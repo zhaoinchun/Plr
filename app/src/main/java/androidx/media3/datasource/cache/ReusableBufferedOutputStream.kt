@@ -13,7 +13,7 @@ class ReusableBufferedOutputStream : BufferedOutputStream {
 
     constructor(out: OutputStream?, size: Int) : super(out, size)
 
-    @Throws(IOException::class)
+    
     override fun close() {
         closed = true
 

@@ -12,7 +12,7 @@ import java.io.IOException
 import kotlin.math.max
 
 object BitmapUtil {
-    @Throws(IOException::class)
+    
     fun decode(
         data: ByteArray?, length: Int, options: BitmapFactory.Options?, maximumOutputDimension: Int
     ): Bitmap {

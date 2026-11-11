@@ -30,7 +30,6 @@ class TimestampAdjuster(firstSampleTimestampUs: Long) {
     }
 
     @Synchronized
-    @Throws(InterruptedException::class, TimeoutException::class)
     fun sharedInitializeOrWait(
         canInitialize: Boolean, nextSampleTimestampUs: Long, timeoutMs: Long
     ) {

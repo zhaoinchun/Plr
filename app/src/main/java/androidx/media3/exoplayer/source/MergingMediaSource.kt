@@ -90,7 +90,7 @@ class MergingMediaSource(
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowSourceInfoRefreshError() {
         mergeError?.also { throw it }
         super.maybeThrowSourceInfoRefreshError()

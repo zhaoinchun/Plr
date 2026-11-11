@@ -24,7 +24,7 @@ class SynchronousMediaCodecAdapter private constructor(
 ) : MediaCodecAdapter {
     class Factory : MediaCodecAdapter.Factory {
         @SuppressLint("WrongConstant") // Can't verify codec flag IntDef
-        @Throws(IOException::class)
+        
         override fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
             var codec: MediaCodec? = null
             try {
@@ -53,7 +53,7 @@ class SynchronousMediaCodecAdapter private constructor(
             }
         }
 
-        @Throws(IOException::class)
+        
         private fun createCodec(configuration: MediaCodecAdapter.Configuration): MediaCodec {
             configuration.codecInfo
             val codecName = configuration.codecInfo.name

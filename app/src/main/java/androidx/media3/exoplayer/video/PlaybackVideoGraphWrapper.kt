@@ -271,7 +271,7 @@ class PlaybackVideoGraphWrapper(
     }
 
     // Internal methods
-    @Throws(VideoSinkException::class)
+    
     private fun registerInput(sourceFormat: Format, inputIndex: Int): Boolean {
         if (inputIndex == PRIMARY_SEQUENCE_INDEX) {
             Preconditions.checkState(state == STATE_CREATED)
@@ -387,7 +387,7 @@ class PlaybackVideoGraphWrapper(
         get() = pendingFlushCount == 0 && hasSignaledEndOfVideoGraphOutputStream
                 && defaultVideoSink.isEnded
 
-    @Throws(VideoSinkException::class)
+    
     private fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         defaultVideoSink.render(positionUs, elapsedRealtimeUs)
     }
@@ -514,7 +514,7 @@ class PlaybackVideoGraphWrapper(
             listenerExecutor = executor
         }
 
-        @Throws(VideoSinkException::class)
+        
         override fun initialize(sourceFormat: Format): Boolean {
             Preconditions.checkState(!isInitialized)
             isInitialized = this@PlaybackVideoGraphWrapper.registerInput(sourceFormat, inputIndex)
@@ -772,7 +772,7 @@ class PlaybackVideoGraphWrapper(
             return true
         }
 
-        @Throws(VideoSinkException::class)
+        
         override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
             this@PlaybackVideoGraphWrapper.render(
                 positionUs + inputBufferTimestampAdjustmentUs, elapsedRealtimeUs
@@ -959,7 +959,6 @@ class PlaybackVideoGraphWrapper(
 
     private class ReflectiveDefaultVideoFrameProcessorFactory
         (private val enableReplayableCache: Boolean) : VideoFrameProcessor.Factory {
-        @Throws(VideoFrameProcessingException::class)
         override fun create(
             context: Context,
             debugViewProvider: DebugViewProvider,

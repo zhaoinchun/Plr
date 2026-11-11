@@ -25,7 +25,7 @@ internal object MpeghUtil {
         return (word and 0xFFFFFF) == MHAS_SYNC_WORD
     }
 
-    @Throws(ParserException::class)
+    
     fun parseMhasPacketHeader(data: ParsableBitArray, header: MhasPacketHeader): Boolean {
         val dataStartPos = data.bytePosition
         header.packetType = readEscapedIntValue(data, 3, 8, 8)
@@ -66,7 +66,7 @@ internal object MpeghUtil {
         return header.packetLength != -1
     }
 
-    @Throws(ParserException::class)
+    
     private fun getOutputFrameLength(index: Int): Int {
         when (index) {
             0 -> return 768
@@ -79,7 +79,7 @@ internal object MpeghUtil {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun getSbrRatioIndex(index: Int): Int {
         when (index) {
             0, 1 -> return 0
@@ -92,7 +92,7 @@ internal object MpeghUtil {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun getResamplingRatio(usacSamplingFrequency: Int): Double {
         when (usacSamplingFrequency) {
             96000, 88200, 48000, 44100 -> return 1.0
@@ -105,7 +105,7 @@ internal object MpeghUtil {
         }
     }
 
-    @Throws(ParserException::class)
+    
     fun parseMpegh3daConfig(data: ParsableBitArray): Mpegh3daConfig {
         var compatibleProfileLevelSet: ByteArray? = null
         val profileLevelIndication = data.readBits(8)
@@ -162,7 +162,7 @@ internal object MpeghUtil {
         )
     }
 
-    @Throws(ParserException::class)
+    
     private fun getSamplingFrequency(index: Int): Int {
         when (index) {
             0 -> return 96000

@@ -36,7 +36,7 @@ interface VideoSink {
     fun stopRendering()
     fun setListener(listener: Listener, executor: Executor)
 
-    @Throws(VideoSinkException::class)
+    
     fun initialize(sourceFormat: Format): Boolean
 
     val isInitialized: Boolean
@@ -78,7 +78,7 @@ interface VideoSink {
         bufferTimestampIterator: TimestampIterator
     ): Boolean
 
-    @Throws(VideoSinkException::class)
+    
     fun render(positionUs: Long, elapsedRealtimeUs: Long)
     fun join(renderNextFrameImmediately: Boolean)
     fun release()

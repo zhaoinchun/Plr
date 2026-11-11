@@ -39,7 +39,7 @@ abstract class TrackSelector {
         bandwidthMeter = null
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     abstract fun selectTracks(
         rendererCapabilities: Array<RendererCapabilities>,
         trackGroups: TrackGroupArray,

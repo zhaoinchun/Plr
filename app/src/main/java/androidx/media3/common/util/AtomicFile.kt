@@ -25,7 +25,7 @@ class AtomicFile(private val baseName: File) {
         backupName.delete()
     }
 
-    @Throws(IOException::class)
+    
     fun startWrite(): OutputStream {
         // Rename the current file so it may be used as a backup during the next read
         if (baseName.exists()) {
@@ -55,14 +55,12 @@ class AtomicFile(private val baseName: File) {
         return str
     }
 
-    @Throws(IOException::class)
+    
     fun endWrite(str: OutputStream) {
         str.close()
         // If close() throws exception, the next line is skipped.
         backupName.delete()
     }
-
-    @Throws(FileNotFoundException::class)
     fun openRead(): InputStream {
         restoreBackup()
         return FileInputStream(baseName)
@@ -83,7 +81,7 @@ class AtomicFile(private val baseName: File) {
             fileOutputStream = FileOutputStream(file)
         }
 
-        @Throws(IOException::class)
+        
         override fun close() {
             if (closed) {
                 return
@@ -98,22 +96,22 @@ class AtomicFile(private val baseName: File) {
             fileOutputStream.close()
         }
 
-        @Throws(IOException::class)
+        
         override fun flush() {
             fileOutputStream.flush()
         }
 
-        @Throws(IOException::class)
+        
         override fun write(b: Int) {
             fileOutputStream.write(b)
         }
 
-        @Throws(IOException::class)
+        
         override fun write(b: ByteArray?) {
             fileOutputStream.write(b)
         }
 
-        @Throws(IOException::class)
+        
         override fun write(b: ByteArray?, off: Int, len: Int) {
             fileOutputStream.write(b, off, len)
         }

@@ -26,8 +26,6 @@ class ContentDataSource(context: Context) : BaseDataSource( false) {
     private var inputStream: FileInputStream? = null
     private var bytesRemaining: Long = 0
     private var opened = false
-
-    @Throws(ContentDataSourceException::class)  // We are inlining EXTRA_ACCEPT_ORIGINAL_MEDIA_FORMAT.
     override fun open(dataSpec: DataSpec): Long {
         try {
             val uri = dataSpec.uri.normalizeScheme()
@@ -135,8 +133,6 @@ class ContentDataSource(context: Context) : BaseDataSource( false) {
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
-
-    @Throws(ContentDataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -165,8 +161,6 @@ class ContentDataSource(context: Context) : BaseDataSource( false) {
         bytesTransferred(bytesRead)
         return bytesRead
     }
-
-    @Throws(ContentDataSourceException::class)
     override fun close() {
         uri = null
         try {

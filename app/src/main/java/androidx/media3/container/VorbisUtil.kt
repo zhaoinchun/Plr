@@ -20,7 +20,7 @@ object VorbisUtil {
         return `val`
     }
 
-    @Throws(ParserException::class)
+    
     fun readVorbisIdentificationHeader(headerData: ParsableByteArray): VorbisIdHeader {
         verifyVorbisHeaderCapturePattern(0x01, headerData, false)
 
@@ -61,7 +61,7 @@ object VorbisUtil {
         )
     }
 
-    @Throws(ParserException::class)
+    
     fun readVorbisCommentHeader(
         headerData: ParsableByteArray,
         hasMetadataHeader: Boolean = true,
@@ -95,7 +95,7 @@ object VorbisUtil {
         return CommentHeader(vendor, comments, length)
     }
 
-    @Throws(ParserException::class)
+    
     fun verifyVorbisHeaderCapturePattern(
         headerType: Int, header: ParsableByteArray, quiet: Boolean
     ): Boolean {
@@ -153,7 +153,7 @@ object VorbisUtil {
         return (src.toInt() shr leastSignificantBitIndex) and (255 ushr (8 - length))
     }
 
-    @Throws(ParserException::class)
+    
     fun readVorbisModes(headerData: ParsableByteArray, channels: Int): Array<Mode?> {
         verifyVorbisHeaderCapturePattern(0x05, headerData, false)
 
@@ -200,7 +200,7 @@ object VorbisUtil {
         return modes
     }
 
-    @Throws(ParserException::class)
+    
     private fun readMappings(channels: Int, bitArray: VorbisBitArray) {
         val mappingsCount = bitArray.readBits(6) + 1
         for (i in 0..<mappingsCount) {
@@ -243,7 +243,7 @@ object VorbisUtil {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun readResidues(bitArray: VorbisBitArray) {
         val residueCount = bitArray.readBits(6) + 1
         for (i in 0..<residueCount) {
@@ -278,7 +278,7 @@ object VorbisUtil {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun readFloors(bitArray: VorbisBitArray) {
         val floorCount = bitArray.readBits(6) + 1
         for (i in 0..<floorCount) {
@@ -352,7 +352,7 @@ object VorbisUtil {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun skipBook(bitArray: VorbisBitArray) {
         if (bitArray.readBits(24) != 0x564342) {
             throw ParserException.createForMalformedContainer(

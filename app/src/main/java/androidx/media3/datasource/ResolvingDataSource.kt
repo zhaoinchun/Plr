@@ -9,7 +9,7 @@ class ResolvingDataSource(
     private val resolver: Resolver
 ) : DataSource {
     interface Resolver {
-        @Throws(IOException::class)
+        
         fun resolveDataSpec(dataSpec: DataSpec?): DataSpec
 
         fun resolveReportedUri(uri: Uri?): Uri? {
@@ -30,14 +30,14 @@ class ResolvingDataSource(
         upstreamDataSource.addTransferListener(transferListener)
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         val resolvedDataSpec = resolver.resolveDataSpec(dataSpec)
         upstreamOpened = true
         return upstreamDataSource.open(resolvedDataSpec)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         return upstreamDataSource.read(buffer, offset, length)
     }
@@ -51,7 +51,7 @@ class ResolvingDataSource(
     override val responseHeaders: MutableMap<String, List<String>>
         get() = upstreamDataSource.responseHeaders
 
-    @Throws(IOException::class)
+    
     override fun close() {
         if (upstreamOpened) {
             upstreamOpened = false

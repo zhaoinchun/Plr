@@ -55,7 +55,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
         seekTimeUs = C.TIME_UNSET
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // TODO: Implement sniff() according to the Extractor interface documentation. For now sniff()
         // can safely return true because we plan to use this class in an ExtractorFactory that returns
@@ -81,7 +81,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
         state = STATE_INITIALIZED
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         Preconditions.checkState(state != STATE_CREATED && state != STATE_RELEASED)
         if (state == STATE_INITIALIZED) {
@@ -135,7 +135,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
         state = STATE_RELEASED
     }
 
-    @Throws(IOException::class)
+    
     private fun skipInput(input: ExtractorInput): Boolean {
         return (input.skip(
             if (input.length != C.LENGTH_UNSET.toLong())
@@ -146,7 +146,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
                 == C.RESULT_END_OF_INPUT)
     }
 
-    @Throws(IOException::class)
+    
     private fun readFromInput(input: ExtractorInput): Boolean {
         if (subtitleData.size == bytesRead) {
             subtitleData =
@@ -164,7 +164,7 @@ class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Form
                 || readResult == C.RESULT_END_OF_INPUT
     }
 
-    @Throws(IOException::class)
+    
     private fun parseAndWriteToOutput() {
         try {
             val outputOptions: OutputOptions =

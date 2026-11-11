@@ -110,7 +110,7 @@ class ChunkReader(
         bytesRemainingInCurrentChunk = size
     }
 
-    @Throws(IOException::class)
+    
     fun onChunkData(input: ExtractorInput): Boolean {
         bytesRemainingInCurrentChunk -=
             trackOutput.sampleData(input, bytesRemainingInCurrentChunk, false)

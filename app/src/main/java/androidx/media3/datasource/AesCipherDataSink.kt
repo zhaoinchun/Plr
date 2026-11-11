@@ -11,7 +11,7 @@ class AesCipherDataSink(
 ) : DataSink {
     private var cipher: AesFlushingCipher? = null
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec) {
         wrappedDataSink.open(dataSpec)
         cipher =
@@ -23,7 +23,7 @@ class AesCipherDataSink(
             )
     }
 
-    @Throws(IOException::class)
+    
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
         if (scratch == null) {
             // In-place mode. Writes over the input data.
@@ -47,7 +47,7 @@ class AesCipherDataSink(
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun close() {
         cipher = null
         wrappedDataSink.close()

@@ -14,7 +14,7 @@ class AesCipherDataSource(private val secretKey: ByteArray, private val upstream
         upstream.addTransferListener(transferListener)
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         val dataLength = upstream.open(dataSpec)
         cipher =
@@ -33,7 +33,7 @@ class AesCipherDataSource(private val secretKey: ByteArray, private val upstream
     override val responseHeaders: MutableMap<String, List<String>>
         get() = upstream.responseHeaders
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -46,7 +46,7 @@ class AesCipherDataSource(private val secretKey: ByteArray, private val upstream
         return read
     }
 
-    @Throws(IOException::class)
+    
     override fun close() {
         cipher = null
         upstream.close()

@@ -109,7 +109,7 @@ object BoxParser {
         return 0x00FFFFFF and fullBoxInt
     }
 
-    @Throws(ParserException::class)
+    
     fun parseTraks(
         moov: ContainerBox,
         gaplessInfoHolder: GaplessInfoHolder,
@@ -258,7 +258,7 @@ object BoxParser {
         meta.setPosition(endPosition)
     }
 
-    @Throws(ParserException::class)
+    
     fun parseTrak(
         trak: ContainerBox,
         mvhd: LeafBox,
@@ -376,7 +376,7 @@ object BoxParser {
         )
     }
 
-    @Throws(ParserException::class)
+    
     fun parseStbl(
         track: Track,
         stblBox: ContainerBox,
@@ -1155,7 +1155,7 @@ object BoxParser {
         return String(chars)
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseStsd(
         stsd: ParsableByteArray,
         tkhdData: TkhdData,
@@ -1311,7 +1311,7 @@ object BoxParser {
     }
 
     // hdrStaticInfo is allocated using allocate() in allocateHdrStaticInfo().
-    @Throws(ParserException::class)
+    
     private fun parseVideoSampleEntry(
         parent: ParsableByteArray,
         atomType: Int,
@@ -1871,7 +1871,7 @@ object BoxParser {
         return hSpacing.toFloat() / vSpacing
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseAudioSampleEntry(
         parent: ParsableByteArray,
         atomType: Int,
@@ -2252,7 +2252,7 @@ object BoxParser {
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun findBoxPosition(
         parent: ParsableByteArray, boxType: Int, parentBoxPosition: Int, parentBoxSize: Int
     ): Int {
@@ -2337,7 +2337,7 @@ object BoxParser {
         return BtrtData(avgBitrate, maxBitrate)
     }
 
-    @Throws(ParserException::class)
+    
     fun parseVideoExtendedUsageBox(
         parent: ParsableByteArray, position: Int, size: Int
     ): VexuData? {
@@ -2357,7 +2357,7 @@ object BoxParser {
         return if (eyesData == null) null else VexuData(eyesData)
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseStereoViewBox(parent: ParsableByteArray, position: Int, size: Int): EyesData? {
         parent.setPosition(position + Mp4Box.HEADER_SIZE)
         var childPosition = parent.getPosition()
@@ -2382,7 +2382,7 @@ object BoxParser {
         return null
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseSampleEntryEncryptionData(
         parent: ParsableByteArray, position: Int, size: Int
     ): Pair<Int?, TrackEncryptionBox?>? {
@@ -2404,7 +2404,7 @@ object BoxParser {
         return null
     }
 
-    @Throws(ParserException::class)
+    
     fun parseCommonEncryptionSinfFromParent(
         parent: ParsableByteArray, position: Int, size: Int
     ): Pair<Int?, TrackEncryptionBox?>? {

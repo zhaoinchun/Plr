@@ -29,7 +29,7 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
 
     override val mediaClock: MediaClock? = null
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun enable(
         configuration: RendererConfiguration,
         formats: Array<Format>,
@@ -49,14 +49,14 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
         onPositionReset(positionUs, joining, true)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun start() {
         Preconditions.checkState(state == Renderer.STATE_ENABLED)
         state = Renderer.STATE_STARTED
         onStarted()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun replaceStream(
         formats: Array<Format>,
         stream: SampleStream,
@@ -82,11 +82,11 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
     override val isCurrentStreamFinal: Boolean
         get() = streamIsFinal
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowStreamError() {
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun resetPosition(positionUs: Long, sampleStreamIsResetToKeyFrame: Boolean) {
         streamIsFinal = false
         onPositionReset(positionUs, false, sampleStreamIsResetToKeyFrame)
@@ -115,18 +115,18 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
     override val isEnded: Boolean = true
 
     // RendererCapabilities implementation.
-    @Throws(ExoPlaybackException::class)
+    
     override fun supportsFormat(format: Format):  Int {
         return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun supportsMixedMimeTypeAdaptation(): Int {
         return RendererCapabilities.ADAPTIVE_NOT_SUPPORTED
     }
 
     // PlayerMessage.Target implementation.
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         // Do nothing.
     }
@@ -135,24 +135,24 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun onEnabled(joining: Boolean) {
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun onRendererOffsetChanged(offsetUs: Long) {
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun onStarted() {
         // Do nothing.
     }

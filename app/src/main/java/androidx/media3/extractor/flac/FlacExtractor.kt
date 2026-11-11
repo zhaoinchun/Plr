@@ -59,7 +59,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
         state = STATE_READ_ID3_METADATA
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         val unused =
             peekId3Metadata(
@@ -74,7 +74,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
         output.endTracks()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -126,7 +126,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
     }
 
     // Private methods.
-    @Throws(IOException::class)
+    
     private fun readId3Metadata(input: ExtractorInput) {
         id3Metadata =
             readId3Metadata(
@@ -135,20 +135,20 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
         state = STATE_GET_STREAM_MARKER_AND_INFO_BLOCK_BYTES
     }
 
-    @Throws(IOException::class)
+    
     private fun getStreamMarkerAndInfoBlockBytes(input: ExtractorInput) {
         input.peekFully(streamMarkerAndInfoBlock, 0, streamMarkerAndInfoBlock.size)
         input.resetPeekPosition()
         state = STATE_READ_STREAM_MARKER
     }
 
-    @Throws(IOException::class)
+    
     private fun readStreamMarker(input: ExtractorInput) {
         FlacMetadataReader.readStreamMarker(input)
         state = STATE_READ_METADATA_BLOCKS
     }
 
-    @Throws(IOException::class)
+    
     private fun readMetadataBlocks(input: ExtractorInput) {
         var isLastMetadataBlock = false
         val metadataHolder =
@@ -170,7 +170,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
         state = STATE_GET_FRAME_START_MARKER
     }
 
-    @Throws(IOException::class)
+    
     private fun getFrameStartMarker(input: ExtractorInput) {
         frameStartMarker = FlacMetadataReader.getFrameStartMarker(input)
         extractorOutput!!.seekMap(
@@ -183,7 +183,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
         state = STATE_READ_FRAMES
     }
 
-    @Throws(IOException::class)
+    
     private fun readFrames(
         input: ExtractorInput,
         seekPosition: PositionHolder

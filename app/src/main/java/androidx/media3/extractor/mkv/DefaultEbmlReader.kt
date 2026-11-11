@@ -43,7 +43,7 @@ class DefaultEbmlReader : EbmlReader {
         varintReader.reset()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput): Boolean {
         processor!!
         while (true) {
@@ -150,7 +150,7 @@ class DefaultEbmlReader : EbmlReader {
     }
 
     @RequiresNonNull("processor")
-    @Throws(IOException::class)
+    
     private fun maybeResyncToNextLevel1Element(input: ExtractorInput): Long {
         input.resetPeekPosition()
         while (true) {
@@ -169,7 +169,7 @@ class DefaultEbmlReader : EbmlReader {
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readInteger(input: ExtractorInput, byteLength: Int): Long {
         input.readFully(scratch, 0, byteLength)
         var value: Long = 0
@@ -179,7 +179,7 @@ class DefaultEbmlReader : EbmlReader {
         return value
     }
 
-    @Throws(IOException::class)
+    
     private fun readFloat(input: ExtractorInput, byteLength: Int): Double {
         val integerValue = readInteger(input, byteLength)
         val floatValue: Double
@@ -204,7 +204,7 @@ class DefaultEbmlReader : EbmlReader {
         private const val VALID_FLOAT32_ELEMENT_SIZE_BYTES = 4
         private const val VALID_FLOAT64_ELEMENT_SIZE_BYTES = 8
 
-        @Throws(IOException::class)
+        
         private fun readString(input: ExtractorInput, byteLength: Int): String {
             if (byteLength == 0) {
                 return ""

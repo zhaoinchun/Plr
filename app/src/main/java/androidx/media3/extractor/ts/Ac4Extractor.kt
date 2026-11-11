@@ -29,7 +29,7 @@ class Ac4Extractor : Extractor {
         sampleData = ParsableByteArray(READ_BUFFER_SIZE)
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // Skip any ID3 headers.
         val scratch = ParsableByteArray(Id3Decoder.ID3_HEADER_LENGTH)
@@ -91,7 +91,7 @@ class Ac4Extractor : Extractor {
         // Do nothing.
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         val bytesRead =
             input.read(sampleData.data,  0,  READ_BUFFER_SIZE)

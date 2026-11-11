@@ -15,7 +15,7 @@ import kotlin.concurrent.Volatile
 
 class ParsingLoadable<T> : Loadable {
     interface Parser<T> {
-        @Throws(IOException::class)
+        
         fun parse(uri: Uri?, inputStream: InputStream?): T
     }
 
@@ -55,7 +55,7 @@ class ParsingLoadable<T> : Loadable {
         this.parser = parser
     }
 
-    @Throws(IOException::class)
+    
     override fun load() {
         // We always load from the beginning, so reset bytesRead to 0.
         dataSource.resetBytesRead()
@@ -84,7 +84,7 @@ class ParsingLoadable<T> : Loadable {
         get() = dataSource.lastResponseHeaders
 
     companion object {
-        @Throws(IOException::class)
+        
         fun <T> load(
             dataSource: DataSource, parser: Parser<out T>, uri: Uri, type: Int
         ): T? {
@@ -93,7 +93,7 @@ class ParsingLoadable<T> : Loadable {
             return loadable.result!!
         }
 
-        @Throws(IOException::class)
+        
         fun <T> load(
             dataSource: DataSource,
             parser: Parser<out T>,

@@ -87,7 +87,7 @@ class TrackFragment {
         sampleEncryptionDataNeedsFill = true
     }
 
-    @Throws(IOException::class)
+    
     fun fillEncryptionData(input: ExtractorInput) {
         input.readFully(sampleEncryptionData.data, 0, sampleEncryptionData.limit())
         sampleEncryptionData.setPosition(0)

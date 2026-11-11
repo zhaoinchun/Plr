@@ -40,7 +40,7 @@ class TrueHdSampleRechunker {
         chunkSampleCount = 0
     }
 
-    @Throws(IOException::class)
+    
     fun startSample(input: ExtractorInput) {
         if (foundSyncframe) {
             return

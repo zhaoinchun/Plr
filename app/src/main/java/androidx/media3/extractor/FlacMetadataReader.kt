@@ -18,7 +18,7 @@ object FlacMetadataReader {
     private const val SYNC_CODE = 0x3FFE
     private const val SEEK_POINT_SIZE = 18
 
-    @Throws(IOException::class)
+    
     fun peekId3Metadata(
         input: ExtractorInput, parseData: Boolean, ignoreArtwork: Boolean
     ): Metadata? {
@@ -32,14 +32,14 @@ object FlacMetadataReader {
         return if (id3Metadata == null || id3Metadata.length() == 0) null else id3Metadata
     }
 
-    @Throws(IOException::class)
+    
     fun checkAndPeekStreamMarker(input: ExtractorInput): Boolean {
         val scratch = ParsableByteArray(FlacConstants.STREAM_MARKER_SIZE)
         input.peekFully(scratch.data, 0, FlacConstants.STREAM_MARKER_SIZE)
         return scratch.readUnsignedInt() == STREAM_MARKER.toLong()
     }
 
-    @Throws(IOException::class)
+    
     fun readId3Metadata(
         input: ExtractorInput, parseData: Boolean, ignoreArtwork: Boolean
     ): Metadata? {
@@ -51,7 +51,7 @@ object FlacMetadataReader {
         return id3Metadata
     }
 
-    @Throws(IOException::class)
+    
     fun readStreamMarker(input: ExtractorInput) {
         val scratch = ParsableByteArray(FlacConstants.STREAM_MARKER_SIZE)
         input.readFully(scratch.data, 0, FlacConstants.STREAM_MARKER_SIZE)
@@ -62,7 +62,7 @@ object FlacMetadataReader {
         }
     }
 
-    @Throws(IOException::class)
+    
     fun readMetadataBlock(
         input: ExtractorInput, metadataHolder: FlacStreamMetadataHolder, ignoreArtwork: Boolean
     ): Boolean {
@@ -132,7 +132,7 @@ object FlacMetadataReader {
         return SeekTable(pointSampleNumbers, pointOffsets)
     }
 
-    @Throws(IOException::class)
+    
     fun getFrameStartMarker(input: ExtractorInput): Int {
         input.resetPeekPosition()
         val scratch = ParsableByteArray(2)
@@ -151,7 +151,7 @@ object FlacMetadataReader {
         return frameStartMarker
     }
 
-    @Throws(IOException::class)
+    
     private fun readStreamInfoBlock(input: ExtractorInput): FlacStreamMetadata {
         val scratchData = ByteArray(FlacConstants.STREAM_INFO_BLOCK_SIZE)
         input.readFully(scratchData, 0, FlacConstants.STREAM_INFO_BLOCK_SIZE)
@@ -160,7 +160,7 @@ object FlacMetadataReader {
         )
     }
 
-    @Throws(IOException::class)
+    
     private fun readSeekTableMetadataBlock(
         input: ExtractorInput, length: Int
     ): SeekTable {
@@ -169,7 +169,7 @@ object FlacMetadataReader {
         return readSeekTableMetadataBlock(scratch)
     }
 
-    @Throws(IOException::class)
+    
     private fun readVorbisCommentMetadataBlock(
         input: ExtractorInput,
         length: Int

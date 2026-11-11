@@ -50,7 +50,7 @@ class PesReader(private val reader: ElementaryStreamReader) : TsPayloadReader {
         reader.seek()
     }
 
-    @Throws(ParserException::class)
+    
     override fun consume(data: ParsableByteArray, flags:  Int) {
         // Asserts init has been called.
         var flags = flags

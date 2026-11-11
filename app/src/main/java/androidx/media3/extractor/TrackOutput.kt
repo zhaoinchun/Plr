@@ -43,7 +43,7 @@ interface TrackOutput {
 
     fun format(format: Format)
 
-    @Throws(IOException::class)
+    
     fun sampleData(input: DataReader, length: Int, allowEndOfInput: Boolean): Int {
         return sampleData(input, length, allowEndOfInput, SAMPLE_DATA_PART_MAIN)
     }
@@ -52,7 +52,7 @@ interface TrackOutput {
         sampleData(data, length, SAMPLE_DATA_PART_MAIN)
     }
 
-    @Throws(IOException::class)
+    
     fun sampleData(
         input: DataReader,
         length: Int,

@@ -267,8 +267,6 @@ class TtmlParser : SubtitleParser {
                 return null
             }
         }
-
-        @Throws(IOException::class, XmlPullParserException::class)
         private fun parseHeader(
             xmlParser: XmlPullParser,
             globalStyles: MutableMap<String, TtmlStyle>,
@@ -308,8 +306,6 @@ class TtmlParser : SubtitleParser {
             } while (!XmlPullParserUtil.isEndTag(xmlParser, TtmlNode.TAG_HEAD))
             return globalStyles
         }
-
-        @Throws(IOException::class, XmlPullParserException::class)
         private fun parseMetadata(
             xmlParser: XmlPullParser,
             imageMap: MutableMap<String, String>
@@ -669,7 +665,7 @@ class TtmlParser : SubtitleParser {
             }
         }
 
-        @Throws(SubtitleDecoderException::class)
+        
         private fun parseNode(
             parser: XmlPullParser,
             parent: TtmlNode?,
@@ -762,7 +758,7 @@ class TtmlParser : SubtitleParser {
                     || tag == TtmlNode.TAG_INFORMATION
         }
 
-        @Throws(SubtitleDecoderException::class)
+        
         private fun parseFontSize(expression: String, out: TtmlStyle) {
             val expressions: Array<String> = Util.split(expression, "\\s+")
             val matcher: Matcher?
@@ -816,7 +812,7 @@ class TtmlParser : SubtitleParser {
             }
         }
 
-        @Throws(SubtitleDecoderException::class)
+        
         private fun parseTimeExpression(time: String, frameAndTickRate: FrameAndTickRate): Long {
             var matcher: Matcher = CLOCK_TIME.matcher(time)
             if (matcher.matches()) {

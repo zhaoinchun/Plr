@@ -122,7 +122,7 @@ interface MediaSource {
         caller: MediaSourceCaller, playerId: PlayerId, bandwidthMeter: BandwidthMeter
     )
 
-    @Throws(IOException::class)
+    
     fun maybeThrowSourceInfoRefreshError()
 
     fun enable(caller: MediaSourceCaller)

@@ -44,8 +44,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
     init {
         this.applicationContext = context.getApplicationContext()
     }
-
-    @Throws(RawResourceDataSourceException::class)
     override fun open(dataSpec: DataSpec): Long {
         this.dataSpec = dataSpec
         transferInitializing(dataSpec)
@@ -126,8 +124,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
-
-    @Throws(RawResourceDataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -169,8 +165,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
 
     override val uri: Uri?
         get() = dataSpec?.uri
-
-    @Throws(RawResourceDataSourceException::class)
     override fun close() {
         dataSpec = null
         try {
@@ -203,7 +197,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
 
     companion object {
         @Suppress("deprecation") // Accepting deprecated scheme
-        @Throws(RawResourceDataSourceException::class)
         private fun openAssetFileDescriptor(
             applicationContext: Context, dataSpec: DataSpec
         ): AssetFileDescriptor {
@@ -300,8 +293,6 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             }
             return assetFileDescriptor
         }
-
-        @Throws(RawResourceDataSourceException::class)
         private fun parseResourceId(resourceId: String): Int {
             try {
                 return resourceId.toInt()

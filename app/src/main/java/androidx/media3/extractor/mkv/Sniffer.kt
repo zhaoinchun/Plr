@@ -15,7 +15,7 @@ class Sniffer {
         scratch = ParsableByteArray(8)
     }
 
-    @Throws(IOException::class)
+    
     fun sniff(input: ExtractorInput): Boolean {
         val inputLength = input.length
         val bytesToSearch =
@@ -65,7 +65,7 @@ class Sniffer {
         return peekLength.toLong() == headerStart + headerSize
     }
 
-    @Throws(IOException::class)
+    
     private fun readUint(input: ExtractorInput): Long {
         input.peekFully(scratch.data, 0, 1)
         var value = scratch.data[0].toInt() and 0xFF

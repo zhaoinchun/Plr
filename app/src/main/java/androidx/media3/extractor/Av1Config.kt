@@ -22,7 +22,7 @@ class Av1Config private constructor(
     companion object {
         private const val TAG = "Av1Config"
 
-        @Throws(ParserException::class)
+        
         fun parse(initializationData: ByteArray): Av1Config? {
             try {
                 val bitArray = ParsableBitArray(initializationData)

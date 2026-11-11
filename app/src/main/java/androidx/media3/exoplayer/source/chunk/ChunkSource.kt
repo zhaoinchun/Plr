@@ -9,7 +9,7 @@ import java.io.IOException
 interface ChunkSource {
     fun getAdjustedSeekPositionUs(positionUs: Long, seekParameters: SeekParameters): Long
 
-    @Throws(IOException::class)
+    
     fun maybeThrowError()
 
     fun getPreferredQueueSize(playbackPositionUs: Long, queue: List<MediaChunk>): Int

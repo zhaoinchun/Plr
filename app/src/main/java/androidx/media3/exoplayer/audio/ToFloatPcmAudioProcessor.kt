@@ -16,7 +16,7 @@ import kotlin.Int
 import kotlin.Throws
 
 class ToFloatPcmAudioProcessor : BaseAudioProcessor() {
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         val encoding: Int = inputAudioFormat.encoding
         if (!isEncodingLinearPcm(encoding)) {

@@ -42,7 +42,7 @@ class SefReader {
         readerState = STATE_SHOULD_CHECK_FOR_SEF
     }
 
-    @Throws(IOException::class)
+    
     fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder,
@@ -71,7 +71,7 @@ class SefReader {
         return Extractor.RESULT_SEEK
     }
 
-    @Throws(IOException::class)
+    
     private fun checkForSefData(input: ExtractorInput, seekPosition: PositionHolder) {
         val scratch: ParsableByteArray = ParsableByteArray( TAIL_FOOTER_LENGTH)
         input.readFully(scratch.data,  0,  TAIL_FOOTER_LENGTH)
@@ -87,7 +87,7 @@ class SefReader {
         readerState = STATE_READING_SDRS
     }
 
-    @Throws(IOException::class)
+    
     private fun readSdrs(input: ExtractorInput, seekPosition: PositionHolder) {
         val streamLength = input.length
         val sdrsLength: Int = tailLength - TAIL_HEADER_LENGTH - TAIL_FOOTER_LENGTH
@@ -119,7 +119,7 @@ class SefReader {
         seekPosition.position = dataReferences[0].startOffset
     }
 
-    @Throws(IOException::class)
+    
     private fun readSefData(
         input: ExtractorInput,
         slowMotionMetadataEntries: MutableList<Metadata.Entry>
@@ -181,7 +181,7 @@ class SefReader {
         private val COLON_SPLITTER: Splitter = Splitter.on(':')
         private val ASTERISK_SPLITTER: Splitter = Splitter.on('*')
 
-        @Throws(ParserException::class)
+        
         private fun readSlowMotionData(data: ParsableByteArray, dataLength: Int): SlowMotionData {
             val segments: MutableList<SlowMotionData.Segment?> =
                 ArrayList<SlowMotionData.Segment?>()
@@ -209,7 +209,7 @@ class SefReader {
             return SlowMotionData(segments)
         }
 
-        @Throws(ParserException::class)
+        
         private fun nameToDataType(name: String):  Int {
             when (name) {
                 "SlowMotion_Data" -> return TYPE_SLOW_MOTION_DATA

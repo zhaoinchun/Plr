@@ -22,7 +22,7 @@ class PriorityTaskManager {
         }
     }
 
-    @Throws(InterruptedException::class)
+
     fun proceed(priority: Int) {
         synchronized(lock) {
             while (highestPriority != priority) {
@@ -36,8 +36,6 @@ class PriorityTaskManager {
             return highestPriority == priority
         }
     }
-
-    @Throws(PriorityTooLowException::class)
     fun proceedOrThrow(priority: Int) {
         synchronized(lock) {
             if (highestPriority != priority) {

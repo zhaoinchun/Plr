@@ -81,25 +81,18 @@ interface ExoMediaDrm {
     fun setOnEventListener(listener: OnEventListener?)
     fun setOnKeyStatusChangeListener(listener: OnKeyStatusChangeListener?)
     fun setOnExpirationUpdateListener(listener: OnExpirationUpdateListener?)
-    @Throws(MediaDrmException::class)
     fun openSession(): ByteArray
     fun closeSession(sessionId: ByteArray)
     fun setPlayerIdForSession(sessionId: ByteArray, playerId: PlayerId) {}
-
-    @Throws(NotProvisionedException::class)
     fun getKeyRequest(
         scope: ByteArray,
         schemeDatas: List<DrmInitData.SchemeData>?,
         keyType: Int,
         optionalParameters: MutableMap<String, String>?
     ): KeyRequest
-
-    @Throws(NotProvisionedException::class, DeniedByServerException::class)
     fun provideKeyResponse(scope: ByteArray, response: ByteArray): ByteArray?
 
     val provisionRequest: ProvisionRequest
-
-    @Throws(DeniedByServerException::class)
     fun provideProvisionResponse(response: ByteArray)
     fun queryKeyStatus(sessionId: ByteArray): Map<String, String>
     fun requiresSecureDecoder(sessionId: ByteArray, mimeType: String): Boolean
@@ -122,7 +115,7 @@ interface ExoMediaDrm {
     fun setPropertyString(propertyName: String, value: String)
     fun setPropertyByteArray(propertyName: String, value: ByteArray)
 
-    @Throws(MediaCryptoException::class)
+    
     fun createCryptoConfig(sessionId: ByteArray): CryptoConfig
 
     val cryptoType:  Int

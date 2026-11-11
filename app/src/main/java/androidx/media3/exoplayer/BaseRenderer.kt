@@ -58,7 +58,7 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
     override val mediaClock: MediaClock?
         get() = null
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun enable(
         configuration: RendererConfiguration,
         formats: Array<Format>,
@@ -79,14 +79,14 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
         resetPosition(startPositionUs, joining, true)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun start() {
         Preconditions.checkState(state == Renderer.STATE_ENABLED)
         state = Renderer.STATE_STARTED
         onStarted()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun replaceStream(
         formats: Array<Format>,
         stream: SampleStream,
@@ -117,7 +117,7 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
     override val isCurrentStreamFinal: Boolean
         get() = streamIsFinal
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowStreamError() {
         stream!!.maybeThrowError()
     }
@@ -130,12 +130,12 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun resetPosition(positionUs: Long, sampleStreamIsResetToKeyFrame: Boolean) {
         resetPosition(positionUs, false, sampleStreamIsResetToKeyFrame)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun resetPosition(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -179,7 +179,7 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
     }
 
     // RendererCapabilities implementation.
-    @Throws(ExoPlaybackException::class)
+    
     override fun supportsMixedMimeTypeAdaptation(): Int {
         return RendererCapabilities.ADAPTIVE_NOT_SUPPORTED
     }
@@ -196,7 +196,7 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         // Do nothing.
     }
@@ -205,12 +205,12 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
         // Do nothing
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected open fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected open fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -220,14 +220,14 @@ abstract class BaseRenderer(override val trackType: Int) : Renderer,
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected open fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
         // Do nothing.
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected open fun onStarted() {
         // Do nothing.
     }

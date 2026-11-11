@@ -157,7 +157,7 @@ abstract class MappingTrackSelector : TrackSelector() {
         currentMappedTrackInfo = info as MappedTrackInfo?
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun selectTracks(
         rendererCapabilities: Array<RendererCapabilities>,
         trackGroups: TrackGroupArray,
@@ -256,7 +256,7 @@ abstract class MappingTrackSelector : TrackSelector() {
         return TrackSelectorResult(result.first, result.second, tracks, mappedTrackInfo)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected abstract fun selectTracks(
         mappedTrackInfo: MappedTrackInfo,
         rendererFormatSupports: Array<Array<IntArray>>,
@@ -266,7 +266,7 @@ abstract class MappingTrackSelector : TrackSelector() {
     ): Pair<Array<RendererConfiguration?>, Array<ExoTrackSelection?>>
 
     companion object {
-        @Throws(ExoPlaybackException::class)
+        
         private fun findRenderer(
             rendererCapabilities: Array<RendererCapabilities>,
             group: TrackGroup,
@@ -299,7 +299,7 @@ abstract class MappingTrackSelector : TrackSelector() {
             return bestRendererIndex
         }
 
-        @Throws(ExoPlaybackException::class)
+        
         private fun getFormatSupport(
             rendererCapabilities: RendererCapabilities, group: TrackGroup
         ): IntArray {
@@ -309,7 +309,7 @@ abstract class MappingTrackSelector : TrackSelector() {
             return formatSupport
         }
 
-        @Throws(ExoPlaybackException::class)
+        
         private fun getMixedMimeTypeAdaptationSupports(
             rendererCapabilities: Array<RendererCapabilities>
         ): IntArray {

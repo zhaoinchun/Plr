@@ -20,7 +20,7 @@ class CacheFileMetadataIndex
     private var tableName:String? = null
 
     @WorkerThread
-    @Throws(DatabaseIOException::class)
+    
     fun initialize(uid: Long) {
         try {
             val hexUid = uid.toHexString()
@@ -76,7 +76,7 @@ class CacheFileMetadataIndex
         }
 
     @WorkerThread
-    @Throws(DatabaseIOException::class)
+    
     fun set(name: String?, length: kotlin.Long, lastTouchTimestamp: kotlin.Long) {
         try {
             val writableDatabase = databaseProvider.writableDatabase
@@ -91,7 +91,7 @@ class CacheFileMetadataIndex
     }
 
     @WorkerThread
-    @Throws(DatabaseIOException::class)
+    
     fun remove(name: String?) {
         try {
             val writableDatabase = databaseProvider.writableDatabase
@@ -102,7 +102,7 @@ class CacheFileMetadataIndex
     }
 
     @WorkerThread
-    @Throws(DatabaseIOException::class)
+    
     fun removeAll(names: MutableSet<String?>) {
         try {
             val writableDatabase = databaseProvider.writableDatabase
@@ -165,7 +165,7 @@ class CacheFileMetadataIndex
                 + " INTEGER NOT NULL)")
 
         @WorkerThread
-        @Throws(DatabaseIOException::class)
+        
         fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
             val hexUid = uid.toHexString()
             try {

@@ -22,7 +22,7 @@ interface Renderer : PlayerMessage.Target {
     val mediaClock: MediaClock?
     val state:  Int
 
-    @Throws(ExoPlaybackException::class)
+    
     fun enable(
         configuration: RendererConfiguration,
         formats: Array<Format>,
@@ -35,10 +35,10 @@ interface Renderer : PlayerMessage.Target {
         mediaPeriodId: MediaPeriodId
     )
 
-    @Throws(ExoPlaybackException::class)
+    
     fun start()
 
-    @Throws(ExoPlaybackException::class)
+    
     fun replaceStream(
         formats: Array<Format>,
         stream: SampleStream,
@@ -61,24 +61,24 @@ interface Renderer : PlayerMessage.Target {
     fun setCurrentStreamFinal()
     val isCurrentStreamFinal: Boolean
 
-    @Throws(IOException::class)
+    
     fun maybeThrowStreamError()
 
-    @Throws(ExoPlaybackException::class)
+    
     fun resetPosition(positionUs: Long, sampleStreamIsResetToKeyFrame: Boolean)
 
     fun supportsResetPositionWithoutKeyFrameReset(positionUs: Long): Boolean {
         return false
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
     }
 
     fun enableMayRenderStartOfStream() {}
     fun setTimeline(timeline: Timeline)
 
-    @Throws(ExoPlaybackException::class)
+    
     fun render(positionUs: Long, elapsedRealtimeUs: Long)
 
     val isReady: Boolean

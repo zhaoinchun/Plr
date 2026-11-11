@@ -32,13 +32,10 @@ abstract class RunnableFutureTask<R, E : Exception?> protected constructor() : R
     }
 
     // Future implementation.
-    @Throws(ExecutionException::class, InterruptedException::class)
     override fun get(): R {
         finished.block()
         return getResult()
     }
-
-    @Throws(ExecutionException::class, InterruptedException::class, TimeoutException::class)
     override fun get(timeout: Long, unit: TimeUnit?): R? {
         val timeoutMs = TimeUnit.MILLISECONDS.convert(timeout, unit)
         if (!finished.block(timeoutMs)) {
@@ -101,7 +98,6 @@ abstract class RunnableFutureTask<R, E : Exception?> protected constructor() : R
     }
 
     // Internal methods.
-    @Throws(Exception::class)
     protected abstract fun doWork(): R
 
     protected open fun cancelWork() {
@@ -110,7 +106,6 @@ abstract class RunnableFutureTask<R, E : Exception?> protected constructor() : R
 
     // The return value is guaranteed to be non-null if and only if R is a non-null type, but there's
     // no way to assert this. Suppress the warning instead.
-    @Throws(ExecutionException::class)
     private fun getResult(): R {
         if (canceled) {
             throw CancellationException()

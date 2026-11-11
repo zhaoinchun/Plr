@@ -104,7 +104,7 @@ class SampleDataQueue(private val allocator: Allocator) {
         }
     }
 
-    @Throws(IOException::class)
+    
     fun sampleData(input: DataReader, length: Int, allowEndOfInput: Boolean): Int {
         var length = length
         length = preAppend(length)

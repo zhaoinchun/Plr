@@ -17,7 +17,7 @@ class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvi
         return data.size.toLong()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(uploadDataSink: UploadDataSink, byteBuffer: ByteBuffer) {
         val readLength = min(byteBuffer.remaining(), data.size - position)
         byteBuffer.put(data, position, readLength)
@@ -25,7 +25,7 @@ class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvi
         uploadDataSink.onReadSucceeded(false)
     }
 
-    @Throws(IOException::class)
+    
     override fun rewind(uploadDataSink: UploadDataSink) {
         position = 0
         uploadDataSink.onRewindSucceeded()

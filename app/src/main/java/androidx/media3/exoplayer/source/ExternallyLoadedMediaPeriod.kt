@@ -140,7 +140,7 @@ class ExternallyLoadedMediaPeriod(
         override val isReady: Boolean
             get() = loadingFinished.get()
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowError() {
             val loadingThrowable = this@ExternallyLoadedMediaPeriod.loadingThrowable.get()
             if (loadingThrowable != null) {

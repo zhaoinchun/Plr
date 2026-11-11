@@ -10,7 +10,7 @@ class FilteringManifestParser<T : FilterableManifest<T?>?>(
     private val parser: ParsingLoadable.Parser<out T?>,
     private val streamKeys: List<StreamKey>?
 ) : ParsingLoadable.Parser<T?> {
-    @Throws(IOException::class)
+    
     override fun parse(uri: Uri?, inputStream: InputStream?): T? {
         val manifest: T? = parser.parse(uri, inputStream)
         return if (streamKeys.isNullOrEmpty()) manifest else manifest!!.copy(

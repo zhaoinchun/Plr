@@ -12,7 +12,7 @@ import java.io.IOException
 import java.io.StringReader
 
 internal object XmpMotionPhotoDescriptionParser {
-    @Throws(IOException::class)
+    
     fun parse(xmpString: String?): MotionPhotoDescription? {
         try {
             return parseInternal(xmpString)
@@ -59,8 +59,6 @@ internal object XmpMotionPhotoDescriptionParser {
         "Camera:MicroVideoOffset",  // Micro Video V1b
         "GCamera:MicroVideoOffset",  // Micro Video V1b (legacy element naming)
     )
-
-    @Throws(XmlPullParserException::class, IOException::class)
     private fun parseInternal(xmpString: String?): MotionPhotoDescription? {
         val xmlPullParserFactory = XmlPullParserFactory.newInstance()
         val xpp = xmlPullParserFactory.newPullParser()
@@ -140,8 +138,6 @@ internal object XmpMotionPhotoDescriptionParser {
         }
         return mutableListOf()
     }
-
-    @Throws(XmlPullParserException::class, IOException::class)
     private fun parseMotionPhotoV1Directory(
         xpp: XmlPullParser, containerNamespacePrefix: String?, itemNamespacePrefix: String?
     ): MutableList<MotionPhotoDescription.ContainerItem> {

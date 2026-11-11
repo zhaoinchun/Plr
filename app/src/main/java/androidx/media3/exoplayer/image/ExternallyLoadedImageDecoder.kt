@@ -84,8 +84,6 @@ class ExternallyLoadedImageDecoder(private val bitmapResolver: BitmapResolver) :
         pendingDecodeTimeUs = inputBuffer.timeUs
         inputBuffer.clear()
     }
-
-    @Throws(ImageDecoderException::class)
     override fun dequeueOutputBuffer(): ImageOutputBuffer? {
         if (pendingEndOfStream) {
             outputBuffer.addFlag(C.BUFFER_FLAG_END_OF_STREAM)

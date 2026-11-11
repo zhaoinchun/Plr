@@ -112,7 +112,7 @@ class PlaceholderSurface private constructor(
             }
         }
 
-        @Throws(GlException::class)
+        
         fun initInternal(secureMode:  Int) {
             eglSurfaceTexture!!.init(secureMode)
             this.surface =

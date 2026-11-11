@@ -13,7 +13,7 @@ interface MediaCodecBufferEnqueuer {
     fun flush()
     fun shutdown()
 
-    @Throws(InterruptedException::class)
+
     fun waitUntilQueueingComplete()
     fun maybeThrowException()
 }

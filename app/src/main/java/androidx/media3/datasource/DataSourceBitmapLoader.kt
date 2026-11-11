@@ -57,7 +57,7 @@ class DataSourceBitmapLoader(
             Suppliers.memoize<ListeningExecutorService?>(
                 Supplier { MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor()) })
 
-        @Throws(IOException::class)
+        
         private fun load(
             dataSource: DataSource,
             uri: Uri,

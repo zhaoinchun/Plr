@@ -26,7 +26,7 @@ class DiscardingTrackOutput : TrackOutput {
         // Do nothing.
     }
 
-    @Throws(IOException::class)
+    
     override fun sampleData(
         input: DataReader,
         length: Int,

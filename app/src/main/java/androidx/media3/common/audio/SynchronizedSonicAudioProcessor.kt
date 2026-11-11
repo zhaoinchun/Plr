@@ -49,7 +49,7 @@ class SynchronizedSonicAudioProcessor(
         return getPlayoutDuration(durationUs)
     }
 
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat? {
         synchronized(lock) {
             return sonicAudioProcessor.configure(inputAudioFormat)

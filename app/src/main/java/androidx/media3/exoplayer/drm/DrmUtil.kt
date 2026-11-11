@@ -73,8 +73,6 @@ object DrmUtil {
         return Build.VERSION.SDK_INT == 34 && e is NoSuchMethodError
                 && e.message != null && e.message!!.contains("Landroid/media/ResourceBusyException;.<init>(")
     }
-
-    @Throws(MediaDrmCallbackException::class)
     fun executePost(
         dataSource: DataSource,
         url: String,

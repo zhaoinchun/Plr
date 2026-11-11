@@ -111,7 +111,7 @@ class DtsReader(
         }
     }
 
-    @Throws(ParserException::class)
+    
     override fun consume(data: ParsableByteArray) {
         // Asserts that createTracks has been called.
         val output = output!!
@@ -363,7 +363,7 @@ class DtsReader(
     }
 
     @RequiresNonNull("output")
-    @Throws(ParserException::class)
+    
     private fun parseExtensionSubstreamHeader() {
         val dtsHeader = parseDtsHdHeader(headerScratchBytes.data)
         updateFormatWithDtsHeaderInfo(dtsHeader)
@@ -374,7 +374,7 @@ class DtsReader(
     }
 
     @RequiresNonNull("output")
-    @Throws(ParserException::class)
+    
     private fun parseUhdHeader() {
         val dtsHeader =
             parseDtsUhdHeader(headerScratchBytes.data, uhdAudioChunkId)

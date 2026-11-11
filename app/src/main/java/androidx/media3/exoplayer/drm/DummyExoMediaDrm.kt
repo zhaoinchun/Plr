@@ -21,8 +21,6 @@ class DummyExoMediaDrm : ExoMediaDrm {
     override fun setOnExpirationUpdateListener(listener: ExoMediaDrm.OnExpirationUpdateListener?) {
         // Do nothing.
     }
-
-    @Throws(MediaDrmException::class)
     override fun openSession(): ByteArray {
         throw MediaDrmException("Attempting to open a session using a dummy ExoMediaDrm.")
     }

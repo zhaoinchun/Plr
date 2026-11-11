@@ -47,7 +47,7 @@ class CacheWriter(
     }
 
     @WorkerThread
-    @Throws(IOException::class)
+    
     fun cache() {
         throwIfCanceled()
 
@@ -81,7 +81,7 @@ class CacheWriter(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readBlockToCache(position: Long, length: Long): Long {
         val isLastBlock = position + length == endPosition || length == C.LENGTH_UNSET.toLong()
 
@@ -161,8 +161,6 @@ class CacheWriter(
 
     private val length: Long
         get() = if (endPosition == C.INDEX_UNSET.toLong()) C.LENGTH_UNSET.toLong() else endPosition - dataSpec.position
-
-    @Throws(InterruptedIOException::class)
     private fun throwIfCanceled() {
         if (isCanceled) {
             throw InterruptedIOException()

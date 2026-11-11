@@ -26,7 +26,7 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
         dataSource.addTransferListener(transferListener)
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         // Reassign defaults in case dataSource.open throws an exception.
         lastOpenedUri = dataSpec.uri
@@ -45,7 +45,7 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         val bytesRead: Int = dataSource.read(buffer, offset, length)
         if (bytesRead != C.RESULT_END_OF_INPUT) {
@@ -59,7 +59,7 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
     override val responseHeaders: MutableMap<String, List<String>>
         get() = dataSource.responseHeaders
 
-    @Throws(IOException::class)
+    
     override fun close() {
         dataSource.close()
     }

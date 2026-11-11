@@ -40,7 +40,7 @@ abstract class DataChunk(
         loadCanceled = true
     }
 
-    @Throws(IOException::class)
+    
     override fun load() {
         try {
             dataSource.open(dataSpec)
@@ -61,7 +61,7 @@ abstract class DataChunk(
         }
     }
 
-    @Throws(IOException::class)
+    
     protected abstract fun consume(data: ByteArray?, limit: Int)
 
     private fun maybeExpandData(limit: Int) {

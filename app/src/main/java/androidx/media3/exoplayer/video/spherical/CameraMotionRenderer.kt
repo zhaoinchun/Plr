@@ -34,7 +34,7 @@ class CameraMotionRenderer : BaseRenderer(C.TRACK_TYPE_CAMERA_MOTION) {
             RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         if (messageType == Renderer.MSG_SET_CAMERA_MOTION_LISTENER) {
             listener = message as CameraMotionListener?

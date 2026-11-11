@@ -51,7 +51,7 @@ import java.util.ArrayDeque
         playbackPositionUs = positionUs
     }
 
-    @Throws(SubtitleDecoderException::class)
+    
     override fun dequeueInputBuffer(): SubtitleInputBuffer? {
         Preconditions.checkState(dequeuedInputBuffer == null)
         if (availableInputBuffers.isEmpty()) {
@@ -61,7 +61,7 @@ import java.util.ArrayDeque
         return dequeuedInputBuffer
     }
 
-    @Throws(SubtitleDecoderException::class)
+    
     override fun queueInputBuffer(inputBuffer: SubtitleInputBuffer) {
         Preconditions.checkArgument(inputBuffer === dequeuedInputBuffer)
         val ceaInputBuffer: CeaInputBuffer = inputBuffer as CeaInputBuffer
@@ -75,7 +75,7 @@ import java.util.ArrayDeque
         dequeuedInputBuffer = null
     }
 
-    @Throws(SubtitleDecoderException::class)
+    
     override fun dequeueOutputBuffer(): SubtitleOutputBuffer? {
         if (availableOutputBuffers.isEmpty()) {
             return null

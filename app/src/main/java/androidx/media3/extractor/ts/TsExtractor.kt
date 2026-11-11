@@ -90,7 +90,7 @@ class TsExtractor(
     }
 
     // Extractor implementation.
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         val buffer = tsPacketBuffer.data
         input.peekFully(buffer, 0, TS_PACKET_SIZE * SNIFF_TS_PACKET_COUNT)
@@ -158,7 +158,7 @@ class TsExtractor(
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -299,7 +299,7 @@ class TsExtractor(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun fillBufferWithAtLeastOnePacket(input: ExtractorInput): Boolean {
         val data = tsPacketBuffer.data
         // Shift bytes to the start of the buffer if there isn't enough space left at the end.
@@ -322,7 +322,7 @@ class TsExtractor(
         return true
     }
 
-    @Throws(ParserException::class)
+    
     private fun findEndOfFirstTsPacketInBuffer(): Int {
         val searchStart = tsPacketBuffer.getPosition()
         val limit = tsPacketBuffer.limit()

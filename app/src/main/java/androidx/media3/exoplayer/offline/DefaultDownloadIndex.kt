@@ -27,7 +27,7 @@ class DefaultDownloadIndex(
     @GuardedBy("initializationLock")
     private var initialized = false
 
-    @Throws(DatabaseIOException::class)
+    
     override fun getDownload(id: String?): Download? {
         ensureInitialized()
         try {
@@ -43,14 +43,14 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun getDownloads( vararg states: Int): DownloadCursor {
         ensureInitialized()
         val cursor = getCursor(getStateQuery(*states), null)
         return DownloadCursorImpl(cursor)
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun putDownload(download: Download) {
         ensureInitialized()
         try {
@@ -61,7 +61,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun removeDownload(id: String) {
         ensureInitialized()
         try {
@@ -75,7 +75,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun setDownloadingStatesToQueued() {
         ensureInitialized()
         try {
@@ -93,7 +93,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun setStatesToRemoving() {
         ensureInitialized()
         try {
@@ -114,7 +114,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun setStopReason(stopReason: Int) {
         ensureInitialized()
         try {
@@ -132,7 +132,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     override fun setStopReason(id: String, stopReason: Int) {
         ensureInitialized()
         try {
@@ -150,7 +150,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     private fun ensureInitialized() {
         synchronized(initializationLock) {
             if (initialized) {
@@ -245,7 +245,7 @@ class DefaultDownloadIndex(
         }
     }
 
-    @Throws(DatabaseIOException::class)
+    
     private fun getCursor(selection: String?, selectionArgs: Array<String?>?): Cursor {
         try {
             val sortOrder = "$COLUMN_START_TIME_MS ASC"

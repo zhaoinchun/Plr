@@ -25,7 +25,7 @@ class MergingMetadataSampleStream(
     override val isReady: Boolean
         get() = primaryStream.isReady
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowError() {
         primaryStream.maybeThrowError()
         if (!metadataTrackInvalid) {

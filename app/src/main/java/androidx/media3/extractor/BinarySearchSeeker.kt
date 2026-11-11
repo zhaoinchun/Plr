@@ -21,7 +21,7 @@ abstract class BinarySearchSeeker protected constructor(
 ) {
     protected interface TimestampSeeker {
        
-        @Throws(IOException::class)
+        
         fun searchForTimestamp(input: ExtractorInput, targetTimestamp: Long): TimestampSearchResult
 
         fun onSeekFinished() {}
@@ -67,7 +67,7 @@ abstract class BinarySearchSeeker protected constructor(
     val isSeeking: Boolean
         get() = seekOperationParams != null
 
-    @Throws(IOException::class)
+    
     fun handlePendingSeek(input: ExtractorInput, seekPositionHolder: PositionHolder): Int {
         while (true) {
             val seekOperationParams: SeekOperationParams =this.seekOperationParams!!
@@ -143,7 +143,7 @@ abstract class BinarySearchSeeker protected constructor(
         // Do nothing.
     }
 
-    @Throws(IOException::class)
+    
     protected fun skipInputUntilPosition(input: ExtractorInput, position: Long): Boolean {
         val bytesToSkip = position - input.position
         if (bytesToSkip in 0..MAX_SKIP_BYTES) {

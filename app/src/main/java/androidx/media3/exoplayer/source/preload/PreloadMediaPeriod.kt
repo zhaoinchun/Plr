@@ -56,7 +56,7 @@ class PreloadMediaPeriod
         )
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowPrepareError() {
         mediaPeriod.maybeThrowPrepareError()
     }
@@ -205,7 +205,7 @@ class PreloadMediaPeriod
         mediaPeriod.reevaluateBuffer(positionUs)
     }
 
-    @Throws(IOException::class)
+    
     fun maybeThrowStreamError() {
         Preconditions.checkState(prepared)
         if (preloadTrackSelectionHolder != null) {

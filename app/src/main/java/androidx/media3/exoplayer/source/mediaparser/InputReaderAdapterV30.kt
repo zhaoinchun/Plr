@@ -34,7 +34,7 @@ class InputReaderAdapterV30 : SeekableInputReader {
         lastSeekPosition = position
     }
 
-    @Throws(IOException::class)
+    
     override fun read(bytes: ByteArray, offset: Int, readLength: Int): Int {
         val bytesRead: Int = dataReader!!.read(bytes, offset, readLength)
         currentPosition += bytesRead.toLong()

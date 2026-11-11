@@ -121,7 +121,7 @@ class Mp4Extractor constructor(
         quickTimeChapters = ArrayList<Chapter>()
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         val sniffFailure = Sniffer.sniffUnfragmented(input)
         this.sniffFailureDetails =
@@ -173,7 +173,7 @@ class Mp4Extractor constructor(
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         if (omitTrackSampleTable && moovAtomProcessed) {
             return Extractor.RESULT_END_OF_INPUT
@@ -213,7 +213,7 @@ class Mp4Extractor constructor(
         atomHeaderBytesRead = 0
     }
 
-    @Throws(IOException::class)
+    
     private fun readAtomHeader(input: ExtractorInput): Boolean {
         if (atomHeaderBytesRead == 0) {
             // Read the standard length atom header.
@@ -288,7 +288,7 @@ class Mp4Extractor constructor(
         return true
     }
 
-    @Throws(IOException::class)
+    
     private fun readAtomPayload(input: ExtractorInput, positionHolder: PositionHolder): Boolean {
         val atomPayloadSize = atomSize - atomHeaderBytesRead
         val atomEndPosition = input.position + atomPayloadSize
@@ -326,7 +326,7 @@ class Mp4Extractor constructor(
         return seekRequired && parserState != STATE_READING_SAMPLE
     }
 
-    @Throws(IOException::class)
+    
     private fun readSefData(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -339,7 +339,7 @@ class Mp4Extractor constructor(
         return result
     }
 
-    @Throws(ParserException::class)
+    
     private fun processAtomEnded(atomEndPosition: Long) {
         while (!containerAtoms.isEmpty() && containerAtoms.peek().endPosition == atomEndPosition) {
             val containerAtom = containerAtoms.pop()
@@ -364,7 +364,7 @@ class Mp4Extractor constructor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun processMoovAtom(moov: ContainerBox) {
         // Process metadata first to determine whether to abort processing and seek to the axte atom.
         var mdtaMetadata: Metadata? = null
@@ -612,7 +612,7 @@ class Mp4Extractor constructor(
         return auxiliaryTrackTypes
     }
 
-    @Throws(IOException::class)
+    
     private fun readSample(input: ExtractorInput, positionHolder: PositionHolder): Int {
         val inputPosition = input.position
         if (sampleTrackIndex == C.INDEX_UNSET) {
@@ -799,7 +799,7 @@ class Mp4Extractor constructor(
         return Extractor.RESULT_CONTINUE
     }
 
-    @Throws(IOException::class)
+    
     private fun readQuickTimeChapters(input: ExtractorInput, seekPosition: PositionHolder): Int {
         val chapterSampleTable = chapterSampleTables.get(chapterTrackIndex)
         if (chapterSampleIndex < chapterSampleTable.sampleCount) {
@@ -939,7 +939,7 @@ class Mp4Extractor constructor(
         track.sampleIndex = sampleIndex
     }
 
-    @Throws(IOException::class)
+    
     private fun maybeSkipRemainingMetaAtomHeaderBytes(input: ExtractorInput) {
         scratch.reset(Mp4Box.HEADER_SIZE)
         input.peekFully(scratch.data, 0, Mp4Box.HEADER_SIZE)

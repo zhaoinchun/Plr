@@ -35,7 +35,7 @@ class IcyDataSource(
         throw UnsupportedOperationException()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (bytesUntilMetadata == 0) {
             if (readMetadata()) {
@@ -61,7 +61,7 @@ class IcyDataSource(
         throw UnsupportedOperationException()
     }
 
-    @Throws(IOException::class)
+    
     private fun readMetadata(): Boolean {
         var bytesRead = upstream.read(metadataLengthByteHolder, 0, 1)
         if (bytesRead == C.RESULT_END_OF_INPUT) {

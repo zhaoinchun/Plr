@@ -14,7 +14,7 @@ interface ProgressiveMediaExtractor {
 
     val currentInputPosition: Long
 
-    @Throws(IOException::class)
+    
     fun init(
         dataReader: DataReader,
         uri: Uri,
@@ -28,7 +28,7 @@ interface ProgressiveMediaExtractor {
     fun disableSeekingOnMp3Streams()
     fun seek(position: Long, seekTimeUs: Long)
 
-    @Throws(IOException::class)
+    
     fun read(positionHolder: PositionHolder): Int
 
     val underlyingImplementationName: String?

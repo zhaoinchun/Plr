@@ -57,7 +57,7 @@ class JpegMotionPhotoExtractor : Extractor {
         mp4StartPosition = C.INDEX_UNSET.toLong()
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // See ITU-T.81 (1992) subsection B.1.1.3.
         if (peekMarker(input) != MARKER_SOI) {
@@ -96,7 +96,7 @@ class JpegMotionPhotoExtractor : Extractor {
         extractorOutput = output
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -160,7 +160,7 @@ class JpegMotionPhotoExtractor : Extractor {
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun peekMarker(input: ExtractorInput): Int {
         scratch.reset(MARKER_SIZE)
         input.peekFully(scratch.data, 0, MARKER_SIZE)
@@ -174,7 +174,7 @@ class JpegMotionPhotoExtractor : Extractor {
         return XmpMotionPhotoDescriptionParser.isMotionPhotoXmp(payload.readNullTerminatedString())
     }
 
-    @Throws(IOException::class)
+    
     private fun readMarker(input: ExtractorInput) {
         scratch.reset(MARKER_SIZE)
         input.readFully(scratch.data, 0, MARKER_SIZE)
@@ -190,21 +190,21 @@ class JpegMotionPhotoExtractor : Extractor {
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun peekSegmentLength(input: ExtractorInput): Int {
         scratch.reset(SEGMENT_LENGTH_SIZE)
         input.peekFully(scratch.data, 0, SEGMENT_LENGTH_SIZE)
         return scratch.readUnsignedShort() - SEGMENT_LENGTH_SIZE
     }
 
-    @Throws(IOException::class)
+    
     private fun readSegmentLength(input: ExtractorInput) {
         segmentLength = peekSegmentLength(input)
         input.skipFully(SEGMENT_LENGTH_SIZE)
         state = STATE_READING_SEGMENT
     }
 
-    @Throws(IOException::class)
+    
     private fun readSegment(input: ExtractorInput) {
         if (marker == MARKER_APP1) {
             val payload = ParsableByteArray(segmentLength)
@@ -226,7 +226,7 @@ class JpegMotionPhotoExtractor : Extractor {
         state = STATE_READING_MARKER
     }
 
-    @Throws(IOException::class)
+    
     private fun sniffMotionPhotoVideo(input: ExtractorInput) {
         // Check if the file is truncated.
         val peekedData =
@@ -300,7 +300,7 @@ class JpegMotionPhotoExtractor : Extractor {
         private const val MARKER_SIZE = 2
         private const val SEGMENT_LENGTH_SIZE = 2
 
-        @Throws(IOException::class)
+        
         private fun getMotionPhotoMetadata(
             xmpString: String?,
             inputLength: Long

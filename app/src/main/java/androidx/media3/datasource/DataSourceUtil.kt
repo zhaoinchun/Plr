@@ -4,7 +4,7 @@ import androidx.media3.common.C
 import java.io.IOException
 
 object DataSourceUtil {
-    @Throws(IOException::class)
+    
     fun readToEnd(dataSource: DataSource): ByteArray {
         var data = ByteArray(1024)
         var position = 0
@@ -21,7 +21,7 @@ object DataSourceUtil {
         return data.copyOf(position)
     }
 
-    @Throws(IOException::class)
+    
     fun readExactly(dataSource: DataSource, length: Int): ByteArray {
         val data = ByteArray(length)
         var position = 0

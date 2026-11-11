@@ -8,8 +8,6 @@ import android.os.RemoteException
 
 class BundleListRetriever(list: List<Bundle>) : Binder() {
     private val list: List<Bundle> = list.toList()
-
-    @Throws(RemoteException::class)
     override fun onTransact(code: Int, data: Parcel, reply: Parcel?, flags: Int): Boolean {
         if (code != FIRST_CALL_TRANSACTION) {
             return super.onTransact(code, data, reply, flags)

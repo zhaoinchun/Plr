@@ -13,7 +13,7 @@ class VvcConfig private constructor(
    val bitdepthLuma: Int
 ) {
     companion object {
-        @Throws(ParserException::class)
+        
         fun parse(data: ParsableByteArray): VvcConfig {
             try {
                 // 11.2.4.3.2: VvcConfigurationBox extends FullBox (version 0, flags 0).

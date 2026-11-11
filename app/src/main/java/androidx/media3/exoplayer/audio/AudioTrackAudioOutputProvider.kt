@@ -63,8 +63,6 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
             isSpeedChangeSupportedForOffload = offloadSupport.isSpeedChangeSupported
         )
     }
-
-    @Throws(AudioOutputProvider.ConfigurationException::class)
     override fun getOutputConfig(formatConfig: FormatConfig): OutputConfig {
         val format = formatConfig.format
         updateAudioCapabilitiesReceiver(formatConfig)
@@ -171,8 +169,6 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
             virtualDeviceId = formatConfig.virtualDeviceId
         )
     }
-
-    @Throws(AudioOutputProvider.InitializationException::class)
     override fun getAudioOutput(config: OutputConfig): AudioTrackAudioOutput {
         val audioTrack: AudioTrack
         try {

@@ -44,7 +44,7 @@ object FlacFrameReader {
                 && checkFirstSubframeHeaderFromPeek(data)
     }
 
-    @Throws(IOException::class)
+    
     fun checkFrameHeaderFromPeek(
         input: ExtractorInput,
         flacStreamMetadata: FlacStreamMetadata,
@@ -78,7 +78,7 @@ object FlacFrameReader {
         )
     }
 
-    @Throws(IOException::class)
+    
     fun getFirstSampleNumber(
         input: ExtractorInput, flacStreamMetadata: FlacStreamMetadata
     ): Long {

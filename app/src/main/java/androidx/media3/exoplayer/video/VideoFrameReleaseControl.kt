@@ -32,7 +32,7 @@ class VideoFrameReleaseControl(
     interface FrameTimingEvaluator {
         fun shouldForceReleaseFrame(earlyUs: Long, elapsedSinceLastReleaseUs: Long): Boolean
         fun shouldDropFrame(earlyUs: Long, elapsedRealtimeUs: Long, isLastFrame: Boolean): Boolean
-        @Throws(ExoPlaybackException::class)
+        
         fun shouldIgnoreFrame(
             earlyUs: Long,
             positionUs: Long,
@@ -168,7 +168,7 @@ class VideoFrameReleaseControl(
     val isJoining: Boolean
         get() = joiningDeadlineMs != C.TIME_UNSET
 
-    @Throws(ExoPlaybackException::class)
+    
     fun getFrameReleaseAction(
         presentationTimeUs: Long,
         positionUs: Long,

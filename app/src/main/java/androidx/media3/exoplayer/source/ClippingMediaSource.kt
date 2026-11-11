@@ -88,7 +88,7 @@ class ClippingMediaSource(
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowSourceInfoRefreshError() {
         clippingError?.also { throw it }
         super.maybeThrowSourceInfoRefreshError()

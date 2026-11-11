@@ -14,7 +14,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 
 class SteeringManifestParser : ParsingLoadable.Parser<SteeringManifest?> {
-    @Throws(IOException::class)
+    
     override fun parse(uri: Uri?, inputStream: InputStream?): SteeringManifest {
         JsonReader(InputStreamReader(inputStream)).use { reader ->
             if (reader.peek() != JsonToken.BEGIN_OBJECT) {
@@ -85,7 +85,7 @@ class SteeringManifestParser : ParsingLoadable.Parser<SteeringManifest?> {
         private const val STEERING_MANIFEST_JSON_NAME_PER_VARIANT_URIS = "PER-VARIANT-URIS"
         private const val STEERING_MANIFEST_JSON_NAME_PER_RENDITION_URIS = "PER-RENDITION-URIS"
 
-        @Throws(IOException::class)
+        
         private fun parsePathwayClone(reader: JsonReader): PathwayClone {
             reader.beginObject()
             var baseId: String? = null
@@ -128,7 +128,7 @@ class SteeringManifestParser : ParsingLoadable.Parser<SteeringManifest?> {
             return PathwayClone(baseId, id, uriReplacement)
         }
 
-        @Throws(IOException::class)
+        
         private fun parseUriReplacement(reader: JsonReader): UriReplacement {
             reader.beginObject()
             var host: String? = null
@@ -180,7 +180,7 @@ class SteeringManifestParser : ParsingLoadable.Parser<SteeringManifest?> {
             return UriReplacement(host, params, perVariantUris, perRenditionUris)
         }
 
-        @Throws(IOException::class)
+        
         private fun parsePathwayClonesArray(
             reader: JsonReader, pathwayClones: MutableList<PathwayClone?>
         ) {
@@ -203,7 +203,7 @@ class SteeringManifestParser : ParsingLoadable.Parser<SteeringManifest?> {
             }
         }
 
-        @Throws(IOException::class)
+        
         private fun parsePathwayPriorityArray(
             reader: JsonReader, pathwayPriority: MutableList<String?>
         ) {
@@ -233,7 +233,7 @@ class SteeringManifestParser : ParsingLoadable.Parser<SteeringManifest?> {
             }
         }
 
-        @Throws(IOException::class)
+        
         private fun <T> parseMap(
             reader: JsonReader, stringConverter: StringConverter<T?>, map: MutableMap<String?, T?>
         ) {

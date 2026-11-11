@@ -101,8 +101,6 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             null
         )
     }
-
-    @Throws(MediaDrmException::class)
     override fun openSession(): ByteArray {
         return mediaDrm.openSession()
     }
@@ -120,8 +118,6 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             }
         }
     }
-
-    @Throws(NotProvisionedException::class)
     override fun getKeyRequest(
         scope: ByteArray,
         schemeDatas: List<DrmInitData.SchemeData>?,
@@ -169,8 +165,6 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         }
         return licenseServerUrl
     }
-
-    @Throws(NotProvisionedException::class, DeniedByServerException::class)
     override fun provideKeyResponse(scope: ByteArray, response: ByteArray): ByteArray? {
         var response = response
         if (C.CLEARKEY_UUID == uuid) {
@@ -185,8 +179,6 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             val request = mediaDrm.provisionRequest
             return ExoMediaDrm.ProvisionRequest(request.data, request.getDefaultUrl())
         }
-
-    @Throws(DeniedByServerException::class)
     override fun provideProvisionResponse(response: ByteArray) {
         mediaDrm.provideProvisionResponse(response)
     }
@@ -280,7 +272,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         mediaDrm.setPropertyByteArray(propertyName, value)
     }
 
-    @Throws(MediaCryptoException::class)
+    
     override fun createCryptoConfig(sessionId: ByteArray): FrameworkCryptoConfig {
         return FrameworkCryptoConfig(adjustUuid(uuid), sessionId)
     }
@@ -348,8 +340,6 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         fun isCryptoSchemeSupported(uuid: UUID?): Boolean {
             return MediaDrm.isCryptoSchemeSupported(adjustUuid(uuid)!!)
         }
-
-        @Throws(UnsupportedDrmException::class)
         fun newInstance(uuid: UUID): FrameworkMediaDrm {
             try {
                 return FrameworkMediaDrm(uuid)

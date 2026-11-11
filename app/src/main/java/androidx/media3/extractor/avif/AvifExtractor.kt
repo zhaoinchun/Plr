@@ -25,7 +25,7 @@ class AvifExtractor : Extractor {
             )
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         input.advancePeekPosition(4)
         return readAndCompareFourBytes(input, AVIF_FILE_SIGNATURE_PART_1)
@@ -36,7 +36,7 @@ class AvifExtractor : Extractor {
         imageExtractor.init(output)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -52,7 +52,7 @@ class AvifExtractor : Extractor {
         // Do nothing.
     }
 
-    @Throws(IOException::class)
+    
     private fun readAndCompareFourBytes(input: ExtractorInput, bytesToCompare: Int): Boolean {
         scratch.reset( FILE_SIGNATURE_SEGMENT_LENGTH)
         input.peekFully(scratch.data,  0, FILE_SIGNATURE_SEGMENT_LENGTH)

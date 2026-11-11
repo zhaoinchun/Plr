@@ -71,7 +71,7 @@ abstract class StreamReader {
         }
     }
 
-    @Throws(IOException::class)
+    
     fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         assertInitialized()
         when (state) {
@@ -98,7 +98,7 @@ abstract class StreamReader {
         extractorOutput!!
     }
 
-    @Throws(IOException::class)
+    
     private fun readHeaders(input: ExtractorInput): Boolean {
         while (true) {
             if (!oggPacket.populate(input)) {
@@ -116,7 +116,7 @@ abstract class StreamReader {
     }
 
     @RequiresNonNull("trackOutput")
-    @Throws(IOException::class)
+    
     private fun readHeadersAndUpdateState(input: ExtractorInput): Int {
         if (!readHeaders(input)) {
             return Extractor.RESULT_END_OF_INPUT
@@ -153,7 +153,7 @@ abstract class StreamReader {
     }
 
     @RequiresNonNull("trackOutput", "oggSeeker", "extractorOutput")
-    @Throws(IOException::class)
+    
     private fun readPayload(input: ExtractorInput, seekPosition: PositionHolder): Int {
         val position = oggSeeker!!.read(input)
         if (position >= 0) {
@@ -205,7 +205,7 @@ abstract class StreamReader {
 
     protected abstract fun preparePayload(packet: ParsableByteArray): Long
 
-    @Throws(IOException::class)
+    
     protected abstract fun readHeaders(
         packet: ParsableByteArray, position: Long, setupData: SetupData
     ): Boolean

@@ -38,8 +38,6 @@ class UdpDataSource  constructor(
         packetBuffer = ByteArray(maxPacketSize)
         packet = DatagramPacket(packetBuffer, 0, maxPacketSize)
     }
-
-    @Throws(UdpDataSourceException::class)
     override fun open(dataSpec: DataSpec): Long {
         uri = dataSpec.uri
         val host = uri!!.host!!
@@ -68,8 +66,6 @@ class UdpDataSource  constructor(
         transferStarted(dataSpec)
         return C.LENGTH_UNSET.toLong()
     }
-
-    @Throws(UdpDataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0

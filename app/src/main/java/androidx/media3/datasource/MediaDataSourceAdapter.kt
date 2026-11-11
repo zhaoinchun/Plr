@@ -13,7 +13,7 @@ class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNet
     private var bytesRemaining: Long = 0
     private var opened = false
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         uri = dataSpec.uri
         position = dataSpec.position
@@ -41,8 +41,6 @@ class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNet
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
-
-    @Throws(DataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -74,7 +72,7 @@ class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNet
         return bytesRead
     }
 
-    @Throws(IOException::class)
+    
     override fun close() {
         uri = null
         if (opened) {

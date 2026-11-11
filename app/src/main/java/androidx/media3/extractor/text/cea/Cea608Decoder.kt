@@ -126,7 +126,7 @@ class Cea608Decoder(mimeType: String?, accessibilityChannel: Int, validDataChann
         // Do nothing
     }
 
-    @Throws(SubtitleDecoderException::class)
+    
     override fun dequeueOutputBuffer(): SubtitleOutputBuffer? {
         var outputBuffer = super.dequeueOutputBuffer()
         if (outputBuffer != null) {

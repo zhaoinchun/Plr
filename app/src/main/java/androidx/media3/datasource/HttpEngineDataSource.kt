@@ -236,7 +236,7 @@ class HttpEngineDataSource(
             }
         }
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun open(dataSpec: DataSpec): Long {
         Preconditions.checkState(!transferStarted)
 
@@ -380,7 +380,7 @@ class HttpEngineDataSource(
         return bytesRemaining
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         Preconditions.checkState(transferStarted)
 
@@ -425,7 +425,7 @@ class HttpEngineDataSource(
         return bytesRead
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     fun read(buffer: ByteBuffer): Int {
         Preconditions.checkState(transferStarted)
 
@@ -494,13 +494,13 @@ class HttpEngineDataSource(
         else
             currentUrlRequestWrapper!!.urlRequestCallback
 
-    @Throws(IOException::class)
+    
     private fun buildRequestWrapper(dataSpec: DataSpec): UrlRequestWrapper {
         val callback = UrlRequestCallback()
         return UrlRequestWrapper(buildRequestBuilder(dataSpec, callback).build(), callback)
     }
 
-    @Throws(IOException::class)
+    
     private fun buildRequestBuilder(
         dataSpec: DataSpec, urlRequestCallback: UrlRequest.Callback
     ): UrlRequest.Builder {
@@ -556,7 +556,7 @@ class HttpEngineDataSource(
     }
 
     // Internal methods.
-    @Throws(InterruptedException::class)
+
     private fun blockUntilConnectTimeout(): Boolean {
         var now = clock.elapsedRealtime()
         var opened = false
@@ -571,7 +571,7 @@ class HttpEngineDataSource(
         currentConnectTimeoutMs = clock.elapsedRealtime() + connectTimeoutMs
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     private fun skipFully(bytesToSkip: Long, dataSpec: DataSpec?) {
         var bytesToSkip = bytesToSkip
         if (bytesToSkip == 0L) {
@@ -620,7 +620,7 @@ class HttpEngineDataSource(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readResponseBody(): ByteArray {
         var responseBody = Util.EMPTY_BYTE_ARRAY
         val readBuffer = this.orCreateReadBuffer
@@ -638,7 +638,7 @@ class HttpEngineDataSource(
         return responseBody
     }
 
-    @Throws(HttpDataSourceException::class)
+   
     private fun readInternal(buffer: ByteBuffer, dataSpec: DataSpec?) {
         currentUrlRequestWrapper!!.read(buffer)
         try {

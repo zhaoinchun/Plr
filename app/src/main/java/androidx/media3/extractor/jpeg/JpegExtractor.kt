@@ -30,7 +30,7 @@ class JpegExtractor  constructor(flags:  Int = 0) : Extractor {
         videoExtractor = if ((flags and FLAG_READ_IMAGE) == 0) JpegMotionPhotoExtractor() else null
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         if (videoExtractor != null && videoExtractor.sniff(input)) {
             return true
@@ -47,7 +47,7 @@ class JpegExtractor  constructor(flags:  Int = 0) : Extractor {
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
@@ -73,7 +73,7 @@ class JpegExtractor  constructor(flags:  Int = 0) : Extractor {
         imageExtractor.release()
     }
 
-    @Throws(IOException::class)
+    
     private fun assignActiveExtractor(input: ExtractorInput) {
         Preconditions.checkState(activeExtractor == null)
         // If activeExtractor is null it means it wasn't assigned in init(), which only happens if

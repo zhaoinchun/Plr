@@ -89,7 +89,7 @@ class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudi
             }
         }
 
-        @Throws(IOException::class)
+        
         private fun maybePrepareFile() {
             if (randomAccessFile != null) {
                 return
@@ -100,7 +100,7 @@ class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudi
             bytesWritten = HEADER_LENGTH
         }
 
-        @Throws(IOException::class)
+        
         private fun writeFileHeader(randomAccessFile: RandomAccessFile) {
             // Write the start of the header as big endian data.
             randomAccessFile.writeInt(WavUtil.RIFF_FOURCC)
@@ -125,7 +125,7 @@ class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudi
             randomAccessFile.writeInt(-1)
         }
 
-        @Throws(IOException::class)
+        
         private fun writeBuffer(buffer: ByteBuffer) {
             val randomAccessFile = this.randomAccessFile!!
             while (buffer.hasRemaining()) {
@@ -136,7 +136,7 @@ class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudi
             }
         }
 
-        @Throws(IOException::class)
+        
         private fun reset() {
             val randomAccessFile = randomAccessFile ?: return
 

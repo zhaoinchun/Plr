@@ -194,7 +194,7 @@ class BundledChunkExtractor(
         extractor.release()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput): Boolean {
         val result = extractor.read(input, POSITION_HOLDER)
         Preconditions.checkState(result != Extractor.RESULT_SEEK)
@@ -261,7 +261,7 @@ class BundledChunkExtractor(
             trackOutput!!.format(sampleFormat!!)
         }
 
-        @Throws(IOException::class)
+        
         override fun sampleData(
             input: DataReader,
             length: Int,

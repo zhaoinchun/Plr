@@ -47,7 +47,7 @@ class FilteringMediaSource(mediaSource: MediaSource, trackTypes: Set<Int>) :
             mediaPeriod.prepare(this, positionUs)
         }
 
-        @Throws(IOException::class)
+        
         override fun maybeThrowPrepareError() {
             mediaPeriod.maybeThrowPrepareError()
         }

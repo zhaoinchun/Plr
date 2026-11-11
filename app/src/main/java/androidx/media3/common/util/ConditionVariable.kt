@@ -23,7 +23,7 @@ class ConditionVariable  constructor(private val clock: Clock = Clock.DEFAULT) {
     }
 
     @Synchronized
-    @Throws(InterruptedException::class)
+
     fun block() {
         while (!isOpen) {
             clock.onThreadBlocked()
@@ -32,7 +32,7 @@ class ConditionVariable  constructor(private val clock: Clock = Clock.DEFAULT) {
     }
 
     @Synchronized
-    @Throws(InterruptedException::class)
+
     fun block(timeoutMs: Long): Boolean {
         if (timeoutMs <= 0) {
             return isOpen

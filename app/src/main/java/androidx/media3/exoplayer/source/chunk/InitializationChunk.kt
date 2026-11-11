@@ -49,7 +49,7 @@ class InitializationChunk(
         loadCanceled = true
     }
 
-    @Throws(IOException::class)
+    
     override fun load() {
         if (nextLoadPosition == 0L) {
             chunkExtractor.init(

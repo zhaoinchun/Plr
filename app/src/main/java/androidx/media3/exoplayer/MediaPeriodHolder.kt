@@ -84,7 +84,7 @@ class MediaPeriodHolder(
     val nextLoadPositionUs: Long
         get() = if (!prepared) 0 else mediaPeriod.nextLoadPositionUs
 
-    @Throws(ExoPlaybackException::class)
+    
     fun handlePrepared(playbackSpeed: Float, timeline: Timeline, playWhenReady: Boolean) {
         prepared = true
         trackGroups = mediaPeriod.trackGroups
@@ -118,7 +118,7 @@ class MediaPeriodHolder(
         mediaPeriod.continueLoading(loadingInfo)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun selectTracks(
         playbackSpeed: Float, timeline: Timeline, playWhenReady: Boolean
     ): TrackSelectorResult {

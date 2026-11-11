@@ -97,13 +97,13 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
         return getUniformLocation(programId, uniformName)
     }
 
-    @Throws(GlUtil.GlException::class)
+    
     fun use() {
         GLES20.glUseProgram(programId)
         checkGlError()
     }
 
-    @Throws(GlUtil.GlException::class)
+    
     fun delete() {
         if (Build.VERSION.SDK_INT == 28) {
             // Some MediaTek devices running API 28 crash with Fatal signal 6 (SIGABRT), code -6
@@ -120,7 +120,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
         checkGlError()
     }
 
-    @Throws(GlUtil.GlException::class)
+    
     fun getAttributeArrayLocationAndEnable(attributeName: String?): Int {
         val location = getAttributeLocation(attributeName)
         GLES20.glEnableVertexAttribArray(location)
@@ -165,7 +165,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
         uniform.setFloats(value)
     }
 
-    @Throws(GlUtil.GlException::class)
+    
     fun bindAttributesAndUniforms() {
         for (attribute in attributes) {
             attribute.bind()
@@ -195,7 +195,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
             this.size = size
         }
 
-        @Throws(GlUtil.GlException::class)
+        
         fun bind() {
             val buffer =
                 Preconditions.checkNotNull<Buffer>(this.buffer, "call setBuffer before bind")
@@ -282,7 +282,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
             System.arraycopy(value,  0, this.floatValue,  0, value.size)
         }
 
-        @Throws(GlUtil.GlException::class)
+        
         fun bind(externalTexturesRequireNearestSampling: Boolean) {
             when (type) {
                 GLES20.GL_INT -> {
@@ -427,7 +427,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
         // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_YUV_target.txt
         private const val GL_SAMPLER_EXTERNAL_2D_Y2Y_EXT = 0x8BE7
 
-        @Throws(GlUtil.GlException::class)
+        
         private fun addShader(programId: Int, type: Int, glsl: String?) {
             val shader = GLES20.glCreateShader(type)
             GLES20.glShaderSource(shader, glsl)

@@ -21,23 +21,23 @@ class DataSourceInputStream(private val dataSource: DataSource, private val data
         return totalBytesRead
     }
 
-    @Throws(IOException::class)
+    
     fun open() {
         checkOpened()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(): Int {
         val length = read(singleByteArray)
         return if (length == -1) -1 else (singleByteArray[0].toInt() and 0xFF)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray): Int {
         return read(buffer, 0, buffer.size)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         Preconditions.checkState(!closed)
         checkOpened()
@@ -50,7 +50,7 @@ class DataSourceInputStream(private val dataSource: DataSource, private val data
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun close() {
         if (!closed) {
             dataSource.close()
@@ -58,7 +58,7 @@ class DataSourceInputStream(private val dataSource: DataSource, private val data
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun checkOpened() {
         if (!opened) {
             dataSource.open(dataSpec)

@@ -20,7 +20,7 @@ class StartOffsetExtractorInput(input: ExtractorInput, startOffset: Long) :
     override val length: Long
         get() = super.length-startOffset
 
-    @Throws(IOException::class)
+    
     override fun <E : Throwable?> setRetryPosition(position: Long, e: E?) {
         super.setRetryPosition<E?>(position + startOffset, e)
     }

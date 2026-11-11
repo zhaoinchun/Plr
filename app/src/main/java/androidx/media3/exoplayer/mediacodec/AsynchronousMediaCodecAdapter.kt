@@ -48,7 +48,7 @@ class AsynchronousMediaCodecAdapter private constructor(
             this.enableAsyncCryptoSynchronization = enableAsyncCryptoSynchronization
         }
 
-        @Throws(IOException::class)
+        
         override fun createAdapter(configuration: MediaCodecAdapter.Configuration): AsynchronousMediaCodecAdapter {
             val codecName = configuration.codecInfo.name
             var codecAdapter: AsynchronousMediaCodecAdapter? = null

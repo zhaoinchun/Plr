@@ -95,7 +95,7 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
         maybeAddListenerToDataSource(rawResourceDataSource, transferListener)
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         Preconditions.checkState(dataSource == null)
         // Choose the correct source for the scheme.
@@ -126,7 +126,7 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
         return dataSource!!.open(dataSpec)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         return dataSource!!.read(buffer, offset, length)
     }
@@ -137,7 +137,7 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
     override val responseHeaders: MutableMap<String, List<String>>
         get() = dataSource?.responseHeaders?:mutableMapOf()
 
-    @Throws(IOException::class)
+    
     override fun close() {
         if (dataSource != null) {
             try {

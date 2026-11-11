@@ -531,7 +531,7 @@ class DownloadHelper(
         "mediaPreparer",
         "mediaPreparer.timeline"
     )
-    @Throws(ExoPlaybackException::class)
+    
     private fun addTrackSelectionInternal(
         periodIndex: Int, trackSelectionParameters: TrackSelectionParameters
     ) {
@@ -549,7 +549,7 @@ class DownloadHelper(
         }
     }
 
-    @Throws(ExoPlaybackException::class)  // Initialization of array of Lists.
+      // Initialization of array of Lists.
     private fun onMediaPrepared() {
         mediaPreparer!!
         mediaPreparer!!.mediaPeriods!!
@@ -654,7 +654,7 @@ class DownloadHelper(
         "mediaPreparer",
         "mediaPreparer.timeline"
     )
-    @Throws(ExoPlaybackException::class)
+    
     private fun runTrackSelection(periodIndex: Int): TrackSelectorResult {
         val trackSelectorResult =
             trackSelector.selectTracks(

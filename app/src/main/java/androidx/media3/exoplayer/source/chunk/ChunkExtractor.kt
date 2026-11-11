@@ -52,6 +52,6 @@ interface ChunkExtractor {
     fun init(trackOutputProvider: TrackOutputProvider?, startTimeUs: Long, endTimeUs: Long)
     fun release()
 
-    @Throws(IOException::class)
+    
     fun read(input: ExtractorInput): Boolean
 }

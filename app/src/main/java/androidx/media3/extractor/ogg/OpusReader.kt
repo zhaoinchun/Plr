@@ -25,7 +25,7 @@ class OpusReader : StreamReader() {
         return convertTimeToGranule(getPacketDurationUs(packet.data))
     }
 
-    @Throws(ParserException::class)
+    
     override fun readHeaders(
         packet: ParsableByteArray,
         position: Long,

@@ -286,7 +286,7 @@ class ChunkSampleStream<T : ChunkSource>(
         // SampleStream implementation.
         get() = !this.isPendingReset && primarySampleQueue.isReady(loadingFinished)
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowError() {
         loader.maybeThrowError()
         primarySampleQueue.maybeThrowError()

@@ -54,14 +54,14 @@ object MediaCodecUtil {
     val decryptOnlyDecoderInfo: MediaCodecInfo?
         get() = getDecoderInfo(MimeTypes.AUDIO_RAW, false, false)
 
-    @Throws(DecoderQueryException::class)
+    
     fun getDecoderInfo(mimeType: String, secure: Boolean, tunneling: Boolean): MediaCodecInfo? {
         val decoderInfos = getDecoderInfos(mimeType, secure, tunneling)
         return if (decoderInfos.isEmpty()) null else decoderInfos[0]
     }
 
     @Synchronized
-    @Throws(DecoderQueryException::class)
+    
     fun getDecoderInfos(
         mimeType: String, secure: Boolean, tunneling: Boolean
     ): List<MediaCodecInfo> {
@@ -99,7 +99,7 @@ object MediaCodecUtil {
     }
 
         @RequiresNonNull("#2.sampleMimeType")
-    @Throws(DecoderQueryException::class)
+    
     fun getDecoderInfosSoftMatch(
         mediaCodecSelector: MediaCodecSelector,
         format: Format,
@@ -120,7 +120,7 @@ object MediaCodecUtil {
         }
     }
 
-        @Throws(DecoderQueryException::class)
+        
     fun getAlternativeDecoderInfos(
         mediaCodecSelector: MediaCodecSelector,
         format: Format,
@@ -166,7 +166,7 @@ object MediaCodecUtil {
         return decoderInfos.toList()
     }
 
-    @Throws(DecoderQueryException::class)
+    
     fun maxH264DecodableFrameSize(): Int {
         if (maxH264DecodableFrameSize == -1) {
             var result = 0
@@ -246,7 +246,7 @@ object MediaCodecUtil {
         return Build.MANUFACTURER != "Google"
     }
 
-    @Throws(DecoderQueryException::class)
+    
     private fun getDecoderInfosInternal(
         key: CodecKey, mediaCodecList: MediaCodecListCompat
     ): MutableList<MediaCodecInfo> {

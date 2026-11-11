@@ -46,7 +46,7 @@ class FlvExtractor : Extractor {
         state = STATE_READING_FLV_HEADER
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // Check if file starts with "FLV" tag
         input.peekFully(scratch.data, 0, 3)
@@ -95,7 +95,7 @@ class FlvExtractor : Extractor {
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         // Asserts that init has been called.
         extractorOutput!!
@@ -121,7 +121,7 @@ class FlvExtractor : Extractor {
     }
 
     @RequiresNonNull("extractorOutput")
-    @Throws(IOException::class)
+    
     private fun readFlvHeader(input: ExtractorInput): Boolean {
         if (!input.readFully(headerBuffer.data, 0, FLV_HEADER_SIZE, true)) {
             // We've reached the end of the stream.
@@ -149,14 +149,14 @@ class FlvExtractor : Extractor {
         return true
     }
 
-    @Throws(IOException::class)
+    
     private fun skipToTagHeader(input: ExtractorInput) {
         input.skipFully(bytesToNextTagHeader)
         bytesToNextTagHeader = 0
         state = STATE_READING_TAG_HEADER
     }
 
-    @Throws(IOException::class)
+    
     private fun readTagHeader(input: ExtractorInput): Boolean {
         if (!input.readFully(tagHeaderBuffer.data, 0, FLV_TAG_HEADER_SIZE, true)) {
             // We've reached the end of the stream.
@@ -175,7 +175,7 @@ class FlvExtractor : Extractor {
     }
 
     @RequiresNonNull("extractorOutput")
-    @Throws(IOException::class)
+    
     private fun readTagData(input: ExtractorInput): Boolean {
         var wasConsumed = true
         var wasSampleOutput = false
@@ -213,7 +213,7 @@ class FlvExtractor : Extractor {
         return wasConsumed
     }
 
-    @Throws(IOException::class)
+    
     private fun prepareTagData(input: ExtractorInput): ParsableByteArray {
         if (tagDataSize > tagData.capacity()) {
             tagData.reset(ByteArray(max(tagData.capacity() * 2, tagDataSize)), 0)

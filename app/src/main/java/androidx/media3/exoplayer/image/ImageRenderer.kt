@@ -49,7 +49,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         return decoderFactory.supportsFormat(format)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (outputStreamEnded) {
             return
@@ -105,7 +105,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     override val isEnded: Boolean
         get() = outputStreamEnded
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         firstFrameState =
             if (mayRenderStartOfStream)
@@ -114,7 +114,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
                 C.FIRST_FRAME_NOT_RENDERED_ONLY_ALLOWED_IF_STARTED
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -139,7 +139,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -172,7 +172,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         releaseDecoderResources()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_IMAGE_OUTPUT -> {
@@ -186,8 +186,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             else -> super.handleMessage(messageType, message)
         }
     }
-
-    @Throws(ImageDecoderException::class, ExoPlaybackException::class)
     private fun drainOutput(positionUs: Long, elapsedRealtimeUs: Long): Boolean {
         // If tileInfo and outputBitmap are both null, we must not return early. The EOS may have been
         // queued to the decoder, and we must stay in this method to deque it further down.
@@ -264,7 +262,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -287,7 +285,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         return false
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeInitializeProcessingPipeline(): Boolean {
         // Do nothing.
         return true
@@ -301,8 +299,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             outputStreamInfo = pendingOutputStreamChanges.removeFirst()
         }
     }
-
-    @Throws(ImageDecoderException::class)
     private fun feedInputBuffer(positionUs: Long): Boolean {
         if (readyToOutputTiles && tileInfo != null) {
             return false
@@ -372,7 +368,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeInitCodec(): Boolean {
         if (!maybeInitializeProcessingPipeline()) {
             return false

@@ -53,7 +53,7 @@ class DefaultOggSeeker(
         pageHeader = OggPageHeader()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput): Long {
         when (state) {
             STATE_IDLE -> return -1
@@ -112,7 +112,7 @@ class DefaultOggSeeker(
         endGranule = totalGranules
     }
 
-    @Throws(IOException::class)
+    
     private fun getNextSeekPosition(input: ExtractorInput): Long {
         if (start == end) {
             return C.INDEX_UNSET.toLong()
@@ -156,7 +156,7 @@ class DefaultOggSeeker(
         return constrainValue(nextPosition, start, end - 1)
     }
 
-    @Throws(IOException::class)
+    
     private fun skipToPageOfTargetGranule(input: ExtractorInput) {
         while (true) {
             // If pageHeader.skipToNextPage fails to find a page it will advance input.position to the
@@ -174,7 +174,7 @@ class DefaultOggSeeker(
     }
 
     
-    @Throws(IOException::class)
+    
     fun readGranuleOfLastPage(input: ExtractorInput): Long {
         pageHeader.reset()
         if (!pageHeader.skipToNextPage(input)) {

@@ -14,7 +14,7 @@ interface MediaPeriod : SequenceableLoader {
 
     fun prepare(callback: Callback, positionUs: Long)
 
-    @Throws(IOException::class)
+    
     fun maybeThrowPrepareError()
 
     val trackGroups: TrackGroupArray

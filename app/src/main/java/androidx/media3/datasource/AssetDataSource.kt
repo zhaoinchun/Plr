@@ -24,8 +24,6 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
     private var inputStream: InputStream? = null
     private var bytesRemaining: Long = 0
     private var opened = false
-
-    @Throws(AssetDataSourceException::class)
     override fun open(dataSpec: DataSpec): Long {
         try {
             uri = dataSpec.uri
@@ -72,8 +70,6 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
         transferStarted(dataSpec)
         return bytesRemaining
     }
-
-    @Throws(AssetDataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -102,8 +98,6 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
         bytesTransferred(bytesRead)
         return bytesRead
     }
-
-    @Throws(AssetDataSourceException::class)
     override fun close() {
         uri = null
         try {

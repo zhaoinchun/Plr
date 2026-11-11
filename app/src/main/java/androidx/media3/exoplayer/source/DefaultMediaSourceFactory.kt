@@ -377,8 +377,6 @@ class DefaultMediaSourceFactory(
                 ensureAllSuppliersAreLoaded()
                 return Ints.toArray(mediaSourceFactorySuppliers.keys)
             }
-
-        @Throws(ClassNotFoundException::class)
         fun getMediaSourceFactory(contentType:  Int): MediaSource.Factory {
             var mediaSourceFactory = mediaSourceFactories[contentType]
             if (mediaSourceFactory != null) {
@@ -490,8 +488,6 @@ class DefaultMediaSourceFactory(
                 return null
             }
         }
-
-        @Throws(ClassNotFoundException::class)
         fun loadSupplier(contentType:  Int): Supplier<MediaSource.Factory> {
             var mediaSourceFactorySupplier = mediaSourceFactorySuppliers[contentType]
             if (mediaSourceFactorySupplier != null) {
@@ -562,7 +558,7 @@ class DefaultMediaSourceFactory(
             )
         }
 
-        @Throws(IOException::class)
+        
         override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
             val skipResult = input.skip(Int.MAX_VALUE)
             if (skipResult == C.RESULT_END_OF_INPUT) {

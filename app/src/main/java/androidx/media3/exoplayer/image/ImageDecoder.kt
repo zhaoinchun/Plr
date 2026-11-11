@@ -10,10 +10,6 @@ interface ImageDecoder : Decoder<DecoderInputBuffer, ImageOutputBuffer, ImageDec
         fun supportsFormat(format: Format):  Int
         fun createImageDecoder(): ImageDecoder
     }
-
-    @Throws(ImageDecoderException::class)
     override fun queueInputBuffer(inputBuffer: DecoderInputBuffer)
-
-    @Throws(ImageDecoderException::class)
     override fun dequeueOutputBuffer(): ImageOutputBuffer?
 }

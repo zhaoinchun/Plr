@@ -22,7 +22,7 @@ class VarintReader {
         this.lastLength = 0
     }
 
-    @Throws(IOException::class)
+    
     fun readUnsignedVarint(
         input: ExtractorInput,
         allowEndOfInput: Boolean,

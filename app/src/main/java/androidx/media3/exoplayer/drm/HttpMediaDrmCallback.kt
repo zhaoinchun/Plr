@@ -54,7 +54,6 @@ class HttpMediaDrmCallback(
 
     // Wrapping into a RuntimeException is recommended by the JSONException docs:
     // https://developer.android.com/reference/org/json/JSONException
-    @Throws(MediaDrmCallbackException::class)
     override fun executeProvisionRequest(
         uuid: UUID,
         request: ExoMediaDrm.ProvisionRequest
@@ -75,8 +74,6 @@ class HttpMediaDrmCallback(
             )
         )
     }
-
-    @Throws(MediaDrmCallbackException::class)
     override fun executeKeyRequest(
         uuid: UUID,
         request: ExoMediaDrm.KeyRequest

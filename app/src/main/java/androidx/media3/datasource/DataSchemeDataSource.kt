@@ -19,7 +19,7 @@ class DataSchemeDataSource : BaseDataSource( false) {
     private var readPosition = 0
     private var bytesRemaining = 0
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         transferInitializing(dataSpec)
         this.dataSpec = dataSpec

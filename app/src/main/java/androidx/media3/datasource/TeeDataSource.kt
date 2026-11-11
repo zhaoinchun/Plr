@@ -16,7 +16,7 @@ class TeeDataSource(
         upstream.addTransferListener(transferListener)
     }
 
-    @Throws(IOException::class)
+    
     override fun open(dataSpec: DataSpec): Long {
         var dataSpec = dataSpec
         bytesRemaining = upstream.open(dataSpec)
@@ -32,7 +32,7 @@ class TeeDataSource(
         return bytesRemaining
     }
 
-    @Throws(IOException::class)
+    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (bytesRemaining == 0L) {
             return C.RESULT_END_OF_INPUT
@@ -53,7 +53,7 @@ class TeeDataSource(
     override val responseHeaders: MutableMap<String, List<String>>
         get() = upstream.responseHeaders
 
-    @Throws(IOException::class)
+    
     override fun close() {
         try {
             upstream.close()

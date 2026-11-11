@@ -13,7 +13,7 @@ abstract class BaseAudioProcessor : AudioProcessor {
     private var outputBuffer = AudioProcessor.EMPTY_BUFFER
     private var inputEnded = false
 
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat? {
         pendingInputAudioFormat = inputAudioFormat
         pendingOutputAudioFormat = onConfigure(inputAudioFormat)
@@ -74,7 +74,7 @@ abstract class BaseAudioProcessor : AudioProcessor {
         return outputBuffer.hasRemaining()
     }
 
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     protected open fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         return AudioProcessor.AudioFormat.NOT_SET
     }

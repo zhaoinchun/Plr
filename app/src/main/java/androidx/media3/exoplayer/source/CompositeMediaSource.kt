@@ -23,7 +23,7 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
     }
 
     @CallSuper
-    @Throws(IOException::class)
+    
     override fun maybeThrowSourceInfoRefreshError() {
         for (childSource in childSources.values) {
             childSource.mediaSource.maybeThrowSourceInfoRefreshError()

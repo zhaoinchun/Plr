@@ -37,7 +37,7 @@ class PsDurationReader {
         return scrTimestampAdjuster
     }
 
-    @Throws(IOException::class)
+    
     fun readDuration(
         input: ExtractorInput, seekPositionHolder: PositionHolder
     ):  Int {
@@ -68,7 +68,7 @@ class PsDurationReader {
         return Extractor.RESULT_CONTINUE
     }
 
-    @Throws(IOException::class)
+    
     private fun readFirstScrValue(input: ExtractorInput, seekPositionHolder: PositionHolder): Int {
         val bytesToSearch = min(TIMESTAMP_SEARCH_BYTES.toLong(), input.length) as Int
         val searchStartPosition = 0
@@ -102,7 +102,7 @@ class PsDurationReader {
         return C.TIME_UNSET
     }
 
-    @Throws(IOException::class)
+    
     private fun readLastScrValue(input: ExtractorInput, seekPositionHolder: PositionHolder): Int {
         val inputLength: Long = input.length
         val bytesToSearch = min(TIMESTAMP_SEARCH_BYTES.toLong(), inputLength).toInt()

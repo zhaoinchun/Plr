@@ -66,7 +66,7 @@ class VorbisReader : StreamReader() {
         return samplesInPacket.toLong()
     }
 
-    @Throws(IOException::class)
+    
     override fun readHeaders(
         packet: ParsableByteArray,
         position: Long,
@@ -109,7 +109,7 @@ class VorbisReader : StreamReader() {
     }
 
     
-    @Throws(IOException::class)
+    
     fun readSetupHeaders(scratch: ParsableByteArray): VorbisSetup? {
         if (vorbisIdHeader == null) {
             vorbisIdHeader = readVorbisIdentificationHeader(scratch)

@@ -47,7 +47,7 @@ class PsExtractor  constructor(
     }
 
     // Extractor implementation.
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         val scratch = ByteArray(14)
         input.peekFully(scratch, 0, 14)
@@ -125,7 +125,7 @@ class PsExtractor  constructor(
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         // Asserts init has been called.
         val output = output!!
@@ -298,7 +298,7 @@ class PsExtractor  constructor(
             pesPayloadReader.seek()
         }
 
-        @Throws(ParserException::class)
+        
         fun consume(data: ParsableByteArray) {
             data.readBytes(pesScratch.data, 0, 3)
             pesScratch.position=(0)

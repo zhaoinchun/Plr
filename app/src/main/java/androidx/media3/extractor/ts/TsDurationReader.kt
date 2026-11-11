@@ -33,7 +33,7 @@ class TsDurationReader(private val timestampSearchBytes: Int) {
         packetBuffer = ParsableByteArray()
     }
 
-    @Throws(IOException::class)
+    
     fun readDuration(
         input: ExtractorInput, seekPositionHolder: PositionHolder, pcrPid: Int
     ):  Int {
@@ -71,7 +71,7 @@ class TsDurationReader(private val timestampSearchBytes: Int) {
         return Extractor.RESULT_CONTINUE
     }
 
-    @Throws(IOException::class)
+    
     private fun readFirstPcrValue(
         input: ExtractorInput,
         seekPositionHolder: PositionHolder,
@@ -108,7 +108,7 @@ class TsDurationReader(private val timestampSearchBytes: Int) {
         return C.TIME_UNSET
     }
 
-    @Throws(IOException::class)
+    
     private fun readLastPcrValue(
         input: ExtractorInput,
         seekPositionHolder: PositionHolder,

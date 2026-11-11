@@ -20,7 +20,7 @@ class PngExtractor : Extractor {
             )
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         return imageExtractor.sniff(input)
     }
@@ -29,7 +29,7 @@ class PngExtractor : Extractor {
         imageExtractor.init(output)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder

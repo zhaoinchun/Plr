@@ -389,12 +389,6 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     private class ExtensionLoader(private val constructorSupplier: ConstructorSupplier) {
         interface ConstructorSupplier {
-            @get:Throws(
-                InvocationTargetException::class,
-                IllegalAccessException::class,
-                NoSuchMethodException::class,
-                ClassNotFoundException::class
-            )
             val constructor: Constructor<out Extractor?>?
         }
 
@@ -479,10 +473,6 @@ class DefaultExtractorsFactory : ExtractorsFactory {
                     get() = midiExtractorConstructor
             })
 
-        @get:Throws(
-            ClassNotFoundException::class,
-            NoSuchMethodException::class
-        )
         private val midiExtractorConstructor: Constructor<out Extractor?>
             get() =// LINT.IfChange
                 Class.forName("androidx.media3.decoder.midi.MidiExtractor")
@@ -490,12 +480,6 @@ class DefaultExtractorsFactory : ExtractorsFactory {
                     .getConstructor()
         // LINT.ThenChange(../../../../../../proguard-rules.txt)
 
-        @get:Throws(
-            ClassNotFoundException::class,
-            NoSuchMethodException::class,
-            InvocationTargetException::class,
-            IllegalAccessException::class
-        )
         private val flacExtractorConstructor: Constructor<out Extractor?>?
             get() {
                 // LINT.IfChange

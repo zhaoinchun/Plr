@@ -79,7 +79,7 @@ class CachedContentIndex(
     }
 
     @WorkerThread
-    @Throws(IOException::class)
+    
     fun initialize(uid: Long) {
         storage!!.initialize(uid)
         if (previousStorage != null) {
@@ -100,7 +100,7 @@ class CachedContentIndex(
     }
 
     @WorkerThread
-    @Throws(IOException::class)
+    
     fun store() {
         storage!!.storeIncremental(keyToContent)
         // Make ids that were removed since the index was last stored eligible for re-use.
@@ -187,19 +187,19 @@ class CachedContentIndex(
     private interface Storage {
         fun initialize(uid: Long)
 
-        @Throws(IOException::class)
+        
         fun exists(): Boolean
 
-        @Throws(IOException::class)
+        
         fun delete()
 
-        @Throws(IOException::class)
+        
         fun load(content: HashMap<String, CachedContent>, idToKey: SparseArray<String>)
 
-        @Throws(IOException::class)
+        
         fun storeFully(content: HashMap<String, CachedContent>)
 
-        @Throws(IOException::class)
+        
         fun storeIncremental(content: HashMap<String, CachedContent>)
 
         fun onUpdate(cachedContent: CachedContent)
@@ -264,13 +264,13 @@ class CachedContentIndex(
             }
         }
 
-        @Throws(IOException::class)
+        
         override fun storeFully(content: HashMap<String, CachedContent>) {
             writeFile(content)
             changed = false
         }
 
-        @Throws(IOException::class)
+        
         override fun storeIncremental(content: HashMap<String, CachedContent>) {
             if (!changed) {
                 return
@@ -349,7 +349,7 @@ class CachedContentIndex(
             return true
         }
 
-        @Throws(IOException::class)
+        
         fun writeFile(content: HashMap<String, CachedContent>) {
             var output: DataOutputStream? = null
             try {
@@ -411,7 +411,7 @@ class CachedContentIndex(
             return result
         }
 
-        @Throws(IOException::class)
+        
         fun readCachedContent(version: Int, input: DataInputStream): CachedContent {
             val id = input.readInt()
             val key = input.readUTF()
@@ -428,7 +428,7 @@ class CachedContentIndex(
             return CachedContent(id, key, metadata)
         }
 
-        @Throws(IOException::class)
+        
         fun writeCachedContent(cachedContent: CachedContent, output: DataOutputStream) {
             output.writeInt(cachedContent.id)
             output.writeUTF(cachedContent.key)
@@ -459,7 +459,7 @@ class CachedContentIndex(
             tableName = getTableName(hexUid!!)
         }
 
-        @Throws(DatabaseIOException::class)
+        
         override fun exists(): Boolean {
             try {
                 return (VersionTable.getVersion(
@@ -473,12 +473,12 @@ class CachedContentIndex(
             }
         }
 
-        @Throws(DatabaseIOException::class)
+        
         override fun delete() {
             delete(databaseProvider, hexUid!!)
         }
 
-        @Throws(IOException::class)
+        
         override fun load(
             content: HashMap<String, CachedContent>, idToKey: SparseArray<String>
         ) {
@@ -523,7 +523,7 @@ class CachedContentIndex(
             }
         }
 
-        @Throws(IOException::class)
+        
         override fun storeFully(content: HashMap<String, CachedContent>) {
             try {
                 val writableDatabase = databaseProvider.writableDatabase!!
@@ -543,7 +543,7 @@ class CachedContentIndex(
             }
         }
 
-        @Throws(IOException::class)
+        
         override fun storeIncremental(content: HashMap<String, CachedContent>) {
             if (pendingUpdates.size() == 0) {
                 return
@@ -595,7 +595,7 @@ class CachedContentIndex(
                     null
                 )
 
-        @Throws(DatabaseIOException::class)
+        
         fun initializeTable(writableDatabase: SQLiteDatabase) {
             VersionTable.setVersion(
                 writableDatabase,
@@ -615,7 +615,7 @@ class CachedContentIndex(
             )
         }
 
-        @Throws(IOException::class)
+        
         fun addOrUpdateRow(writableDatabase: SQLiteDatabase, cachedContent: CachedContent) {
             val outputStream = ByteArrayOutputStream()
             writeContentMetadata(cachedContent.metadata, DataOutputStream(outputStream))
@@ -654,12 +654,12 @@ class CachedContentIndex(
                     + COLUMN_METADATA
                     + " BLOB NOT NULL)")
 
-            @Throws(DatabaseIOException::class)
+            
             fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
                 delete(databaseProvider, uid.toHexString())
             }
 
-            @Throws(DatabaseIOException::class)
+            
             private fun delete(databaseProvider: DatabaseProvider, hexUid: String) {
                 try {
                     val tableName = getTableName(hexUid)
@@ -701,7 +701,7 @@ class CachedContentIndex(
         }
 
         @WorkerThread
-        @Throws(DatabaseIOException::class)
+        
         fun delete(databaseProvider: DatabaseProvider, uid: kotlin.Long) {
             DatabaseStorage.delete(databaseProvider, uid)
         }
@@ -722,7 +722,7 @@ class CachedContentIndex(
             return id
         }
 
-        @Throws(IOException::class)
+        
         private fun readContentMetadata(input: DataInputStream): DefaultContentMetadata {
             val size = input.readInt()
             val metadata = HashMap<String?, ByteArray?>()
@@ -749,7 +749,7 @@ class CachedContentIndex(
             return DefaultContentMetadata(metadata)
         }
 
-        @Throws(IOException::class)
+        
         private fun writeContentMetadata(
             metadata: DefaultContentMetadata,
             output: DataOutputStream

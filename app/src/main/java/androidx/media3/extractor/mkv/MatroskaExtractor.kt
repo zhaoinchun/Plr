@@ -185,7 +185,7 @@ class MatroskaExtractor(
         pendingEndTracks = true
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         return Sniffer().sniff(input)
     }
@@ -225,7 +225,7 @@ class MatroskaExtractor(
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         haveOutputSample = false
         var continueReading = true
@@ -268,7 +268,7 @@ class MatroskaExtractor(
     }
 
     @CallSuper
-    @Throws(ParserException::class)
+    
     protected fun startMasterElement(id: Int, contentPosition: Long, contentSize: Long) {
         assertInitialized()
         when (id) {
@@ -344,7 +344,7 @@ class MatroskaExtractor(
     }
 
     @CallSuper
-    @Throws(ParserException::class)
+    
     protected fun endMasterElement(id: Int) {
         assertInitialized()
         when (id) {
@@ -626,7 +626,7 @@ class MatroskaExtractor(
     }
 
     @CallSuper
-    @Throws(ParserException::class)
+    
     protected fun integerElement(id: Int, value: Long) {
         when (id) {
             ID_EBML_READ_VERSION ->         // Validate that EBMLReadVersion is supported. This extractor only supports v1.
@@ -805,7 +805,7 @@ class MatroskaExtractor(
     }
 
     @CallSuper
-    @Throws(ParserException::class)
+    
     protected fun floatElement(id: Int, value: Double) {
         when (id) {
             ID_DURATION -> durationTimecode = value.toLong()
@@ -844,7 +844,7 @@ class MatroskaExtractor(
     }
 
     @CallSuper
-    @Throws(ParserException::class)
+    
     protected fun stringElement(id: Int, value: String) {
         when (id) {
             ID_DOC_TYPE -> {
@@ -867,7 +867,7 @@ class MatroskaExtractor(
     }
 
     @CallSuper
-    @Throws(IOException::class)
+    
     protected fun binaryElement(id: Int, contentSize: Int, input: ExtractorInput) {
         when (id) {
             ID_SEEK_ID -> {
@@ -1102,7 +1102,7 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(IOException::class)
+    
     protected fun handleBlockAddIDExtraData(track: Track, input: ExtractorInput, contentSize: Int) {
         if (track.blockAddIdType == BLOCK_ADD_ID_TYPE_DVVC
             || track.blockAddIdType == BLOCK_ADD_ID_TYPE_DVCC
@@ -1115,7 +1115,7 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(IOException::class)
+    
     protected fun handleBlockAdditionalData(
         track: Track, blockAdditionalId: Int, input: ExtractorInput, contentSize: Int
     ) {
@@ -1130,7 +1130,7 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun assertInEditionEntry(id: Int) {
         if (currentChapter == null) {
             throw ParserException.createForMalformedContainer(
@@ -1139,7 +1139,7 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun assertInTrackEntry(id: Int) {
         if (currentTrack == null) {
             throw ParserException.createForMalformedContainer(
@@ -1148,7 +1148,7 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     private fun assertInCues(id: Int) {
         if (!inCuesElement) {
             throw ParserException.createForMalformedContainer(
@@ -1157,13 +1157,13 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(ParserException::class)
+    
     protected fun getCurrentChapter(currentElementId: Int): ChapterEntry? {
         assertInEditionEntry(currentElementId)
         return currentChapter
     }
 
-    @Throws(ParserException::class)
+    
     protected fun getCurrentTrack(currentElementId: Int): Track? {
         assertInTrackEntry(currentElementId)
         return currentTrack
@@ -1231,7 +1231,7 @@ class MatroskaExtractor(
         haveOutputSample = true
     }
 
-    @Throws(IOException::class)
+    
     private fun readScratch(input: ExtractorInput, requiredLength: Int) {
         if (scratch.limit() >= requiredLength) {
             return
@@ -1244,7 +1244,7 @@ class MatroskaExtractor(
     }
 
     @RequiresNonNull("#2.output")
-    @Throws(IOException::class)
+    
     private fun writeSampleData(
         input: ExtractorInput,
         track: Track,
@@ -1483,7 +1483,7 @@ class MatroskaExtractor(
         sampleStrippedBytes.reset(0)
     }
 
-    @Throws(IOException::class)
+    
     private fun writeSubtitleSampleData(input: ExtractorInput, samplePrefix: ByteArray, size: Int) {
         val sizeWithPrefix = samplePrefix.size + size
         if (subtitleSample.capacity() < sizeWithPrefix) {
@@ -1500,7 +1500,7 @@ class MatroskaExtractor(
         // the correct end timecode, which we might not have yet.
     }
 
-    @Throws(IOException::class)
+    
     private fun writeToTarget(input: ExtractorInput, target: ByteArray, offset: Int, length: Int) {
         val pendingStrippedBytes = min(length, sampleStrippedBytes.bytesLeft())
         input.readFully(target, offset + pendingStrippedBytes, length - pendingStrippedBytes)
@@ -1509,7 +1509,7 @@ class MatroskaExtractor(
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun writeToOutput(input: ExtractorInput, output: TrackOutput, length: Int): Int {
         val bytesWritten: Int
         val strippedBytesLeft = sampleStrippedBytes.bytesLeft()
@@ -1554,7 +1554,7 @@ class MatroskaExtractor(
         return false
     }
 
-    @Throws(ParserException::class)
+    
     private fun scaleTimecodeToUs(unscaledTimecode: Long): Long {
         if (timecodeScale == C.TIME_UNSET) {
             throw ParserException.createForMalformedContainer(
@@ -1600,32 +1600,32 @@ class MatroskaExtractor(
             return this@MatroskaExtractor.isLevel1Element(id)
         }
 
-        @Throws(ParserException::class)
+        
         override fun startMasterElement(id: Int, contentPosition: Long, contentSize: Long) {
             this@MatroskaExtractor.startMasterElement(id, contentPosition, contentSize)
         }
 
-        @Throws(ParserException::class)
+        
         override fun endMasterElement(id: Int) {
             this@MatroskaExtractor.endMasterElement(id)
         }
 
-        @Throws(ParserException::class)
+        
         override fun integerElement(id: Int, value: Long) {
             this@MatroskaExtractor.integerElement(id, value)
         }
 
-        @Throws(ParserException::class)
+        
         override fun floatElement(id: Int, value: Double) {
             this@MatroskaExtractor.floatElement(id, value)
         }
 
-        @Throws(ParserException::class)
+        
         override fun stringElement(id: Int, value: String) {
             this@MatroskaExtractor.stringElement(id, value)
         }
 
-        @Throws(IOException::class)
+        
         override fun binaryElement(id: Int, contentsSize: Int, input: ExtractorInput) {
             this@MatroskaExtractor.binaryElement(id, contentsSize, input)
         }
@@ -1720,7 +1720,7 @@ class MatroskaExtractor(
         var nalUnitLengthFieldLength: Int = 0
 
         @RequiresNonNull("codecId")
-        @Throws(ParserException::class)
+        
         fun initializeFormat(trackId: Int) {
             var mimeType: String?
             var maxInputSize = Format.NO_VALUE
@@ -2244,7 +2244,7 @@ class MatroskaExtractor(
             }
         }
 
-        @Throws(ParserException::class)
+        
         private fun parseMsAcmCodecPrivate(buffer: ParsableByteArray): Boolean {
             try {
                 val formatTag: Int = buffer.readLittleEndianUnsignedShort()
@@ -2272,7 +2272,7 @@ class MatroskaExtractor(
             output!!
         }
 
-        @Throws(ParserException::class)
+        
         private fun getCodecPrivate(codecId: String?): ByteArray {
             if (codecPrivate == null) {
                 throw ParserException.createForMalformedContainer(
@@ -2339,7 +2339,7 @@ class MatroskaExtractor(
                 return if (bestCueIndex == -1) C.TIME_UNSET else cuePoints.get(bestCueIndex).timeUs
             }
 
-            @Throws(ParserException::class)
+            
             private fun parseFourCcPrivate(
                 buffer: ParsableByteArray
             ): Pair<String?, MutableList<ByteArray>?> {
@@ -2380,7 +2380,7 @@ class MatroskaExtractor(
                 return Pair<String?, MutableList<ByteArray>?>(MimeTypes.VIDEO_UNKNOWN, null)
             }
 
-            @Throws(ParserException::class)
+            
             private fun parseVorbisCodecPrivate(codecPrivate: ByteArray): MutableList<ByteArray> {
                 try {
                     if (codecPrivate[0].toInt() != 0x02) {

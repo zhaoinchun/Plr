@@ -28,7 +28,7 @@ class OggPacket {
         populated = false
     }
 
-    @Throws(IOException::class)
+    
     fun populate(input: ExtractorInput): Boolean {
         Preconditions.checkState(input != null)
 

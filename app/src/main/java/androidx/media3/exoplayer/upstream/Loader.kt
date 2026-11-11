@@ -29,7 +29,7 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
     interface Loadable {
         fun cancelLoad()
 
-        @Throws(IOException::class)
+        
         fun load()
     }
 
@@ -114,12 +114,12 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
     }
 
     // LoaderErrorThrower implementation.
-    @Throws(IOException::class)
+    
     override fun maybeThrowError() {
         maybeThrowError(Int.MIN_VALUE)
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowError(minRetryCount: Int) {
         if (fatalError != null) {
             throw fatalError!!
@@ -148,7 +148,7 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
         @Volatile
         private var released = false
 
-        @Throws(IOException::class)
+        
         fun maybeThrowError(minRetryCount: Int) {
             if (currentError != null && errorCount > minRetryCount) {
                 throw currentError!!

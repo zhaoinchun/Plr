@@ -6,7 +6,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree
 import java.io.IOException
 
 interface Extractor {
-    @Throws(IOException::class)
+    
     fun sniff(input: ExtractorInput): Boolean
 
     val sniffFailureDetails: List<SniffFailure>
@@ -14,7 +14,7 @@ interface Extractor {
 
     fun init(output: ExtractorOutput)
 
-    @Throws(IOException::class)
+    
     fun read(input: ExtractorInput, seekPosition: PositionHolder):  Int
     fun seek(position: Long, timeUs: Long)
     fun release()

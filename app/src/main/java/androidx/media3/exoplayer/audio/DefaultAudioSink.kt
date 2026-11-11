@@ -340,8 +340,6 @@ class DefaultAudioSink(
         positionUs = min(positionUs, configuration!!.framesToDurationUs(this.writtenFrames))
         return applySkipping(applyMediaPositionParameters(positionUs))
     }
-
-    @Throws(AudioSink.ConfigurationException::class)
     override fun configure(audioSinkConfig: AudioSinkConfig) {
         var audioProcessingPipeline: AudioProcessingPipeline?
         val inputPcmFrameSize: Int
@@ -470,8 +468,7 @@ class DefaultAudioSink(
             )
         )
     }
-
-    @Throws(AudioSink.InitializationException::class)
+    
     private fun initializeAudioOutput(): Boolean {
         if (initializationExceptionPendingExceptionHolder.shouldWaitBeforeRetry()) {
             return false
@@ -540,8 +537,6 @@ class DefaultAudioSink(
     override fun handleDiscontinuity() {
         startMediaTimeUsNeedsSync = true
     }
-
-    @Throws(AudioSink.InitializationException::class, AudioSink.WriteException::class)
     override fun handleBuffer(
         buffer: ByteBuffer, presentationTimeUs: Long, encodedAccessUnitCount: Int
     ): Boolean {
@@ -694,8 +689,7 @@ class DefaultAudioSink(
         }
         return false
     }
-
-    @Throws(AudioSink.InitializationException::class)
+    
     private fun buildAudioOutputWithRetry(): AudioOutput? {
         val configuration = configuration!!
         try {
@@ -756,8 +750,7 @@ class DefaultAudioSink(
 
             return max(oneSecondBufferSize, minBufferSize)
         }
-
-    @Throws(AudioSink.InitializationException::class)
+    
     private fun buildAudioOutput(outputConfig: OutputConfig): AudioOutput? {
         try {
             return audioOutputProvider.getAudioOutput(outputConfig)
@@ -780,7 +773,7 @@ class DefaultAudioSink(
         }
     }
 
-    @Throws(AudioSink.WriteException::class)
+    
     private fun processBuffers(avSyncPresentationTimeUs: Long) {
         // Drain existing buffer first.
         drainOutputBuffer(avSyncPresentationTimeUs)
@@ -817,7 +810,7 @@ class DefaultAudioSink(
         }
     }
 
-    @Throws(AudioSink.WriteException::class)
+    
     private fun drainToEndOfStream(): Boolean {
         if (!audioProcessingPipeline!!.isOperational) {
             drainOutputBuffer(C.TIME_END_OF_SOURCE)
@@ -838,7 +831,7 @@ class DefaultAudioSink(
         outputBuffer = maybeRampUpVolume(buffer)
     }
 
-    @Throws(AudioSink.WriteException::class)
+    
     private fun drainOutputBuffer(avSyncPresentationTimeUs: Long) {
         if (outputBuffer == null) {
             return
@@ -915,7 +908,7 @@ class DefaultAudioSink(
         }
     }
 
-    @Throws(AudioSink.WriteException::class)
+    
     override fun playToEndOfStream() {
         if (!handledEndOfStream && this.isAudioOutputInitialized && drainToEndOfStream()) {
             playPendingData()
@@ -1544,8 +1537,6 @@ class DefaultAudioSink(
             this.throwDeadlineMs = C.TIME_UNSET
             this.earliestNextRetryTimeMs = C.TIME_UNSET
         }
-
-        @Throws(Throwable::class)
         fun throwExceptionIfDeadlineIsReached(exception: T?) {
             val nowMs = SystemClock.elapsedRealtime()
             if (pendingException == null) {

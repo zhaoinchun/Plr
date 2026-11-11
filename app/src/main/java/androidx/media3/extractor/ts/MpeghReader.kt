@@ -106,7 +106,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
         }
     }
 
-    @Throws(ParserException::class)
+    
     override fun consume(data: ParsableByteArray) {
         // Asserts that createTracks has been called.
         val output = output!!
@@ -206,7 +206,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
         return false
     }
 
-    @Throws(ParserException::class)
+    
     private fun parseHeader(): Boolean {
         val headerLength = headerScratchBytes.limit()
         headerScratchBits.reset(headerScratchBytes.data, headerLength)
@@ -236,7 +236,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
     }
 
     @RequiresNonNull("output")
-    @Throws(ParserException::class)
+    
     private fun parseConfig(bitArray: ParsableBitArray) {
         val config = MpeghUtil.parseMpegh3daConfig(bitArray)
         samplingRate = config.samplingFrequency

@@ -64,8 +64,6 @@ class ProgressiveDownloader(
             CacheWriter(dataSource, dataSpec, null, progressListener)
         priorityTaskManager = cacheDataSourceFactory.getUpstreamPriorityTaskManager()
     }
-
-    @Throws(IOException::class, InterruptedException::class)
     override fun download(progressListener: Downloader.ProgressListener?) {
         this.progressListener = progressListener
         priorityTaskManager?.add(C.PRIORITY_DOWNLOAD)
@@ -75,7 +73,7 @@ class ProgressiveDownloader(
                 // Recreate downloadRunnable on each loop iteration to avoid rethrowing a previous error.
                 downloadRunnable =
                     object : RunnableFutureTask<Void?, IOException?>() {
-                        @Throws(IOException::class)
+                        
                         override fun doWork(): Void? {
                             cacheWriter.cache()
                             return null

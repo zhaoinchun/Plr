@@ -193,7 +193,7 @@ class MediaCodecVideoRenderer(
         return shouldDropOutputBuffer(earlyUs, elapsedRealtimeUs, isLastFrame)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun shouldIgnoreFrame(
         earlyUs: Long,
         positionUs: Long,
@@ -213,7 +213,7 @@ class MediaCodecVideoRenderer(
 
     override val name: String = TAG
 
-    @Throws(DecoderQueryException::class)
+    
     override fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector,
         format: Format
@@ -221,7 +221,7 @@ class MediaCodecVideoRenderer(
         return supportsFormatInternal(context, mediaCodecSelector, format)
     }
 
-    @Throws(DecoderQueryException::class)
+    
     override fun getDecoderInfos(
         mediaCodecSelector: MediaCodecSelector, format: Format, requiresSecureDecoder: Boolean
     ): List<MediaCodecInfo> {
@@ -259,7 +259,7 @@ class MediaCodecVideoRenderer(
         super.onInit()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         super.onEnabled(joining, mayRenderStartOfStream)
         val tunneling = getConfiguration().tunneling
@@ -389,7 +389,7 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -402,7 +402,7 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -535,7 +535,7 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VIDEO_OUTPUT -> setOutput(message)
@@ -620,7 +620,7 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun setOutput(output: Any?) {
         // Handle unsupported (i.e., non-Surface) outputs by clearing the display surface.
         val displaySurface = if (output is Surface) output else null
@@ -752,7 +752,7 @@ class MediaCodecVideoRenderer(
     }
 
     @CallSuper
-    @Throws(ExoPlaybackException::class)
+    
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (videoSink != null) {
             try {
@@ -778,7 +778,7 @@ class MediaCodecVideoRenderer(
         av1SampleDependencyParser?.reset()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
         super.setPlaybackSpeed(currentPlaybackSpeed, targetPlaybackSpeed)
         if (videoSink != null) {
@@ -889,7 +889,7 @@ class MediaCodecVideoRenderer(
     }
 
     @CallSuper
-    @Throws(ExoPlaybackException::class)
+    
     override fun maybeInitializeProcessingPipeline(format: Format): Boolean {
         if (videoSink != null && !videoSink!!.isInitialized) {
             try {
@@ -975,7 +975,7 @@ class MediaCodecVideoRenderer(
                 || lastBufferInStreamPresentationTimeUs != C.TIME_UNSET
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onInputFormatChanged(formatHolder: FormatHolder): DecoderReuseEvaluation? {
         val evaluation = super.onInputFormatChanged(formatHolder)
         isApplyingContainerHagcMetadata = false
@@ -993,7 +993,7 @@ class MediaCodecVideoRenderer(
     }
 
     @CallSuper
-    @Throws(ExoPlaybackException::class)
+    
     override fun onQueueInputBuffer(buffer: DecoderInputBuffer) {
         val mimeType = codecInfo!!.mimeType
         val av1SampleDependencyParser = av1SampleDependencyParser
@@ -1214,7 +1214,7 @@ class MediaCodecVideoRenderer(
 
     // codecHandlesHdr10PlusOutOfBandMetadata is false if SDK_INT < 29
     @TargetApi(29)
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleInputBufferSupplementalData(buffer: DecoderInputBuffer) {
         if (buffer.supplementalData == null) {
             return
@@ -1260,7 +1260,7 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -1422,7 +1422,7 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun onProcessedTunneledBuffer(presentationTimeUs: Long) {
         updateOutputFormatForTime(presentationTimeUs)
         maybeNotifyVideoSizeChanged(decodedVideoSize)
@@ -1498,7 +1498,7 @@ class MediaCodecVideoRenderer(
         )
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun maybeDropBuffersToKeyframe(
         positionUs: Long, treatDroppedBuffersAsSkipped: Boolean
     ): Boolean {
@@ -2053,14 +2053,14 @@ class MediaCodecVideoRenderer(
         private var evaluatedDeviceNeedsSetOutputSurfaceWorkaround = false
         private var deviceNeedsSetOutputSurfaceWorkaround = false
 
-        @Throws(DecoderQueryException::class)
+        
         fun supportsFormat(
             context: Context, mediaCodecSelector: MediaCodecSelector, format: Format
         ):  Int {
             return supportsFormatInternal(context, mediaCodecSelector, format)
         }
 
-        @Throws(DecoderQueryException::class)
+        
         private fun supportsFormatInternal(
             context: Context, mediaCodecSelector: MediaCodecSelector, format: Format
         ):  Int {
@@ -2169,7 +2169,7 @@ class MediaCodecVideoRenderer(
 
         // Other methods
 
-        @Throws(DecoderQueryException::class)
+        
         private fun getDecoderInfos(
             context: Context,
             mediaCodecSelector: MediaCodecSelector,

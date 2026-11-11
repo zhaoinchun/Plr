@@ -52,7 +52,7 @@ class SilenceSkippingAudioProcessor(
         this.enabled = enabled
     }
 
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         if (inputAudioFormat.encoding != C.ENCODING_PCM_16BIT) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)

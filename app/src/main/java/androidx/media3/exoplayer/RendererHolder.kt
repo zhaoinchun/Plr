@@ -172,7 +172,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
         primaryRenderer.setPlaybackSpeed(currentPlaybackSpeed, targetPlaybackSpeed)
         if (secondaryRenderer != null) {
@@ -263,7 +263,7 @@ class RendererHolder(
                 || renderer.readingPositionUs >= nextPeriod.startPositionRendererTime)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun render(rendererPositionUs: Long, rendererPositionElapsedRealtimeUs: Long) {
         if (isRendererEnabled(primaryRenderer)) {
             primaryRenderer.render(rendererPositionUs, rendererPositionElapsedRealtimeUs)
@@ -280,12 +280,12 @@ class RendererHolder(
                 || renderer.isEnded
     }
 
-    @Throws(IOException::class)
+    
     fun maybeThrowStreamError(mediaPeriodHolder: MediaPeriodHolder?) {
         getRendererReadingFromPeriod(mediaPeriodHolder)!!.maybeThrowStreamError()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun start() {
         if (primaryRenderer.state == Renderer.STATE_ENABLED
             && (prewarmingState != RENDERER_PREWARMING_STATE_TRANSITIONING_TO_PRIMARY)
@@ -311,7 +311,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun enable(
         configuration: RendererConfiguration,
         trackSelection: ExoTrackSelection,
@@ -359,7 +359,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun handleMessage(
         messageType:  Int,
         message: Any?,
@@ -369,7 +369,7 @@ class RendererHolder(
         renderer.handleMessage(messageType, message)
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setScrubbingMode(scrubbingModeParameters: ScrubbingModeParameters?) {
         primaryRenderer.handleMessage(
             Renderer.MSG_SET_SCRUBBING_MODE,
@@ -383,7 +383,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun disable(mediaClock: DefaultMediaClock) {
         disableRenderer(primaryRenderer, mediaClock)
         if (secondaryRenderer != null) {
@@ -399,7 +399,7 @@ class RendererHolder(
         prewarmingState = RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun maybeHandlePrewarmingTransition() {
         if (prewarmingState == RENDERER_PREWARMING_STATE_TRANSITIONING_TO_SECONDARY
             || prewarmingState == RENDERER_PREWARMING_STATE_TRANSITIONING_TO_PRIMARY
@@ -418,7 +418,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun transferResources(transferToPrimary: Boolean) {
         if (transferToPrimary) {
             secondaryRenderer!!.handleMessage(Renderer.MSG_TRANSFER_RESOURCES, primaryRenderer)
@@ -460,7 +460,7 @@ class RendererHolder(
                 RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun maybeDisableOrResetPosition(
         sampleStream: SampleStream?,
         mediaClock: DefaultMediaClock,
@@ -477,7 +477,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeDisableOrResetPositionInternal(
         renderer: Renderer,
         sampleStream: SampleStream?,
@@ -509,7 +509,7 @@ class RendererHolder(
         renderer.disable()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun resetPosition(
         playingPeriod: MediaPeriodHolder?, positionUs: Long, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -547,7 +547,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun replaceStreamsOrDisableRendererForTransition(
         readingPeriodHolder: MediaPeriodHolder,
         newTrackSelectorResult: TrackSelectorResult,
@@ -567,7 +567,7 @@ class RendererHolder(
             primaryRendererResult
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun replaceStreamsOrDisableRendererForTransitionInternal(
         renderer: Renderer?,
         readingPeriodHolder: MediaPeriodHolder,
@@ -621,7 +621,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setVideoOutput(videoOutput: Any?) {
         if (this.trackType != TRACK_TYPE_VIDEO) {
             return
@@ -635,7 +635,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setVideoFrameMetadataListener(videoFrameMetadataListener: VideoFrameMetadataListener?) {
         // TODO: b/507835122 - Remove image track type once metadata listener handling is refined.
         if (this.trackType != TRACK_TYPE_VIDEO && this.trackType != TRACK_TYPE_IMAGE) {
@@ -651,7 +651,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setImageMetadataListener(imageMetadataListener: ImageMetadataListener?) {
         if (this.trackType != TRACK_TYPE_IMAGE) {
             return
@@ -667,7 +667,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setVolume(volume: Float) {
         if (this.trackType != TRACK_TYPE_AUDIO) {
             return
@@ -678,7 +678,7 @@ class RendererHolder(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     fun setAudioSessionId(audioSessionId: Int) {
         if (this.trackType != TRACK_TYPE_AUDIO && this.trackType != TRACK_TYPE_VIDEO) {
             return

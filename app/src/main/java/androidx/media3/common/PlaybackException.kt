@@ -245,7 +245,6 @@ open class PlaybackException protected constructor(
         }
 
         // Creates a new {@link Throwable} with possibly {@code null} message.
-        @Throws(Exception::class)
         private fun createThrowable(clazz: Class<*>, message: String?): Throwable {
             return clazz.getConstructor(String::class.java).newInstance(message) as Throwable
         }

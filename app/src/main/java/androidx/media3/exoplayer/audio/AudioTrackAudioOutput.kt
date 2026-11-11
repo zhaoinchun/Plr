@@ -157,8 +157,6 @@ class AudioTrackAudioOutput(
             audioTrack.pause()
         }
     }
-
-    @Throws(AudioOutput.WriteException::class)
     override fun write(
         buffer: ByteBuffer,
         encodedAccessUnitCount: Int,

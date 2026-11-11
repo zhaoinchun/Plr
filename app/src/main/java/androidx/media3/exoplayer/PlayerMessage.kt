@@ -19,7 +19,7 @@ class PlayerMessage(
     var looper: Looper
 ) {
     interface Target {
-        @Throws(ExoPlaybackException::class)
+        
         fun handleMessage(messageType:  Int, message: Any?)
     }
 
@@ -116,7 +116,7 @@ class PlayerMessage(
     }
 
     @Synchronized
-    @Throws(InterruptedException::class)
+
     fun blockUntilDelivered(): Boolean {
         Preconditions.checkState(isSent)
         Preconditions.checkState(looper.getThread() !== Thread.currentThread())
@@ -127,7 +127,6 @@ class PlayerMessage(
     }
 
     @Synchronized
-    @Throws(InterruptedException::class, TimeoutException::class)
     fun blockUntilDelivered(timeoutMs: Long): Boolean {
         Preconditions.checkState(isSent)
         Preconditions.checkState(looper.getThread() !== Thread.currentThread())

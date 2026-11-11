@@ -58,7 +58,7 @@ class MergingMediaPeriod(
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun maybeThrowPrepareError() {
         for (period in periods) {
             period.maybeThrowPrepareError()

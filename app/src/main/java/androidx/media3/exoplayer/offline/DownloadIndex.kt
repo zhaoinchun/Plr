@@ -6,9 +6,9 @@ import java.io.IOException
 @WorkerThread
 interface DownloadIndex {
 
-    @Throws(IOException::class)
+    
     fun getDownload(id: String?): Download?
 
-    @Throws(IOException::class)
+    
     fun getDownloads( vararg states: Int): DownloadCursor
 }

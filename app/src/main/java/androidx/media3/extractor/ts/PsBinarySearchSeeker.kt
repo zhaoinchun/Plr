@@ -33,7 +33,7 @@ class PsBinarySearchSeeker(
             packetBuffer = ParsableByteArray()
         }
 
-        @Throws(IOException::class)
+        
         override fun searchForTimestamp(
             input: ExtractorInput,
             targetTimestamp: Long

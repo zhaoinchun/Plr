@@ -160,7 +160,7 @@ class MediaParserChunkExtractor @SuppressLint("WrongConstant") constructor(
         mediaParser.release()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput): Boolean {
         maybeExecutePendingSeek()
         inputReaderAdapter.setDataReader(input, input.length)

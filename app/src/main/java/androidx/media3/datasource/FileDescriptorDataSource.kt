@@ -24,8 +24,6 @@ class FileDescriptorDataSource(
     private var inputStream: FileInputStream? = null
     private var bytesRemaining: Long = 0
     private var opened = false
-
-    @Throws(DataSourceException::class)
     override fun open(dataSpec: DataSpec): Long {
         try {
             uri = dataSpec.uri
@@ -91,8 +89,6 @@ class FileDescriptorDataSource(
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
-
-    @Throws(DataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -119,8 +115,6 @@ class FileDescriptorDataSource(
         bytesTransferred(bytesRead)
         return bytesRead
     }
-
-    @Throws(DataSourceException::class)
     override fun close() {
         uri = null
         inUseFileDescriptors.remove(fileDescriptor)
@@ -143,8 +137,6 @@ class FileDescriptorDataSource(
         // Track file descriptors currently in use to fail fast if an attempt is made to re-use one.
         private val inUseFileDescriptors: MutableSet<FileDescriptor?> =
             Sets.newConcurrentHashSet<FileDescriptor?>()
-
-        @Throws(DataSourceException::class)
         private fun seekFileDescriptor(fileDescriptor: FileDescriptor?, position: Long) {
             try {
                 Os.lseek(fileDescriptor, position,  OsConstants.SEEK_SET)

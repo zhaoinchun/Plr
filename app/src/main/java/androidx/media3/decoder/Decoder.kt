@@ -7,13 +7,13 @@ interface Decoder<I, O, E : DecoderException> {
 
     fun setOutputStartTimeUs(outputStartTimeUs: Long)
 
-    @Throws(DecoderException::class)
+    
     fun dequeueInputBuffer(): I?
 
-    @Throws(DecoderException::class)
+    
     fun queueInputBuffer(inputBuffer: I)
 
-    @Throws(DecoderException::class)
+    
     fun dequeueOutputBuffer(): O?
 
     fun flush()

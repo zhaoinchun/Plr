@@ -28,8 +28,6 @@ class VideoTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
     override fun seek() {
         hasOutputKeyframe = false
     }
-
-    @Throws(UnsupportedFormatException::class)
     override fun parseHeader(data: ParsableByteArray): Boolean {
         val header = data.readUnsignedByte()
         val frameType = (header shr 4) and 0x0F
@@ -42,7 +40,7 @@ class VideoTagPayloadReader(output: TrackOutput) : TagPayloadReader(output) {
         return (frameType != VIDEO_FRAME_VIDEO_INFO)
     }
 
-    @Throws(ParserException::class)
+    
     override fun parsePayload(data: ParsableByteArray, timeUs: Long): Boolean {
         var timeUs = timeUs
         val packetType = data.readUnsignedByte()

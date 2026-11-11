@@ -12,10 +12,10 @@ interface RendererCapabilities {
     val name: String
     val trackType: Int
 
-    @Throws(ExoPlaybackException::class)
+    
     fun supportsFormat(format: Format):  Int
 
-    @Throws(ExoPlaybackException::class)
+    
     fun supportsMixedMimeTypeAdaptation(): Int
 
     fun setListener(listener: Listener?) {

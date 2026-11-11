@@ -23,7 +23,7 @@ class BundledExtractorsAdapter(private val extractorsFactory: ExtractorsFactory)
     private var extractor: Extractor? = null
     private var extractorInput: ExtractorInput? = null
 
-    @Throws(IOException::class)
+    
     override fun init(
         dataReader: DataReader,
         uri: Uri,
@@ -98,7 +98,7 @@ class BundledExtractorsAdapter(private val extractorsFactory: ExtractorsFactory)
         extractor!!.seek(position, seekTimeUs)
     }
 
-    @Throws(IOException::class)
+    
     override fun read(positionHolder: PositionHolder): Int {
         return extractor!!.read(extractorInput!!, positionHolder)
     }

@@ -43,7 +43,7 @@ class HeicMotionPhotoExtractor : Extractor {
         state = STATE_READING_ATOM_HEADER
     }
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         return HeifSniffer.sniff(input, true)
     }
@@ -52,7 +52,7 @@ class HeicMotionPhotoExtractor : Extractor {
         this.extractorOutput = output
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         while (true) {
             when (state) {
@@ -91,7 +91,7 @@ class HeicMotionPhotoExtractor : Extractor {
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readAtomHeader(input: ExtractorInput): Boolean {
         if (atomHeaderBytesRead == 0) {
             if (!input.readFully(
@@ -135,7 +135,7 @@ class HeicMotionPhotoExtractor : Extractor {
         return true
     }
 
-    @Throws(IOException::class)
+    
     private fun readAtomPayload(input: ExtractorInput) {
         val atomPayloadSize = atomSize - atomHeaderBytesRead
         input.skipFully(atomPayloadSize.toInt())
@@ -143,7 +143,7 @@ class HeicMotionPhotoExtractor : Extractor {
         state = STATE_READING_ATOM_HEADER
     }
 
-    @Throws(IOException::class)
+    
     private fun sniffMotionPhotoVideo(input: ExtractorInput) {
         if (mp4Extractor == null) {
             mp4Extractor =
@@ -166,7 +166,7 @@ class HeicMotionPhotoExtractor : Extractor {
         }
     }
 
-    @Throws(IOException::class)
+    
     private fun readMotionPhotoVideo(input: ExtractorInput, seekPosition: PositionHolder): Int {
         if (mp4ExtractorStartOffsetExtractorInput == null || input !== lastExtractorInput) {
             lastExtractorInput = input

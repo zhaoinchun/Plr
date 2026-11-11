@@ -19,7 +19,7 @@ class OggExtractor : Extractor {
     private var streamReader:StreamReader? = null
     private var streamReaderInitialized = false
 
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         try {
             return sniffInternal(input)
@@ -42,7 +42,7 @@ class OggExtractor : Extractor {
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         // Check that init has been called.
         val output =  output!!
@@ -63,7 +63,7 @@ class OggExtractor : Extractor {
         return streamReader!!.read(input, seekPosition)
     }
 
-    @Throws(IOException::class)
+    
     private fun sniffInternal(input: ExtractorInput): Boolean {
         val header = OggPageHeader()
         if (!header.populate(input, true) || (header.type and 0x02) != 0x02) {

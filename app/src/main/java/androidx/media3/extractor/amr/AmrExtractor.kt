@@ -61,7 +61,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
     }
 
     // Extractor implementation.
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         return readAmrHeader(input)
     }
@@ -73,7 +73,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
         output.endTracks()
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         assertInitialized()
         if (input.position == 0L) {
@@ -119,7 +119,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
     }
 
     // Internal methods.
-    @Throws(IOException::class)
+    
     private fun readAmrHeader(input: ExtractorInput): Boolean {
         if (Companion.peekAmrSignature(input, amrSignatureNb!!)) {
             isWideBand = false
@@ -156,7 +156,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
     }
 
     @RequiresNonNull("realTrackOutput")
-    @Throws(IOException::class)
+    
     private fun readSample(extractorInput: ExtractorInput): Int {
         if (currentSampleBytesRemaining == 0) {
             try {
@@ -215,7 +215,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
         return Extractor.RESULT_CONTINUE
     }
 
-    @Throws(IOException::class)
+    
     private fun peekNextSampleSize(extractorInput: ExtractorInput): Int {
         extractorInput.resetPeekPosition()
         extractorInput.peekFully(scratch, 0, 1)
@@ -233,7 +233,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
         return getFrameSizeInBytes(frameType)
     }
 
-    @Throws(ParserException::class)
+    
     private fun getFrameSizeInBytes(frameType: Int): Int {
         if (!isValidFrameType(frameType)) {
             throw ParserException.createForMalformedContainer(
@@ -387,7 +387,7 @@ class AmrExtractor constructor(flags:  Int = 0) : Extractor {
             return amrSignatureWb!!.copyOf(amrSignatureWb.size)
         }
 
-        @Throws(IOException::class)
+        
         private fun peekAmrSignature(input: ExtractorInput, amrSignature: ByteArray): Boolean {
             input.resetPeekPosition()
             val header = ByteArray(amrSignature.size)

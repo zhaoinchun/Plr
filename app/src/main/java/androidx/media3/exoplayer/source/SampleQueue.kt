@@ -159,7 +159,7 @@ class SampleQueue(
     }
 
     @CallSuper
-    @Throws(IOException::class)
+    
     fun maybeThrowError() {
         // TODO: Avoid throwing if the DRM error is not preventing a read operation.
         if (currentDrmSession?.state == DrmSession.STATE_ERROR) {
@@ -355,7 +355,7 @@ class SampleQueue(
         }
     }
 
-    @Throws(IOException::class)
+    
     override fun sampleData(
         input: DataReader,
         length: Int,

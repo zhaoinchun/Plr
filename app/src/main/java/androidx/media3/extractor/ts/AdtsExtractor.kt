@@ -58,7 +58,7 @@ class AdtsExtractor  constructor(flags:  Int = 0) : Extractor {
     }
 
     // Extractor implementation.
-    @Throws(IOException::class)
+    
     override fun sniff(input: ExtractorInput): Boolean {
         // Skip any ID3 headers.
         val startPosition = peekId3Header(input)
@@ -123,7 +123,7 @@ class AdtsExtractor  constructor(flags:  Int = 0) : Extractor {
         // Do nothing
     }
 
-    @Throws(IOException::class)
+    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         // Asserts that init has been called.
        val extractorOutput=extractorOutput!!
@@ -162,7 +162,7 @@ class AdtsExtractor  constructor(flags:  Int = 0) : Extractor {
         return Extractor.RESULT_CONTINUE
     }
 
-    @Throws(IOException::class)
+    
     private fun peekId3Header(input: ExtractorInput): Int {
         var firstFramePosition = 0
         while (true) {
@@ -212,7 +212,7 @@ class AdtsExtractor  constructor(flags:  Int = 0) : Extractor {
         hasOutputSeekMap = true
     }
 
-    @Throws(IOException::class)
+    
     private fun calculateAverageFrameSize(input: ExtractorInput) {
         if (hasCalculatedAverageFrameSize) {
             return

@@ -88,7 +88,7 @@ class SimpleCache(
     }
 
     @Synchronized
-    @Throws(CacheException::class)
+    
     fun checkInitialization() {
         initializationException?.also { throw it }
     }
@@ -161,7 +161,6 @@ class SimpleCache(
         }
 
     @Synchronized
-    @Throws(InterruptedException::class, CacheException::class)
     override fun startReadWrite(key: String, position: Long, length: Long): CacheSpan {
         Preconditions.checkState(!released)
         checkInitialization()
@@ -182,7 +181,7 @@ class SimpleCache(
     }
 
     @Synchronized
-    @Throws(CacheException::class)
+    
     override fun startReadWriteNonBlocking(key: String, position: Long, length: Long): CacheSpan? {
         Preconditions.checkState(!released)
         checkInitialization()
@@ -205,7 +204,7 @@ class SimpleCache(
     }
 
     @Synchronized
-    @Throws(CacheException::class)
+    
     override fun startFile(key: String, position: Long, length: Long): File {
         Preconditions.checkState(!released)
         checkInitialization()
@@ -231,7 +230,7 @@ class SimpleCache(
     }
 
     @Synchronized
-    @Throws(CacheException::class)
+    
     override fun commitFile(file: File, length: Long) {
         Preconditions.checkState(!released)
         if (!file.exists()) {
@@ -342,7 +341,7 @@ class SimpleCache(
     }
 
     @Synchronized
-    @Throws(CacheException::class)
+    
     override fun applyContentMetadataMutations(
         key: String, mutations: ContentMetadataMutations
     ) {
@@ -644,7 +643,7 @@ class SimpleCache(
             return Cache.UID_UNSET
         }
 
-        @Throws(IOException::class)
+        
         private fun createUid(directory: File?): Long {
             // Generate a non-negative UID.
             var uid = SecureRandom().nextLong()
@@ -664,7 +663,7 @@ class SimpleCache(
                 .toLong( 16)
         }
 
-        @Throws(CacheException::class)
+        
         private fun createCacheDirectories(cacheDir: File) {
             // If mkdirs() returns false, double check that the directory doesn't exist before throwing.
             if (!cacheDir.mkdirs() && !cacheDir.isDirectory()) {

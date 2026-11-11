@@ -213,13 +213,13 @@ interface HttpDataSource : DataSource {
         TYPE_OPEN
     )
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun open(dataSpec: DataSpec): Long
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun close()
 
-    @Throws(HttpDataSourceException::class)
+   
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int
 
     fun setRequestProperty(name: String, value: String)

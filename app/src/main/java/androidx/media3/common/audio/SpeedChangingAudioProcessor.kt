@@ -74,7 +74,7 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
         this.shouldMaintainPitch = shouldMaintainPitch
     }
 
-    @Throws(AudioProcessor.UnhandledAudioFormatException::class)
+
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat? {
         pendingInputAudioFormat = inputAudioFormat
         pendingOutputAudioFormat = sonicAudioProcessor.configure(inputAudioFormat)

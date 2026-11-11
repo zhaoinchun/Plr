@@ -29,19 +29,15 @@ interface Cache {
     val cacheSpace: Long
 
     @WorkerThread
-    @Throws(InterruptedException::class, CacheException::class)
     fun startReadWrite(key: String, position: Long, length: Long): CacheSpan?
 
     @WorkerThread
-    @Throws(CacheException::class)
     fun startReadWriteNonBlocking(key: String, position: Long, length: Long): CacheSpan?
 
     @WorkerThread
-    @Throws(CacheException::class)
     fun startFile(key: String, position: Long, length: Long): File?
 
     @WorkerThread
-    @Throws(CacheException::class)
     fun commitFile(file: File, length: Long)
 
     fun releaseHoleSpan(holeSpan: CacheSpan)
@@ -57,7 +53,7 @@ interface Cache {
     fun getCachedBytes(key: String, position: Long, length: Long): Long
 
     @WorkerThread
-    @Throws(CacheException::class)
+    
     fun applyContentMetadataMutations(key: String, mutations: ContentMetadataMutations)
 
     fun getContentMetadata(key: String): ContentMetadata

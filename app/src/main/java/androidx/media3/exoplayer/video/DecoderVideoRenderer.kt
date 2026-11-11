@@ -93,7 +93,7 @@ abstract class DecoderVideoRenderer protected constructor(
     private var wakeupListener: WakeupListener? = null
     private var playbackThreadExecutor: Executor? = null
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (outputStreamEnded) {
             return
@@ -169,7 +169,7 @@ abstract class DecoderVideoRenderer protected constructor(
         }
 
     // PlayerMessage.Target implementation.
-    @Throws(ExoPlaybackException::class)
+    
     override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VIDEO_OUTPUT -> {
@@ -199,7 +199,7 @@ abstract class DecoderVideoRenderer protected constructor(
     }
 
     // Protected methods.
-    @Throws(ExoPlaybackException::class)
+    
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         decoderCounters = DecoderCounters()
         eventDispatcher.enabled(decoderCounters)
@@ -216,7 +216,7 @@ abstract class DecoderVideoRenderer protected constructor(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -275,7 +275,7 @@ abstract class DecoderVideoRenderer protected constructor(
         }
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -317,7 +317,7 @@ abstract class DecoderVideoRenderer protected constructor(
     }
 
     @CallSuper
-    @Throws(ExoPlaybackException::class)
+    
     protected fun flushDecoder() {
         buffersInCodecCount = 0
         if (decoderReinitializationState != REINITIALIZATION_STATE_NONE) {
@@ -353,7 +353,7 @@ abstract class DecoderVideoRenderer protected constructor(
     }
 
     @CallSuper
-    @Throws(ExoPlaybackException::class)
+    
     protected fun onInputFormatChanged(formatHolder: FormatHolder) {
         waitingForFirstSampleInFormat = true
         val newFormat = formatHolder.format!!
@@ -444,7 +444,7 @@ abstract class DecoderVideoRenderer protected constructor(
         outputBuffer.release()
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     protected fun maybeDropBuffersToKeyframe(positionUs: Long): Boolean {
         val droppedSourceBufferCount = skipSource(positionUs)
         if (droppedSourceBufferCount == 0) {
@@ -475,13 +475,13 @@ abstract class DecoderVideoRenderer protected constructor(
         }
     }
 
-    @Throws(DecoderException::class)
+    
     protected abstract fun createDecoder(
         format: Format,
         cryptoConfig: CryptoConfig?
     ): Decoder<DecoderInputBuffer, out VideoDecoderOutputBuffer, out DecoderException>
 
-    @Throws(DecoderException::class)
+    
     protected fun renderOutputBuffer(
         outputBuffer: VideoDecoderOutputBuffer, presentationTimeUs: Long, outputFormat: Format
     ) {
@@ -512,7 +512,7 @@ abstract class DecoderVideoRenderer protected constructor(
         }
     }
 
-    @Throws(DecoderException::class)
+    
     protected abstract fun renderOutputBufferToSurface(
         outputBuffer: VideoDecoderOutputBuffer, surface: Surface
     )
@@ -577,7 +577,7 @@ abstract class DecoderVideoRenderer protected constructor(
         decoderDrmSession = session
     }
 
-    @Throws(ExoPlaybackException::class)
+    
     private fun maybeInitDecoder() {
         if (decoder != null) {
             return
@@ -630,8 +630,6 @@ abstract class DecoderVideoRenderer protected constructor(
             )
         }
     }
-
-    @Throws(DecoderException::class, ExoPlaybackException::class)
     private fun feedInputBuffer(): Boolean {
         this.lastOutputStreamInfo!!.streamFlags = stream!!.flags
         if (decoder == null || decoderReinitializationState == REINITIALIZATION_STATE_WAIT_END_OF_STREAM || inputStreamEnded) {
@@ -690,8 +688,6 @@ abstract class DecoderVideoRenderer protected constructor(
             else -> throw IllegalStateException()
         }
     }
-
-    @Throws(ExoPlaybackException::class, DecoderException::class)
     private fun drainOutputBuffer(positionUs: Long, elapsedRealtimeUs: Long): Boolean {
         if (outputBuffer == null) {
             outputBuffer = decoder!!.dequeueOutputBuffer()
@@ -723,8 +719,6 @@ abstract class DecoderVideoRenderer protected constructor(
         }
         return processedOutputBuffer
     }
-
-    @Throws(ExoPlaybackException::class, DecoderException::class)
     private fun processOutputBuffer(positionUs: Long, elapsedRealtimeUs: Long): Boolean {
         if (initialPositionUs == C.TIME_UNSET) {
             initialPositionUs = positionUs

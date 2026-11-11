@@ -62,7 +62,7 @@ interface MediaCodecAdapter {
     }
 
     interface Factory {
-        @Throws(IOException::class)
+        
         fun createAdapter(configuration: Configuration): MediaCodecAdapter
 
         companion object {

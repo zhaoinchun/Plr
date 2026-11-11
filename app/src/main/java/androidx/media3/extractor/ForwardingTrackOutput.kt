@@ -19,7 +19,7 @@ open class ForwardingTrackOutput(private val trackOutput: TrackOutput) :
         trackOutput.format(format)
     }
 
-    @Throws(IOException::class)
+    
     override fun sampleData(input: DataReader, length: Int, allowEndOfInput: Boolean): Int {
         return trackOutput.sampleData(input, length, allowEndOfInput)
     }
@@ -28,7 +28,7 @@ open class ForwardingTrackOutput(private val trackOutput: TrackOutput) :
         trackOutput.sampleData(data, length)
     }
 
-    @Throws(IOException::class)
+    
     override fun sampleData(
         input: DataReader,
         length: Int,

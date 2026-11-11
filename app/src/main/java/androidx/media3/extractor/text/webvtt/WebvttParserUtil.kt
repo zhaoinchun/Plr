@@ -12,7 +12,7 @@ object WebvttParserUtil {
     private val COMMENT: Pattern = Pattern.compile("^NOTE([ \t].*)?$")
     private const val WEBVTT_HEADER = "WEBVTT"
 
-    @Throws(ParserException::class)
+    
     fun validateWebvttHeaderLine(input: ParsableByteArray) {
         val startPosition = input.getPosition()
         if (!isWebvttHeaderLine(input)) {
@@ -46,8 +46,6 @@ object WebvttParserUtil {
         }
         return value * 1000
     }
-
-    @Throws(NumberFormatException::class)
     fun parsePercentage(s: String): Float {
         if (!s.endsWith("%")) {
             throw NumberFormatException("Percentages must end with %")

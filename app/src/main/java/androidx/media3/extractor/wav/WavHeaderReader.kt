@@ -28,7 +28,7 @@ internal object WavHeaderReader {
         0x00.toByte(), 0x00.toByte()
     )
 
-    @Throws(IOException::class)
+    
     fun checkFileType(input: ExtractorInput): Boolean {
         val scratch: ParsableByteArray = ParsableByteArray(ChunkHeader.SIZE_IN_BYTES)
         val chunkHeader: ChunkHeader = ChunkHeader.peek(input, scratch)
@@ -47,7 +47,7 @@ internal object WavHeaderReader {
         return true
     }
 
-    @Throws(IOException::class)
+    
     fun readRf64SampleDataSize(input: ExtractorInput): Long {
         val scratch: ParsableByteArray = ParsableByteArray(ChunkHeader.SIZE_IN_BYTES)
         val chunkHeader: ChunkHeader = ChunkHeader.peek(input, scratch)
@@ -63,7 +63,7 @@ internal object WavHeaderReader {
         return sampleDataSize
     }
 
-    @Throws(IOException::class)
+    
     fun readFormat(input: ExtractorInput): WavFormat {
         // Allocate a scratch buffer large enough to store the format chunk.
         val scratch: ParsableByteArray = ParsableByteArray(16)
@@ -135,7 +135,7 @@ internal object WavHeaderReader {
         )
     }
 
-    @Throws(IOException::class)
+    
     fun skipToSampleData(input: ExtractorInput): Pair<Long, Long> {
         // Make sure the peek position is set to the read position before we peek the first header.
         input.resetPeekPosition()
@@ -150,7 +150,7 @@ internal object WavHeaderReader {
         return Pair.create<Long, Long>(dataStartPosition, chunkHeader.size)
     }
 
-    @Throws(IOException::class)
+    
     private fun skipToChunk(
         chunkId: Int, input: ExtractorInput, scratch: ParsableByteArray
     ): ChunkHeader {
@@ -185,7 +185,7 @@ internal object WavHeaderReader {
             
             const val SIZE_IN_BYTES: Int = 8
 
-            @Throws(IOException::class)
+            
             fun peek(input: ExtractorInput, scratch: ParsableByteArray): ChunkHeader {
                 input.peekFully(scratch.data,  0,  SIZE_IN_BYTES)
                 scratch.setPosition(0)

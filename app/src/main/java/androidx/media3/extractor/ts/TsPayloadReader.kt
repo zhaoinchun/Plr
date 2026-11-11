@@ -111,7 +111,7 @@ interface TsPayloadReader {
 
     fun seek()
 
-    @Throws(ParserException::class)
+    
     fun consume(data: ParsableByteArray, flags:  Int)
 
     companion object {

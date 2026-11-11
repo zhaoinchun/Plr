@@ -47,17 +47,17 @@ object Sniffer {
         0x70696666,  // piff
     )
 
-    @Throws(IOException::class)
+    
     fun sniffFragmented(input: ExtractorInput): SniffFailure? {
         return sniffInternal(input,  true)
     }
 
-    @Throws(IOException::class)
+    
     fun sniffUnfragmented(input: ExtractorInput): SniffFailure? {
         return sniffInternal(input,  false)
     }
 
-    @Throws(IOException::class)
+    
     private fun sniffInternal(input: ExtractorInput, fragmented: Boolean): SniffFailure? {
         val inputLength = input.length
         var bytesToSearch =
