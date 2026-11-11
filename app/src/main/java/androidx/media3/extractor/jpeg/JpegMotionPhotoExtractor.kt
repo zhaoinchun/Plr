@@ -37,16 +37,6 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 
 internal class JpegMotionPhotoExtractor : Extractor {
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_READING_MARKER, STATE_READING_SEGMENT_LENGTH, STATE_READING_SEGMENT, STATE_SNIFFING_MOTION_PHOTO_VIDEO, STATE_READING_MOTION_PHOTO_VIDEO, STATE_ENDED
-        ]
-    )
-    private annotation class State
-
     private val scratch: ParsableByteArray
 
     private var extractorOutput: ExtractorOutput? = null
@@ -110,7 +100,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         when (state) {
             STATE_READING_MARKER -> {
                 readMarker(input)
@@ -142,7 +132,7 @@ internal class JpegMotionPhotoExtractor : Extractor {
                     mp4ExtractorStartOffsetExtractorInput =
                         StartOffsetExtractorInput(input, mp4StartPosition)
                 }
-                val readResult: @Extractor.ReadResult Int =
+                val readResult:  Int =
                     mp4Extractor!!.read(mp4ExtractorStartOffsetExtractorInput!!, seekPosition)
                 if (readResult == Extractor.RESULT_SEEK) {
                     seekPosition.position += mp4StartPosition

@@ -23,17 +23,7 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 
 internal class HeicMotionPhotoExtractor : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_READING_ATOM_HEADER, STATE_READING_ATOM_PAYLOAD, STATE_SNIFFING_MOTION_PHOTO_VIDEO, STATE_READING_MOTION_PHOTO_VIDEO, STATE_ENDED
-        ]
-    )
-    private annotation class State
-
     private val scratch: ParsableByteArray
-
     private var extractorOutput: ExtractorOutput? = null
     private var motionPhotoMetadata: MotionPhotoMetadata? = null
     private var lastExtractorInput: ExtractorInput? = null
@@ -183,7 +173,7 @@ internal class HeicMotionPhotoExtractor : Extractor {
             mp4ExtractorStartOffsetExtractorInput =
                 StartOffsetExtractorInput(input, mp4StartPosition)
         }
-        val readResult: @Extractor.ReadResult Int =
+        val readResult:  Int =
             mp4Extractor!!.read(mp4ExtractorStartOffsetExtractorInput!!, seekPosition)
         if (readResult == Extractor.RESULT_SEEK) {
             seekPosition.position += mp4StartPosition

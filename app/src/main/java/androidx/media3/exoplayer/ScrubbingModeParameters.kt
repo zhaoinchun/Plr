@@ -4,7 +4,7 @@ import androidx.media3.common.C
 
 data class ScrubbingModeParameters(
     var disabledTrackTypes: Set<Int> =
-        setOf<@C.TrackType Int>(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_METADATA),
+        setOf<Int>(C.TRACK_TYPE_AUDIO, C.TRACK_TYPE_METADATA),
     var fractionalSeekToleranceBefore: Double? = null,
     var fractionalSeekToleranceAfter: Double? = null,
     var shouldIncreaseCodecOperatingRate: Boolean = true,

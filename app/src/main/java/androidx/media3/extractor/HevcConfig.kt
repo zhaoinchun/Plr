@@ -2,9 +2,6 @@
 package androidx.media3.extractor
 
 import androidx.media3.common.C
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
-import androidx.media3.common.C.StereoMode
 import androidx.media3.common.Format
 import androidx.media3.common.ParserException
 import androidx.media3.common.util.CodecSpecificDataUtil.buildHevcCodecString
@@ -36,13 +33,13 @@ class HevcConfig private constructor(
   
    val bitdepthChroma: Int,
   
-   val colorSpace: @C.ColorSpace Int,
+   val colorSpace: Int,
   
-   val colorRange: @ColorRange Int,
+   val colorRange: Int,
   
-   val colorTransfer: @ColorTransfer Int,
+   val colorTransfer: Int,
   
-   val stereoMode: @StereoMode Int,
+   val stereoMode: Int,
   
    val pixelWidthHeightRatio: Float,
   
@@ -102,10 +99,10 @@ class HevcConfig private constructor(
                 var decodedHeight = Format.NO_VALUE
                 var bitdepthLuma = Format.NO_VALUE
                 var bitdepthChroma = Format.NO_VALUE
-                var colorSpace: @C.ColorSpace Int = Format.NO_VALUE
-                var colorRange: @ColorRange Int = Format.NO_VALUE
-                var colorTransfer: @ColorTransfer Int = Format.NO_VALUE
-                var stereoMode: @StereoMode Int = Format.NO_VALUE
+                var colorSpace: Int = Format.NO_VALUE
+                var colorRange: Int = Format.NO_VALUE
+                var colorTransfer: Int = Format.NO_VALUE
+                var stereoMode: Int = Format.NO_VALUE
                 var pixelWidthHeightRatio = 1f
                 var maxNumReorderPics = Format.NO_VALUE
                 var codecs: String? = null

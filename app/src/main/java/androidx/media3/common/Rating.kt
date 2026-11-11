@@ -7,14 +7,6 @@ abstract class Rating internal constructor() {
     abstract val isRated: Boolean
     abstract fun toBundle(): Bundle?
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [RATING_TYPE_UNSET, RATING_TYPE_HEART, RATING_TYPE_PERCENTAGE, RATING_TYPE_STAR, RATING_TYPE_THUMB]
-    )
-    internal annotation class RatingType
-
     companion object {
         const val RATING_UNSET: Float = -1.0f
         const val RATING_TYPE_UNSET: Int = -1
@@ -25,7 +17,7 @@ abstract class Rating internal constructor() {
         const val FIELD_RATING_TYPE: String = "0"
 
         fun fromBundle(bundle: Bundle): Rating {
-            val ratingType: @RatingType Int = bundle.getInt(
+            val ratingType: Int = bundle.getInt(
                 FIELD_RATING_TYPE,
                 RATING_TYPE_UNSET
             )

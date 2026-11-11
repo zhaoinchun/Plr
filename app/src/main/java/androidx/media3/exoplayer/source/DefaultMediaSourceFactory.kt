@@ -82,7 +82,7 @@ class DefaultMediaSourceFactory(
     }
 
     override fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-        codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+        codecsToParseWithinGopSampleDependencies:  Int
     ): DefaultMediaSourceFactory {
         delegateFactoryLoader.setCodecsToParseWithinGopSampleDependencies(
             codecsToParseWithinGopSampleDependencies
@@ -205,7 +205,7 @@ class DefaultMediaSourceFactory(
             )
                 .createMediaSource(mediaItem)
         }
-        val type: @C.ContentType Int =
+        val type:  Int =
             inferContentTypeForUriAndMimeType(
                 config.uri, mediaItem.localConfiguration.mimeType
             )
@@ -363,7 +363,7 @@ class DefaultMediaSourceFactory(
         private val mediaSourceFactories: MutableMap<Int, MediaSource.Factory> = mutableMapOf()
 
         private var dataSourceFactory: DataSource.Factory? = null
-        private var codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int =
+        private var codecsToParseWithinGopSampleDependencies:  Int =
             C.VIDEO_CODEC_FLAG_H264 or C.VIDEO_CODEC_FLAG_H265
         private var loadOnlySelectedTracks = false
         private var experimentalEnableHagcPlayback = true
@@ -379,7 +379,7 @@ class DefaultMediaSourceFactory(
             }
 
         @Throws(ClassNotFoundException::class)
-        fun getMediaSourceFactory(contentType: @C.ContentType Int): MediaSource.Factory {
+        fun getMediaSourceFactory(contentType:  Int): MediaSource.Factory {
             var mediaSourceFactory = mediaSourceFactories[contentType]
             if (mediaSourceFactory != null) {
                 return mediaSourceFactory
@@ -418,7 +418,7 @@ class DefaultMediaSourceFactory(
         }
 
         fun setCodecsToParseWithinGopSampleDependencies(
-            codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+            codecsToParseWithinGopSampleDependencies:  Int
         ) {
             this.codecsToParseWithinGopSampleDependencies = codecsToParseWithinGopSampleDependencies
             extractorsFactory.experimentalSetCodecsToParseWithinGopSampleDependencies(
@@ -447,7 +447,7 @@ class DefaultMediaSourceFactory(
             }
         }
 
-        fun setJpegExtractorFlags(flags: @JpegExtractor.Flags Int) {
+        fun setJpegExtractorFlags(flags:  Int) {
             if (this.extractorsFactory is DefaultExtractorsFactory) {
                 this.extractorsFactory.setJpegExtractorFlags(flags)
             }
@@ -461,7 +461,7 @@ class DefaultMediaSourceFactory(
             this.experimentalEnableHagcPlayback = experimentalEnableHagcPlayback
         }
 
-        fun setHeifExtractorFlags(flags: @HeifExtractor.Flags Int) {
+        fun setHeifExtractorFlags(flags:  Int) {
             if (this.extractorsFactory is DefaultExtractorsFactory) {
                 this.extractorsFactory.setHeifExtractorFlags(flags)
             }
@@ -482,7 +482,7 @@ class DefaultMediaSourceFactory(
             maybeLoadSupplier(C.CONTENT_TYPE_OTHER)
         }
 
-        fun maybeLoadSupplier(contentType: @C.ContentType Int): Supplier<MediaSource.Factory>? {
+        fun maybeLoadSupplier(contentType:  Int): Supplier<MediaSource.Factory>? {
             try {
                 return loadSupplier(contentType)
             } catch (e: ClassNotFoundException) {
@@ -492,7 +492,7 @@ class DefaultMediaSourceFactory(
         }
 
         @Throws(ClassNotFoundException::class)
-        fun loadSupplier(contentType: @C.ContentType Int): Supplier<MediaSource.Factory> {
+        fun loadSupplier(contentType:  Int): Supplier<MediaSource.Factory> {
             var mediaSourceFactorySupplier = mediaSourceFactorySuppliers[contentType]
             if (mediaSourceFactorySupplier != null) {
                 return mediaSourceFactorySupplier

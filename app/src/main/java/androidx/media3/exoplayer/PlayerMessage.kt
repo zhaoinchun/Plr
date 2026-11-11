@@ -20,7 +20,7 @@ class PlayerMessage(
 ) {
     interface Target {
         @Throws(ExoPlaybackException::class)
-        fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?)
+        fun handleMessage(messageType:  Int, message: Any?)
     }
 
     interface Sender {

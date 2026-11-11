@@ -10,19 +10,9 @@ import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.extractor.ts.TsPayloadReader.EsInfo
 
 class DefaultTsPayloadReaderFactory(
-    private val flags: @Flags Int = 0,
+    private val flags:  Int = 0,
     private val closedCaptionFormats: List<Format> = mutableListOf()
 ) : TsPayloadReader.Factory {
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_ALLOW_NON_IDR_KEYFRAMES, FLAG_IGNORE_AAC_STREAM, FLAG_IGNORE_H264_STREAM, FLAG_DETECT_ACCESS_UNITS, FLAG_IGNORE_SPLICE_INFO_STREAM, FLAG_OVERRIDE_CAPTION_DESCRIPTORS, FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS]
-    )
-    annotation class Flags
-
     override fun createInitialPayloadReaders(): SparseArray<TsPayloadReader> {
         return SparseArray<TsPayloadReader>()
     }
@@ -220,7 +210,7 @@ class DefaultTsPayloadReaderFactory(
         return closedCaptionFormats
     }
 
-    private fun isSet(flag: @Flags Int): Boolean {
+    private fun isSet(flag:  Int): Boolean {
         return (flags and flag) != 0
     }
 

@@ -35,12 +35,10 @@ import androidx.media3.exoplayer.Renderer.WakeupListener
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.audio.AudioSink.AudioSinkConfig
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
-import androidx.media3.exoplayer.audio.AudioSink.SinkFormatSupport
 import androidx.media3.exoplayer.audio.DefaultAudioSink.DefaultAudioProcessorChain
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
 import com.google.common.base.MoreObjects
 import com.google.common.base.Preconditions
 import com.google.common.primitives.ImmutableIntArray
@@ -55,13 +53,6 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     eventListener: AudioRendererEventListener,
     private val audioSink: AudioSink
 ) : BaseRenderer(C.TRACK_TYPE_AUDIO), MediaClock, Decoder.Callback {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [REINITIALIZATION_STATE_NONE, REINITIALIZATION_STATE_SIGNAL_END_OF_STREAM, REINITIALIZATION_STATE_WAIT_END_OF_STREAM]
-    )
-    private annotation class ReinitializationState
 
     private val eventDispatcher =
         AudioRendererEventListener.EventDispatcher(eventHandler, eventListener)
@@ -76,7 +67,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     private var outputBuffer: SimpleDecoderOutputBuffer? = null
     private var decoderDrmSession: DrmSession? = null
     private var sourceDrmSession: DrmSession? = null
-    private var decoderReinitializationState: @ReinitializationState Int =
+    private var decoderReinitializationState:  Int =
         REINITIALIZATION_STATE_NONE
     private var decoderReceivedBuffers = false
     private var audioTrackNeedsConfigure = true
@@ -144,11 +135,11 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         return max(Renderer.DEFAULT_DURATION_TO_PROGRESS_US, bufferedDurationUs)
     }
 
-    override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+    override fun supportsFormat(format: Format):  Int {
         if (!isAudio(format.sampleMimeType)) {
             return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
         }
-        val formatSupport: @C.FormatSupport Int = supportsFormatInternal(format)
+        val formatSupport:  Int = supportsFormatInternal(format)
         if (formatSupport <= C.FORMAT_UNSUPPORTED_DRM) {
             return RendererCapabilities.create(formatSupport)
         }
@@ -159,13 +150,13 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
         )
     }
 
-    protected abstract fun supportsFormatInternal(format: Format?): @C.FormatSupport Int
+    protected abstract fun supportsFormatInternal(format: Format?):  Int
 
     protected fun sinkSupportsFormat(format: Format): Boolean {
         return audioSink.supportsFormat(format)
     }
 
-    protected fun getSinkFormatSupport(format: Format): @SinkFormatSupport Int {
+    protected fun getSinkFormatSupport(format: Format): Int {
         return audioSink.getFormatSupport(format)
     }
 
@@ -626,7 +617,7 @@ abstract class DecoderAudioRenderer<T : Decoder<DecoderInputBuffer?, out SimpleD
     }
 
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VOLUME -> audioSink.setVolume((message as kotlin.Float?)!!)
             Renderer.MSG_SET_AUDIO_ATTRIBUTES -> {

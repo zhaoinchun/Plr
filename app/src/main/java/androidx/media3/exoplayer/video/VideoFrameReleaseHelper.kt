@@ -33,8 +33,8 @@ class VideoFrameReleaseHelper(private val context: Context) {
     private var surfacePlaybackFrameRate = 0f
     private var playbackSpeed = 1f
 
-    @C.VideoChangeFrameRateStrategy
-    private var changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+    
+    private var changeFrameRateStrategy:  Int
 
     private var lastVsyncHysteresisOffsetNs: Long = 0
     private var pendingVsyncHysteresisOffsetNs: Long = 0
@@ -56,7 +56,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
     }
 
     fun setChangeFrameRateStrategy(
-        @C.VideoChangeFrameRateStrategy changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+         changeFrameRateStrategy:  Int
     ) {
         if (this.changeFrameRateStrategy == changeFrameRateStrategy) {
             return

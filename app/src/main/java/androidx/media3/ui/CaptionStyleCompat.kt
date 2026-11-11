@@ -9,17 +9,10 @@ class CaptionStyleCompat(
     val foregroundColor: Int,
     val backgroundColor: Int,
     val windowColor: Int,
-    val edgeType: @EdgeType Int,
+    val edgeType:  Int,
     val edgeColor: Int,
     val typeface: Typeface?
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [EDGE_TYPE_NONE, EDGE_TYPE_OUTLINE, EDGE_TYPE_DROP_SHADOW, EDGE_TYPE_RAISED, EDGE_TYPE_DEPRESSED]
-    )
-    annotation class EdgeType
 
     companion object {
         const val EDGE_TYPE_NONE: Int = 0

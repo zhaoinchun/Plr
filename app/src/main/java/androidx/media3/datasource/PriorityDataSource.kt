@@ -9,13 +9,13 @@ import java.io.IOException
 class PriorityDataSource(
     private val upstream: DataSource,
     priorityTaskManager: PriorityTaskManager?,
-    private val priority: @C.Priority Int
+    private val priority: Int
 ) : DataSource {
 
     class Factory(
         private val upstreamFactory: DataSource.Factory,
         private val priorityTaskManager: PriorityTaskManager,
-        private val priority: @C.Priority Int
+        private val priority: Int
     ) : DataSource.Factory {
         override fun createDataSource(): PriorityDataSource {
             return PriorityDataSource(

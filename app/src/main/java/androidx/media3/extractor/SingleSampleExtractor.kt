@@ -2,7 +2,7 @@ package androidx.media3.extractor
 
 import androidx.annotation.IntDef
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.util.ParsableByteArray
 
@@ -17,12 +17,6 @@ class SingleSampleExtractor(
     private val fileSignatureLength: Int,
     private val sampleMimeType: String?
 ) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [STATE_READING, STATE_ENDED])
-    private annotation class State
-
     private var size = 0
     private var state:  Int = 0
     private var extractorOutput: ExtractorOutput? = null
@@ -45,7 +39,7 @@ class SingleSampleExtractor(
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         when (state) {
             STATE_READING -> {
                 readSegment(input)
@@ -73,7 +67,7 @@ class SingleSampleExtractor(
         val result = trackOutput!!.sampleData(input, FIXED_READ_LENGTH, true)
         if (result == C.RESULT_END_OF_INPUT) {
             state = STATE_ENDED
-            val flags: @BufferFlags Int = C.BUFFER_FLAG_KEY_FRAME
+            val flags:  Int = C.BUFFER_FLAG_KEY_FRAME
             trackOutput!!.sampleMetadata(
                 0, flags, size, 0, null
             )

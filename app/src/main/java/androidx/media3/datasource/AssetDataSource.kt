@@ -15,7 +15,7 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
     class AssetDataSourceException : DataSourceException {
         constructor(
             cause: Throwable?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+             errorCode:  Int
         ) : super(cause, errorCode)
     }
 

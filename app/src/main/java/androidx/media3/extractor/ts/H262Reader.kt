@@ -2,7 +2,7 @@ package androidx.media3.extractor.ts
 
 import android.util.Pair
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.ParsableByteArray
@@ -83,7 +83,7 @@ class H262Reader internal constructor(
         }
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         // TODO (Internal b/32267012): Consider using random access indicator.
         this.pesTimeUs = pesTimeUs
     }
@@ -161,7 +161,7 @@ class H262Reader internal constructor(
                 val bytesWrittenPastStartCode = limit - startCodeOffset
                 if (sampleHasPicture && hasOutputFormat && sampleTimeUs != C.TIME_UNSET) {
                     // Output the sample.
-                    val flags: @BufferFlags Int =
+                    val flags:  Int =
                         if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
                     val size =
                         (totalBytesWritten - samplePosition).toInt() - bytesWrittenPastStartCode
@@ -201,7 +201,7 @@ class H262Reader internal constructor(
         // Asserts that createTracks has been called.
         val output = output!!
         if (sampleTimeUs != C.TIME_UNSET) {
-            val flags: @BufferFlags Int = if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
+            val flags:  Int = if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
             val size = (totalBytesWritten - samplePosition).toInt()
             output!!.sampleMetadata(
                 sampleTimeUs,

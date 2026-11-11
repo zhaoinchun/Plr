@@ -61,17 +61,8 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
         fun onLoaderReleased()
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [ACTION_TYPE_RETRY, ACTION_TYPE_RETRY_AND_RESET_ERROR_COUNT, ACTION_TYPE_DONT_RETRY, ACTION_TYPE_DONT_RETRY_FATAL
-        ]
-    )
-    private annotation class RetryActionType
-
     class LoadErrorAction constructor(
-        val type: @RetryActionType Int,
+        val type:  Int,
         val retryDelayMillis: Long
     ) {
         val isRetry: Boolean

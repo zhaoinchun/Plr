@@ -13,7 +13,7 @@ import kotlin.Int
 object PcmAudioUtil {
     fun rampUpVolume(
         buffer: ByteBuffer,
-        pcmEncoding: @C.Encoding Int,
+        pcmEncoding: Int,
         pcmFrameSize: Int,
         startFrameIndex: Int,
         rampFrameCount: Int
@@ -36,7 +36,7 @@ object PcmAudioUtil {
         return outputBuffer
     }
 
-    fun readAs32BitIntPcm(buffer: ByteBuffer, pcmEncoding: @C.Encoding Int): Int {
+    fun readAs32BitIntPcm(buffer: ByteBuffer, pcmEncoding: Int): Int {
         when (pcmEncoding) {
             C.ENCODING_PCM_8BIT -> return (buffer.get().toInt() and 0xFF) shl 24
             C.ENCODING_PCM_16BIT -> return ((buffer.get()
@@ -112,7 +112,7 @@ object PcmAudioUtil {
     }
 
     fun write32BitIntPcm(
-        buffer: ByteBuffer, pcm32bit: Int, pcmEncoding: @C.Encoding Int
+        buffer: ByteBuffer, pcm32bit: Int, pcmEncoding: Int
     ) {
         when (pcmEncoding) {
             C.ENCODING_PCM_32BIT -> {

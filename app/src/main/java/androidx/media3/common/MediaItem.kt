@@ -4,8 +4,6 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.annotation.IntRange
 import androidx.annotation.VisibleForTesting
-import androidx.media3.common.C.RoleFlags
-import androidx.media3.common.C.SelectionFlags
 import androidx.media3.common.util.BundleCollectionUtil
 import androidx.media3.common.util.Util
 import com.google.common.base.Function
@@ -178,7 +176,7 @@ class MediaItem private constructor(
         var multiSession: Boolean = false,
         var playClearContentWithoutKey: Boolean = true,
         var forceDefaultLicenseUri: Boolean = false,
-        var forcedSessionTrackTypes: List<Int?> = listOf<@C.TrackType Int?>(),
+        var forcedSessionTrackTypes: List<Int?> = listOf<Int?>(),
         val keySetId: ByteArray? = null,
     ) {
         fun setForceSessionsForAudioAndVideoTracks(
@@ -186,9 +184,9 @@ class MediaItem private constructor(
         ) {
             this.forcedSessionTrackTypes =
                 if (forceSessionsForAudioAndVideoTracks)
-                    listOf<@C.TrackType Int?>(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
+                    listOf<Int?>(C.TRACK_TYPE_VIDEO, C.TRACK_TYPE_AUDIO)
                 else
-                    listOf<@C.TrackType Int?>()
+                    listOf<Int?>()
         }
 
         fun toBundle(): Bundle {
@@ -507,8 +505,8 @@ class MediaItem private constructor(
         var uri: Uri,
         var mimeType: String? = null,
         var language: String? = null,
-        var selectionFlags: @SelectionFlags Int = 0,
-        var roleFlags: @RoleFlags Int = 0,
+        var selectionFlags: Int = 0,
+        var roleFlags: Int = 0,
         var label: String? = null,
         var id: String? = null,
     ) {
@@ -581,10 +579,10 @@ class MediaItem private constructor(
                 val uri = bundle.getParcelable<Uri?>(FIELD_URI)!!
                 val mimeType = bundle.getString(FIELD_MIME_TYPE)
                 val language = bundle.getString(FIELD_LANGUAGE)
-                val selectionFlags: @SelectionFlags Int = bundle.getInt(
+                val selectionFlags: Int = bundle.getInt(
                     FIELD_SELECTION_FLAGS, 0
                 )
-                val roleFlags: @RoleFlags Int = bundle.getInt(FIELD_ROLE_FLAGS, 0)
+                val roleFlags: Int = bundle.getInt(FIELD_ROLE_FLAGS, 0)
                 val label = bundle.getString(FIELD_LABEL)
                 val id = bundle.getString(FIELD_ID)
 

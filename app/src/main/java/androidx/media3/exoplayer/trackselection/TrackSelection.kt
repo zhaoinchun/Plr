@@ -5,13 +5,8 @@ import androidx.media3.common.Format
 import androidx.media3.common.TrackGroup
 
 interface TrackSelection {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(open = true, value = [TYPE_UNSET])
-    annotation class Type
 
-    val type: @Type Int
+    val type: Int
     val trackGroup: TrackGroup
     fun length(): Int
     fun getFormat(index: Int): Format

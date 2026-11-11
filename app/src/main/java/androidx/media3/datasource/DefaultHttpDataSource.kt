@@ -350,7 +350,7 @@ class DefaultHttpDataSource private constructor(
     @Throws(IOException::class)
     private fun makeConnection(dataSpec: DataSpec): HttpURLConnection {
         var url = URL(dataSpec.uri.toString())
-        var httpMethod: @DataSpec.HttpMethod Int = dataSpec.httpMethod
+        var httpMethod:  Int = dataSpec.httpMethod
         var httpBody = dataSpec.httpBody
         val position = dataSpec.position
         val length = dataSpec.length
@@ -422,7 +422,7 @@ class DefaultHttpDataSource private constructor(
     @Throws(IOException::class)
     private fun makeConnection(
         url: URL,
-        httpMethod: @DataSpec.HttpMethod Int,
+        httpMethod:  Int,
         httpBody: ByteArray?,
         position: Long,
         length: Long,

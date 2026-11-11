@@ -34,8 +34,8 @@ import androidx.media3.common.util.Util.systemLanguageCodes
 import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
-import androidx.media3.exoplayer.RendererCapabilities.AdaptiveSupport
-import androidx.media3.exoplayer.RendererCapabilities.DecoderSupport
+
+
 import androidx.media3.exoplayer.RendererConfiguration
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getAlternativeCodecMimeType
@@ -346,7 +346,7 @@ class DefaultTrackSelector(
                 return this
             }
 
-            override fun setPreferredVideoRoleFlags(@C.RoleFlags preferredVideoRoleFlags: @C.RoleFlags Int): Builder {
+            override fun setPreferredVideoRoleFlags( preferredVideoRoleFlags:  Int): Builder {
                 super.setPreferredVideoRoleFlags(preferredVideoRoleFlags)
                 return this
             }
@@ -361,7 +361,7 @@ class DefaultTrackSelector(
                 return this
             }
 
-            override fun setPreferredAudioRoleFlags(@C.RoleFlags preferredAudioRoleFlags: @C.RoleFlags Int): Builder {
+            override fun setPreferredAudioRoleFlags( preferredAudioRoleFlags:  Int): Builder {
                 super.setPreferredAudioRoleFlags(preferredAudioRoleFlags)
                 return this
             }
@@ -465,12 +465,12 @@ class DefaultTrackSelector(
                 return this
             }
 
-            override fun setPreferredTextRoleFlags(@C.RoleFlags preferredTextRoleFlags: @C.RoleFlags Int): Builder {
+            override fun setPreferredTextRoleFlags( preferredTextRoleFlags:  Int): Builder {
                 super.setPreferredTextRoleFlags(preferredTextRoleFlags)
                 return this
             }
 
-            override fun setIgnoredTextSelectionFlags(@C.SelectionFlags ignoredTextSelectionFlags: @C.SelectionFlags Int): Builder {
+            override fun setIgnoredTextSelectionFlags( ignoredTextSelectionFlags:  Int): Builder {
                 super.setIgnoredTextSelectionFlags(ignoredTextSelectionFlags)
                 return this
             }
@@ -523,7 +523,7 @@ class DefaultTrackSelector(
                 return this
             }
 
-            override fun clearOverridesOfType(trackType: @C.TrackType Int): Builder {
+            override fun clearOverridesOfType(trackType: Int): Builder {
                 super.clearOverridesOfType(trackType)
                 return this
             }
@@ -539,7 +539,7 @@ class DefaultTrackSelector(
             }
 
             override fun setTrackTypeDisabled(
-                trackType: @C.TrackType Int,
+                trackType: Int,
                 disabled: Boolean
             ): Builder {
                 super.setTrackTypeDisabled(trackType, disabled)
@@ -1050,7 +1050,7 @@ class DefaultTrackSelector(
     class SelectionOverride(
         val groupIndex: Int,
         tracks: IntArray,
-        val type: @TrackSelection.Type Int
+        val type:  Int
     ) {
         val tracks: IntArray = tracks.copyOf(tracks.size)
         val length: Int = tracks.size
@@ -1112,12 +1112,6 @@ class DefaultTrackSelector(
             }
         }
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [SELECTION_ELIGIBILITY_NO, SELECTION_ELIGIBILITY_FIXED, SELECTION_ELIGIBILITY_ADAPTIVE])
-    protected annotation class SelectionEligibility
 
     val context: Context?
 
@@ -1293,7 +1287,7 @@ class DefaultTrackSelector(
         // selections, and null otherwise.
         val rendererConfigurations = arrayOfNulls<RendererConfiguration>(rendererCount)
         for (i in 0..<rendererCount) {
-            val rendererType: @C.TrackType Int = mappedTrackInfo.getRendererType(i)
+            val rendererType: Int = mappedTrackInfo.getRendererType(i)
             val forceRendererDisabled =
                 playerParameters.getRendererDisabled(i)
                         || playerParameters.disabledTrackTypes.contains(rendererType)
@@ -1668,7 +1662,7 @@ class DefaultTrackSelector(
     }
 
     private fun <T : TrackInfo<T>> selectTracksForType(
-        trackType: @C.TrackType Int,
+        trackType: Int,
         mappedTrackInfo: MappedTrackInfo,
         formatSupport: Array<Array<IntArray>>,
         trackInfoFactory: TrackInfo.Factory<T>,
@@ -1687,7 +1681,7 @@ class DefaultTrackSelector(
                     val usedTrackInSelection = BooleanArray(trackGroup.length)
                     for (trackIndex in 0..<trackGroup.length) {
                         val trackInfo = trackInfos.get(trackIndex)
-                        val eligibility: @SelectionEligibility Int =
+                        val eligibility:  Int =
                             trackInfo.selectionEligibility
                         if (usedTrackInSelection[trackIndex] || eligibility == SELECTION_ELIGIBILITY_NO) {
                             continue
@@ -1757,7 +1751,7 @@ class DefaultTrackSelector(
 
         val format: Format = trackGroup.getFormat(trackIndex)
 
-        abstract val selectionEligibility: @SelectionEligibility Int
+        abstract val selectionEligibility:  Int
         abstract fun isCompatibleForAdaptationWith(otherTrack: T): Boolean
     }
 
@@ -1766,9 +1760,9 @@ class DefaultTrackSelector(
         trackGroup: TrackGroup,
         trackIndex: Int,
         private val parameters: Parameters,
-        formatSupport: @RendererCapabilities.Capabilities Int,
+        formatSupport:  Int,
         selectedAudioLanguage: String?,
-        mixedMimeTypeAdaptationSupport: @AdaptiveSupport Int,
+        mixedMimeTypeAdaptationSupport: Int,
         isSuitableForViewport: Boolean
     ) : TrackInfo<VideoTrackInfo>(rendererIndex, trackGroup, trackIndex) {
         private val isWithinMaxConstraints: Boolean
@@ -1785,7 +1779,7 @@ class DefaultTrackSelector(
         private val hasMainOrNoRoleFlag: Boolean
         private val selectedAudioLanguageScore: Int
         private val allowMixedMimeTypes: Boolean
-        override val selectionEligibility: @SelectionEligibility Int
+        override val selectionEligibility:  Int
         private val usesPrimaryOrFallbackDecoder: Boolean
         private val usesPrimaryDecoder: Boolean
         private val usesHardwareAcceleration: Boolean
@@ -1855,7 +1849,7 @@ class DefaultTrackSelector(
                 )
 
             var resolvedMimeType = format.sampleMimeType
-            val decoderSupport: @DecoderSupport Int =
+            val decoderSupport:  Int =
                 RendererCapabilities.getDecoderSupport(formatSupport)
             if (decoderSupport == RendererCapabilities.DECODER_SUPPORT_FALLBACK_MIMETYPE) {
                 val fallbackMimeType = getAlternativeCodecMimeType(format)
@@ -1898,9 +1892,9 @@ class DefaultTrackSelector(
         }
 
         fun evaluateSelectionEligibility(
-            rendererSupport: @RendererCapabilities.Capabilities Int,
-            requiredAdaptiveSupport: @AdaptiveSupport Int
-        ): @SelectionEligibility Int {
+            rendererSupport:  Int,
+            requiredAdaptiveSupport: Int
+        ):  Int {
             if ((format.roleFlags and C.ROLE_FLAG_TRICK_PLAY) != 0) {
                 // Ignore trick-play tracks for now.
                 return SELECTION_ELIGIBILITY_NO
@@ -1934,7 +1928,7 @@ class DefaultTrackSelector(
                 params: Parameters,
                 formatSupport: IntArray,
                 selectedAudioLanguage: String?,
-                mixedMimeTypeAdaptationSupport: @AdaptiveSupport Int,
+                mixedMimeTypeAdaptationSupport: Int,
                 viewportSizeFromDisplay: Point?
             ): List<VideoTrackInfo> {
                 val viewportWidth = viewportSizeFromDisplay?.x ?: params.viewportWidth
@@ -2109,13 +2103,13 @@ class DefaultTrackSelector(
         trackGroup: TrackGroup,
         trackIndex: Int,
         private val parameters: Parameters,
-        formatSupport: @RendererCapabilities.Capabilities Int,
+        formatSupport:  Int,
         hasMappedVideoTracks: Boolean,
         withinAudioChannelCountConstraints: Predicate<Format?>,
-        mixedMimeTypeAdaptationSupport: @AdaptiveSupport Int
+        mixedMimeTypeAdaptationSupport: Int
     ) : TrackInfo<AudioTrackInfo>(rendererIndex, trackGroup, trackIndex),
         Comparable<AudioTrackInfo> {
-        override val selectionEligibility: @SelectionEligibility Int
+        override val selectionEligibility:  Int
         private val isWithinConstraints: Boolean
         private val language: String?
         private val isWithinRendererCapabilities: Boolean
@@ -2309,10 +2303,10 @@ class DefaultTrackSelector(
         }
 
         fun evaluateSelectionEligibility(
-            rendererSupport: @RendererCapabilities.Capabilities Int,
+            rendererSupport:  Int,
             hasMappedVideoTracks: Boolean,
-            requiredAdaptiveSupport: @AdaptiveSupport Int
-        ): @SelectionEligibility Int {
+            requiredAdaptiveSupport: Int
+        ):  Int {
             if (!RendererCapabilities.isFormatSupported(
                     rendererSupport,
                     parameters.exceedRendererCapabilitiesIfNecessary
@@ -2348,7 +2342,7 @@ class DefaultTrackSelector(
                 formatSupport: IntArray,
                 hasMappedVideoTracks: Boolean,
                 withinAudioChannelCountConstraints: Predicate<Format?>,
-                mixedMimeTypeAdaptationSupport: @AdaptiveSupport Int
+                mixedMimeTypeAdaptationSupport: Int
             ): List<AudioTrackInfo> {
                 val listBuilder = mutableListOf<AudioTrackInfo>()
                 for (i in 0..<trackGroup.length) {
@@ -2383,12 +2377,12 @@ class DefaultTrackSelector(
         trackGroup: TrackGroup,
         trackIndex: Int,
         parameters: Parameters,
-        trackFormatSupport: @RendererCapabilities.Capabilities Int,
+        trackFormatSupport:  Int,
         selectedAudioLanguage: String?,
         preferredCaptioningLanguage: String?
     ) : TrackInfo<TextTrackInfo>(rendererIndex, trackGroup, trackIndex),
         Comparable<TextTrackInfo> {
-        override val selectionEligibility: @SelectionEligibility Int
+        override val selectionEligibility:  Int
         private val isWithinRendererCapabilities: Boolean = RendererCapabilities.isFormatSupported(
             trackFormatSupport, false
         )
@@ -2548,10 +2542,10 @@ class DefaultTrackSelector(
         trackGroup: TrackGroup,
         trackIndex: Int,
         parameters: Parameters,
-        trackFormatSupport: @RendererCapabilities.Capabilities Int
+        trackFormatSupport:  Int
     ) : TrackInfo<ImageTrackInfo>(rendererIndex, trackGroup, trackIndex),
         Comparable<ImageTrackInfo> {
-        override val selectionEligibility: @SelectionEligibility Int =
+        override val selectionEligibility:  Int =
             if (RendererCapabilities.isFormatSupported(
                     trackFormatSupport,
                     parameters.exceedRendererCapabilitiesIfNecessary
@@ -2595,7 +2589,7 @@ class DefaultTrackSelector(
 
     private class OtherTrackScore(
         format: Format,
-        trackFormatSupport: @RendererCapabilities.Capabilities Int
+        trackFormatSupport:  Int
     ) : Comparable<OtherTrackScore> {
         private val isDefault: Boolean = (format.selectionFlags and C.SELECTION_FLAG_DEFAULT) != 0
         private val isWithinRendererCapabilities: Boolean = RendererCapabilities.isFormatSupported(
@@ -2676,7 +2670,7 @@ class DefaultTrackSelector(
 
             // Apply the overrides.
             for (rendererIndex in 0..<rendererCount) {
-                val trackType: @C.TrackType Int = mappedTrackInfo.getRendererType(rendererIndex)
+                val trackType: Int = mappedTrackInfo.getRendererType(rendererIndex)
                 val overrideForType = overridesByType[trackType] ?: continue
 
                 // If the override is non-empty and applies to this renderer, then apply it. Else we don't
@@ -2749,7 +2743,7 @@ class DefaultTrackSelector(
             definitions: Array<ExoTrackSelection.Definition?>
         ) {
             for (i in 0..<mappedTrackInfo.rendererCount) {
-                val rendererType: @C.TrackType Int = mappedTrackInfo.getRendererType(i)
+                val rendererType: Int = mappedTrackInfo.getRendererType(i)
                 if (parameters.getRendererDisabled(i)
                     || parameters.disabledTrackTypes.contains(rendererType)
                 ) {
@@ -2819,7 +2813,7 @@ class DefaultTrackSelector(
             }
             val trackGroupIndex = trackGroups.indexOf(selection.trackGroup)
             for (i in 0..<selection.length()) {
-                val trackFormatSupport: @RendererCapabilities.Capabilities Int =
+                val trackFormatSupport:  Int =
                     formatSupport[trackGroupIndex][selection.getIndexInTrackGroup(i)]
                 if (RendererCapabilities.getTunnelingSupport(trackFormatSupport)
                     != RendererCapabilities.TUNNELING_SUPPORTED
@@ -2854,7 +2848,7 @@ class DefaultTrackSelector(
                 if (rendererType == C.TRACK_TYPE_AUDIO && trackSelection != null && trackSelection.length() == 1) {
                     val trackGroupIndex =
                         mappedTrackInfo.getTrackGroups(i).indexOf(trackSelection.trackGroup)
-                    val trackFormatSupport: @RendererCapabilities.Capabilities Int =
+                    val trackFormatSupport:  Int =
                         rendererFormatSupports[i][trackGroupIndex][trackSelection.getIndexInTrackGroup(
                             0
                         )]
@@ -2883,7 +2877,7 @@ class DefaultTrackSelector(
 
         private fun rendererSupportsOffload(
             parameters: Parameters,
-            formatSupport: @RendererCapabilities.Capabilities Int,
+            formatSupport:  Int,
             format: Format
         ): Boolean {
             if (RendererCapabilities.getAudioOffloadSupport(formatSupport) == RendererCapabilities.AUDIO_OFFLOAD_NOT_SUPPORTED) {
@@ -3044,7 +3038,7 @@ class DefaultTrackSelector(
         }
 
         private fun findDefinitionForType(
-            definitions: Array<ExoTrackSelection.Definition?>, trackType: @C.TrackType Int
+            definitions: Array<ExoTrackSelection.Definition?>, trackType: Int
         ): Pair<ExoTrackSelection.Definition, Int>? {
             for (i in definitions.indices) {
                 if (definitions[i] != null && definitions[i]!!.group.type == trackType) {

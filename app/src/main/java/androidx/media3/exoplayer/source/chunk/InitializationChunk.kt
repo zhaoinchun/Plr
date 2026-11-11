@@ -18,7 +18,7 @@ class InitializationChunk(
     dataSource: DataSource,
     dataSpec: DataSpec,
     trackFormat: Format,
-    trackSelectionReason: @C.SelectionReason Int,
+    trackSelectionReason:  Int,
     trackSelectionData: Any?,
     private val chunkExtractor: ChunkExtractor
 ) : Chunk(

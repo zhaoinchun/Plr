@@ -22,21 +22,11 @@ interface TsPayloadReader {
     class EsInfo(
         val streamType: Int,
         val language: String?,
-        val audioType: @AudioType Int,
+        val audioType:  Int,
         dvbSubtitleInfos: MutableList<DvbSubtitleInfo?>?,
         val descriptorBytes: ByteArray
     ) {
-        
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [AUDIO_TYPE_UNDEFINED, AUDIO_TYPE_CLEAN_EFFECTS, AUDIO_TYPE_HEARING_IMPAIRED, AUDIO_TYPE_VISUAL_IMPAIRED_COMMENTARY
-            ]
-        )
-        annotation class AudioType
 
-        @get:C.RoleFlags
         val roleFlags: Int
             get() {
                 when (audioType) {
@@ -113,16 +103,6 @@ interface TsPayloadReader {
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_PAYLOAD_UNIT_START_INDICATOR, FLAG_RANDOM_ACCESS_INDICATOR, FLAG_DATA_ALIGNMENT_INDICATOR
-        ]
-    )
-    annotation class Flags
-
     fun init(
         timestampAdjuster: TimestampAdjuster,
         extractorOutput: ExtractorOutput,
@@ -132,7 +112,7 @@ interface TsPayloadReader {
     fun seek()
 
     @Throws(ParserException::class)
-    fun consume(data: ParsableByteArray, flags: @Flags Int)
+    fun consume(data: ParsableByteArray, flags:  Int)
 
     companion object {
         const val FLAG_PAYLOAD_UNIT_START_INDICATOR: Int = 1

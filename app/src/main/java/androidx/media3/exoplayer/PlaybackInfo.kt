@@ -26,8 +26,8 @@ data class PlaybackInfo(
     val staticMetadata: List<Metadata>?,
     val loadingMediaPeriodId: MediaPeriodId,
     val playWhenReady: Boolean,
-    val playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int,
-    val playbackSuppressionReason: @Player.PlaybackSuppressionReason Int,
+    val playWhenReadyChangeReason:  Int,
+    val playbackSuppressionReason:  Int,
     val playbackParameters: PlaybackParameters,
     @field:Volatile var bufferedPositionUs: Long,
     @field:Volatile var totalBufferedDurationUs: Long,
@@ -80,8 +80,8 @@ data class PlaybackInfo(
 
     fun copyWithPlayWhenReady(
         playWhenReady: Boolean,
-        playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int,
-        playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
+        playWhenReadyChangeReason:  Int,
+        playbackSuppressionReason:  Int
     ): PlaybackInfo {
         return copy(
             playWhenReady = playWhenReady,

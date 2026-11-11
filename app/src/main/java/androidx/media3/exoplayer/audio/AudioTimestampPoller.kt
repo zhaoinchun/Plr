@@ -12,14 +12,6 @@ internal class AudioTimestampPoller(
     audioTrack: AudioTrack,
     private val errorListener: AudioTrackPositionTracker.Listener
 ) {
-    
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_INITIALIZING, STATE_TIMESTAMP, STATE_TIMESTAMP_ADVANCING, STATE_NO_TIMESTAMP, STATE_ERROR]
-    )
-    private annotation class State
 
     private val audioTimestamp: AudioTimestampWrapper = AudioTimestampWrapper(audioTrack)
     private val sampleRate: Int= audioTrack.sampleRate

@@ -42,7 +42,7 @@ class TrackEncryptionBox(
     companion object {
         private const val TAG = "TrackEncryptionBox"
 
-        private fun schemeToCryptoMode(schemeType: String?): @C.CryptoMode Int {
+        private fun schemeToCryptoMode(schemeType: String?):  Int {
             if (schemeType == null) {
                 // If unknown, assume cenc.
                 return C.CRYPTO_MODE_AES_CTR

@@ -1,7 +1,6 @@
 package androidx.media3.common
 
 import android.os.Bundle
-import androidx.media3.common.C.RoleFlags
 import androidx.media3.common.util.Log
 import androidx.media3.common.util.Util
 import androidx.media3.common.util.contentHashCode
@@ -10,7 +9,7 @@ import com.google.common.base.Preconditions
 class TrackGroup(id: String, formats: List<Format>) {
     val length: Int
     val id: String
-    val type: @C.TrackType Int
+    val type: Int
     private val formats: List<Format>
     private var hashCode = 0
 
@@ -89,7 +88,7 @@ class TrackGroup(id: String, formats: List<Format>) {
         // cases where malformed TrackGroups happen to work by chance (e.g. because adaptive selections
         // are always disabled).
         val language = normalizeLanguage(formats[0].language)
-        @RoleFlags val roleFlags: @RoleFlags Int = normalizeRoleFlags(formats[0].roleFlags)
+        val roleFlags: Int = normalizeRoleFlags(formats[0].roleFlags)
         for (i in 1..<formats.size) {
             if (language != normalizeLanguage(formats[i].language)) {
                 logErrorMessage(
@@ -131,8 +130,8 @@ class TrackGroup(id: String, formats: List<Format>) {
             return if (language == null || language == C.LANGUAGE_UNDETERMINED) "" else language
         }
 
-        @RoleFlags
-        private fun normalizeRoleFlags(@RoleFlags roleFlags: @RoleFlags Int): @RoleFlags Int {
+        
+        private fun normalizeRoleFlags(roleFlags: Int): Int {
             // Treat trick-play and non-trick-play formats as compatible.
             return roleFlags or C.ROLE_FLAG_TRICK_PLAY
         }

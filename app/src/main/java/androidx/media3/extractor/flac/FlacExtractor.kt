@@ -30,23 +30,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class FlacExtractor  constructor(flags: Int = 0) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(flag = true, value = [FLAG_DISABLE_ID3_METADATA, FLAG_DISABLE_ARTWORK_METADATA])
-    annotation class Flags
-
-    // LINT.ThenChange(../../../../../../../../decoder_flac/src/main/java/androidx/media3/decoder/flac/FlacExtractor.java)
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_READ_ID3_METADATA, STATE_GET_STREAM_MARKER_AND_INFO_BLOCK_BYTES, STATE_READ_STREAM_MARKER, STATE_READ_METADATA_BLOCKS, STATE_GET_FRAME_START_MARKER, STATE_READ_FRAMES
-        ]
-    )
-    private annotation class State
-
     private val streamMarkerAndInfoBlock: ByteArray
     private val buffer: ParsableByteArray
     private val id3MetadataDisabled: Boolean
@@ -95,7 +78,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         when (state) {
             STATE_READ_ID3_METADATA -> {
                 readId3Metadata(input)
@@ -204,7 +187,7 @@ class FlacExtractor  constructor(flags: Int = 0) : Extractor {
     private fun readFrames(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         // Handle pending binary search seek if necessary.
         if (binarySearchSeeker != null && binarySearchSeeker!!.isSeeking) {
             return binarySearchSeeker!!.handlePendingSeek(input, seekPosition)

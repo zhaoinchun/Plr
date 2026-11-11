@@ -209,7 +209,7 @@ internal object SpannedToHtmlConverter {
     }
 
     private fun getTextEmphasisStyle(
-        shape: @TextEmphasisSpan.MarkShape Int, fill: @TextEmphasisSpan.MarkFill Int
+        shape:  Int, fill:  Int
     ): String {
         val builder = StringBuilder()
         when (fill) {
@@ -229,7 +229,7 @@ internal object SpannedToHtmlConverter {
         return builder.toString()
     }
 
-    private fun getTextEmphasisPosition(position: @TextAnnotation.Position Int): String {
+    private fun getTextEmphasisPosition(position:  Int): String {
         when (position) {
             TextAnnotation.POSITION_AFTER -> return "under left"
             TextAnnotation.POSITION_UNKNOWN, TextAnnotation.POSITION_BEFORE -> return "over right"

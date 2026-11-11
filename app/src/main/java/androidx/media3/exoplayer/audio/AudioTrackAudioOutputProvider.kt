@@ -23,7 +23,6 @@ import androidx.media3.common.util.Util.getSystemProperty
 import androidx.media3.common.util.Util.isEncodingLinearPcm
 import androidx.media3.exoplayer.audio.AudioOutputProvider.FormatConfig
 import androidx.media3.exoplayer.audio.AudioOutputProvider.OutputConfig
-import androidx.media3.exoplayer.audio.AudioOutputProvider.SupportLevel
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
 import androidx.media3.exoplayer.audio.DefaultAudioSink.AudioOffloadSupportProvider
 import androidx.media3.exoplayer.audio.DefaultAudioSink.AudioTrackBufferSizeProvider
@@ -70,8 +69,8 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
         val format = formatConfig.format
         updateAudioCapabilitiesReceiver(formatConfig)
 
-        val outputMode: @DefaultAudioSink.OutputMode Int
-        var outputEncoding: @C.Encoding Int
+        val outputMode:  Int
+        var outputEncoding: Int
         var outputSampleRate: Int
         var outputChannelConfig: Int
         val outputPcmFrameSize: Int
@@ -335,7 +334,7 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
         playbackLooper = myLooper
     }
 
-    private fun getFormatSupportLevel(formatConfig: FormatConfig): @SupportLevel Int {
+    private fun getFormatSupportLevel(formatConfig: FormatConfig):  Int {
         val format = formatConfig.format
         if (format.sampleMimeType == MimeTypes.AUDIO_RAW) {
             if (format.pcmEncoding == C.ENCODING_PCM_16BIT) {

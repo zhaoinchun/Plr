@@ -21,7 +21,7 @@ internal class AudioTrackPositionTracker(
     private val listener: Listener,
     private val clock: Clock,
     private val audioTrack: AudioTrack,
-    outputEncoding: @C.Encoding Int,
+    outputEncoding: Int,
     outputPcmFrameSize: Int,
     bufferSize: Int
 ) {

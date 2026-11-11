@@ -6,7 +6,7 @@ open class ParserException protected constructor(
     message: String?,
     cause: Throwable?,
     val contentIsMalformed: Boolean,
-    val dataType: @C.DataType Int
+    val dataType: Int
 ) : IOException(message, cause) {
     override val message: String?
         get() {

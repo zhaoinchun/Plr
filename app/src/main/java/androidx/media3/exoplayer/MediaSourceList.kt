@@ -482,7 +482,7 @@ internal class MediaSourceList(
         override fun onDrmSessionAcquired(
             windowIndex: Int,
             mediaPeriodId: MediaPeriodId?,
-            @DrmSession.State state: @DrmSession.State Int
+             state:  Int
         ) {
             val eventParameters =
                 getEventParameters(windowIndex, mediaPeriodId)

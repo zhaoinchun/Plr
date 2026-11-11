@@ -19,7 +19,6 @@ import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
 import androidx.media3.extractor.text.CueDecoder
 import androidx.media3.extractor.text.Subtitle
 import androidx.media3.extractor.text.SubtitleDecoder
@@ -40,13 +39,6 @@ class TextRenderer(
 ) : BaseRenderer(
     C.TRACK_TYPE_TEXT
 ), Handler.Callback {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [REPLACEMENT_STATE_NONE, REPLACEMENT_STATE_SIGNAL_END_OF_STREAM, REPLACEMENT_STATE_WAIT_END_OF_STREAM]
-    )
-    private annotation class ReplacementState
 
     // Fields used when handling CuesWithTiming objects from application/x-media3-cues samples.
     private val cueDecoder = CueDecoder()
@@ -54,7 +46,7 @@ class TextRenderer(
     private var cuesResolver:CuesResolver? = null
 
     private var waitingForKeyFrame = false
-    private var decoderReplacementState: @ReplacementState Int = 0
+    private var decoderReplacementState:  Int = 0
     private var subtitleDecoder: SubtitleDecoder? = null
     private var nextSubtitleInputBuffer: SubtitleInputBuffer? = null
     private var subtitle: SubtitleOutputBuffer? = null
@@ -74,7 +66,7 @@ class TextRenderer(
     private var legacyDecodingEnabled= false
     override val name: String = TAG
 
-    override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+    override fun supportsFormat(format: Format):  Int {
         return if (isCuesWithTiming(format) || subtitleDecoderFactory.supportsFormat(format)) {
             RendererCapabilities.create(
                 if (format.cryptoType == C.CRYPTO_TYPE_NONE) C.FORMAT_HANDLED else C.FORMAT_UNSUPPORTED_DRM
@@ -183,7 +175,7 @@ class TextRenderer(
         if (inputStreamEnded) {
             return false
         }
-        var readResult: @ReadDataResult Int =
+        var readResult:  Int =
             readSource(
                 formatHolder,
                 cueDecoderInputBuffer,
@@ -313,7 +305,7 @@ class TextRenderer(
                     return
                 }
                 // Try and read the next subtitle from the source.
-                var result: @ReadDataResult Int =
+                var result:  Int =
                     readSource(
                         formatHolder,
                         nextInputBuffer,

@@ -60,7 +60,7 @@ abstract class BasePlayer protected constructor() : Player {
         removeMediaItems( 0,  Int.MAX_VALUE)
     }
 
-    override fun isCommandAvailable(@Player.Command command: @Player.Command Int): Boolean {
+    override fun isCommandAvailable(command: Int): Boolean {
         return availableCommands!!.contains(command)
     }
 
@@ -166,7 +166,7 @@ abstract class BasePlayer protected constructor() : Player {
     protected abstract fun seekTo(
         mediaItemIndex: Int,
         positionMs: Long,
-        @Player.Command seekCommand: @Player.Command Int,
+        seekCommand: Int,
         isRepeatingCurrentItem: Boolean
     )
 
@@ -312,15 +312,15 @@ abstract class BasePlayer protected constructor() : Player {
                 timeline.getWindow(currentMediaItemIndex, window).durationMs
         }
 
-    @get:Player.RepeatMode
-    private val repeatModeForNavigation: @Player.RepeatMode Int
+    
+    private val repeatModeForNavigation: Int
         get() {
-            @Player.RepeatMode val repeatMode: @Player.RepeatMode Int =
+            val repeatMode: Int =
                 repeatMode
             return if (repeatMode == Player.REPEAT_MODE_ONE) Player.REPEAT_MODE_OFF else repeatMode
         }
 
-    private fun ignoreSeek(@Player.Command seekCommand: @Player.Command Int) {
+    private fun ignoreSeek(seekCommand: Int) {
         seekTo( 
             C.INDEX_UNSET,  
             C.TIME_UNSET,
@@ -331,14 +331,14 @@ abstract class BasePlayer protected constructor() : Player {
 
     private fun seekToCurrentItem(
         positionMs: Long,
-        @Player.Command seekCommand: @Player.Command Int
+        seekCommand: Int
     ) {
         seekTo(
             currentMediaItemIndex, positionMs, seekCommand,  false
         )
     }
 
-    private fun seekToOffset(offsetMs: Long, @Player.Command seekCommand: @Player.Command Int) {
+    private fun seekToOffset(offsetMs: Long, seekCommand: Int) {
         var positionMs = currentPosition + offsetMs
         val durationMs = duration
         if (durationMs != C.TIME_UNSET) {
@@ -350,7 +350,7 @@ abstract class BasePlayer protected constructor() : Player {
 
     private fun seekToDefaultPositionInternal(
         mediaItemIndex: Int,
-        @Player.Command seekCommand: @Player.Command Int
+        seekCommand: Int
     ) {
         seekTo(
             mediaItemIndex,  
@@ -360,7 +360,7 @@ abstract class BasePlayer protected constructor() : Player {
         )
     }
 
-    private fun seekToNextMediaItemInternal(@Player.Command seekCommand: @Player.Command Int) {
+    private fun seekToNextMediaItemInternal(seekCommand: Int) {
         val nextMediaItemIndex = nextMediaItemIndex
         if (nextMediaItemIndex == C.INDEX_UNSET) {
             ignoreSeek(seekCommand)
@@ -373,7 +373,7 @@ abstract class BasePlayer protected constructor() : Player {
         }
     }
 
-    private fun seekToPreviousMediaItemInternal(@Player.Command seekCommand: @Player.Command Int) {
+    private fun seekToPreviousMediaItemInternal(seekCommand: Int) {
         val previousMediaItemIndex = previousMediaItemIndex
         if (previousMediaItemIndex == C.INDEX_UNSET) {
             ignoreSeek(seekCommand)
@@ -386,7 +386,7 @@ abstract class BasePlayer protected constructor() : Player {
         }
     }
 
-    private fun repeatCurrentMediaItem(@Player.Command seekCommand: @Player.Command Int) {
+    private fun repeatCurrentMediaItem(seekCommand: Int) {
         seekTo(
             currentMediaItemIndex,  
             C.TIME_UNSET,

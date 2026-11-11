@@ -53,7 +53,7 @@ class PlaybackStats internal constructor(
 ) {
     class EventTimeAndPlaybackState(
         val eventTime: EventTime,
-        val playbackState: @PlaybackState Int
+        val playbackState:  Int
     ) {
         override fun equals(o: Any?): Boolean {
             if (this === o) {
@@ -120,26 +120,18 @@ class PlaybackStats internal constructor(
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [PLAYBACK_STATE_NOT_STARTED, PLAYBACK_STATE_JOINING_BACKGROUND, PLAYBACK_STATE_JOINING_FOREGROUND, PLAYBACK_STATE_PLAYING, PLAYBACK_STATE_PAUSED, PLAYBACK_STATE_SEEKING, PLAYBACK_STATE_BUFFERING, PLAYBACK_STATE_PAUSED_BUFFERING, PLAYBACK_STATE_SUPPRESSED, PLAYBACK_STATE_SUPPRESSED_BUFFERING, PLAYBACK_STATE_ENDED, PLAYBACK_STATE_STOPPED, PLAYBACK_STATE_FAILED, PLAYBACK_STATE_INTERRUPTED_BY_AD, PLAYBACK_STATE_ABANDONED]
-    )
-    internal annotation class PlaybackState
-
     val mediaTimeHistory: List<LongArray?> = mediaTimeHistory.toList()
     val videoFormatHistory: List<EventTimeAndFormat?> = videoFormatHistory.toList()
     val audioFormatHistory: List<EventTimeAndFormat?> = audioFormatHistory.toList()
     val fatalErrorHistory: List<EventTimeAndException?> = fatalErrorHistory.toList()
     val nonFatalErrorHistory: List<EventTimeAndException?> = nonFatalErrorHistory.toList()
 
-    fun getPlaybackStateDurationMs(playbackState: @PlaybackState Int): Long {
+    fun getPlaybackStateDurationMs(playbackState:  Int): Long {
         return playbackStateDurationsMs[playbackState]
     }
 
-    fun getPlaybackStateAtTime(realtimeMs: Long): @PlaybackState Int {
-        var state: @PlaybackState Int = PLAYBACK_STATE_NOT_STARTED
+    fun getPlaybackStateAtTime(realtimeMs: Long):  Int {
+        var state:  Int = PLAYBACK_STATE_NOT_STARTED
         for (timeAndState in playbackStateHistory) {
             if (timeAndState.eventTime.realtimeMs > realtimeMs) {
                 break

@@ -26,13 +26,13 @@ object Log {
     private var logger: Logger = Logger.DEFAULT
 
     @Pure
-    fun getLogLevel(): @LogLevel Int {
+    fun getLogLevel():  Int {
         synchronized(lock) {
             return logLevel
         }
     }
 
-    fun setLogLevel(logLevel: @LogLevel Int) {
+    fun setLogLevel(logLevel:  Int) {
         synchronized(lock) {
             this.logLevel = logLevel
         }
@@ -166,12 +166,6 @@ object Log {
         }
         return false
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [LOG_LEVEL_ALL, LOG_LEVEL_INFO, LOG_LEVEL_WARNING, LOG_LEVEL_ERROR, LOG_LEVEL_OFF])
-    annotation class LogLevel
 
     interface Logger {
         

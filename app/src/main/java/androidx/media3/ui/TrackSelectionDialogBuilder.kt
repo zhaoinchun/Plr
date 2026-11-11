@@ -58,7 +58,7 @@ class TrackSelectionDialogBuilder {
         context: Context?,
         title: CharSequence?,
         player: Player,
-        trackType: @C.TrackType Int
+        trackType: Int
     ) {
         this.context = context
         this.title = title

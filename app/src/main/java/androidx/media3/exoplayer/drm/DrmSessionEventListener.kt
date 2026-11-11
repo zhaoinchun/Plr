@@ -10,7 +10,7 @@ interface DrmSessionEventListener {
     fun onDrmSessionAcquired(
         windowIndex: Int,
         mediaPeriodId: MediaPeriodId?,
-        @DrmSession.State state: @DrmSession.State Int
+         state:  Int
     ) {
     }
 
@@ -55,7 +55,7 @@ interface DrmSessionEventListener {
             }
         }
 
-        fun drmSessionAcquired(@DrmSession.State state: @DrmSession.State Int) {
+        fun drmSessionAcquired( state:  Int) {
             for (listenerAndHandler in listenerAndHandlers) {
                 val listener = listenerAndHandler.listener
                 postOrRun(

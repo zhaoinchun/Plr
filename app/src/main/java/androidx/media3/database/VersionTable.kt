@@ -40,7 +40,7 @@ object VersionTable {
 
     @Throws(DatabaseIOException::class)
     fun setVersion(
-        writableDatabase: SQLiteDatabase, feature: @Feature Int, instanceUid: String?, version: Int
+        writableDatabase: SQLiteDatabase, feature:  Int, instanceUid: String?, version: Int
     ) {
         try {
             writableDatabase.execSQL(SQL_CREATE_TABLE_IF_NOT_EXISTS)
@@ -56,7 +56,7 @@ object VersionTable {
 
     @Throws(DatabaseIOException::class)
     fun removeVersion(
-        writableDatabase: SQLiteDatabase, feature: @Feature Int, instanceUid: String?
+        writableDatabase: SQLiteDatabase, feature:  Int, instanceUid: String?
     ) {
         try {
             if (!tableExists(writableDatabase, TABLE_NAME)) {
@@ -73,7 +73,7 @@ object VersionTable {
     }
 
     @Throws(DatabaseIOException::class)
-    fun getVersion(database: SQLiteDatabase, feature: @Feature Int, instanceUid: String?): Int {
+    fun getVersion(database: SQLiteDatabase, feature:  Int, instanceUid: String?): Int {
         try {
             if (!tableExists(database, TABLE_NAME)) {
                 return VERSION_UNSET
@@ -102,11 +102,4 @@ object VersionTable {
         return arrayOf<String?>(feature.toString(), instance)
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [FEATURE_OFFLINE, FEATURE_CACHE_CONTENT_METADATA, FEATURE_CACHE_FILE_METADATA, FEATURE_EXTERNAL]
-    )
-    private annotation class Feature
 }

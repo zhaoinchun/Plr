@@ -210,7 +210,7 @@ class PgsParser : SubtitleParser {
 
     companion object {
         
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_REPLACE
 
         private const val SECTION_TYPE_PALETTE = 0x14

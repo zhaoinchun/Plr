@@ -16,13 +16,13 @@ class FileDataSource : BaseDataSource( false) {
     class FileDataSourceException : DataSourceException {
         constructor(
             cause: Throwable,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+             errorCode:  Int
         ) : super(cause, errorCode)
 
         constructor(
             message: String?,
             cause: Throwable?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+             errorCode:  Int
         ) : super(message, cause, errorCode)
     }
 

@@ -17,7 +17,7 @@ import androidx.media3.exoplayer.source.MediaLoadData
 import androidx.media3.exoplayer.source.MediaSourceEventListener
 import androidx.media3.exoplayer.source.SampleQueue
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
+
 import androidx.media3.exoplayer.source.SequenceableLoader
 import androidx.media3.exoplayer.upstream.Allocator
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
@@ -32,7 +32,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class ChunkSampleStream<T : ChunkSource>(
-    val primaryTrackType: @C.TrackType Int,
+    val primaryTrackType: Int,
     embeddedTrackTypes: IntArray?,
     embeddedTrackFormats: Array<Format>?,
     val chunkSource: T,
@@ -296,7 +296,7 @@ class ChunkSampleStream<T : ChunkSource>(
     }
 
     override fun readData(
-        formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+        formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
     ): Int {
         val shouldBlockForInitialDiscontinuity =
             !usesStreamPrerollFlags && mayHaveInitialDiscontinuity()
@@ -837,7 +837,7 @@ class ChunkSampleStream<T : ChunkSource>(
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
         ): Int {
             if (this@ChunkSampleStream.isPendingReset) {
                 return C.RESULT_NOTHING_READ

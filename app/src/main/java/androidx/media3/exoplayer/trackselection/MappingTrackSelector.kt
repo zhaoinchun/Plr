@@ -8,7 +8,6 @@ import androidx.media3.common.TrackGroup
 import androidx.media3.common.util.Util
 import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.RendererCapabilities
-import androidx.media3.exoplayer.RendererCapabilities.AdaptiveSupport
 import androidx.media3.exoplayer.RendererConfiguration
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.TrackGroupArray
@@ -24,23 +23,6 @@ abstract class MappingTrackSelector : TrackSelector() {
         private val rendererFormatSupports: Array<Array<IntArray>>,
          val unmappedTrackGroups: TrackGroupArray
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(
-            AnnotationTarget.FIELD,
-            AnnotationTarget.FUNCTION,
-            AnnotationTarget.PROPERTY_GETTER,
-            AnnotationTarget.PROPERTY_SETTER,
-            AnnotationTarget.VALUE_PARAMETER,
-            AnnotationTarget.LOCAL_VARIABLE,
-            AnnotationTarget.CLASS,
-            AnnotationTarget.TYPE,
-            AnnotationTarget.TYPE_PARAMETER
-        )
-        @IntDef(
-            value = [RENDERER_SUPPORT_NO_TRACKS, RENDERER_SUPPORT_UNSUPPORTED_TRACKS, RENDERER_SUPPORT_EXCEEDS_CAPABILITIES_TRACKS, RENDERER_SUPPORT_PLAYABLE_TRACKS]
-        )
-        annotation class RendererSupport
 
         val rendererCount = rendererTrackTypes.size
 
@@ -48,7 +30,7 @@ abstract class MappingTrackSelector : TrackSelector() {
             return rendererNames[rendererIndex]
         }
 
-        fun getRendererType(rendererIndex: Int): @C.TrackType Int {
+        fun getRendererType(rendererIndex: Int): Int {
             return rendererTrackTypes[rendererIndex]
         }
 
@@ -56,12 +38,12 @@ abstract class MappingTrackSelector : TrackSelector() {
             return rendererTrackGroups[rendererIndex]
         }
 
-        @RendererSupport
-        fun getRendererSupport(rendererIndex: Int): @RendererSupport Int {
-            var bestRendererSupport: @RendererSupport Int = RENDERER_SUPPORT_NO_TRACKS
+        
+        fun getRendererSupport(rendererIndex: Int):  Int {
+            var bestRendererSupport:  Int = RENDERER_SUPPORT_NO_TRACKS
             val rendererFormatSupport = rendererFormatSupports[rendererIndex]
             for (trackGroupFormatSupport in rendererFormatSupport) {
-                for (trackFormatSupport: @RendererCapabilities.Capabilities Int in trackGroupFormatSupport) {
+                for (trackFormatSupport:  Int in trackGroupFormatSupport) {
                     val trackRendererSupport: Int
                     when (RendererCapabilities.getFormatSupport(trackFormatSupport)) {
                         C.FORMAT_HANDLED -> return RENDERER_SUPPORT_PLAYABLE_TRACKS
@@ -79,9 +61,9 @@ abstract class MappingTrackSelector : TrackSelector() {
             return bestRendererSupport
         }
 
-        @RendererSupport
-        fun getTypeSupport(trackType: @C.TrackType Int): @RendererSupport Int {
-            var bestRendererSupport: @RendererSupport Int = RENDERER_SUPPORT_NO_TRACKS
+        
+        fun getTypeSupport(trackType: Int):  Int {
+            var bestRendererSupport:  Int = RENDERER_SUPPORT_NO_TRACKS
             for (i in 0..<rendererCount) {
                 if (rendererTrackTypes[i] == trackType) {
                     bestRendererSupport = max(bestRendererSupport, getRendererSupport(i))
@@ -94,16 +76,16 @@ abstract class MappingTrackSelector : TrackSelector() {
             rendererIndex: Int,
             groupIndex: Int,
             trackIndex: Int
-        ): @RendererCapabilities.Capabilities Int {
+        ):  Int {
             return rendererFormatSupports[rendererIndex][groupIndex][trackIndex]
         }
 
-        @C.FormatSupport
+        
         fun getTrackSupport(
             rendererIndex: Int,
             groupIndex: Int,
             trackIndex: Int
-        ): @C.FormatSupport Int {
+        ):  Int {
             return RendererCapabilities.getFormatSupport(
                 getCapabilities(rendererIndex, groupIndex, trackIndex)
             )
@@ -111,13 +93,13 @@ abstract class MappingTrackSelector : TrackSelector() {
 
         fun getAdaptiveSupport(
             rendererIndex: Int, groupIndex: Int, includeCapabilitiesExceededTracks: Boolean
-        ): @AdaptiveSupport Int {
+        ): Int {
             val trackCount = rendererTrackGroups[rendererIndex].get(groupIndex)!!.length
             // Iterate over the tracks in the group, recording the indices of those to consider.
             var trackIndices = IntArray(trackCount)
             var trackIndexCount = 0
             for (i in 0..<trackCount) {
-                val fixedSupport: @C.FormatSupport Int =
+                val fixedSupport:  Int =
                     getTrackSupport(rendererIndex, groupIndex, i)
                 if (fixedSupport == C.FORMAT_HANDLED
                     || (includeCapabilitiesExceededTracks && fixedSupport == C.FORMAT_EXCEEDS_CAPABILITIES)
@@ -131,9 +113,9 @@ abstract class MappingTrackSelector : TrackSelector() {
 
         fun getAdaptiveSupport(
             rendererIndex: Int, groupIndex: Int, trackIndices: IntArray
-        ): @AdaptiveSupport Int {
+        ): Int {
             var handledTrackCount = 0
-            var adaptiveSupport: @AdaptiveSupport Int = RendererCapabilities.ADAPTIVE_SEAMLESS
+            var adaptiveSupport: Int = RendererCapabilities.ADAPTIVE_SEAMLESS
             var multipleMimeTypes = false
             var firstSampleMimeType: String? = null
             for (i in trackIndices.indices) {
@@ -292,13 +274,13 @@ abstract class MappingTrackSelector : TrackSelector() {
             preferUnassociatedRenderer: Boolean
         ): Int {
             var bestRendererIndex = rendererCapabilities.size
-            var bestFormatSupportLevel: @C.FormatSupport Int = C.FORMAT_UNSUPPORTED_TYPE
+            var bestFormatSupportLevel:  Int = C.FORMAT_UNSUPPORTED_TYPE
             var bestRendererIsUnassociated = true
             for (rendererIndex in rendererCapabilities.indices) {
                 val rendererCapability = rendererCapabilities[rendererIndex]
-                var formatSupportLevel: @C.FormatSupport Int = C.FORMAT_UNSUPPORTED_TYPE
+                var formatSupportLevel:  Int = C.FORMAT_UNSUPPORTED_TYPE
                 for (trackIndex in 0..<group.length) {
-                    val trackFormatSupportLevel: @C.FormatSupport Int =
+                    val trackFormatSupportLevel:  Int =
                         RendererCapabilities.getFormatSupport(
                             rendererCapability.supportsFormat(group.getFormat(trackIndex))
                         )

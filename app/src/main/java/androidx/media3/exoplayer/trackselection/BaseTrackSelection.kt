@@ -15,7 +15,7 @@ import kotlin.math.max
 abstract class BaseTrackSelection(
     val group: TrackGroup,
     tracks: IntArray,
-    override val type: @TrackSelection.Type Int = TrackSelection.TYPE_UNSET,
+    override val type:  Int = TrackSelection.TYPE_UNSET,
     formatComparator: Comparator<Format> = DEFAULT_FORMAT_COMPARATOR
 ) : ExoTrackSelection {
     protected val length: Int = tracks.size

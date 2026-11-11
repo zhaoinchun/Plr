@@ -22,15 +22,10 @@ class ClippingMediaSource(
     WrappingMediaSource(mediaSource) {
 
     class IllegalClippingException(
-        val reason: @Reason Int, startUs: Long = C.TIME_UNSET, endUs: Long = C.TIME_UNSET
+        val reason:  Int, startUs: Long = C.TIME_UNSET, endUs: Long = C.TIME_UNSET
     ) : IOException(
         "Illegal clipping: " + getReasonDescription(reason, startUs, endUs)
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(value = [REASON_INVALID_PERIOD_COUNT, REASON_NOT_SEEKABLE_TO_START, REASON_START_EXCEEDS_END])
-        annotation class Reason
 
         companion object {
             const val REASON_INVALID_PERIOD_COUNT: Int = 0
@@ -38,7 +33,7 @@ class ClippingMediaSource(
             const val REASON_START_EXCEEDS_END: Int = 2
 
             private fun getReasonDescription(
-                reason: @Reason Int,
+                reason:  Int,
                 startUs: Long,
                 endUs: Long
             ): String {

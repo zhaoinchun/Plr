@@ -4,8 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.IntDef
-import androidx.media3.common.C.RoleFlags
-import androidx.media3.common.C.SelectionFlags
 import androidx.media3.common.util.BundleCollectionUtil
 import androidx.media3.common.util.Util.intToStringMaxRadix
 import androidx.media3.common.util.Util.normalizeLanguageCode
@@ -30,13 +28,13 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
     val preferredVideoLabels: List<String>
     val preferredVideoLanguages: List<String>
 
-    @RoleFlags
-    val preferredVideoRoleFlags: @RoleFlags Int
+    
+    val preferredVideoRoleFlags: Int
     val preferredAudioLanguages: List<String>
     val preferredAudioLabels: List<String>
 
-    @RoleFlags
-    val preferredAudioRoleFlags: @RoleFlags Int
+    
+    val preferredAudioRoleFlags: Int
     val maxAudioChannelCount: Int
     val maxAudioBitrate: Int
     val preferredAudioMimeTypes: List<String>
@@ -45,12 +43,12 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
     val preferredTextLanguages: List<String>
     val preferredTextLabels: List<String>
 
-    @RoleFlags
-    val preferredTextRoleFlags: @RoleFlags Int
+    
+    val preferredTextRoleFlags: Int
     val usePreferredTextLanguagesAndRoleFlagsFromCaptioningManager: Boolean
 
-    @SelectionFlags
-    val ignoredTextSelectionFlags: @SelectionFlags Int
+   
+    val ignoredTextSelectionFlags: Int
     val selectUndeterminedTextLanguage: Boolean
     val isPrioritizeImageOverVideoEnabled: Boolean
     val forceLowestBitrate: Boolean
@@ -268,17 +266,10 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
     }
 
     data class AudioOffloadPreferences(
-        var audioOffloadMode: @AudioOffloadMode Int = AUDIO_OFFLOAD_MODE_DISABLED,
+        var audioOffloadMode: Int = AUDIO_OFFLOAD_MODE_DISABLED,
         var isGaplessSupportRequired: Boolean = false,
         var isSpeedChangeSupportRequired: Boolean = false,
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [AUDIO_OFFLOAD_MODE_REQUIRED, AUDIO_OFFLOAD_MODE_ENABLED, AUDIO_OFFLOAD_MODE_DISABLED]
-        )
-        annotation class AudioOffloadMode
 
         fun toBundle(): Bundle {
             val bundle = Bundle()
@@ -334,15 +325,15 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
         var preferredVideoLabels: List<String> = listOf()
         var preferredVideoLanguages: List<String> = listOf()
 
-        @RoleFlags
-        var preferredVideoRoleFlags: @RoleFlags Int = 0
+        
+        var preferredVideoRoleFlags: Int = 0
 
         // Audio
         var preferredAudioLanguages: List<String> = listOf()
         var preferredAudioLabels: List<String> = listOf()
 
-        @RoleFlags
-        var preferredAudioRoleFlags: @RoleFlags Int = 0
+        
+        var preferredAudioRoleFlags: Int = 0
         var maxAudioChannelCount = 0
         var maxAudioBitrate = 0
         var preferredAudioMimeTypes: List<String> = listOf()
@@ -352,13 +343,13 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
         var selectTextByDefault = false
         var preferredTextLanguages: List<String> = listOf()
 
-        @RoleFlags
-        var preferredTextRoleFlags: @RoleFlags Int = 0
+        
+        var preferredTextRoleFlags: Int = 0
         var usePreferredTextLanguagesAndRoleFlagsFromCaptioningManager = false
         var preferredTextLabels: List<String> = listOf()
 
-        @SelectionFlags
-        var ignoredTextSelectionFlags: @SelectionFlags Int = 0
+       
+        var ignoredTextSelectionFlags: Int = 0
         var selectUndeterminedTextLanguage = false
 
         // Image
@@ -514,7 +505,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
                     IntArray(0)
                 )
             disabledTrackTypes = HashSet()
-            for (disabledTrackType: @C.TrackType Int in disabledTrackTypeArray) {
+            for (disabledTrackType: Int in disabledTrackTypeArray) {
                 disabledTrackTypes!!.add(disabledTrackType)
             }
         }
@@ -663,7 +654,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open fun setPreferredVideoRoleFlags(@RoleFlags preferredVideoRoleFlags: @RoleFlags Int): Builder {
+        open fun setPreferredVideoRoleFlags(preferredVideoRoleFlags: Int): Builder {
             this.preferredVideoRoleFlags = preferredVideoRoleFlags
             return this
         }
@@ -679,7 +670,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open fun setPreferredAudioRoleFlags(@RoleFlags preferredAudioRoleFlags: @RoleFlags Int): Builder {
+        open fun setPreferredAudioRoleFlags(preferredAudioRoleFlags: Int): Builder {
             this.preferredAudioRoleFlags = preferredAudioRoleFlags
             return this
         }
@@ -737,7 +728,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open fun setPreferredTextRoleFlags(@RoleFlags preferredTextRoleFlags: @RoleFlags Int): Builder {
+        open fun setPreferredTextRoleFlags(preferredTextRoleFlags: Int): Builder {
             this.preferredTextRoleFlags = preferredTextRoleFlags
             this.usePreferredTextLanguagesAndRoleFlagsFromCaptioningManager = false
             return this
@@ -748,7 +739,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open fun setIgnoredTextSelectionFlags(@SelectionFlags ignoredTextSelectionFlags: @SelectionFlags Int): Builder {
+        open fun setIgnoredTextSelectionFlags(ignoredTextSelectionFlags: Int): Builder {
             this.ignoredTextSelectionFlags = ignoredTextSelectionFlags
             return this
         }
@@ -789,7 +780,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open fun clearOverridesOfType(trackType: @C.TrackType Int): Builder {
+        open fun clearOverridesOfType(trackType: Int): Builder {
             val it = overrides!!.values.iterator()
             while (it.hasNext()) {
                 val override = it.next()
@@ -811,7 +802,7 @@ open class TrackSelectionParameters protected constructor(builder: Builder) {
             return this
         }
 
-        open fun setTrackTypeDisabled(trackType: @C.TrackType Int, disabled: Boolean): Builder {
+        open fun setTrackTypeDisabled(trackType: Int, disabled: Boolean): Builder {
             if (disabled) {
                 disabledTrackTypes!!.add(trackType)
             } else {

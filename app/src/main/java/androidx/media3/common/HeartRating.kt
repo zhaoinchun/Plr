@@ -42,7 +42,7 @@ class HeartRating : Rating {
     }
 
     companion object {
-        private const val TYPE: @RatingType Int = RATING_TYPE_HEART
+        private const val TYPE: Int = RATING_TYPE_HEART
 
         private val FIELD_RATED: String = Util.intToStringMaxRadix(1)
         private val FIELD_IS_HEART: String = Util.intToStringMaxRadix(2)

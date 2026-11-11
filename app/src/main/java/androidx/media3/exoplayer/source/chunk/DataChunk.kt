@@ -13,9 +13,9 @@ import kotlin.concurrent.Volatile
 abstract class DataChunk(
     dataSource: DataSource,
     dataSpec: DataSpec,
-    type: @C.DataType Int,
+    type: Int,
     trackFormat: Format,
-    trackSelectionReason: @C.SelectionReason Int,
+    trackSelectionReason:  Int,
     trackSelectionData: Any?,
     data: ByteArray?
 ) : Chunk(

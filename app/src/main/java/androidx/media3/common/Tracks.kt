@@ -1,7 +1,6 @@
 package androidx.media3.common
 
 import android.os.Bundle
-import androidx.media3.common.C.FormatSupport
 import androidx.media3.common.util.BundleCollectionUtil
 import androidx.media3.common.util.Util
 import com.google.common.base.Function
@@ -12,19 +11,19 @@ class Tracks(groups: List<Group>) {
     val isEmpty: Boolean
         get() = groups.isEmpty()
 
-    fun containsType(trackType: @C.TrackType Int): Boolean {
+    fun containsType(trackType: Int): Boolean {
         return groups.find { it.type == trackType } != null
     }
 
-    fun isTypeSupported(trackType: @C.TrackType Int): Boolean {
+    fun isTypeSupported(trackType: Int): Boolean {
         return isTypeSupported(trackType, false)
     }
 
-    fun isTypeSupported(trackType: @C.TrackType Int, allowExceedsCapabilities: Boolean): Boolean {
+    fun isTypeSupported(trackType: Int, allowExceedsCapabilities: Boolean): Boolean {
         return groups.find { it.type == trackType && it.isSupported(allowExceedsCapabilities) } != null
     }
 
-    fun isTypeSelected(trackType: @C.TrackType Int): Boolean {
+    fun isTypeSelected(trackType: Int): Boolean {
         return groups.find { it.isSelected && it.type == trackType } != null
     }
 
@@ -64,7 +63,7 @@ class Tracks(groups: List<Group>) {
         val mediaTrackGroup: TrackGroup
         val isAdaptiveSupported: Boolean
 
-        @FormatSupport
+        
         private val trackSupport: IntArray
         private val trackSelected: BooleanArray
 
@@ -72,8 +71,8 @@ class Tracks(groups: List<Group>) {
             return mediaTrackGroup.getFormat(trackIndex)
         }
 
-        @FormatSupport
-        fun getTrackSupport(trackIndex: Int): @FormatSupport Int {
+        
+        fun getTrackSupport(trackIndex: Int):  Int {
             return trackSupport[trackIndex]
         }
 
@@ -105,7 +104,7 @@ class Tracks(groups: List<Group>) {
             return trackSelected[trackIndex]
         }
 
-        val type: @C.TrackType Int
+        val type: Int
             get() = mediaTrackGroup.type
 
         fun copyWithMediaTrackGroup(trackGroup: TrackGroup): Group {

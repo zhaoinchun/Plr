@@ -10,7 +10,7 @@ import com.google.common.base.Preconditions
 class CryptoInfo {
     var iv: ByteArray? = null
     var key: ByteArray? = null
-    var mode: @C.CryptoMode Int = 0
+    var mode:  Int = 0
     var numBytesOfClearData: IntArray? = null
     var numBytesOfEncryptedData: IntArray? = null
     var numSubSamples: Int = 0
@@ -31,7 +31,7 @@ class CryptoInfo {
         numBytesOfEncryptedData: IntArray?,
         key: ByteArray?,
         iv: ByteArray?,
-        mode: @C.CryptoMode Int,
+        mode:  Int,
         encryptedBlocks: Int,
         clearBlocks: Int
     ) {

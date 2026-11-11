@@ -152,7 +152,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             licenseServerUrl = schemeData.licenseServerUrl!!
         }
 
-        val requestType: @ExoMediaDrm.KeyRequest.RequestType Int = request.requestType
+        val requestType: Int = request.requestType
         return ExoMediaDrm.KeyRequest(requestData, licenseServerUrl, requestType)
     }
 
@@ -285,7 +285,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         return FrameworkCryptoConfig(adjustUuid(uuid), sessionId)
     }
 
-    override val cryptoType: @C.CryptoType Int = C.CRYPTO_TYPE_FRAMEWORK
+    override val cryptoType:  Int = C.CRYPTO_TYPE_FRAMEWORK
 
     @get:RequiresApi(31)
     private val isMediaDrmRequiresSecureDecoderImplemented: Boolean

@@ -17,7 +17,6 @@ import androidx.media3.common.util.Util.split
 import androidx.media3.common.util.Util.usToMs
 import androidx.media3.datasource.DataSpec
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
-import androidx.media3.exoplayer.upstream.CmcdConfiguration.DataTransmissionMode
 import com.google.common.base.Joiner
 import com.google.common.base.Preconditions
 import com.google.common.collect.ArrayListMultimap
@@ -30,11 +29,11 @@ class CmcdData private constructor(
     private val cmcdRequest: CmcdRequest,
     private val cmcdSession: CmcdSession,
     private val cmcdStatus: CmcdStatus,
-    private val dataTransmissionMode: @DataTransmissionMode Int
+    private val dataTransmissionMode:  Int
 ) {
     class Factory(
         private val cmcdConfiguration: CmcdConfiguration,
-        private val streamingFormat: @StreamingFormat String?
+        private val streamingFormat:String?
     ) {
         private var trackSelection: ExoTrackSelection? = null
         private var bufferedDurationUs: Long
@@ -43,7 +42,7 @@ class CmcdData private constructor(
         private var didRebuffer = false
         private var isBufferEmpty = false
         private var chunkDurationUs: Long
-        private var objectType: @ObjectType String? = null
+        private var objectType:  String? = null
         private var nextObjectRequest: String? = null
         private var nextRangeRequest: String? = null
 
@@ -59,7 +58,7 @@ class CmcdData private constructor(
             return this
         }
 
-        fun setObjectType(objectType: @ObjectType String?): Factory {
+        fun setObjectType(objectType:  String?): Factory {
             this.objectType = objectType
             return this
         }
@@ -261,7 +260,7 @@ class CmcdData private constructor(
         companion object {
             private val CUSTOM_KEY_NAME_PATTERN: Pattern = Pattern.compile(".*-.*")
 
-            private fun getObjectTypeFromFormat(format: Format): @ObjectType String? {
+            private fun getObjectTypeFromFormat(format: Format):  String? {
                 val audioMimeType = getAudioMediaMimeType(format.codecs)
                 val videoMimeType = getVideoMediaMimeType(format.codecs)
 
@@ -269,7 +268,7 @@ class CmcdData private constructor(
                     return OBJECT_TYPE_MUXED_AUDIO_AND_VIDEO
                 }
 
-                var trackType: @C.TrackType Int = getTrackType(format.sampleMimeType)
+                var trackType: Int = getTrackType(format.sampleMimeType)
                 if (trackType == C.TRACK_TYPE_UNKNOWN) {
                     trackType = getTrackType(format.containerMimeType)
                 }
@@ -284,42 +283,17 @@ class CmcdData private constructor(
                 }
             }
 
-            private fun isManifestObjectType(objectType: @ObjectType String?): Boolean {
+            private fun isManifestObjectType(objectType:  String?): Boolean {
                 return objectType == OBJECT_TYPE_MANIFEST
             }
 
-            private fun isMediaObjectType(objectType: @ObjectType String?): Boolean {
+            private fun isMediaObjectType(objectType:  String?): Boolean {
                 return objectType == OBJECT_TYPE_AUDIO_ONLY
                         || objectType == OBJECT_TYPE_VIDEO_ONLY
                         || objectType == OBJECT_TYPE_MUXED_AUDIO_AND_VIDEO
             }
         }
     }
-
-    @Retention(AnnotationRetention.SOURCE)
-    @StringDef(value = [STREAMING_FORMAT_DASH, STREAMING_FORMAT_HLS, STREAMING_FORMAT_SS])
-    @MustBeDocumented
-    @Target(
-        AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER
-    )
-    annotation class StreamingFormat
-
-    @Retention(AnnotationRetention.SOURCE)
-    @StringDef(value = [STREAM_TYPE_VOD, STREAM_TYPE_LIVE])
-    @MustBeDocumented
-    @Target(
-        AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER
-    )
-    annotation class StreamType
-
-    @Retention(AnnotationRetention.SOURCE)
-    @StringDef(
-        value = [OBJECT_TYPE_INIT_SEGMENT, OBJECT_TYPE_AUDIO_ONLY, OBJECT_TYPE_VIDEO_ONLY, OBJECT_TYPE_MUXED_AUDIO_AND_VIDEO, OBJECT_TYPE_MANIFEST
-        ]
-    )
-    @MustBeDocumented
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    annotation class ObjectType
 
     fun addToDataSpec(dataSpec: DataSpec): DataSpec {
         val cmcdDataMap: ArrayListMultimap<String, String> =
@@ -359,7 +333,7 @@ class CmcdData private constructor(
         var bitrateKbps: Int = C.RATE_UNSET_INT,
         var topBitrateKbps: Int = C.RATE_UNSET_INT,
         var objectDurationMs: Long = C.TIME_UNSET,
-        var objectType: @ObjectType String? = null,
+        var objectType:  String? = null,
         var customDataList: List<String?> = listOf()
     ) {
 
@@ -441,8 +415,8 @@ class CmcdData private constructor(
     private class CmcdSession() {
         var contentId: String? = null
         var sessionId: String? = null
-        var streamingFormat: @StreamingFormat String? = null
-        var streamType: @StreamType String? = null
+        var streamingFormat:String? = null
+        var streamType:  String? = null
         var playbackRate: Float = C.RATE_UNSET
         var customDataList: List<String?> = listOf()
 

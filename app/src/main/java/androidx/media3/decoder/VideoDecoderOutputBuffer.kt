@@ -1,7 +1,6 @@
 package androidx.media3.decoder
 
 import androidx.media3.common.C
-import androidx.media3.common.C.VideoOutputMode
 import androidx.media3.common.Format
 
 import java.nio.ByteBuffer
@@ -13,7 +12,7 @@ class VideoDecoderOutputBuffer
     //     ../../../../../../../decoder_vp9/src/main/jni/vpx_jni.cc
     // )
     var decoderPrivate: Long = 0
-    var mode: @VideoOutputMode Int = 0
+    var mode:  Int = 0
     var data: ByteBuffer? = null
 
     var width: Int = 0
@@ -35,7 +34,7 @@ class VideoDecoderOutputBuffer
     }
 
     fun init(
-        timeUs: Long, mode: @VideoOutputMode Int, supplementalData: ByteBuffer?
+        timeUs: Long, mode:  Int, supplementalData: ByteBuffer?
     ) {
         this.timeUs = timeUs
         this.mode = mode

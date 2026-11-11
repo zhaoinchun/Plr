@@ -37,17 +37,17 @@ interface AnalyticsListener {
         init {
             val flagsToTimes = SparseArray<EventTime>(flags.size())
             for (i in 0..<flags.size()) {
-                val eventFlag: @EventFlags Int = flags[i]
+                val eventFlag:  Int = flags[i]
                 flagsToTimes.append(eventFlag, eventTimes.get(eventFlag)!!)
             }
             this.eventTimes = flagsToTimes
         }
 
-        fun getEventTime(event: @EventFlags Int): EventTime {
+        fun getEventTime(event:  Int): EventTime {
             return eventTimes.get(event)!!
         }
 
-        fun contains(event: @EventFlags Int): Boolean {
+        fun contains(event:  Int): Boolean {
             return flags.contains(event)
         }
 
@@ -59,28 +59,10 @@ interface AnalyticsListener {
             return flags.size()
         }
 
-        fun get(index: Int): @EventFlags Int {
+        fun get(index: Int):  Int {
             return flags.get(index)
         }
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [EVENT_TIMELINE_CHANGED, EVENT_MEDIA_ITEM_TRANSITION, EVENT_TRACKS_CHANGED, EVENT_IS_LOADING_CHANGED, EVENT_PLAYBACK_STATE_CHANGED, EVENT_PLAY_WHEN_READY_CHANGED, EVENT_PLAYBACK_SUPPRESSION_REASON_CHANGED, EVENT_IS_PLAYING_CHANGED, EVENT_REPEAT_MODE_CHANGED, EVENT_SHUFFLE_MODE_ENABLED_CHANGED, EVENT_PLAYER_ERROR, EVENT_POSITION_DISCONTINUITY, EVENT_PLAYBACK_PARAMETERS_CHANGED, EVENT_AVAILABLE_COMMANDS_CHANGED, EVENT_MEDIA_METADATA_CHANGED, EVENT_PLAYLIST_METADATA_CHANGED, EVENT_SEEK_BACK_INCREMENT_CHANGED, EVENT_SEEK_FORWARD_INCREMENT_CHANGED, EVENT_MAX_SEEK_TO_PREVIOUS_POSITION_CHANGED, EVENT_TRACK_SELECTION_PARAMETERS_CHANGED, EVENT_DEVICE_INFO_CHANGED, EVENT_DEVICE_VOLUME_CHANGED, EVENT_LOAD_STARTED, EVENT_LOAD_COMPLETED, EVENT_LOAD_CANCELED, EVENT_LOAD_ERROR, EVENT_DOWNSTREAM_FORMAT_CHANGED, EVENT_UPSTREAM_DISCARDED, EVENT_BANDWIDTH_ESTIMATE, EVENT_METADATA, EVENT_CUES, EVENT_AUDIO_ENABLED, EVENT_AUDIO_DECODER_INITIALIZED, EVENT_AUDIO_INPUT_FORMAT_CHANGED, EVENT_AUDIO_POSITION_ADVANCING, EVENT_AUDIO_UNDERRUN, EVENT_AUDIO_DECODER_RELEASED, EVENT_AUDIO_DISABLED, EVENT_AUDIO_SESSION_ID, EVENT_AUDIO_ATTRIBUTES_CHANGED, EVENT_SKIP_SILENCE_ENABLED_CHANGED, EVENT_AUDIO_SINK_ERROR, EVENT_VOLUME_CHANGED, EVENT_VIDEO_ENABLED, EVENT_VIDEO_DECODER_INITIALIZED, EVENT_VIDEO_INPUT_FORMAT_CHANGED, EVENT_DROPPED_VIDEO_FRAMES, EVENT_VIDEO_DECODER_RELEASED, EVENT_VIDEO_DISABLED, EVENT_VIDEO_FRAME_PROCESSING_OFFSET, EVENT_RENDERED_FIRST_FRAME, EVENT_VIDEO_SIZE_CHANGED, EVENT_SURFACE_SIZE_CHANGED, EVENT_DRM_SESSION_ACQUIRED, EVENT_DRM_KEYS_LOADED, EVENT_DRM_SESSION_MANAGER_ERROR, EVENT_DRM_KEYS_RESTORED, EVENT_DRM_KEYS_REMOVED, EVENT_DRM_SESSION_RELEASED, EVENT_PLAYER_RELEASED, EVENT_AUDIO_CODEC_ERROR, EVENT_VIDEO_CODEC_ERROR, EVENT_AUDIO_TRACK_INITIALIZED, EVENT_AUDIO_TRACK_RELEASED, EVENT_RENDERER_READY_CHANGED]
-    )
-    annotation class EventFlags
 
     class EventTime(
         val realtimeMs: Long,
@@ -130,13 +112,13 @@ interface AnalyticsListener {
     fun onPlayWhenReadyChanged(
         eventTime: EventTime,
         playWhenReady: Boolean,
-        @Player.PlayWhenReadyChangeReason reason: @Player.PlayWhenReadyChangeReason Int
+         reason:  Int
     ) {
     }
 
     fun onPlaybackSuppressionReasonChanged(
         eventTime: EventTime,
-        @Player.PlaybackSuppressionReason playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
+         playbackSuppressionReason:  Int
     ) {
     }
 
@@ -144,14 +126,14 @@ interface AnalyticsListener {
 
     fun onTimelineChanged(
         eventTime: EventTime,
-        @Player.TimelineChangeReason reason: @Player.TimelineChangeReason Int
+         reason:  Int
     ) {
     }
 
     fun onMediaItemTransition(
         eventTime: EventTime,
         mediaItem: MediaItem?,
-        @Player.MediaItemTransitionReason reason: @Player.MediaItemTransitionReason Int
+         reason:  Int
     ) {
     }
 
@@ -159,7 +141,7 @@ interface AnalyticsListener {
         eventTime: EventTime,
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+         reason:  Int
     ) {
     }
 
@@ -182,7 +164,7 @@ interface AnalyticsListener {
 
     fun onRepeatModeChanged(
         eventTime: EventTime,
-        @Player.RepeatMode repeatMode: @Player.RepeatMode Int
+        repeatMode: Int
     ) {
     }
 
@@ -310,7 +292,7 @@ interface AnalyticsListener {
 
     fun onDrmSessionAcquired(
         eventTime: EventTime,
-        @DrmSession.State state: @DrmSession.State Int
+         state:  Int
     ) {
     }
 
@@ -323,7 +305,7 @@ interface AnalyticsListener {
     fun onRendererReadyChanged(
         eventTime: EventTime,
         rendererIndex: Int,
-        rendererTrackType: @C.TrackType Int,
+        rendererTrackType: Int,
         isRendererReady: Boolean
     ) {
     }

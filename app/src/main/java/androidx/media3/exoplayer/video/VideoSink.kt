@@ -32,21 +32,6 @@ interface VideoSink {
         fun skip()
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [INPUT_TYPE_SURFACE, INPUT_TYPE_BITMAP])
-    annotation class InputType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    
-    @IntDef(
-        value = [RELEASE_FIRST_FRAME_IMMEDIATELY, RELEASE_FIRST_FRAME_WHEN_STARTED, RELEASE_FIRST_FRAME_WHEN_PREVIOUS_STREAM_PROCESSED]
-    )
-    annotation class FirstFrameReleaseInstruction
-
     fun startRendering()
     fun stopRendering()
     fun setListener(listener: Listener, executor: Executor)
@@ -71,13 +56,13 @@ interface VideoSink {
     fun setBufferTimestampAdjustmentUs(bufferTimestampAdjustmentUs: Long)
     fun setOutputSurfaceInfo(outputSurface: Surface, outputResolution: Size)
     fun clearOutputSurfaceInfo()
-    fun setChangeFrameRateStrategy(@C.VideoChangeFrameRateStrategy changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int)
+    fun setChangeFrameRateStrategy( changeFrameRateStrategy:  Int)
 
     fun onInputStreamChanged(
-        inputType: @InputType Int,
+        inputType: Int,
         format: Format,
         startPositionUs: Long,
-        firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int,
+        firstFrameReleaseInstruction:  Int,
         videoEffects: List<Effect>
     )
 

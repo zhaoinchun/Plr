@@ -13,9 +13,9 @@ import androidx.media3.exoplayer.upstream.Loader.Loadable
 abstract class Chunk(
     dataSource: DataSource,
     val dataSpec: DataSpec,
-    val type: @C.DataType Int,
+    val type: Int,
     val trackFormat: Format,
-    val trackSelectionReason: @C.SelectionReason Int,
+    val trackSelectionReason:  Int,
     val trackSelectionData: Any?,
     val startTimeUs: Long,
     val endTimeUs: Long,

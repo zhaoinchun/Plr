@@ -20,7 +20,7 @@ class UdpDataSource  constructor(
     class UdpDataSourceException
         (
         cause: Throwable?,
-        @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+         errorCode:  Int
     ) : DataSourceException(cause, errorCode)
 
     private val packetBuffer: ByteArray

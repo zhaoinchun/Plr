@@ -2,7 +2,7 @@ package androidx.media3.extractor.ts
 
 import android.util.SparseArray
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
@@ -86,7 +86,7 @@ class H264Reader(
         seiReader.createTracks(extractorOutput, idGenerator)
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         this.pesTimeUs = pesTimeUs
         randomAccessIndicator =
             randomAccessIndicator or ((flags and TsPayloadReader.FLAG_RANDOM_ACCESS_INDICATOR) != 0)
@@ -487,7 +487,7 @@ class H264Reader(
             if (sampleTimeUs == C.TIME_UNSET || nalUnitStartPosition == samplePosition) {
                 return
             }
-            val flags: @BufferFlags Int = if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
+            val flags:  Int = if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
             val size = (nalUnitStartPosition - samplePosition).toInt()
             output.sampleMetadata(sampleTimeUs, flags, size, offset, null)
         }

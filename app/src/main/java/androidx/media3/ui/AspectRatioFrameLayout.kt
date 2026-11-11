@@ -15,18 +15,10 @@ class AspectRatioFrameLayout(context: Context, attrs: AttributeSet? = null) :
         )
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [RESIZE_MODE_FIT, RESIZE_MODE_FIXED_WIDTH, RESIZE_MODE_FIXED_HEIGHT, RESIZE_MODE_FILL, RESIZE_MODE_ZOOM]
-    )
-    annotation class ResizeMode
-
     private val aspectRatioUpdateDispatcher = AspectRatioUpdateDispatcher()
     private var aspectRatioListener: AspectRatioListener? = null
     private var videoAspectRatio = 0f
-    private var resizeMode: @ResizeMode Int = RESIZE_MODE_FIT
+    private var resizeMode:  Int = RESIZE_MODE_FIT
 
     init {
         if (attrs != null) {
@@ -52,11 +44,11 @@ class AspectRatioFrameLayout(context: Context, attrs: AttributeSet? = null) :
         this.aspectRatioListener = listener
     }
 
-    fun getResizeMode(): @ResizeMode Int {
+    fun getResizeMode():  Int {
         return resizeMode
     }
 
-    fun setResizeMode(resizeMode: @ResizeMode Int) {
+    fun setResizeMode(resizeMode:  Int) {
         if (this.resizeMode != resizeMode) {
             this.resizeMode = resizeMode
             requestLayout()

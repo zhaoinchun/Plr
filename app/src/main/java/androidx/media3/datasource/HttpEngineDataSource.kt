@@ -143,7 +143,7 @@ class HttpEngineDataSource internal constructor(
         constructor(
             cause: IOException?,
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
+             errorCode:  Int,
             httpEngineConnectionStatus: Int
         ) : super(cause, dataSpec, errorCode, HttpDataSourceException.TYPE_OPEN) {
             this.httpEngineConnectionStatus = httpEngineConnectionStatus
@@ -152,7 +152,7 @@ class HttpEngineDataSource internal constructor(
         constructor(
             errorMessage: String?,
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
+             errorCode:  Int,
             httpEngineConnectionStatus: Int
         ) : super(errorMessage, dataSpec, errorCode, HttpDataSourceException.TYPE_OPEN) {
             this.httpEngineConnectionStatus = httpEngineConnectionStatus
@@ -160,7 +160,7 @@ class HttpEngineDataSource internal constructor(
 
         constructor(
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
+             errorCode:  Int,
             httpEngineConnectionStatus: Int
         ) : super(dataSpec, errorCode, HttpDataSourceException.TYPE_OPEN) {
             this.httpEngineConnectionStatus = httpEngineConnectionStatus

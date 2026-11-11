@@ -81,15 +81,15 @@ object AudioManagerCompat {
         }
     }
 
-    fun getStreamMaxVolume(audioManager: AudioManager, streamType: @C.StreamType Int): Int {
+    fun getStreamMaxVolume(audioManager: AudioManager, streamType: Int): Int {
         return audioManager.getStreamMaxVolume(streamType)
     }
 
-    fun getStreamMinVolume(audioManager: AudioManager, streamType: @C.StreamType Int): Int {
+    fun getStreamMinVolume(audioManager: AudioManager, streamType: Int): Int {
         return if (Build.VERSION.SDK_INT >= 28) audioManager.getStreamMinVolume(streamType) else 0
     }
 
-    fun getStreamVolume(audioManager: AudioManager, streamType: @C.StreamType Int): Int {
+    fun getStreamVolume(audioManager: AudioManager, streamType: Int): Int {
         // AudioManager#getStreamVolume(int) throws an exception on some devices. See
         // https://github.com/google/ExoPlayer/issues/8191.
         try {
@@ -100,7 +100,7 @@ object AudioManagerCompat {
         }
     }
 
-    fun isStreamMute(audioManager: AudioManager, streamType: @C.StreamType Int): Boolean {
+    fun isStreamMute(audioManager: AudioManager, streamType: Int): Boolean {
         return audioManager.isStreamMute(streamType)
     }
 }

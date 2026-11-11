@@ -137,7 +137,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
     }
 
     fun setSamplerTexIdUniform(
-        name: String?, texId: Int, texUnitIndex: Int, texMinFilter: @C.TextureMinFilter Int
+        name: String?, texId: Int, texUnitIndex: Int, texMinFilter:  Int
     ) {
         val texUniform = uniformByName[name]!!
         texUniform.setSamplerTexId(texId, texUnitIndex)
@@ -249,7 +249,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
 
         private var texIdValue = 0
         private var texUnitIndex = 0
-        private var texMinFilter: @C.TextureMinFilter Int
+        private var texMinFilter:  Int
 
         init {
             this.floatValue = FloatArray(16) // Allocate 16 for mat4
@@ -262,7 +262,7 @@ class GlProgram(vertexShaderGlsl: String?, fragmentShaderGlsl: String?) {
             this.texUnitIndex = texUnitIndex
         }
 
-        fun setTexMinFilter(texMinFilter: @C.TextureMinFilter Int) {
+        fun setTexMinFilter(texMinFilter:  Int) {
             this.texMinFilter = texMinFilter
         }
 

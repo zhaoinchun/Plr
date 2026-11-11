@@ -37,7 +37,7 @@ internal class DefaultDrmSession(
     private val provisioningManager: ProvisioningManager,
     private val referenceCountListener: ReferenceCountListener,
     schemeDatas: List<DrmInitData.SchemeData>?,
-    private val mode: @DefaultDrmSessionManager.Mode Int,
+    private val mode:  Int,
     private val playClearSamplesWithoutKeys: Boolean,
     private val isPlaceholderSession: Boolean,
     offlineLicenseKeySetId: ByteArray?,
@@ -65,8 +65,8 @@ internal class DefaultDrmSession(
     private val responseHandler = ResponseHandler(playbackLooper)
     private val keyRequestInfoLock = Any()
 
-    @DrmSession.State
-    override var state: @DrmSession.State Int = DrmSession.STATE_OPENING
+    
+    override var state:  Int = DrmSession.STATE_OPENING
         get() {
             verifyPlaybackThread()
             return field
@@ -449,7 +449,7 @@ internal class DefaultDrmSession(
         }
     }
 
-    private fun onError(e: Throwable, @DrmUtil.ErrorSource errorSource: @DrmUtil.ErrorSource Int) {
+    private fun onError(e: Throwable,  errorSource:  Int) {
         lastException =
             DrmSessionException(e, DrmUtil.getErrorCodeForMediaDrmException(e, errorSource))
         e(TAG, "DRM session error", e)

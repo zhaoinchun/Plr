@@ -25,7 +25,7 @@ class TrackSelectionOverride(mediaTrackGroup: TrackGroup, trackIndices: List<Int
         this.trackIndices = trackIndices.toList()
     }
 
-    val type: @C.TrackType Int
+    val type: Int
         get() = mediaTrackGroup.type
 
     override fun equals(other: Any?): Boolean {

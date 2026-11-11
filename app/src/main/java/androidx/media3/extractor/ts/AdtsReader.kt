@@ -1,7 +1,7 @@
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
-import androidx.media3.common.C.RoleFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.ParserException
@@ -24,7 +24,7 @@ import kotlin.math.min
 class AdtsReader(
     exposeId3: Boolean,
     language: String?,
-    @RoleFlags roleFlags: @RoleFlags Int,
+    roleFlags: Int,
     containerMimeType: String?
 ) : ElementaryStreamReader {
     private val exposeId3: Boolean
@@ -32,8 +32,8 @@ class AdtsReader(
     private val id3HeaderBuffer: ParsableByteArray
     private val language: String?
 
-    @RoleFlags
-    private val roleFlags: @RoleFlags Int
+    
+    private val roleFlags: Int
     private val containerMimeType: String?
 
     private var formatId: String? = null
@@ -113,7 +113,7 @@ class AdtsReader(
         }
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         timeUs = pesTimeUs
     }
 

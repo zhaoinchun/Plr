@@ -13,7 +13,7 @@ class BaseMediaChunkOutput(
     private val sampleQueues: Array<SampleQueue>
 ) :
     TrackOutputProvider {
-    override fun track(id: Int, type: @C.TrackType Int): TrackOutput {
+    override fun track(id: Int, type: Int): TrackOutput {
         for (i in trackTypes.indices) {
             if (type == trackTypes[i]) {
                 return sampleQueues[i]

@@ -27,7 +27,7 @@ internal class RendererHolder(
     private val secondaryRenderer: Renderer?, // Index of renderer in renderer list held by the {@link Player}.
     private val index: Int
 ) {
-    private var prewarmingState: @RendererPrewarmingState Int
+    private var prewarmingState:  Int
     private var primaryRequiresReset = false
     private var secondaryRequiresReset = false
 
@@ -68,7 +68,7 @@ internal class RendererHolder(
             return result
         }
 
-    val trackType: @C.TrackType Int
+    val trackType: Int
         get() = primaryRenderer.trackType
 
     fun getReadingPositionUs(period: MediaPeriodHolder?): Long {
@@ -361,7 +361,7 @@ internal class RendererHolder(
 
     @Throws(ExoPlaybackException::class)
     fun handleMessage(
-        messageType: @Renderer.MessageType Int,
+        messageType:  Int,
         message: Any?,
         mediaPeriod: MediaPeriodHolder?
     ) {
@@ -715,24 +715,6 @@ internal class RendererHolder(
         }
         return null
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY, RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_SECONDARY, RENDERER_PREWARMING_STATE_PREWARMING_PRIMARY, RENDERER_PREWARMING_STATE_TRANSITIONING_TO_SECONDARY, RENDERER_PREWARMING_STATE_TRANSITIONING_TO_PRIMARY
-        ]
-    )
-    internal annotation class RendererPrewarmingState
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [REPLACE_STREAMS_DISABLE_RENDERERS_COMPLETED, REPLACE_STREAMS_DISABLE_RENDERERS_DISABLE_OFFLOAD_SCHEDULING]
-    )
-    internal annotation class ReplaceStreamsOrDisableRendererResult
 
     init {
         prewarmingState = RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY

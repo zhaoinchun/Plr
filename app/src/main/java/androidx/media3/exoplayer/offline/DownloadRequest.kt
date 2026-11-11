@@ -28,7 +28,7 @@ class DownloadRequest(
     class UnsupportedRequestException : IOException()
 
     init {
-        @C.ContentType val contentType: @C.ContentType Int =
+         val contentType:  Int =
             inferContentTypeForUriAndMimeType(uri, mimeType)
         if (contentType == C.CONTENT_TYPE_DASH || contentType == C.CONTENT_TYPE_HLS || contentType == C.CONTENT_TYPE_SS) {
             Preconditions.checkArgument(

@@ -152,7 +152,7 @@ class TtmlParser : SubtitleParser {
     private class TtsExtent(val width: Int, val height: Int)
     companion object {
         
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
 
         private const val TAG = "TtmlParser"
@@ -439,7 +439,7 @@ class TtmlParser : SubtitleParser {
                 height = 1f
             }
 
-            @Cue.AnchorType var lineAnchor: @Cue.AnchorType Int = Cue.ANCHOR_TYPE_START
+             var lineAnchor:  Int = Cue.ANCHOR_TYPE_START
             var displayAlign: String? =
                 XmlPullParserUtil.getAttributeValue(
                     xmlParser,
@@ -473,7 +473,7 @@ class TtmlParser : SubtitleParser {
 
             val regionTextHeight = 1.0f / cellRows
 
-            @Cue.VerticalType var verticalType: @Cue.VerticalType Int = Cue.TYPE_UNSET
+             var verticalType:  Int = Cue.TYPE_UNSET
             val writingDirection: String? =
                 XmlPullParserUtil.getAttributeValue(
                     xmlParser,

@@ -22,8 +22,6 @@ import androidx.media3.common.MediaLibraryInfo.registerModule
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.RepeatModeUtil
-import androidx.media3.common.util.RepeatModeUtil.RepeatToggleModes
-
 import androidx.media3.common.util.Util.constrainValue
 import androidx.media3.common.util.Util.getDrawable
 import androidx.media3.common.util.Util.getStringForTime
@@ -99,8 +97,8 @@ class LegacyPlayerControlView  constructor(
     private var showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS
     private var timeBarMinUpdateIntervalMs = DEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS
 
-    @RepeatToggleModes
-    private var repeatToggleModes: @RepeatToggleModes Int = DEFAULT_REPEAT_TOGGLE_MODES
+    
+    private var repeatToggleModes:  Int = DEFAULT_REPEAT_TOGGLE_MODES
     private var showRewindButton = true
     private var showFastForwardButton = true
     private var showPreviousButton = true
@@ -325,15 +323,15 @@ class LegacyPlayerControlView  constructor(
         }
     }
 
-    @RepeatToggleModes
-    fun getRepeatToggleModes(): @RepeatToggleModes Int {
+    
+    fun getRepeatToggleModes():  Int {
         return repeatToggleModes
     }
 
-    fun setRepeatToggleModes(@RepeatToggleModes repeatToggleModes: @RepeatToggleModes Int) {
+    fun setRepeatToggleModes( repeatToggleModes:  Int) {
         this.repeatToggleModes = repeatToggleModes
         if (player != null) {
-            @Player.RepeatMode val currentMode: @Player.RepeatMode Int = player!!.repeatMode
+            val currentMode: Int = player!!.repeatMode
             when (repeatToggleModes) {
                 RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
                     if currentMode != Player.REPEAT_MODE_OFF
@@ -896,8 +894,8 @@ class LegacyPlayerControlView  constructor(
 
         const val DEFAULT_SHOW_TIMEOUT_MS: Int = 5000
 
-        @RepeatToggleModes
-        val DEFAULT_REPEAT_TOGGLE_MODES: @RepeatToggleModes Int =
+        
+        val DEFAULT_REPEAT_TOGGLE_MODES:  Int =
             RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
 
         const val DEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS: Int = 200
@@ -925,10 +923,10 @@ class LegacyPlayerControlView  constructor(
             return true
         }
 
-        @RepeatToggleModes
+        
         private fun getRepeatToggleModes(
-            a: TypedArray, @RepeatToggleModes defaultValue: @RepeatToggleModes Int
-        ): @RepeatToggleModes Int {
+            a: TypedArray,  defaultValue:  Int
+        ):  Int {
             return a.getInt(R.styleable.LegacyPlayerControlView_repeat_toggle_modes, defaultValue)
         }
     }

@@ -101,7 +101,7 @@ internal object CustomSpanBundler {
     }
 
     private fun spanToBundle(
-        spanned: Spanned, span: Any?, spanType: @CustomSpanType Int, params: Bundle?
+        spanned: Spanned, span: Any?, spanType: Int, params: Bundle?
     ): Bundle {
         val bundle = Bundle()
         bundle.putInt(FIELD_START_INDEX, spanned.getSpanStart(span))
@@ -113,10 +113,4 @@ internal object CustomSpanBundler {
         }
         return bundle
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [UNKNOWN, RUBY, TEXT_EMPHASIS, HORIZONTAL_TEXT_IN_VERTICAL_CONTEXT, VOICE])
-    private annotation class CustomSpanType
 }

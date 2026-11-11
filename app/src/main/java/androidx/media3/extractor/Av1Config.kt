@@ -1,8 +1,8 @@
 package androidx.media3.extractor
 
 import androidx.media3.common.C
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
+
+
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.Format
 import androidx.media3.common.ParserException
@@ -15,9 +15,9 @@ import androidx.media3.common.util.Util.formatInvariant
 class Av1Config private constructor(
    val bitdepth: Int,
    val codecs: String?,
-   val colorSpace: @C.ColorSpace Int = Format.NO_VALUE,
-   val colorRange: @ColorRange Int = Format.NO_VALUE,
-   val colorTransfer: @ColorTransfer Int = Format.NO_VALUE
+   val colorSpace: Int = Format.NO_VALUE,
+   val colorRange: Int = Format.NO_VALUE,
+   val colorTransfer: Int = Format.NO_VALUE
 ) {
     companion object {
         private const val TAG = "Av1Config"
@@ -144,11 +144,11 @@ class Av1Config private constructor(
                         1
                     else
                         bitArray.readBits(1) // color_range;
-                val colorSpace: @C.ColorSpace Int =
+                val colorSpace: Int =
                     ColorInfo.isoColorPrimariesToColorSpace(colorPrimaries)
-                val colorRange: @ColorRange Int =
+                val colorRange: Int =
                     if (colorRangeValue == 1) C.COLOR_RANGE_FULL else C.COLOR_RANGE_LIMITED
-                val colorTransfer: @ColorTransfer Int =
+                val colorTransfer: Int =
                     ColorInfo.isoTransferCharacteristicsToColorTransfer(transferCharacteristics)
                 return Av1Config(bitdepth, codecs, colorSpace, colorRange, colorTransfer)
             } catch (e: RuntimeException) {

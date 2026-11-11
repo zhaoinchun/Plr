@@ -23,7 +23,7 @@ interface ChunkExtractor {
         }
 
         fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-            codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+            codecsToParseWithinGopSampleDependencies:  Int
         ): Factory {
             return this
         }
@@ -33,7 +33,7 @@ interface ChunkExtractor {
         }
 
         fun createProgressiveMediaExtractor(
-            primaryTrackType: @C.TrackType Int,
+            primaryTrackType: Int,
             representationFormat: Format,
             enableEventMessageTrack: Boolean,
             closedCaptionFormats: List<Format>,
@@ -43,7 +43,7 @@ interface ChunkExtractor {
     }
 
     interface TrackOutputProvider {
-        fun track(id: Int, type: @C.TrackType Int): TrackOutput
+        fun track(id: Int, type: Int): TrackOutput
     }
 
     val chunkIndex: ChunkIndex?

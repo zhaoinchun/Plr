@@ -57,7 +57,7 @@ interface VideoGraph {
 
     fun registerInputStream(
         inputIndex: Int,
-        inputType: @VideoFrameProcessor.InputType Int,
+        inputType: Int,
         format: Format?,
         effects: List<Effect?>?,
         offsetToAddUs: Long

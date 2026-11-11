@@ -2,10 +2,10 @@ package androidx.media3.extractor.mp4
 
 import androidx.annotation.IntDef
 import androidx.media3.common.C
-import androidx.media3.common.C.AuxiliaryTrackType
-import androidx.media3.common.C.BufferFlags
-import androidx.media3.common.C.RoleFlags
-import androidx.media3.common.C.VideoCodecFlags
+
+
+
+
 import androidx.media3.common.Format
 import androidx.media3.common.Label
 import androidx.media3.common.Metadata
@@ -56,34 +56,8 @@ import kotlin.math.min
 
 class Mp4Extractor constructor(
     private val subtitleParserFactory: SubtitleParser.Factory,
-    private val flags: @Flags Int = 0
+    private val flags:  Int = 0
 ) : Extractor {
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_WORKAROUND_IGNORE_EDIT_LISTS, FLAG_READ_SEF_DATA, FLAG_MARK_FIRST_VIDEO_TRACK_WITH_MAIN_ROLE, FLAG_EMIT_RAW_SUBTITLE_DATA, FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES, FLAG_READ_AUXILIARY_TRACKS, FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES_H265, FLAG_OMIT_TRACK_SAMPLE_TABLE, FLAG_DISABLE_ARTWORK_METADATA
-        ]
-    )
-    annotation class Flags
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_READING_ATOM_HEADER, STATE_READING_ATOM_PAYLOAD, STATE_READING_SAMPLE, STATE_READING_SEF, STATE_READING_QUICKTIME_CHAPTERS
-        ]
-    )
-    private annotation class State
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [FILE_TYPE_MP4, FILE_TYPE_QUICKTIME])
-    private annotation class FileType
-
     private val omitTrackSampleTable: Boolean
 
     // Temporary arrays.
@@ -126,7 +100,7 @@ class Mp4Extractor constructor(
     private var extractorOutput: ExtractorOutput
     private var tracks: Array<Mp4Track>
     private var accumulatedSampleSizes: Array<LongArray>? = null
-    private var fileType: @FileType Int = 0
+    private var fileType:  Int = 0
 
     init {
         omitTrackSampleTable = (flags and FLAG_OMIT_TRACK_SAMPLE_TABLE) != 0
@@ -356,8 +330,8 @@ class Mp4Extractor constructor(
     private fun readSefData(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
-        val result: @Extractor.ReadResult Int =
+    ):  Int {
+        val result:  Int =
             sefReader.read(input, seekPosition, slowMotionMetadataEntries)
         if (result == Extractor.RESULT_SEEK && seekPosition.position == 0L) {
             enterReadingAtomHeaderState()
@@ -508,7 +482,7 @@ class Mp4Extractor constructor(
             var auxiliaryTrackType = C.AUXILIARY_TRACK_TYPE_UNDEFINED
             var rFlags = 0
             if (track.type == C.TRACK_TYPE_VIDEO) {
-                @RoleFlags var roleFlags: @RoleFlags Int = track.format.roleFlags
+                var roleFlags: Int = track.format.roleFlags
                 if ((flags and FLAG_MARK_FIRST_VIDEO_TRACK_WITH_MAIN_ROLE) != 0) {
                     roleFlags =
                         roleFlags or if (firstVideoTrackIndex == C.INDEX_UNSET) C.ROLE_FLAG_MAIN else C.ROLE_FLAG_ALTERNATE
@@ -625,7 +599,7 @@ class Mp4Extractor constructor(
         val auxiliaryTrackTypes: MutableList<Int?> =
             ArrayList<Int?>(auxiliaryTrackTypesFromMap.size)
         for (i in auxiliaryTrackTypesFromMap.indices) {
-            @AuxiliaryTrackType val auxiliaryTrackType: @AuxiliaryTrackType Int
+            val auxiliaryTrackType: Int
             when (auxiliaryTrackTypesFromMap[i]) {
                 0 -> auxiliaryTrackType = C.AUXILIARY_TRACK_TYPE_ORIGINAL
                 1 -> auxiliaryTrackType = C.AUXILIARY_TRACK_TYPE_DEPTH_LINEAR
@@ -791,7 +765,7 @@ class Mp4Extractor constructor(
         }
 
         val timeUs = track.sampleTable.timestampsUs[sampleIndex]
-        var sampleFlags: @BufferFlags Int = track.sampleTable.flags[sampleIndex]
+        var sampleFlags:  Int = track.sampleTable.flags[sampleIndex]
         if (!isSampleDependedOn) {
             sampleFlags = sampleFlags or C.BUFFER_FLAG_NOT_DEPENDED_ON
         }
@@ -1120,9 +1094,9 @@ class Mp4Extractor constructor(
         private val MAXIMUM_READ_AHEAD_BYTES_STREAM = (10 * 1024 * 1024).toLong()
 
         fun codecsToParseWithinGopSampleDependenciesAsFlags(
-            videoCodecFlags: @VideoCodecFlags Int
-        ): @Flags Int {
-            var flags: @Flags Int = 0
+            videoCodecFlags:  Int
+        ):  Int {
+            var flags:  Int = 0
             if ((videoCodecFlags and C.VIDEO_CODEC_FLAG_H264) != 0) {
                 flags = flags or FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES
             }
@@ -1230,10 +1204,10 @@ class Mp4Extractor constructor(
             return sampleIndex
         }
 
-        private fun processFtypAtom(atomData: ParsableByteArray): @FileType Int {
+        private fun processFtypAtom(atomData: ParsableByteArray):  Int {
             atomData.setPosition(Mp4Box.HEADER_SIZE)
             val majorBrand = atomData.readInt()
-            var fileType: @FileType Int = brandToFileType(majorBrand)
+            var fileType:  Int = brandToFileType(majorBrand)
             if (fileType != FILE_TYPE_MP4) {
                 return fileType
             }
@@ -1247,7 +1221,7 @@ class Mp4Extractor constructor(
             return FILE_TYPE_MP4
         }
 
-        private fun brandToFileType(brand: Int): @FileType Int {
+        private fun brandToFileType(brand: Int):  Int {
             when (brand) {
                 Sniffer.BRAND_QUICKTIME -> return FILE_TYPE_QUICKTIME
                 else -> return FILE_TYPE_MP4

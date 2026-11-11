@@ -26,7 +26,7 @@ interface AudioOutputProvider {
     )
 
     data class OutputConfig(
-        val encoding: @C.Encoding Int = 0,
+        val encoding: Int = 0,
         val sampleRate: Int = 0,
         val channelMask: Int = 0,
         val isTunneling: Boolean = false,
@@ -43,7 +43,7 @@ interface AudioOutputProvider {
         var isFormatSupportedForOffload: Boolean = false,
         var isGaplessSupportedForOffload: Boolean = false,
         var isSpeedChangeSupportedForOffload: Boolean = false,
-        var supportLevel: @SupportLevel Int = FORMAT_UNSUPPORTED,
+        var supportLevel:  Int = FORMAT_UNSUPPORTED,
     ) {
         companion object {
             val UNSUPPORTED: FormatSupport = FormatSupport()
@@ -56,12 +56,6 @@ interface AudioOutputProvider {
         constructor() : super()
         constructor(cause: Throwable?) : super(cause)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [FORMAT_SUPPORTED_DIRECTLY, FORMAT_SUPPORTED_WITH_TRANSCODING, FORMAT_UNSUPPORTED])
-    annotation class SupportLevel
 
     fun getFormatSupport(formatConfig: FormatConfig): FormatSupport
 

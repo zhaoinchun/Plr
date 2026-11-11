@@ -9,7 +9,7 @@ import androidx.media3.common.util.Clock
 
 import androidx.media3.common.util.Util.msToUs
 import androidx.media3.exoplayer.ExoPlaybackException
-import androidx.media3.exoplayer.video.VideoSink.FirstFrameReleaseInstruction
+
 import com.google.common.base.Preconditions
 import kotlin.math.min
 
@@ -18,15 +18,6 @@ class VideoFrameReleaseControl(
     private val frameTimingEvaluator: FrameTimingEvaluator,
     private val allowedJoiningTimeMs: Long
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    
-    @IntDef(
-       value =  [FRAME_RELEASE_IMMEDIATELY, FRAME_RELEASE_SCHEDULED, FRAME_RELEASE_DROP, FRAME_RELEASE_SKIP, FRAME_RELEASE_IGNORE, FRAME_RELEASE_TRY_AGAIN_LATER
-        ]
-    )
-    annotation class FrameReleaseAction
 
     class FrameReleaseInfo {
         var earlyUs=C.TIME_UNSET
@@ -56,7 +47,7 @@ class VideoFrameReleaseControl(
     private val frameReleaseHelper: VideoFrameReleaseHelper
 
     private var started = false
-    private var firstFrameState: @C.FirstFrameState Int
+    private var firstFrameState:  Int
     private var initialPositionUs: Long
     private var lastReleaseRealtimeUs: Long = 0
     private var joiningDeadlineMs: Long
@@ -85,7 +76,7 @@ class VideoFrameReleaseControl(
     }
 
     fun onStreamChanged(
-        firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int
+        firstFrameReleaseInstruction:  Int
     ) {
         when (firstFrameReleaseInstruction) {
             VideoSink.RELEASE_FIRST_FRAME_IMMEDIATELY -> firstFrameState =
@@ -188,7 +179,7 @@ class VideoFrameReleaseControl(
         frameDurationNs: Long,
         frameIndex: Long,
         frameReleaseInfo: FrameReleaseInfo
-    ): @FrameReleaseAction Int {
+    ):  Int {
         frameReleaseInfo.reset()
 
         if (started && initialPositionUs == C.TIME_UNSET) {
@@ -272,7 +263,7 @@ class VideoFrameReleaseControl(
     }
 
     fun setChangeFrameRateStrategy(
-        @C.VideoChangeFrameRateStrategy changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+         changeFrameRateStrategy:  Int
     ) {
         frameReleaseHelper.setChangeFrameRateStrategy(changeFrameRateStrategy)
     }
@@ -290,7 +281,7 @@ class VideoFrameReleaseControl(
         this.disableAdvancingTimestampChecks = true
     }
 
-    private fun lowerFirstFrameState(firstFrameState: @C.FirstFrameState Int) {
+    private fun lowerFirstFrameState(firstFrameState:  Int) {
         this.firstFrameState = min(this.firstFrameState, firstFrameState)
     }
 

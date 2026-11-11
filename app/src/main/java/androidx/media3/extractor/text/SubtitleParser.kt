@@ -9,7 +9,7 @@ interface SubtitleParser {
         
         fun supportsFormat(format: Format): Boolean
 
-        fun getCueReplacementBehavior(format: Format): @Format.CueReplacementBehavior Int
+        fun getCueReplacementBehavior(format: Format):  Int
 
         fun create(format: Format): SubtitleParser?
 
@@ -20,7 +20,7 @@ interface SubtitleParser {
                     return false
                 }
 
-                override fun getCueReplacementBehavior(format: Format): @Format.CueReplacementBehavior Int {
+                override fun getCueReplacementBehavior(format: Format):  Int {
                     return Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
                 }
 

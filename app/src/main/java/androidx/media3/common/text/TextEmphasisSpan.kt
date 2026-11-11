@@ -5,21 +5,10 @@ import androidx.annotation.IntDef
 import androidx.media3.common.util.Util.intToStringMaxRadix
 
 class TextEmphasisSpan(
-    var markShape: @MarkShape Int,
-    var markFill: @MarkFill Int,
-    val position: @TextAnnotation.Position Int
+    var markShape:  Int,
+    var markFill:  Int,
+    val position:  Int
 ) : LanguageFeatureSpan {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [MARK_SHAPE_NONE, MARK_SHAPE_CIRCLE, MARK_SHAPE_DOT, MARK_SHAPE_SESAME])
-    annotation class MarkShape
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [MARK_FILL_UNKNOWN, MARK_FILL_FILLED, MARK_FILL_OPEN])
-    annotation class MarkFill
 
     fun toBundle(): Bundle {
         val bundle = Bundle()

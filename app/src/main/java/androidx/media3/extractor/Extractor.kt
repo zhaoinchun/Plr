@@ -6,12 +6,6 @@ import org.checkerframework.dataflow.qual.SideEffectFree
 import java.io.IOException
 
 interface Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [RESULT_CONTINUE, RESULT_SEEK, RESULT_END_OF_INPUT])
-    annotation class ReadResult
-
     @Throws(IOException::class)
     fun sniff(input: ExtractorInput): Boolean
 
@@ -21,7 +15,7 @@ interface Extractor {
     fun init(output: ExtractorOutput)
 
     @Throws(IOException::class)
-    fun read(input: ExtractorInput, seekPosition: PositionHolder): @ReadResult Int
+    fun read(input: ExtractorInput, seekPosition: PositionHolder):  Int
     fun seek(position: Long, timeUs: Long)
     fun release()
 

@@ -8,26 +8,6 @@ import java.io.IOException
 
 interface SampleStream {
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(flag = true, value = [FLAG_PEEK, FLAG_REQUIRE_FORMAT, FLAG_OMIT_SAMPLE_DATA])
-    annotation class ReadFlags
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true, value = [FLAG_STRICT_DURATION, FLAG_MAYBE_HAS_PREROLL, FLAG_HAS_PREROLL]
-    )
-    annotation class Flags
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [C.RESULT_NOTHING_READ, C.RESULT_FORMAT_READ, C.RESULT_BUFFER_READ])
-    annotation class ReadDataResult
-
     val isReady: Boolean
 
     @Throws(IOException::class)
@@ -36,12 +16,12 @@ interface SampleStream {
     fun readData(
         formatHolder: FormatHolder,
         buffer: DecoderInputBuffer,
-        readFlags: @ReadFlags Int
-    ): @ReadDataResult Int
+        readFlags:  Int
+    ):  Int
 
     fun skipData(positionUs: Long): Int
 
-    val flags: @Flags Int
+    val flags:  Int
         get() = 0
 
     companion object {

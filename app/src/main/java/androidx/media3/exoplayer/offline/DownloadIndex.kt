@@ -10,5 +10,5 @@ interface DownloadIndex {
     fun getDownload(id: String?): Download?
 
     @Throws(IOException::class)
-    fun getDownloads(@Download.State vararg states: Int): DownloadCursor
+    fun getDownloads( vararg states: Int): DownloadCursor
 }

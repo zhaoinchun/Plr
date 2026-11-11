@@ -2,7 +2,7 @@ package androidx.media3.extractor.ts
 
 import androidx.annotation.IntDef
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.ParserException
@@ -18,12 +18,6 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import kotlin.math.min
 
 class MpeghReader(private val containerMimeType: String?) : ElementaryStreamReader {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [STATE_FINDING_SYNC, STATE_READING_PACKET_HEADER, STATE_READING_PACKET_PAYLOAD])
-    private annotation class State
-
     private val headerScratchBytes: ParsableByteArray
     private val headerScratchBits: ParsableBitArray
     private val dataScratchBytes: ParsableByteArray
@@ -38,7 +32,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
     private var timeUsPending: Double
     private var dataPending = false
     private var rapPending: Boolean
-    private var flags: @TsPayloadReader.Flags Int = 0
+    private var flags:  Int = 0
 
     private var syncBytes = 0
 
@@ -95,7 +89,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
         output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO)
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         this.flags = flags
 
         // check if data is pending (an MPEG-H frame could not be completed)
@@ -228,7 +222,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
         return result
     }
 
-    private fun shouldParsePacket(packetType: @MhasPacketHeader.Type Int): Boolean {
+    private fun shouldParsePacket(packetType:  Int): Boolean {
         return packetType == MhasPacketHeader.PACTYP_MPEGH3DACFG
                 || packetType == MhasPacketHeader.PACTYP_AUDIOTRUNCATION
     }
@@ -280,7 +274,7 @@ class MpeghReader(private val containerMimeType: String?) : ElementaryStreamRead
 
     @RequiresNonNull("output")
     private fun finalizeFrame() {
-        var flag: @BufferFlags Int = 0
+        var flag:  Int = 0
         // if we have a frame with an mpegh3daConfig, set the obtained AU to a key frame
         if (configFound) {
             flag = C.BUFFER_FLAG_KEY_FRAME

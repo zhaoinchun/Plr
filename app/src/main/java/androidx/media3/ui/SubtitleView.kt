@@ -36,28 +36,22 @@ class SubtitleView  constructor(context: Context, attrs: AttributeSet? = null) :
             cues: List<Cue>,
             style: CaptionStyleCompat,
             defaultTextSize: Float,
-            @Cue.TextSizeType defaultTextSizeType: @Cue.TextSizeType Int,
+             defaultTextSizeType:  Int,
             bottomPaddingFraction: Float
         )
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [VIEW_TYPE_CANVAS, VIEW_TYPE_WEB])
-    annotation class ViewType
-
     private var cues: List<Cue> = listOf<Cue>()
     private var style: CaptionStyleCompat = CaptionStyleCompat.DEFAULT
 
-    @Cue.TextSizeType
-    private var defaultTextSizeType: @Cue.TextSizeType Int
+    
+    private var defaultTextSizeType:  Int
     private var defaultTextSize: Float
     private var bottomPaddingFraction: Float
     private var applyEmbeddedStyles = true
     private var applyEmbeddedFontSizes = true
 
-    private var viewType: @ViewType Int
+    private var viewType:  Int
     private var innerSubtitleView: View = CanvasSubtitleOutput(context)
     private var output: Output = innerSubtitleView as CanvasSubtitleOutput
 
@@ -75,7 +69,7 @@ class SubtitleView  constructor(context: Context, attrs: AttributeSet? = null) :
         updateOutput()
     }
 
-    fun setViewType(viewType: @ViewType Int) {
+    fun setViewType(viewType:  Int) {
         if (this.viewType == viewType) {
             return
         }
@@ -130,7 +124,7 @@ class SubtitleView  constructor(context: Context, attrs: AttributeSet? = null) :
     }
 
     private fun setTextSize(
-        @Cue.TextSizeType textSizeType: @Cue.TextSizeType Int,
+         textSizeType:  Int,
         textSize: Float
     ) {
         this.defaultTextSizeType = textSizeType

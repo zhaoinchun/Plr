@@ -9,13 +9,13 @@ import java.util.Collections
 data class DataSpec(
     var uri: Uri,
     var uriPositionOffset: Long = 0,
-    var httpMethod: @HttpMethod Int = HTTP_METHOD_GET,
+    var httpMethod:  Int = HTTP_METHOD_GET,
     private val body: ByteArray? = null,
     var headers: Map<String, String> = mapOf(),
     var position: Long = 0,
     var length: Long = C.LENGTH_UNSET.toLong(),
     var key: String? = null,
-    var flags: @Flags Int = 0,
+    var flags:  Int = 0,
     var customData: Any? = null,
 ) {
     val httpBody: ByteArray? = if (body != null && body.isNotEmpty()) body else null
@@ -30,23 +30,7 @@ data class DataSpec(
         key = null
     )
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_ALLOW_GZIP, FLAG_DONT_CACHE_IF_LENGTH_UNKNOWN, FLAG_ALLOW_CACHE_FRAGMENTATION, FLAG_MIGHT_NOT_USE_FULL_NETWORK_SPEED
-        ]
-    )
-    annotation class Flags
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [HTTP_METHOD_GET, HTTP_METHOD_POST, HTTP_METHOD_HEAD])
-    annotation class HttpMethod
-
-    fun isFlagSet(flag: @Flags Int): Boolean {
+    fun isFlagSet(flag:  Int): Boolean {
         return (this.flags and flag) == flag
     }
 
@@ -151,7 +135,7 @@ data class DataSpec(
         const val HTTP_METHOD_GET: Int = 1
         const val HTTP_METHOD_POST: Int = 2
         const val HTTP_METHOD_HEAD: Int = 3
-        fun getStringForHttpMethod(httpMethod: @HttpMethod Int): String {
+        fun getStringForHttpMethod(httpMethod:  Int): String {
             when (httpMethod) {
                 HTTP_METHOD_GET -> return "GET"
                 HTTP_METHOD_POST -> return "POST"

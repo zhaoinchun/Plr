@@ -18,7 +18,7 @@ import kotlin.math.min
 
 class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudioProcessor() {
     interface AudioBufferSink {
-        fun flush(sampleRateHz: Int, channelCount: Int, encoding: @C.PcmEncoding Int)
+        fun flush(sampleRateHz: Int, channelCount: Int, encoding: Int)
         fun handleBuffer(buffer: ByteBuffer)
     }
 
@@ -64,12 +64,12 @@ class TeeAudioProcessor(private val audioBufferSink: AudioBufferSink) : BaseAudi
             ByteBuffer.wrap(scratchBuffer).order(ByteOrder.LITTLE_ENDIAN)
         private var sampleRateHz = 0
         private var channelCount = 0
-        private var encoding: @C.PcmEncoding Int = 0
+        private var encoding: Int = 0
         private var randomAccessFile: RandomAccessFile? = null
         private var counter = 0
         private var bytesWritten = 0
 
-        override fun flush(sampleRateHz: Int, channelCount: Int, encoding: @C.PcmEncoding Int) {
+        override fun flush(sampleRateHz: Int, channelCount: Int, encoding: Int) {
             try {
                 reset()
             } catch (e: IOException) {

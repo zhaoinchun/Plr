@@ -7,7 +7,7 @@ import android.util.Base64
 import android.util.Pair
 import androidx.media3.common.C
 import androidx.media3.common.text.Cue
-import androidx.media3.common.text.Cue.VerticalType
+
 import com.google.common.base.Preconditions
 
 import java.util.TreeMap
@@ -238,7 +238,7 @@ internal class TtmlNode private constructor(
             val end: Int = entry.value!!
             if (start != end) {
                 val regionOutput =regionOutputs.get(regionId)!!
-                @VerticalType val verticalType: @VerticalType Int =regionMaps.get(resolvedRegionId)!!.verticalType
+                 val verticalType:  Int =regionMaps.get(resolvedRegionId)!!.verticalType
                 applyStyleToOutput(globalStyles, regionOutput, start, end, verticalType)
             }
         }
@@ -253,7 +253,7 @@ internal class TtmlNode private constructor(
         regionOutput: Cue.Builder,
         start: Int,
         end: Int,
-        @VerticalType verticalType: @VerticalType Int
+         verticalType:  Int
     ) {
         val resolvedStyle = TtmlRenderUtil.resolveStyle(style, styleIds, globalStyles)
         var text = regionOutput.text as SpannableStringBuilder?

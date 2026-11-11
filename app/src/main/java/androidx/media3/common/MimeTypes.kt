@@ -150,7 +150,7 @@ object MimeTypes {
         Pattern.compile("^mp4a\\.([a-zA-Z0-9]{2})(?:\\.([0-9]{1,2}))?$")
 
     fun registerCustomMimeType(
-        mimeType: String, codecPrefix: String, trackType: @C.TrackType Int
+        mimeType: String, codecPrefix: String, trackType: Int
     ) {
         val customMimeType = CustomMimeType(mimeType, codecPrefix, trackType)
         val customMimeTypeCount = customMimeTypes.size
@@ -208,7 +208,7 @@ object MimeTypes {
                 }
                 val objectType = getObjectTypeFromMp4aRFC6381CodecString(codec) ?: return false
 
-                val encoding: @C.Encoding Int = objectType.encoding
+                val encoding: Int = objectType.encoding
                 // xHE-AAC is an exception in which it's not true that all samples will be sync samples.
                 // Also return false for ENCODING_INVALID, which indicates we weren't able to parse the
                 // encoding from the codec string.
@@ -405,7 +405,7 @@ object MimeTypes {
                 || (supplementalCodecs.startsWith("dav1") && codecs.startsWith("av01"))
     }
 
-    fun getTrackType(mimeType: String?): @C.TrackType Int {
+    fun getTrackType(mimeType: String?): Int {
         if (TextUtils.isEmpty(mimeType)) {
             return C.TRACK_TYPE_UNKNOWN
         } else if (isAudio(mimeType)) {
@@ -432,7 +432,7 @@ object MimeTypes {
         }
     }
 
-    fun getEncoding(mimeType: String, codec: String?): @C.Encoding Int {
+    fun getEncoding(mimeType: String, codec: String?): Int {
         when (mimeType) {
             AUDIO_MPEG -> return C.ENCODING_MP3
             AUDIO_AAC -> {
@@ -461,7 +461,7 @@ object MimeTypes {
         }
     }
 
-    fun getTrackTypeOfCodec(codec: String?): @C.TrackType Int {
+    fun getTrackTypeOfCodec(codec: String?): Int {
         return getTrackType(getMediaMimeType(codec))
     }
 
@@ -514,7 +514,7 @@ object MimeTypes {
         return null
     }
 
-    private fun getTrackTypeForCustomMimeType(mimeType: String): @C.TrackType Int {
+    private fun getTrackTypeForCustomMimeType(mimeType: String): Int {
         val customMimeTypeCount = customMimeTypes.size
         for (i in 0..<customMimeTypeCount) {
             val customMimeType = customMimeTypes[i]
@@ -549,7 +549,7 @@ object MimeTypes {
         val objectTypeIndication: Int,
         val audioObjectTypeIndication: Int
     ) {
-        val encoding: @C.Encoding Int
+        val encoding: Int
             get() {
                 return when (audioObjectTypeIndication) {
                     2 -> C.ENCODING_AAC_LC
@@ -566,6 +566,6 @@ object MimeTypes {
     private class CustomMimeType(
         val mimeType: String?,
         val codecPrefix: String,
-        val trackType: @C.TrackType Int
+        val trackType: Int
     )
 }

@@ -60,7 +60,7 @@ class WebvttParser : SubtitleParser {
     override val cueReplacementBehavior: Int
         get() = Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
     companion object {
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
 
         private val EVENT_NONE = -1

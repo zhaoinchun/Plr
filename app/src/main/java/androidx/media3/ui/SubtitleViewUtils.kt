@@ -29,7 +29,7 @@ import com.google.common.base.Predicate
 internal object SubtitleViewUtils {
     
     fun resolveTextSize(
-        @Cue.TextSizeType textSizeType: @Cue.TextSizeType Int,
+         textSizeType:  Int,
         textSize: Float,
         rawViewHeight: Int,
         viewHeightMinusPadding: Int

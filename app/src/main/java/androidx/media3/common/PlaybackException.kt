@@ -13,34 +13,15 @@ import androidx.media3.common.util.Util.intToStringMaxRadix
 open class PlaybackException protected constructor(
     message: String?,
     cause: Throwable?,
-    @field:ErrorCode @param:ErrorCode val errorCode: @ErrorCode Int,
+      val errorCode: Int,
     val extras: Bundle?,
     val timestampMs: Long
 ) : Exception(message, cause) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        open = true,
-        value = [ERROR_CODE_INVALID_STATE, ERROR_CODE_BAD_VALUE, ERROR_CODE_PERMISSION_DENIED, ERROR_CODE_NOT_SUPPORTED, ERROR_CODE_DISCONNECTED, ERROR_CODE_AUTHENTICATION_EXPIRED, ERROR_CODE_PREMIUM_ACCOUNT_REQUIRED, ERROR_CODE_CONCURRENT_STREAM_LIMIT, ERROR_CODE_PARENTAL_CONTROL_RESTRICTED, ERROR_CODE_NOT_AVAILABLE_IN_REGION, ERROR_CODE_SKIP_LIMIT_REACHED, ERROR_CODE_SETUP_REQUIRED, ERROR_CODE_END_OF_PLAYLIST, ERROR_CODE_CONTENT_ALREADY_PLAYING, ERROR_CODE_UNSPECIFIED, ERROR_CODE_REMOTE_ERROR, ERROR_CODE_BEHIND_LIVE_WINDOW, ERROR_CODE_TIMEOUT, ERROR_CODE_FAILED_RUNTIME_CHECK, ERROR_CODE_IO_UNSPECIFIED, ERROR_CODE_IO_NETWORK_CONNECTION_FAILED, ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT, ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE, ERROR_CODE_IO_BAD_HTTP_STATUS, ERROR_CODE_IO_FILE_NOT_FOUND, ERROR_CODE_IO_NO_PERMISSION, ERROR_CODE_IO_CLEARTEXT_NOT_PERMITTED, ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE, ERROR_CODE_PARSING_CONTAINER_MALFORMED, ERROR_CODE_PARSING_MANIFEST_MALFORMED, ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED, ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED, ERROR_CODE_DECODER_INIT_FAILED, ERROR_CODE_DECODER_QUERY_FAILED, ERROR_CODE_DECODING_FAILED, ERROR_CODE_DECODING_FORMAT_EXCEEDS_CAPABILITIES, ERROR_CODE_DECODING_FORMAT_UNSUPPORTED, ERROR_CODE_DECODING_RESOURCES_RECLAIMED, ERROR_CODE_AUDIO_TRACK_INIT_FAILED, ERROR_CODE_AUDIO_TRACK_WRITE_FAILED, ERROR_CODE_AUDIO_TRACK_OFFLOAD_INIT_FAILED, ERROR_CODE_AUDIO_TRACK_OFFLOAD_WRITE_FAILED, ERROR_CODE_DRM_UNSPECIFIED, ERROR_CODE_DRM_SCHEME_UNSUPPORTED, ERROR_CODE_DRM_PROVISIONING_FAILED, ERROR_CODE_DRM_CONTENT_ERROR, ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED, ERROR_CODE_DRM_DISALLOWED_OPERATION, ERROR_CODE_DRM_SYSTEM_ERROR, ERROR_CODE_DRM_DEVICE_REVOKED, ERROR_CODE_DRM_LICENSE_EXPIRED
-        ]
-    )
-    annotation class ErrorCode
 
     val errorCodeName: String
         get() = getErrorCodeName(errorCode)
 
-    constructor(message: String?, cause: Throwable?, @ErrorCode errorCode: @ErrorCode Int) : this(
+    constructor(message: String?, cause: Throwable?, errorCode: Int) : this(
         message,
         cause,
         errorCode,
@@ -51,7 +32,7 @@ open class PlaybackException protected constructor(
     constructor(
         message: String?,
         cause: Throwable?,
-        @ErrorCode errorCode: @ErrorCode Int,
+        errorCode: Int,
         extras: Bundle?
     ) : this(message, cause, errorCode, extras, Clock.DEFAULT.elapsedRealtime())
 
@@ -178,7 +159,7 @@ open class PlaybackException protected constructor(
         const val ERROR_CODE_VIDEO_FRAME_PROCESSING_FAILED: Int = 7001
         const val CUSTOM_ERROR_CODE_BASE: Int = 1000000
 
-        fun getErrorCodeName(@ErrorCode errorCode: @ErrorCode Int): String {
+        fun getErrorCodeName(errorCode: Int): String {
             when (errorCode) {
                 ERROR_CODE_INVALID_STATE -> return "ERROR_CODE_INVALID_STATE"
                 ERROR_CODE_BAD_VALUE -> return "ERROR_CODE_BAD_VALUE"

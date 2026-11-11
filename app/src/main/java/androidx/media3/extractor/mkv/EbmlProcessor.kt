@@ -8,16 +8,7 @@ import androidx.media3.extractor.ExtractorInput
 import java.io.IOException
 
 interface EbmlProcessor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [ELEMENT_TYPE_UNKNOWN, ELEMENT_TYPE_MASTER, ELEMENT_TYPE_UNSIGNED_INT, ELEMENT_TYPE_STRING, ELEMENT_TYPE_BINARY, ELEMENT_TYPE_FLOAT
-        ]
-    )
-    annotation class ElementType
-
-    fun getElementType(id: Int): @ElementType Int
+    fun getElementType(id: Int):  Int
 
     fun isLevel1Element(id: Int): Boolean
 

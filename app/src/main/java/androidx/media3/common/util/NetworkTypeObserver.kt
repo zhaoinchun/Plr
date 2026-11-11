@@ -29,7 +29,7 @@ class NetworkTypeObserver private constructor(context: Context) {
 
     fun interface Listener {
 
-        fun onNetworkTypeChanged(@C.NetworkType networkType: @C.NetworkType Int)
+        fun onNetworkTypeChanged( networkType:  Int)
     }
 
     private val backgroundExecutor: Executor?
@@ -37,8 +37,8 @@ class NetworkTypeObserver private constructor(context: Context) {
     private val lock: Any
 
     @GuardedBy("lock")
-    @C.NetworkType
-    private var networkType: @C.NetworkType Int
+    
+    private var networkType:  Int
 
     @GuardedBy("lock")
     private var isInitialized = false
@@ -71,8 +71,8 @@ class NetworkTypeObserver private constructor(context: Context) {
         }
     }
 
-    @C.NetworkType
-    fun getNetworkType(): @C.NetworkType Int {
+    
+    fun getNetworkType():  Int {
         synchronized(lock) {
             return networkType
         }
@@ -94,7 +94,7 @@ class NetworkTypeObserver private constructor(context: Context) {
     }
 
     private fun handleConnectivityActionBroadcast(context: Context) {
-        @C.NetworkType val networkType: @C.NetworkType Int =
+         val networkType:  Int =
             getNetworkTypeFromConnectivityManager(context)
         if (Build.VERSION.SDK_INT >= 31 && networkType == C.NETWORK_TYPE_4G) {
             // Delay update of the network type to check whether this is actually 5G-NSA.
@@ -104,7 +104,7 @@ class NetworkTypeObserver private constructor(context: Context) {
         }
     }
 
-    private fun updateNetworkType(@C.NetworkType networkType: @C.NetworkType Int) {
+    private fun updateNetworkType( networkType:  Int) {
         removeClearedReferences()
         val currentListeners: MutableIterator<ListenerHolder?>?
         synchronized(lock) {
@@ -195,8 +195,8 @@ class NetworkTypeObserver private constructor(context: Context) {
         }
 
         @Suppress("deprecation") // Using deprecated NetworkInfo for compatibility to older APIs
-        @C.NetworkType
-        private fun getNetworkTypeFromConnectivityManager(context: Context): @C.NetworkType Int {
+        
+        private fun getNetworkTypeFromConnectivityManager(context: Context):  Int {
             val networkInfo: NetworkInfo?
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
@@ -224,8 +224,8 @@ class NetworkTypeObserver private constructor(context: Context) {
             }
         }
 
-        @C.NetworkType
-        private fun getMobileNetworkType(networkInfo: NetworkInfo): @C.NetworkType Int {
+        
+        private fun getMobileNetworkType(networkInfo: NetworkInfo):  Int {
             when (networkInfo.getSubtype()) {
                 TelephonyManager.NETWORK_TYPE_EDGE, TelephonyManager.NETWORK_TYPE_GPRS -> return C.NETWORK_TYPE_2G
                 TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_EVDO_0, TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyManager.NETWORK_TYPE_EVDO_B, TelephonyManager.NETWORK_TYPE_HSDPA, TelephonyManager.NETWORK_TYPE_HSPA, TelephonyManager.NETWORK_TYPE_HSUPA, TelephonyManager.NETWORK_TYPE_IDEN, TelephonyManager.NETWORK_TYPE_UMTS, TelephonyManager.NETWORK_TYPE_EHRPD, TelephonyManager.NETWORK_TYPE_HSPAP, TelephonyManager.NETWORK_TYPE_TD_SCDMA -> return C.NETWORK_TYPE_3G

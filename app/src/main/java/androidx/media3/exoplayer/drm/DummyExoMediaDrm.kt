@@ -101,7 +101,7 @@ class DummyExoMediaDrm : ExoMediaDrm {
         throw IllegalStateException()
     }
 
-    override val cryptoType: @C.CryptoType Int
+    override val cryptoType:  Int
         get() =  C.CRYPTO_TYPE_UNSUPPORTED
 
     companion object {

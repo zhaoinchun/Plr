@@ -9,18 +9,15 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.util.Clock
 
 import androidx.media3.decoder.DecoderInputBuffer
-import androidx.media3.exoplayer.RendererCapabilities.AdaptiveSupport
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
 import com.google.common.base.Preconditions
 
 import java.io.IOException
 import kotlin.math.max
 
-abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer,
+abstract class BaseRenderer(override val trackType: Int) : Renderer,
     RendererCapabilities {
     private val lock = Any()
     private val formatHolder = FormatHolder()
@@ -183,7 +180,7 @@ abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer
 
     // RendererCapabilities implementation.
     @Throws(ExoPlaybackException::class)
-    override fun supportsMixedMimeTypeAdaptation(): @AdaptiveSupport Int {
+    override fun supportsMixedMimeTypeAdaptation(): Int {
         return RendererCapabilities.ADAPTIVE_NOT_SUPPORTED
     }
 
@@ -200,7 +197,7 @@ abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer
     }
 
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         // Do nothing.
     }
 
@@ -283,7 +280,7 @@ abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer
     protected fun createRendererException(
         cause: Throwable?,
         format: Format?,
-        errorCode: @PlaybackException.ErrorCode Int
+        errorCode:  Int
     ): ExoPlaybackException {
         return createRendererException(cause, format, false, errorCode)
     }
@@ -292,9 +289,9 @@ abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer
         cause: Throwable?,
         format: Format?,
         isRecoverable: Boolean,
-        errorCode: @PlaybackException.ErrorCode Int
+        errorCode:  Int
     ): ExoPlaybackException {
-        var formatSupport: @C.FormatSupport Int = C.FORMAT_HANDLED
+        var formatSupport:  Int = C.FORMAT_HANDLED
         if (format != null && !throwRendererExceptionIsExecuting) {
             // Prevent recursive re-entry from subclass supportsFormat implementations.
             throwRendererExceptionIsExecuting = true
@@ -319,10 +316,10 @@ abstract class BaseRenderer(override val trackType: @C.TrackType Int) : Renderer
     }
 
     protected fun readSource(
-        formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
-    ): @ReadDataResult Int {
+        formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
+    ):  Int {
         val isPeeking = (readFlags and SampleStream.FLAG_PEEK) != 0
-        val result: @ReadDataResult Int = stream!!.readData(formatHolder, buffer, readFlags)
+        val result:  Int = stream!!.readData(formatHolder, buffer, readFlags)
         if (result == C.RESULT_BUFFER_READ) {
             if (buffer.isEndOfStream) {
                 if (!isPeeking) {

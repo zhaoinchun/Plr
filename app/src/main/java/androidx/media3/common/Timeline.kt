@@ -4,7 +4,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Pair
 import androidx.media3.common.MediaItem.LiveConfiguration
-import androidx.media3.common.Player.RepeatMode
 import androidx.media3.common.util.Util.getNowUnixTimeMs
 import androidx.media3.common.util.Util.intToStringMaxRadix
 import androidx.media3.common.util.Util.usToMs
@@ -453,7 +452,7 @@ abstract class Timeline protected constructor() {
     abstract val windowCount: Int
 
     open fun getNextWindowIndex(
-        windowIndex: Int, @RepeatMode repeatMode: @RepeatMode Int, shuffleModeEnabled: Boolean
+        windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
     ): Int {
         when (repeatMode) {
             Player.REPEAT_MODE_OFF ->
@@ -477,7 +476,7 @@ abstract class Timeline protected constructor() {
     }
 
     open fun getPreviousWindowIndex(
-        windowIndex: Int, @RepeatMode repeatMode: @RepeatMode Int, shuffleModeEnabled: Boolean
+        windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
     ): Int {
         when (repeatMode) {
             Player.REPEAT_MODE_OFF ->
@@ -521,7 +520,7 @@ abstract class Timeline protected constructor() {
         periodIndex: Int,
         period: Period?,
         window: Window,
-        @RepeatMode repeatMode: @RepeatMode Int,
+        repeatMode: Int,
         shuffleModeEnabled: Boolean
     ): Int {
         val windowIndex = getPeriod(periodIndex, period!!).windowIndex
@@ -539,7 +538,7 @@ abstract class Timeline protected constructor() {
         periodIndex: Int,
         period: Period?,
         window: Window,
-        @RepeatMode repeatMode: @RepeatMode Int,
+        repeatMode: Int,
         shuffleModeEnabled: Boolean
     ): Boolean {
         return (getNextPeriodIndex(periodIndex, period, window, repeatMode, shuffleModeEnabled)
@@ -819,7 +818,7 @@ abstract class Timeline protected constructor() {
             get() = windows.size
 
         override fun getNextWindowIndex(
-            windowIndex: Int, @RepeatMode repeatMode: @RepeatMode Int, shuffleModeEnabled: Boolean
+            windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
         ): Int {
             if (repeatMode == Player.REPEAT_MODE_ONE) {
                 return windowIndex
@@ -839,7 +838,7 @@ abstract class Timeline protected constructor() {
         }
 
         override fun getPreviousWindowIndex(
-            windowIndex: Int, @RepeatMode repeatMode: @RepeatMode Int, shuffleModeEnabled: Boolean
+            windowIndex: Int, repeatMode: Int, shuffleModeEnabled: Boolean
         ): Int {
             if (repeatMode == Player.REPEAT_MODE_ONE) {
                 return windowIndex

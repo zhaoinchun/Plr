@@ -427,8 +427,8 @@ object MediaFormatUtil {
     }
 
     @SuppressLint("InlinedApi") // Inlined MediaFormat keys.
-    private fun getPcmEncoding(mediaFormat: MediaFormat): @C.PcmEncoding Int {
-        val exoPcmEncoding: @C.PcmEncoding Int =
+    private fun getPcmEncoding(mediaFormat: MediaFormat): Int {
+        val exoPcmEncoding: Int =
             getInteger(mediaFormat, KEY_PCM_ENCODING_EXTENDED, Format.NO_VALUE)
         if (exoPcmEncoding != Format.NO_VALUE) {
             return exoPcmEncoding
@@ -440,7 +440,7 @@ object MediaFormatUtil {
 
     @SuppressLint("InlinedApi") // Inlined KEY_PCM_ENCODING.
     private fun maybeSetPcmEncoding(
-        mediaFormat: MediaFormat, exoPcmEncoding: @C.PcmEncoding Int
+        mediaFormat: MediaFormat, exoPcmEncoding: Int
     ) {
         if (exoPcmEncoding == Format.NO_VALUE) {
             return

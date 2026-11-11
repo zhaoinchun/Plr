@@ -25,7 +25,7 @@ class DefaultBandwidthMeter(
     private val initialBitrateSupplier: InitialBitrateSupplier? = null
 ) : BandwidthMeter, TransferListener {
     interface InitialBitrateSupplier {
-        fun getInitialBitrateEstimate(@C.NetworkType networkType: @C.NetworkType Int): Long
+        fun getInitialBitrateEstimate( networkType:  Int): Long
     }
 
     private val context: Context? = context?.applicationContext
@@ -68,12 +68,12 @@ class DefaultBandwidthMeter(
     @GuardedBy("this") // Used in TransferListener methods that are called on a background thread.
     private var lastReportedBitrateEstimate: Long = 0
 
-    @C.NetworkType
-    private var networkType: @C.NetworkType Int = 0
+    
+    private var networkType:  Int = 0
     private var networkTypeOverrideSet = false
 
-    @C.NetworkType
-    private var networkTypeOverride: @C.NetworkType Int = 0
+    
+    private var networkTypeOverride:  Int = 0
     private var countryCode: String? = null
 
     init {
@@ -95,7 +95,7 @@ class DefaultBandwidthMeter(
     }
 
     @Synchronized
-    fun setNetworkTypeOverride(@C.NetworkType networkType: @C.NetworkType Int) {
+    fun setNetworkTypeOverride( networkType:  Int) {
         networkTypeOverride = networkType
         networkTypeOverrideSet = true
         onNetworkTypeChanged(networkType)
@@ -176,7 +176,7 @@ class DefaultBandwidthMeter(
     }
 
     @Synchronized
-    private fun onNetworkTypeChanged(@C.NetworkType networkType: @C.NetworkType Int) {
+    private fun onNetworkTypeChanged( networkType:  Int) {
         var networkType = networkType
         if (this.networkType != C.NETWORK_TYPE_UNKNOWN && !resetOnNetworkTypeChange) {
             // Reset on network change disabled. Ignore all updates except the initial one.
@@ -225,7 +225,7 @@ class DefaultBandwidthMeter(
         eventDispatcher.bandwidthSample(elapsedMs, bytesTransferred, bitrateEstimate)
     }
 
-    private fun getInitialBitrateEstimateForNetworkType(@C.NetworkType networkType: @C.NetworkType Int): Long {
+    private fun getInitialBitrateEstimateForNetworkType( networkType:  Int): Long {
         if (initialBitrateSupplier != null) {
             val supplierEstimate = initialBitrateSupplier.getInitialBitrateEstimate(networkType)
             if (supplierEstimate != C.TIME_UNSET) {
@@ -287,7 +287,7 @@ class DefaultBandwidthMeter(
         }
 
         private fun getInitialBitrateEstimatesForCountry(
-            countryCode: String?, @C.NetworkType networkType: @C.NetworkType Int
+            countryCode: String?,  networkType:  Int
         ): Long {
             val packedGroupIndices: Int =
                 getInitialBitrateCountryGroupAssignment(Strings.nullToEmpty(countryCode))

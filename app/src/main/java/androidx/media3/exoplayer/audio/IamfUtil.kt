@@ -128,7 +128,7 @@ object IamfUtil {
             CHANNEL_OUT_IAMF_9POINT1POINT6
         )
 
-    fun getOutputLayoutForChannelMask(channelMask: Int): @OutputLayout Int {
+    fun getOutputLayoutForChannelMask(channelMask: Int):  Int {
         when (channelMask) {
             AudioFormat.CHANNEL_OUT_STEREO -> return OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_A_0_2_0
             AudioFormat.CHANNEL_OUT_5POINT1 -> return OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_B_0_5_0
@@ -154,7 +154,7 @@ object IamfUtil {
         throw IllegalArgumentException("Unsupported channel mask: $channelMask")
     }
 
-    fun getChannelMaskForOutputLayout(outputLayout: @OutputLayout Int): Int {
+    fun getChannelMaskForOutputLayout(outputLayout:  Int): Int {
         when (outputLayout) {
             OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_A_0_2_0 -> return AudioFormat.CHANNEL_OUT_STEREO
             OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_B_0_5_0 -> return AudioFormat.CHANNEL_OUT_5POINT1
@@ -182,7 +182,7 @@ object IamfUtil {
 
     fun getOutputLayoutForCurrentConfiguration(
         audioCapabilities: AudioCapabilities, useIntegratedBinauralRenderer: Boolean
-    ): @OutputLayout Int {
+    ):  Int {
         if (!audioCapabilities.spatializerChannelMasks.isEmpty()) {
             // If Spatializer enabled and available, we will use that as a signal that the user is likely
             // using headphones and wants spatial audio, but we will use decoder built-in binaural.
@@ -230,12 +230,4 @@ object IamfUtil {
         return channelMasks.find { IAMF_SUPPORTED_CHANNEL_MASKS.contains(it) }
             ?: AudioFormat.CHANNEL_INVALID
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [OUTPUT_LAYOUT_UNSET, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_A_0_2_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_B_0_5_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_C_2_5_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_D_4_5_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_E_4_5_1, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_F_3_7_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_G_4_9_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_H_9_10_3, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_I_0_7_0, OUTPUT_LAYOUT_ITU2051_SOUND_SYSTEM_J_4_7_0, OUTPUT_LAYOUT_IAMF_SOUND_SYSTEM_EXTENSION_2_7_0, OUTPUT_LAYOUT_IAMF_SOUND_SYSTEM_EXTENSION_2_3_0, OUTPUT_LAYOUT_IAMF_SOUND_SYSTEM_EXTENSION_0_1_0, OUTPUT_LAYOUT_IAMF_SOUND_SYSTEM_EXTENSION_6_9_0, OUTPUT_LAYOUT_BINAURAL]
-    )
-    annotation class OutputLayout
 }

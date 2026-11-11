@@ -28,8 +28,8 @@ internal class MediaPeriodQueue(
 
     private var nextWindowSequenceNumber: Long = 0
 
-    @Player.RepeatMode
-    private var repeatMode: @Player.RepeatMode Int = 0
+    
+    private var repeatMode: Int = 0
     private var shuffleModeEnabled = false
     var playingPeriod: MediaPeriodHolder? = null
         private set
@@ -46,7 +46,7 @@ internal class MediaPeriodQueue(
 
     fun updateRepeatMode(
         timeline: Timeline,
-        @Player.RepeatMode repeatMode: @Player.RepeatMode Int
+        repeatMode: Int
     ): Int {
         this.repeatMode = repeatMode
         return updateForPlaybackModeChange(timeline)
@@ -54,7 +54,7 @@ internal class MediaPeriodQueue(
 
     fun updateShuffleModeEnabled(
         timeline: Timeline, shuffleModeEnabled: Boolean
-    ): @UpdatePeriodQueueResult Int {
+    ):  Int {
         this.shuffleModeEnabled = shuffleModeEnabled
         return updateForPlaybackModeChange(timeline)
     }
@@ -435,7 +435,7 @@ internal class MediaPeriodQueue(
         rendererPositionUs: Long,
         rendererReadingPositionsUs: LongArray,
         rendererPrewarmingPositionsUs: LongArray
-    ): @UpdatePeriodQueueResult Int {
+    ):  Int {
         // TODO: Merge this into setTimeline so that the queue gets updated as soon as the new timeline
         // is set, once all cases handled by ExoPlayerImplInternal.handleMediaSourceListInfoRefreshed
         // can be handled here.
@@ -503,7 +503,7 @@ internal class MediaPeriodQueue(
                         newDurationInRendererTime
                     )
                 // Remove all subsequent periods.
-                val removeAfterResult: @UpdatePeriodQueueResult Int = removeAfter(periodHolder)
+                val removeAfterResult:  Int = removeAfter(periodHolder)
                 if (removeAfterResult != 0) {
                     return removeAfterResult
                 }
@@ -800,7 +800,7 @@ internal class MediaPeriodQueue(
         }
 
         // Release any period holders that don't match the new period order.
-        val removeAfterResult: @UpdatePeriodQueueResult Int = removeAfter(lastValidPeriodHolder)
+        val removeAfterResult:  Int = removeAfter(lastValidPeriodHolder)
 
         // Update the period info for the last holder, as it may now be the last period in the timeline.
         lastValidPeriodHolder.info =
@@ -1202,15 +1202,6 @@ internal class MediaPeriodQueue(
         }
         return startPositionUs + period.getContentResumeOffsetUs(adGroupIndex)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [UPDATE_PERIOD_QUEUE_ALTERED_READING_PERIOD, UPDATE_PERIOD_QUEUE_ALTERED_PREWARMING_PERIOD]
-    )
-    internal annotation class UpdatePeriodQueueResult
 
     init {
         period = Timeline.Period()

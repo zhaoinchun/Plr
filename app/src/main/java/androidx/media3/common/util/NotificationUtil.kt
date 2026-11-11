@@ -30,7 +30,7 @@ object NotificationUtil {
         id: String?,
         @StringRes nameResourceId: Int,
         @StringRes descriptionResourceId: Int,
-        importance: @Importance Int
+        importance:  Int
     ) {
         if (Build.VERSION.SDK_INT >= 26) {
             val notificationManager =
@@ -55,12 +55,4 @@ object NotificationUtil {
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [IMPORTANCE_UNSPECIFIED, IMPORTANCE_NONE, IMPORTANCE_MIN, IMPORTANCE_LOW, IMPORTANCE_DEFAULT, IMPORTANCE_HIGH
-        ]
-    )
-    annotation class Importance
 }

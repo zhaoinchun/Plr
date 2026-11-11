@@ -9,7 +9,7 @@ import java.util.UUID
 
 class ErrorStateDrmSession(override val error: DrmSessionException) : DrmSession {
 
-    override val state: @DrmSession.State Int
+    override val state:  Int
         get() = DrmSession.STATE_ERROR
 
     override fun playClearSamplesWithoutKeys(): Boolean {

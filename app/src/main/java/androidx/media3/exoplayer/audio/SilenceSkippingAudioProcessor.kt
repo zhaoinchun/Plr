@@ -19,22 +19,6 @@ class SilenceSkippingAudioProcessor(
     silenceThresholdLevel: Short = DEFAULT_SILENCE_THRESHOLD_LEVEL
 ) : BaseAudioProcessor() {
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_NOISY, STATE_SHORTENING_SILENCE]
-    )
-    private annotation class State
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [FADE_OUT, MUTE, FADE_IN, DO_NOT_CHANGE_VOLUME]
-    )
-    private annotation class VolumeChangeType
-
     private val silenceRetentionRatio: Float
     private val silenceThresholdLevel: Short
     private val minVolumeToKeepPercentageWhenMuting: Int
@@ -195,7 +179,7 @@ class SilenceSkippingAudioProcessor(
     private fun outputShortenedSilenceBuffer(shouldTransitionToNoisyState: Boolean) {
         val sizeBeforeOutput = maybeSilenceBufferContentsSize
         val bytesToOutput: Int
-        val volumeChangeType: @VolumeChangeType Int
+        val volumeChangeType:  Int
         val bytesConsumed: Int
         // Only output when buffer is full or transitioning to noisy state.
         if (maybeSilenceBufferContentsSize == maybeSilenceBuffer.size
@@ -286,7 +270,7 @@ class SilenceSkippingAudioProcessor(
         return alignToBytePerFrameBoundary(value.toInt())
     }
 
-    private fun outputRange(data: ByteArray, size: Int, rampType: @VolumeChangeType Int) {
+    private fun outputRange(data: ByteArray, size: Int, rampType:  Int) {
         Preconditions.checkArgument(
             size % bytesPerFrame == 0, "byteOutput size is not aligned to frame size %s", size
         )
@@ -295,7 +279,7 @@ class SilenceSkippingAudioProcessor(
         replaceOutputBuffer(size).put(data, 0, size).flip()
     }
 
-    private fun outputSilence(sizeToOutput: Int, rampType: @VolumeChangeType Int) {
+    private fun outputSilence(sizeToOutput: Int, rampType:  Int) {
         if (sizeToOutput == 0) {
             return
         }
@@ -395,7 +379,7 @@ class SilenceSkippingAudioProcessor(
     private fun modifyVolume(
         sampleBuffer: ByteArray,
         size: Int,
-        volumeChangeType: @VolumeChangeType Int
+        volumeChangeType:  Int
     ) {
         if (volumeChangeType == DO_NOT_CHANGE_VOLUME) {
             return

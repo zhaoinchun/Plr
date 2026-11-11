@@ -28,7 +28,7 @@ class DownloadNotificationHelper(context: Context, channelId: String?) {
         contentIntent: PendingIntent?,
         message: String?,
         downloads: List<Download>,
-        @Requirements.RequirementFlags notMetRequirements: @Requirements.RequirementFlags Int
+         notMetRequirements:  Int
     ): Notification {
         var totalPercentage = 0f
         var downloadTaskCount = 0

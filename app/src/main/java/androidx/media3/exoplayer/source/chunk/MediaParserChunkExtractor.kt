@@ -31,7 +31,7 @@ import java.io.IOException
 
 @RequiresApi(30)
 class MediaParserChunkExtractor @SuppressLint("WrongConstant") constructor(
-    primaryTrackType: @C.TrackType Int,
+    primaryTrackType: Int,
     manifestFormat: Format,
     closedCaptionFormats: List<Format>,
     playerId: PlayerId
@@ -70,7 +70,7 @@ class MediaParserChunkExtractor @SuppressLint("WrongConstant") constructor(
         }
 
         override fun createProgressiveMediaExtractor(
-            primaryTrackType: @C.TrackType Int,
+            primaryTrackType: Int,
             representationFormat: Format,
             enableEventMessageTrack: Boolean,
             closedCaptionFormats: List<Format>,

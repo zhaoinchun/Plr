@@ -18,18 +18,12 @@ import kotlin.Throws
 import kotlin.text.String
 
 internal class DefaultEbmlReader : EbmlReader {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [ELEMENT_STATE_READ_ID, ELEMENT_STATE_READ_CONTENT_SIZE, ELEMENT_STATE_READ_CONTENT])
-    private annotation class ElementState
-
     private val scratch: ByteArray
     private val masterElementsStack: ArrayDeque<MasterElement>
     private val varintReader: VarintReader
 
     private var processor:EbmlProcessor? = null
-    private var elementState: @ElementState Int = 0
+    private var elementState:  Int = 0
     private var elementId = 0
     private var elementContentSize: Long = 0
 
@@ -78,7 +72,7 @@ internal class DefaultEbmlReader : EbmlReader {
                 elementState = ELEMENT_STATE_READ_CONTENT
             }
 
-            val type: @EbmlProcessor.ElementType Int = processor!!.getElementType(elementId)
+            val type:  Int = processor!!.getElementType(elementId)
             when (type) {
                 EbmlProcessor.ELEMENT_TYPE_MASTER -> {
                     val elementContentPosition = input.position

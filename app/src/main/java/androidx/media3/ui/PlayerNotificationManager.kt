@@ -104,24 +104,6 @@ class PlayerNotificationManager(
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [NotificationCompat.VISIBILITY_PRIVATE, NotificationCompat.VISIBILITY_PUBLIC, NotificationCompat.VISIBILITY_SECRET
-        ]
-    )
-    annotation class Visibility
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [NotificationCompat.PRIORITY_DEFAULT, NotificationCompat.PRIORITY_MAX, NotificationCompat.PRIORITY_HIGH, NotificationCompat.PRIORITY_LOW, NotificationCompat.PRIORITY_MIN
-        ]
-    )
-    annotation class Priority
-
     private val context: Context = context.applicationContext
     private val mainHandler: Handler
     private val notificationManager: NotificationManagerCompat
@@ -155,7 +137,7 @@ class PlayerNotificationManager(
     private var defaults = 0
     private var color = Color.TRANSPARENT
     private var visibility = NotificationCompat.VISIBILITY_PUBLIC
-    private var priority: @Priority Int = NotificationCompat.PRIORITY_LOW
+    private var priority:  Int = NotificationCompat.PRIORITY_LOW
     private var useChronometer = true
 
     init {
@@ -349,7 +331,7 @@ class PlayerNotificationManager(
         }
     }
 
-    fun setPriority(priority: @Priority Int) {
+    fun setPriority(priority:  Int) {
         if (this.priority == priority) {
             return
         }
@@ -376,7 +358,7 @@ class PlayerNotificationManager(
         }
     }
 
-    fun setVisibility(visibility: @Visibility Int) {
+    fun setVisibility(visibility: Int) {
         if (this.visibility == visibility) {
             return
         }

@@ -37,7 +37,6 @@ import androidx.media3.common.util.Util.usToMs
 import androidx.media3.datasource.DataSourceException
 import androidx.media3.exoplayer.DefaultMediaClock.PlaybackParametersListener
 import androidx.media3.exoplayer.ExoPlayer.PreloadConfiguration
-import androidx.media3.exoplayer.MediaPeriodQueue.UpdatePeriodQueueResult
 import androidx.media3.exoplayer.MediaSourceList.MediaSourceListInfoRefreshListener
 import androidx.media3.exoplayer.PlayerMessage.Sender
 import androidx.media3.exoplayer.Renderer.WakeupListener
@@ -74,7 +73,7 @@ internal class ExoPlayerImplInternal(
     private val emptyTrackSelectorResult: TrackSelectorResult,
     private val loadControl: LoadControl,
     bandwidthMeter: BandwidthMeter,
-    private var repeatMode: @Player.RepeatMode Int,
+    private var repeatMode: Int,
     private var shuffleModeEnabled: Boolean,
     private val analyticsCollector: AnalyticsCollector,
     private var seekParameters: SeekParameters?,
@@ -103,14 +102,14 @@ internal class ExoPlayerImplInternal(
             }
         var operationAcks: Int = 0
         var positionDiscontinuity: Boolean = false
-        var discontinuityReason: @Player.DiscontinuityReason Int = 0
+        var discontinuityReason:  Int = 0
 
         fun incrementPendingOperationAcks(operationAcks: Int) {
             hasPendingChange = hasPendingChange or (operationAcks > 0)
             this.operationAcks += operationAcks
         }
 
-        fun setPositionDiscontinuity(@Player.DiscontinuityReason discontinuityReason: @Player.DiscontinuityReason Int) {
+        fun setPositionDiscontinuity( discontinuityReason:  Int) {
             if (positionDiscontinuity
                 && this.discontinuityReason != Player.DISCONTINUITY_REASON_INTERNAL
             ) {
@@ -274,8 +273,8 @@ internal class ExoPlayerImplInternal(
 
     fun setPlayWhenReady(
         playWhenReady: Boolean,
-        playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int,
-        playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
+        playWhenReadyChangeReason:  Int,
+        playbackSuppressionReason:  Int
     ) {
         val combinedReasons = playbackSuppressionReason shl 4 or playWhenReadyChangeReason
         handler
@@ -303,7 +302,7 @@ internal class ExoPlayerImplInternal(
             .sendToTarget()
     }
 
-    fun setRepeatMode(@Player.RepeatMode repeatMode: @Player.RepeatMode Int) {
+    fun setRepeatMode(repeatMode: Int) {
         handler.obtainMessage(MSG_SET_REPEAT_MODE, repeatMode, 0).sendToTarget()
     }
 
@@ -785,7 +784,7 @@ internal class ExoPlayerImplInternal(
         } catch (e: DrmSessionException) {
             handleIoException(e, e.errorCode)
         } catch (e: ParserException) {
-            @PlaybackException.ErrorCode val errorCode: @PlaybackException.ErrorCode Int
+             val errorCode:  Int
             if (e.dataType == C.DATA_TYPE_MEDIA) {
                 errorCode =
                     if (e.contentIsMalformed)
@@ -809,7 +808,7 @@ internal class ExoPlayerImplInternal(
         } catch (e: IOException) {
             handleIoException(e, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
         } catch (e: RuntimeException) {
-            @PlaybackException.ErrorCode val errorCode: @PlaybackException.ErrorCode Int
+             val errorCode:  Int
             if (e is IllegalStateException || e is IllegalArgumentException) {
                 errorCode = PlaybackException.ERROR_CODE_FAILED_RUNTIME_CHECK
             } else {
@@ -826,7 +825,7 @@ internal class ExoPlayerImplInternal(
 
     private fun handleIoException(
         e: IOException?,
-        @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+         errorCode:  Int
     ) {
         var error = ExoPlaybackException.createForSource(e, errorCode)
         val playingPeriod = queue.playingPeriod
@@ -1013,9 +1012,9 @@ internal class ExoPlayerImplInternal(
     @Throws(ExoPlaybackException::class)
     private fun setPlayWhenReadyInternal(
         playWhenReady: Boolean,
-        playbackSuppressionReason: @Player.PlaybackSuppressionReason Int,
+        playbackSuppressionReason:  Int,
         operationAck: Boolean,
-        reason: @Player.PlayWhenReadyChangeReason Int
+        reason:  Int
     ) {
         playbackInfoUpdate.incrementPendingOperationAcks(if (operationAck) 1 else 0)
         updatePlayWhenReadyWithAudioFocus(playWhenReady, playbackSuppressionReason, reason)
@@ -1024,8 +1023,8 @@ internal class ExoPlayerImplInternal(
     @Throws(ExoPlaybackException::class)
     private fun updatePlayWhenReadyWithAudioFocus(
         playWhenReady: Boolean = playbackInfo.playWhenReady,
-        playbackSuppressionReason: @Player.PlaybackSuppressionReason Int = playbackInfo.playbackSuppressionReason,
-        playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int = playbackInfo.playWhenReadyChangeReason
+        playbackSuppressionReason:  Int = playbackInfo.playbackSuppressionReason,
+        playWhenReadyChangeReason:  Int = playbackInfo.playWhenReadyChangeReason
     ) {
         val playerCommand:  Int =
             audioFocusManager.updateAudioFocus(playWhenReady, playbackInfo.playbackState)
@@ -1038,8 +1037,8 @@ internal class ExoPlayerImplInternal(
     private fun updatePlayWhenReadyWithAudioFocus(
         playWhenReady: Boolean,
         playerCommand:  Int,
-        playbackSuppressionReason: @Player.PlaybackSuppressionReason Int,
-        playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int
+        playbackSuppressionReason:  Int,
+        playWhenReadyChangeReason:  Int
     ) {
         var playWhenReady = playWhenReady
         var playbackSuppressionReason = playbackSuppressionReason
@@ -1109,9 +1108,9 @@ internal class ExoPlayerImplInternal(
     }
 
     @Throws(ExoPlaybackException::class)
-    private fun setRepeatModeInternal(@Player.RepeatMode repeatMode: @Player.RepeatMode Int) {
+    private fun setRepeatModeInternal(repeatMode: Int) {
         this.repeatMode = repeatMode
-        val result: @UpdatePeriodQueueResult Int =
+        val result:  Int =
             queue.updateRepeatMode(playbackInfo.timeline, repeatMode)
         if ((result and MediaPeriodQueue.UPDATE_PERIOD_QUEUE_ALTERED_READING_PERIOD) != 0) {
             seekToCurrentPosition(true)
@@ -1124,7 +1123,7 @@ internal class ExoPlayerImplInternal(
     @Throws(ExoPlaybackException::class)
     private fun setShuffleModeEnabledInternal(shuffleModeEnabled: Boolean) {
         this.shuffleModeEnabled = shuffleModeEnabled
-        val result: @UpdatePeriodQueueResult Int =
+        val result:  Int =
             queue.updateShuffleModeEnabled(playbackInfo.timeline, shuffleModeEnabled)
         if ((result and MediaPeriodQueue.UPDATE_PERIOD_QUEUE_ALTERED_READING_PERIOD) != 0) {
             seekToCurrentPosition(true)
@@ -2370,7 +2369,7 @@ internal class ExoPlayerImplInternal(
         if (selectionsChangedForReadPeriod) {
             // Update streams and rebuffer for the new selection, recreating all streams if reading ahead.
             val playingPeriodHolder = queue.playingPeriod
-            val removeAfterResult: @UpdatePeriodQueueResult Int =
+            val removeAfterResult:  Int =
                 queue.removeAfter(playingPeriodHolder)
             val recreateStreams =
                 (removeAfterResult and MediaPeriodQueue.UPDATE_PERIOD_QUEUE_ALTERED_READING_PERIOD) != 0
@@ -2582,7 +2581,7 @@ internal class ExoPlayerImplInternal(
                             i
                         )
                 }
-                val updateQueuedPeriodsResult: @UpdatePeriodQueueResult Int =
+                val updateQueuedPeriodsResult:  Int =
                     queue.updateQueuedPeriods(
                         timeline,
                         rendererPositionUs,
@@ -3228,7 +3227,7 @@ internal class ExoPlayerImplInternal(
             && renderer.isRendererEnabled
             && !isRendererPrewarming(index) && !renderer.isReadingFromPeriod(readingMediaPeriod)
         ) {
-            val flags: @SampleStream.Flags Int = readingMediaPeriod.sampleStreams[index]!!.flags
+            val flags:  Int = readingMediaPeriod.sampleStreams[index]!!.flags
             if ((flags and SampleStream.FLAG_MAYBE_HAS_PREROLL) !== 0) {
                 return false
             } else if ((flags and SampleStream.FLAG_HAS_PREROLL) !== 0) {
@@ -3617,7 +3616,7 @@ internal class ExoPlayerImplInternal(
         requestedContentPositionUs: Long,
         discontinuityStartPositionUs: Long,
         reportDiscontinuity: Boolean,
-        discontinuityReason: @Player.DiscontinuityReason Int
+        discontinuityReason:  Int
     ): PlaybackInfo {
         deliverPendingMessageAtStartPositionRequired =
             deliverPendingMessageAtStartPositionRequired
@@ -4007,7 +4006,7 @@ internal class ExoPlayerImplInternal(
         val setTargetLiveOffset: Boolean,
         val periodPositionChanged: Boolean,
         val reportDiscontinuity: Boolean,
-        val discontinuityReason: @Player.DiscontinuityReason Int
+        val discontinuityReason:  Int
     )
 
     private class PendingMessageInfo(val message: PlayerMessage) : Comparable<PendingMessageInfo?> {
@@ -4108,7 +4107,7 @@ internal class ExoPlayerImplInternal(
             playbackInfo: PlaybackInfo,
             pendingInitialSeekPosition: SeekPosition?,
             queue: MediaPeriodQueue,
-            @Player.RepeatMode repeatMode: @Player.RepeatMode Int,
+            repeatMode: Int,
             shuffleModeEnabled: Boolean,
             isSourceRefresh: Boolean,
             window: Timeline.Window,
@@ -4328,7 +4327,7 @@ internal class ExoPlayerImplInternal(
             }
             val periodPositionChanged =
                 newPeriodId != playbackInfo.periodId || periodPositionUs != playbackInfo.positionUs
-            var discontinuityReason: @Player.DiscontinuityReason Int =
+            var discontinuityReason:  Int =
                 if (timeline.getIndexOfPeriod(playbackInfo.periodId.periodUid) == C.INDEX_UNSET)
                     Player.DISCONTINUITY_REASON_REMOVE
                 else
@@ -4410,7 +4409,7 @@ internal class ExoPlayerImplInternal(
             pendingMessageInfo: PendingMessageInfo,
             newTimeline: Timeline,
             previousTimeline: Timeline,
-            repeatMode: @Player.RepeatMode Int,
+            repeatMode: Int,
             shuffleModeEnabled: Boolean,
             window: Timeline.Window,
             period: Timeline.Period
@@ -4516,7 +4515,7 @@ internal class ExoPlayerImplInternal(
             timeline: Timeline,
             seekPosition: SeekPosition,
             trySubsequentPeriods: Boolean,
-            repeatMode: @Player.RepeatMode Int,
+            repeatMode: Int,
             shuffleModeEnabled: Boolean,
             window: Timeline.Window,
             period: Timeline.Period
@@ -4592,7 +4591,7 @@ internal class ExoPlayerImplInternal(
         fun resolveSubsequentPeriod(
             window: Timeline.Window?,
             period: Timeline.Period?,
-            repeatMode: @Player.RepeatMode Int,
+            repeatMode: Int,
             shuffleModeEnabled: Boolean,
             oldPeriodUid: Any?,
             oldTimeline: Timeline,
@@ -4631,7 +4630,7 @@ internal class ExoPlayerImplInternal(
 
         private fun updatePlayWhenReadyChangeReason(
             playerCommand:  Int,
-            playWhenReadyChangeReason: @Player.PlayWhenReadyChangeReason Int
+            playWhenReadyChangeReason:  Int
         ): Int {
             if (playerCommand == AudioFocusManager.PLAYER_COMMAND_DO_NOT_PLAY) {
                 return Player.PLAY_WHEN_READY_CHANGE_REASON_AUDIO_FOCUS_LOSS
@@ -4644,7 +4643,7 @@ internal class ExoPlayerImplInternal(
 
         private fun updatePlaybackSuppressionReason(
             playerCommand:  Int,
-            playbackSuppressionReason: @Player.PlaybackSuppressionReason Int,
+            playbackSuppressionReason:  Int,
             isScrubbingModeEnabled: Boolean
         ): Int {
             if (playerCommand == AudioFocusManager.PLAYER_COMMAND_WAIT_FOR_CALLBACK) {

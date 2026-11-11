@@ -46,22 +46,22 @@ internal class SubtitlePainter(context: Context) {
     private var cueBitmap: Bitmap? = null
     private var cueLine = 0f
 
-    @Cue.LineType
-    private var cueLineType: @Cue.LineType Int = 0
+    
+    private var cueLineType:  Int = 0
 
-    @Cue.AnchorType
-    private var cueLineAnchor: @Cue.AnchorType Int = 0
+    
+    private var cueLineAnchor:  Int = 0
     private var cuePosition = 0f
 
-    @Cue.AnchorType
-    private var cuePositionAnchor: @Cue.AnchorType Int = 0
+    
+    private var cuePositionAnchor:  Int = 0
     private var cueSize = 0f
     private var cueBitmapHeight = 0f
     private var foregroundColor = 0
     private var backgroundColor = 0
     private var windowColor = 0
     private var edgeColor = 0
-    private var edgeType: @CaptionStyleCompat.EdgeType Int = 0
+    private var edgeType: Int = 0
     private var defaultTextSizePx = 0f
     private var cueTextSizePx = 0f
     private var bottomPaddingFraction = 0f

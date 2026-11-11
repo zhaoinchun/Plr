@@ -2,10 +2,10 @@ package androidx.media3.extractor.mp4
 
 import android.util.Pair
 import androidx.media3.common.C
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
-import androidx.media3.common.C.PcmEncoding
-import androidx.media3.common.C.StereoMode
+
+
+
+
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format
@@ -269,7 +269,7 @@ object BoxParser {
     ): Track? {
         var duration = duration
         val mdia = trak.getContainerBoxOfType(Mp4Box.TYPE_mdia)!!
-        val trackType: @C.TrackType Int =
+        val trackType: Int =
             getTrackTypeForHdlr(
                 BoxParser.parseHdlr(
                     mdia.getLeafBoxOfType(
@@ -1091,7 +1091,7 @@ object BoxParser {
         return hdlr.readInt()
     }
 
-    private fun getTrackTypeForHdlr(hdlr: Int): @C.TrackType Int {
+    private fun getTrackTypeForHdlr(hdlr: Int): Int {
         if (hdlr == TYPE_soun) {
             return C.TRACK_TYPE_AUDIO
         } else if (hdlr == TYPE_vide) {
@@ -1367,7 +1367,7 @@ object BoxParser {
         var initializationData: List<ByteArray>? = null
         var codecs: String? = null
         var projectionData: ByteArray? = null
-        var stereoMode: @StereoMode Int = Format.NO_VALUE
+        var stereoMode: Int = Format.NO_VALUE
         var esdsData: EsdsData? = null
         var btrtData: BtrtData? = null
         var maxNumReorderSamples = Format.NO_VALUE
@@ -1377,9 +1377,9 @@ object BoxParser {
         var decodedHeight = Format.NO_VALUE
 
         // HDR related metadata.
-        var colorSpace: @C.ColorSpace Int = Format.NO_VALUE
-        var colorRange: @ColorRange Int = Format.NO_VALUE
-        var colorTransfer: @ColorTransfer Int = Format.NO_VALUE
+        var colorSpace: Int = Format.NO_VALUE
+        var colorRange: Int = Format.NO_VALUE
+        var colorTransfer: Int = Format.NO_VALUE
         // The format of HDR static info is defined in CTA-861-G:2017, Table 45.
         var hdrStaticInfo: ByteBuffer? = null
         var dolbyVisionConfig: DolbyVisionConfig? = null
@@ -1899,7 +1899,7 @@ object BoxParser {
         var channelCount: Int
         var sampleRate: Int
         var sampleRateMlp = 0
-        var pcmEncoding: @PcmEncoding Int = Format.NO_VALUE
+        var pcmEncoding: Int = Format.NO_VALUE
         var codecs: String? = null
         var esdsData: EsdsData? = null
         var btrtData: BtrtData? = null
@@ -2598,7 +2598,7 @@ object BoxParser {
 
         var format: Format? = null
         var nalUnitLengthFieldLength: Int = 0
-        var requiredSampleTransformation: @Track.Transformation Int
+        var requiredSampleTransformation:  Int
 
         init {
             trackEncryptionBoxes = arrayOfNulls<TrackEncryptionBox>(numberOfEntries)

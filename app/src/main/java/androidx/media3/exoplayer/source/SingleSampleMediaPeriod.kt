@@ -15,7 +15,7 @@ import androidx.media3.decoder.DecoderInputBuffer
 import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.LoadingInfo
 import androidx.media3.exoplayer.SeekParameters
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
+
 import androidx.media3.exoplayer.source.SingleSampleMediaPeriod.SourceLoadable
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
@@ -285,7 +285,7 @@ class SingleSampleMediaPeriod(
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
         ): Int {
             maybeNotifyDownstreamFormat()
             if (loadingFinished && sampleData == null) {

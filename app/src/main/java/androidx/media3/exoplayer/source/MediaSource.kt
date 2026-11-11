@@ -34,7 +34,7 @@ interface MediaSource {
         }
 
         fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-            codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+            codecsToParseWithinGopSampleDependencies:  Int
         ): Factory {
             return this
         }
@@ -43,7 +43,6 @@ interface MediaSource {
             return this
         }
 
-        @get:C.ContentType
         val supportedTypes: IntArray
         fun createMediaSource(mediaItem: MediaItem): MediaSource
     }

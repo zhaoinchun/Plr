@@ -604,7 +604,7 @@ class DefaultLoadControl protected constructor(
         private const val TAG = "DefaultLoadControl"
 
         private fun getDefaultBufferSize(
-            trackType: @C.TrackType Int,
+            trackType: Int,
             isLocalPlayback: Boolean
         ): Int {
             when (trackType) {

@@ -18,7 +18,7 @@ import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.DrmSessionManager
 import androidx.media3.exoplayer.drm.DrmSessionManager.DrmSessionReference
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
+
 import androidx.media3.exoplayer.upstream.Allocator
 import androidx.media3.extractor.TrackOutput
 import com.google.common.base.Preconditions
@@ -218,7 +218,7 @@ class SampleQueue(
     fun read(
         formatHolder: FormatHolder,
         buffer: DecoderInputBuffer,
-        readFlags: @ReadFlags Int,
+        readFlags:  Int,
         loadingFinished: Boolean
     ): Int {
         val result =
@@ -360,20 +360,20 @@ class SampleQueue(
         input: DataReader,
         length: Int,
         allowEndOfInput: Boolean,
-        sampleDataPart: @TrackOutput.SampleDataPart Int
+        sampleDataPart:  Int
     ): Int {
         return sampleDataQueue.sampleData(input, length, allowEndOfInput)
     }
 
     override fun sampleData(
-        data: ParsableByteArray, length: Int, sampleDataPart: @TrackOutput.SampleDataPart Int
+        data: ParsableByteArray, length: Int, sampleDataPart:  Int
     ) {
         sampleDataQueue.sampleData(data, length)
     }
 
     override fun sampleMetadata(
         timeUs: Long,
-        flags: @C.BufferFlags Int,
+        flags:  Int,
         size: Int,
         offset: Int,
         cryptoData: TrackOutput.CryptoData?
@@ -561,7 +561,7 @@ class SampleQueue(
     @Synchronized
     private fun commitSample(
         timeUs: Long,
-        sampleFlags: @C.BufferFlags Int,
+        sampleFlags:  Int,
         offset: Long,
         size: Int,
         cryptoData: TrackOutput.CryptoData?
@@ -912,7 +912,7 @@ class SampleQueue(
             // sync samples. This optimization is also only possible for audio tracks where the inherent
             // duration of a sample is negligible, and it doesn't affect playback if a partial sample is
             // dropped.
-            val trackType: @C.TrackType Int = getTrackType(mimeType)
+            val trackType: Int = getTrackType(mimeType)
             return trackType == C.TRACK_TYPE_AUDIO && allSamplesAreSyncSamples(mimeType, codec)
         }
     }

@@ -16,7 +16,7 @@ abstract class AbstractConcatenatedTimeline(
 
     override fun getNextWindowIndex(
         windowIndex: Int,
-        @Player.RepeatMode repeatMode: @Player.RepeatMode Int,
+        repeatMode: Int,
         shuffleModeEnabled: Boolean
     ): Int {
         var repeatMode = repeatMode
@@ -60,7 +60,7 @@ abstract class AbstractConcatenatedTimeline(
 
     override fun getPreviousWindowIndex(
         windowIndex: Int,
-        @Player.RepeatMode repeatMode: @Player.RepeatMode Int,
+        repeatMode: Int,
         shuffleModeEnabled: Boolean
     ): Int {
         var repeatMode = repeatMode

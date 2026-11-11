@@ -10,47 +10,9 @@ class Download(
     val updateTimeMs: Long,
     val contentLength: Long,
     val stopReason: Int,
-    val failureReason: @FailureReason Int,
+    val failureReason: Int,
     val progress: DownloadProgress = DownloadProgress()
 ) {
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [STATE_QUEUED, STATE_STOPPED, STATE_DOWNLOADING, STATE_COMPLETED, STATE_FAILED, STATE_REMOVING, STATE_RESTARTING]
-    )
-    annotation class State
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [FAILURE_REASON_NONE, FAILURE_REASON_UNKNOWN])
-    annotation class FailureReason
-
     init {
         Preconditions.checkArgument((failureReason == FAILURE_REASON_NONE) == (state != STATE_FAILED))
         if (stopReason != 0) {

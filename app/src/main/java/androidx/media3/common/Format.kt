@@ -3,12 +3,6 @@ package androidx.media3.common
 import android.os.Bundle
 import android.text.TextUtils
 import androidx.annotation.IntDef
-import androidx.media3.common.C.AuxiliaryTrackType
-import androidx.media3.common.C.CryptoType
-import androidx.media3.common.C.PcmEncoding
-import androidx.media3.common.C.RoleFlags
-import androidx.media3.common.C.SelectionFlags
-import androidx.media3.common.C.StereoMode
 import androidx.media3.common.util.BundleCollectionUtil
 import androidx.media3.common.util.Util
 import com.google.common.base.Function
@@ -29,10 +23,10 @@ data class Format(
     var label: String? = null,
     var labels: List<Label> = listOf(),
     var language: String? = null,
-    var selectionFlags: @SelectionFlags Int = 0,
-    var roleFlags: @RoleFlags Int = 0,
+    var selectionFlags: Int = 0,
+    var roleFlags: Int = 0,
     var selectionPriority: Float = NO_VALUE.toFloat(),
-    var auxiliaryTrackType: @AuxiliaryTrackType Int = C.AUXILIARY_TRACK_TYPE_UNDEFINED,
+    var auxiliaryTrackType: Int = C.AUXILIARY_TRACK_TYPE_UNDEFINED,
     val codecs: String? = null,
     val metadata: Metadata? = null,
     var customData: Any? = null,
@@ -59,7 +53,7 @@ data class Format(
     var mirrorHorizontal: Boolean = false,
     var pixelWidthHeightRatio: Float = 1.0f,
     var projectionData: ByteArray? = null,
-    var stereoMode: @StereoMode Int = NO_VALUE,
+    var stereoMode: Int = NO_VALUE,
     val colorInfo: ColorInfo? = null,
     var maxSubLayers: Int = NO_VALUE,
 
@@ -67,13 +61,13 @@ data class Format(
     var channelCount: Int = NO_VALUE,
     var channelMask: Int = NO_VALUE,
     var sampleRate: Int = NO_VALUE,
-    var pcmEncoding: @PcmEncoding Int = NO_VALUE,
+    var pcmEncoding: Int = NO_VALUE,
     var encoderDelay: Int = 0,
     var encoderPadding: Int = 0,
 
     // Text specific.
     var accessibilityChannel: Int = NO_VALUE,
-    var cueReplacementBehavior: @CueReplacementBehavior Int =
+    var cueReplacementBehavior: Int =
         CUE_REPLACEMENT_BEHAVIOR_MERGE,
 
     // Image specific
@@ -81,17 +75,10 @@ data class Format(
     var tileCountVertical: Int = NO_VALUE,
 
     // Provided by the source.
-    var cryptoType: @CryptoType Int = C.CRYPTO_TYPE_NONE,
+    var cryptoType: Int = C.CRYPTO_TYPE_NONE,
     var peakBitrate: Int = NO_VALUE,
     var averageBitrate: Int = NO_VALUE,
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [CUE_REPLACEMENT_BEHAVIOR_MERGE, CUE_REPLACEMENT_BEHAVIOR_REPLACE]
-    )
-    annotation class CueReplacementBehavior
 
     val bitrate: Int = if (peakBitrate != NO_VALUE) peakBitrate else averageBitrate
     private var hashCode = 0
@@ -125,7 +112,7 @@ data class Format(
             return this
         }
 
-        val trackType: @C.TrackType Int = MimeTypes.getTrackType(sampleMimeType)
+        val trackType: Int = MimeTypes.getTrackType(sampleMimeType)
 
         // Use manifest value only.
         val id = manifestFormat.id
@@ -174,9 +161,9 @@ data class Format(
         }
 
         // Merge manifest and sample format values.
-        @SelectionFlags val selectionFlags: @SelectionFlags Int =
+        val selectionFlags: Int =
             this.selectionFlags or manifestFormat.selectionFlags
-        @RoleFlags val roleFlags: @RoleFlags Int = this.roleFlags or manifestFormat.roleFlags
+        val roleFlags: Int = this.roleFlags or manifestFormat.roleFlags
         val drmInitData =
             DrmInitData.createSessionCreationData(manifestFormat.drmInitData, this.drmInitData)
 

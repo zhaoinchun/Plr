@@ -18,7 +18,6 @@ import androidx.media3.common.util.Util.createHandlerForCurrentOrMainLooper
 import androidx.media3.common.util.Util.setForegroundServiceNotification
 import androidx.media3.common.util.Util.startForegroundService
 import androidx.media3.exoplayer.scheduler.Requirements
-import androidx.media3.exoplayer.scheduler.Requirements.RequirementFlags
 import androidx.media3.exoplayer.scheduler.Scheduler
 import com.google.common.base.Preconditions
 
@@ -193,7 +192,7 @@ abstract class DownloadService protected constructor(
 
     protected abstract fun getForegroundNotification(
         downloads: List<Download?>?,
-        notMetRequirements: @RequirementFlags Int
+        notMetRequirements:  Int
     ): Notification
 
     protected fun invalidateForegroundNotification() {
@@ -280,7 +279,7 @@ abstract class DownloadService protected constructor(
         fun update() {
             val downloadManager: DownloadManager = downloadManagerHelper!!.downloadManager
             val downloads = downloadManager.currentDownloads
-            @RequirementFlags val notMetRequirements: @RequirementFlags Int =
+             val notMetRequirements:  Int =
                 downloadManager.notMetRequirements
             val notification = getForegroundNotification(downloads, notMetRequirements)
             if (!notificationDisplayed) {
@@ -405,7 +404,7 @@ abstract class DownloadService protected constructor(
         override fun onRequirementsStateChanged(
             downloadManager: DownloadManager?,
             requirements: Requirements?,
-           notMetRequirements: @RequirementFlags Int
+           notMetRequirements:  Int
         ) {
             updateScheduler()
         }
@@ -666,7 +665,7 @@ abstract class DownloadService protected constructor(
             downloadManagerHelpers.clear()
         }
 
-        private fun needsStartedService(@Download.State state: @Download.State Int): Boolean {
+        private fun needsStartedService( state:  Int): Boolean {
             return state == Download.STATE_DOWNLOADING || state == Download.STATE_REMOVING || state == Download.STATE_RESTARTING
         }
 

@@ -12,7 +12,7 @@ internal class CanvasSubtitleOutput(
 ) : View(context, attrs), SubtitleView.Output {
     private val painters = mutableListOf<SubtitlePainter>()
     private var cues = listOf<Cue>()
-    private var textSizeType: @Cue.TextSizeType Int = Cue.TEXT_SIZE_TYPE_FRACTIONAL
+    private var textSizeType:  Int = Cue.TEXT_SIZE_TYPE_FRACTIONAL
     private var textSize: Float = SubtitleView.DEFAULT_TEXT_SIZE_FRACTION
     private var style: CaptionStyleCompat = CaptionStyleCompat.DEFAULT
     private var bottomPaddingFraction: Float = SubtitleView.DEFAULT_BOTTOM_PADDING_FRACTION
@@ -21,7 +21,7 @@ internal class CanvasSubtitleOutput(
         cues: List<Cue>,
         style: CaptionStyleCompat,
         textSize: Float,
-        textSizeType: @Cue.TextSizeType Int,
+        textSizeType:  Int,
         bottomPaddingFraction: Float
     ) {
         this.cues = cues

@@ -142,7 +142,7 @@ class DefaultPlaybackSessionManager(private val sessionIdGenerator: Supplier<Str
 
     @Synchronized
     override fun updateSessionsWithDiscontinuity(
-        eventTime: EventTime, @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+        eventTime: EventTime,  reason:  Int
     ) {
         val listener = listener!!
         val hasAutomaticTransition = reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION

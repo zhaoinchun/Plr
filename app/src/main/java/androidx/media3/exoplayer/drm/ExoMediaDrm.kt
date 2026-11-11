@@ -61,16 +61,8 @@ interface ExoMediaDrm {
     class KeyRequest  (
         val data: ByteArray,
         val licenseServerUrl: String,
-        val requestType: @RequestType Int = REQUEST_TYPE_UNKNOWN
+        val requestType:  Int = REQUEST_TYPE_UNKNOWN
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [REQUEST_TYPE_UNKNOWN, REQUEST_TYPE_INITIAL, REQUEST_TYPE_RENEWAL, REQUEST_TYPE_RELEASE, REQUEST_TYPE_NONE, REQUEST_TYPE_UPDATE]
-        )
-        annotation class RequestType
-
         companion object {
             const val REQUEST_TYPE_UNKNOWN: Int = Int.MIN_VALUE
             const val REQUEST_TYPE_INITIAL: Int = MediaDrm.KeyRequest.REQUEST_TYPE_INITIAL
@@ -133,7 +125,7 @@ interface ExoMediaDrm {
     @Throws(MediaCryptoException::class)
     fun createCryptoConfig(sessionId: ByteArray): CryptoConfig
 
-    val cryptoType: @C.CryptoType Int
+    val cryptoType:  Int
 
     companion object {
         const val EVENT_KEY_REQUIRED: Int = MediaDrm.EVENT_KEY_REQUIRED

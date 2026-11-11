@@ -30,11 +30,11 @@ internal class SceneRenderer : VideoFrameMetadataListener, CameraMotionListener 
 
     // Used by other threads only
     @Volatile
-    private var defaultStereoMode: @C.StereoMode Int = C.STEREO_MODE_MONO
-    private var lastStereoMode: @C.StereoMode Int = Format.NO_VALUE
+    private var defaultStereoMode:  Int = C.STEREO_MODE_MONO
+    private var lastStereoMode:  Int = Format.NO_VALUE
     private var lastProjectionData: ByteArray? = null
 
-    fun setDefaultStereoMode(stereoMode: @C.StereoMode Int) {
+    fun setDefaultStereoMode(stereoMode:  Int) {
         defaultStereoMode = stereoMode
     }
 
@@ -122,7 +122,7 @@ internal class SceneRenderer : VideoFrameMetadataListener, CameraMotionListener 
     }
 
     private fun setProjection(
-        projectionData: ByteArray?, stereoMode: @C.StereoMode Int, timeNs: Long
+        projectionData: ByteArray?, stereoMode:  Int, timeNs: Long
     ) {
         val oldProjectionData = lastProjectionData
         val oldStereoMode = lastStereoMode

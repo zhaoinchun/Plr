@@ -17,16 +17,6 @@ internal class ChunkReader(
     trackOutput: TrackOutput,
     private val allSamplesAreSyncSamples: Boolean
 ) {
-    
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [CHUNK_TYPE_VIDEO_COMPRESSED, CHUNK_TYPE_VIDEO_UNCOMPRESSED, CHUNK_TYPE_AUDIO
-        ]
-    )
-    private annotation class ChunkType
-
     private val trackOutput: TrackOutput
     private val chunkId: Int
     private val alternativeChunkId: Int
@@ -43,9 +33,9 @@ internal class ChunkReader(
     private var keyFrameIndices: IntArray
 
     init {
-        val trackType: @C.TrackType Int = streamHeaderChunk.trackType
+        val trackType: Int = streamHeaderChunk.trackType
         Preconditions.checkArgument(trackType == C.TRACK_TYPE_AUDIO || trackType == C.TRACK_TYPE_VIDEO)
-        val chunkType: @ChunkType Int =
+        val chunkType:  Int =
             if (trackType == C.TRACK_TYPE_VIDEO) CHUNK_TYPE_VIDEO_COMPRESSED else CHUNK_TYPE_AUDIO
         chunkId = getChunkIdFourCc(id, chunkType)
         durationUs = streamHeaderChunk.durationUs
@@ -192,7 +182,7 @@ internal class ChunkReader(
         private const  val CHUNK_TYPE_VIDEO_UNCOMPRESSED = ('d'.code shl 16) or ('b'.code shl 24)
         private const val CHUNK_TYPE_AUDIO = ('w'.code shl 16) or ('b'.code shl 24)
 
-        private fun getChunkIdFourCc(streamId: Int, chunkType: @ChunkType Int): Int {
+        private fun getChunkIdFourCc(streamId: Int, chunkType:  Int): Int {
             val tens = streamId / 10
             val ones = streamId % 10
             return (('0'.code + ones) shl 8) or ('0'.code + tens) or chunkType

@@ -223,13 +223,4 @@ object AacUtil {
          val channelCount: Int,
          val codecs: String?
     )
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [AUDIO_OBJECT_TYPE_AAC_LC, AUDIO_OBJECT_TYPE_AAC_SBR, AUDIO_OBJECT_TYPE_AAC_ER_BSAC, AUDIO_OBJECT_TYPE_AAC_ELD, AUDIO_OBJECT_TYPE_AAC_PS, AUDIO_OBJECT_TYPE_AAC_XHE
-        ]
-    )
-    annotation class AacAudioObjectType
 }

@@ -13,7 +13,6 @@ import androidx.media3.common.util.Size
 import androidx.media3.common.util.TimestampIterator
 import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.video.VideoFrameRenderControl.FrameRenderer
-import androidx.media3.exoplayer.video.VideoSink.FirstFrameReleaseInstruction
 import androidx.media3.exoplayer.video.VideoSink.VideoFrameHandler
 import androidx.media3.exoplayer.video.VideoSink.VideoSinkException
 import com.google.common.base.Preconditions
@@ -145,10 +144,10 @@ internal class DefaultVideoSink(
     }
 
     override fun onInputStreamChanged(
-        inputType: @VideoSink.InputType Int,
+        inputType:  Int,
         format: Format,
         startPositionUs: Long,
-        firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int,
+        firstFrameReleaseInstruction:  Int,
         videoEffects: List<Effect>
     ) {
         Preconditions.checkState(videoEffects.isEmpty())

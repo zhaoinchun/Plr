@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions
 
 class RubySpan(
     
-    val rubyText: String?, val position: @TextAnnotation.Position Int
+    val rubyText: String?, val position:  Int
 ) : LanguageFeatureSpan {
     fun toBundle(): Bundle {
         val bundle = Bundle()

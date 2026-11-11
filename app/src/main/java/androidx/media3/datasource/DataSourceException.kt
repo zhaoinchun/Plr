@@ -4,23 +4,23 @@ import androidx.media3.common.PlaybackException
 import java.io.IOException
 
 open class DataSourceException : IOException {
-    @PlaybackException.ErrorCode
-    val reason: @PlaybackException.ErrorCode Int
+    
+    val reason:  Int
 
-    constructor(@PlaybackException.ErrorCode reason: @PlaybackException.ErrorCode Int) {
+    constructor( reason:  Int) {
         this.reason = reason
     }
 
     constructor(
         cause: Throwable?,
-        @PlaybackException.ErrorCode reason: @PlaybackException.ErrorCode Int
+         reason:  Int
     ) : super(cause) {
         this.reason = reason
     }
 
     constructor(
         message: String?,
-        @PlaybackException.ErrorCode reason: @PlaybackException.ErrorCode Int
+         reason:  Int
     ) : super(message) {
         this.reason = reason
     }
@@ -28,7 +28,7 @@ open class DataSourceException : IOException {
     constructor(
         message: String?,
         cause: Throwable?,
-        @PlaybackException.ErrorCode reason: @PlaybackException.ErrorCode Int
+         reason:  Int
     ) : super(message, cause) {
         this.reason = reason
     }

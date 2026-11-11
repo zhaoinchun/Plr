@@ -21,34 +21,10 @@ import androidx.media3.extractor.metadata.id3.TextInformationFrame
 import org.checkerframework.checker.nullness.qual.RequiresNonNull
 
 class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
-    flags: @androidx.media3.extractor.mp3.Mp3Extractor.Flags kotlin.Int = 0,
+    flags: Int = 0,
     forcedFirstSampleTimestampUs: kotlin.Long = androidx.media3.common.C.TIME_UNSET
 ) : Extractor {
-    @kotlin.annotation.MustBeDocumented
-    @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE)
-    @kotlin.annotation.Target(
-        kotlin.annotation.AnnotationTarget.CLASS,
-        kotlin.annotation.AnnotationTarget.TYPE,
-        kotlin.annotation.AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        flag = true,
-        value = [FLAG_ENABLE_CONSTANT_BITRATE_SEEKING, FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS, FLAG_ENABLE_INDEX_SEEKING, FLAG_DISABLE_ID3_METADATA, FLAG_DISABLE_ARTWORK_METADATA
-        ]
-    )
-    annotation class Flags
-
-    @kotlin.annotation.MustBeDocumented
-    @kotlin.annotation.Target(
-        kotlin.annotation.AnnotationTarget.CLASS,
-        kotlin.annotation.AnnotationTarget.TYPE,
-        kotlin.annotation.AnnotationTarget.TYPE_PARAMETER
-    )
-    @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE)
-    @IntDef(value = [SEEK_HEADER_XING, SEEK_HEADER_INFO, SEEK_HEADER_VBRI, SEEK_HEADER_UNSET])
-    private annotation class SeekHeader
-
-    private val flags: @androidx.media3.extractor.mp3.Mp3Extractor.Flags kotlin.Int
+    private val flags: Int
     private val forcedFirstSampleTimestampUs: kotlin.Long
     private val scratch: ParsableByteArray
     private val synchronizedHeader: androidx.media3.extractor.MpegAudioUtil.Header
@@ -471,7 +447,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
                 (if (synchronizedHeader.channels != 1) 36 else 21) // MPEG 1
             else
                 (if (synchronizedHeader.channels != 1) 21 else 13) // MPEG 2 or 2.5
-        val seekHeader: @SeekHeader kotlin.Int =
+        val seekHeader:  kotlin.Int =
             getSeekFrameHeader(frame, xingBase)
         val seeker: Seeker?
         when (seekHeader) {
@@ -653,7 +629,7 @@ class Mp3Extractor @kotlin.jvm.JvmOverloads constructor(
         private fun getSeekFrameHeader(
             frame: ParsableByteArray,
             xingBase: kotlin.Int
-        ): @SeekHeader kotlin.Int {
+        ):  kotlin.Int {
             if (frame.limit() >= xingBase + 4) {
                 frame.setPosition(xingBase)
                 val headerData: kotlin.Int = frame.readInt()

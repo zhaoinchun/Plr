@@ -73,13 +73,13 @@ object FileTypes {
 
     fun inferFileTypeFromResponseHeaders(
         responseHeaders: MutableMap<String, List<String>>
-    ): @Type Int {
+    ): Int {
         val contentTypes = responseHeaders[HEADER_CONTENT_TYPE]
         val mimeType = contentTypes?.firstOrNull()
         return inferFileTypeFromMimeType(mimeType)
     }
 
-    fun inferFileTypeFromMimeType(mimeType: String?): @Type Int {
+    fun inferFileTypeFromMimeType(mimeType: String?): Int {
         var mimeType: String? = mimeType ?: return UNKNOWN
         mimeType = MimeTypes.normalizeMimeType(mimeType)
         when (mimeType) {
@@ -108,7 +108,7 @@ object FileTypes {
         }
     }
 
-    fun inferFileTypeFromUri(uri: Uri): @Type Int {
+    fun inferFileTypeFromUri(uri: Uri): Int {
         val filename = uri.lastPathSegment
         if (filename == null) {
             return UNKNOWN
@@ -196,12 +196,4 @@ object FileTypes {
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [UNKNOWN, AC3, AC4, ADTS, AMR, FLAC, FLV, MATROSKA, MP3, MP4, OGG, PS, TS, WAV,
-            WEBVTT, JPEG, MIDI, AVI, PNG, WEBP, BMP, HEIF, AVIF]
-    )
-    annotation class Type
 }

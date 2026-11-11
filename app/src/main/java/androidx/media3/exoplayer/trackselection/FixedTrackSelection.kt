@@ -9,8 +9,8 @@ import androidx.media3.exoplayer.source.chunk.MediaChunkIterator
 class FixedTrackSelection(
     group: TrackGroup,
     track: Int,
-    type: @TrackSelection.Type Int = TrackSelection.TYPE_UNSET,
-    private val reason: @C.SelectionReason Int = C.SELECTION_REASON_UNKNOWN,
+    type:  Int = TrackSelection.TYPE_UNSET,
+    private val reason:  Int = C.SELECTION_REASON_UNKNOWN,
     private val data: Any? = null
 ) : BaseTrackSelection(group, intArrayOf(track), type) {
 
@@ -25,7 +25,7 @@ class FixedTrackSelection(
     }
 
     override val selectedIndex = 0
-    override val selectionReason: @C.SelectionReason Int
+    override val selectionReason:  Int
         get() = reason
     override val selectionData: Any?
         get() = data

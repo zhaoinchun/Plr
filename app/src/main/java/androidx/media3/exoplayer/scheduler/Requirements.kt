@@ -12,32 +12,8 @@ import android.os.Parcelable
 import android.os.PowerManager
 import androidx.annotation.IntDef
 
-class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parcelable {
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        flag = true,
-        value = [NETWORK, NETWORK_UNMETERED, DEVICE_IDLE, DEVICE_CHARGING, DEVICE_STORAGE_NOT_LOW]
-    )
-    annotation class RequirementFlags
-
-    @get:RequirementFlags
-    @RequirementFlags
-    val requirements: @RequirementFlags Int
+class Requirements( requirements:  Int) : Parcelable {
+    val requirements: Int
 
     fun filterRequirements(requirementsFilter: Int): Requirements {
         val filteredRequirements = requirements and requirementsFilter
@@ -59,9 +35,9 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
         return getNotMetRequirements(context) == 0
     }
 
-    @RequirementFlags
-    fun getNotMetRequirements(context: Context): @RequirementFlags Int {
-        @RequirementFlags var notMetRequirements: @RequirementFlags Int =
+    
+    fun getNotMetRequirements(context: Context):  Int {
+         var notMetRequirements:  Int =
             getNotMetNetworkRequirements(context)
         if (this.isChargingRequired && !isDeviceCharging(context)) {
             notMetRequirements = notMetRequirements or DEVICE_CHARGING
@@ -75,8 +51,8 @@ class Requirements(@RequirementFlags requirements: @RequirementFlags Int) : Parc
         return notMetRequirements
     }
 
-    @RequirementFlags
-    private fun getNotMetNetworkRequirements(context: Context): @RequirementFlags Int {
+    
+    private fun getNotMetNetworkRequirements(context: Context):  Int {
         if (!this.isNetworkRequired) {
             return 0
         }

@@ -110,7 +110,7 @@ interface MediaCodecAdapter {
     @RequiresApi(35)
     fun detachOutputSurface()
     fun setParameters(params: Bundle)
-    fun setVideoScalingMode(@C.VideoScalingMode scalingMode: @C.VideoScalingMode Int)
+    fun setVideoScalingMode( scalingMode:  Int)
     fun needsReconfiguration(): Boolean
 
     @get:RequiresApi(26)

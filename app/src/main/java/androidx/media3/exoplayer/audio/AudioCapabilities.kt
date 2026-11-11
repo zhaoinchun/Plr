@@ -49,7 +49,7 @@ data class AudioCapabilities(
         audioProfiles.maxBy { it.maxChannelCount }.maxChannelCount
     )
 
-    fun supportsEncoding(encoding: @C.Encoding Int): Boolean {
+    fun supportsEncoding(encoding: Int): Boolean {
         return encodingToAudioProfile.contains(encoding)
     }
 
@@ -59,7 +59,7 @@ data class AudioCapabilities(
 
     fun getEncodingAndChannelConfigForPassthrough(format: Format, audioAttributes: AudioAttributes)
             : Pair<Int, Int>? {
-        var encoding: @C.Encoding Int =
+        var encoding: Int =
             MimeTypes.getEncoding(format.sampleMimeType!!, format.codecs)
         // Check that this is an encoding known to work for passthrough. This avoids trying to use
         // passthrough with an encoding where the device/app reports it's capable but it is untested or
@@ -111,12 +111,12 @@ data class AudioCapabilities(
     }
 
     data class AudioProfile(
-        val encoding: @C.Encoding Int,
+        val encoding: Int,
         val maxChannelCount: Int,
         private val channelMasks: Set<Int>? = null
     ) {
         @RequiresApi(33)
-        constructor(encoding: @C.Encoding Int, channelMasks: Set<Int>) :
+        constructor(encoding: Int, channelMasks: Set<Int>) :
                 this(
                     encoding,
                     channelMasks.maxBy { it.countOneBits() },
@@ -202,7 +202,7 @@ data class AudioCapabilities(
         }
 
         fun getMaxSupportedChannelCountForPassthrough(
-            encoding: @C.Encoding Int, sampleRate: Int, audioAttributes: AudioAttributes
+            encoding: Int, sampleRate: Int, audioAttributes: AudioAttributes
         ): Int {
             for (channelCount in DEFAULT_MAX_CHANNEL_COUNT downTo 1) {
                 val channelConfig = getAudioTrackChannelConfig(channelCount)

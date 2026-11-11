@@ -34,14 +34,8 @@ import java.lang.reflect.Constructor
 import kotlin.collections.toTypedArray
 
 class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [EXTENSION_RENDERER_MODE_OFF, EXTENSION_RENDERER_MODE_ON, EXTENSION_RENDERER_MODE_PREFER])
-    annotation class ExtensionRendererMode
-
     private val codecAdapterFactory: DefaultMediaCodecAdapterFactory
-    private var extensionRendererMode: @ExtensionRendererMode Int
+    private var extensionRendererMode:  Int
     private var allowedVideoJoiningTimeMs: Long
     private var enableDecoderFallback = false
     private var mediaCodecSelector: MediaCodecSelector?
@@ -67,7 +61,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     }
 
     fun setExtensionRendererMode(
-        extensionRendererMode: @ExtensionRendererMode Int
+        extensionRendererMode:  Int
     ): DefaultRenderersFactory {
         this.extensionRendererMode = extensionRendererMode
         return this
@@ -257,7 +251,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildVideoRenderers(
         context: Context,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         mediaCodecSelector: MediaCodecSelector?,
         enableDecoderFallback: Boolean,
         eventHandler: Handler?,
@@ -375,7 +369,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildAudioRenderers(
         context: Context,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         mediaCodecSelector: MediaCodecSelector?,
         enableDecoderFallback: Boolean,
         audioSink: AudioSink,
@@ -553,7 +547,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         context: Context?,
         output: TextOutput?,
         outputLooper: Looper?,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         out: ArrayList<Renderer>
     ) {
         out.add(TextRenderer(output, outputLooper))
@@ -563,7 +557,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         context: Context?,
         output: MetadataOutput,
         outputLooper: Looper?,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         out: ArrayList<Renderer>
     ) {
         for (i in 0..<METADATA_RENDERER_COUNT) {
@@ -573,7 +567,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildCameraMotionRenderers(
         context: Context?,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         out: ArrayList<Renderer>
     ) {
         out.add(CameraMotionRenderer())
@@ -586,7 +580,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     protected fun buildMiscellaneousRenderers(
         context: Context?,
         eventHandler: Handler?,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         out: ArrayList<Renderer>?
     ) {
         // Do nothing.
@@ -627,7 +621,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     protected fun buildSecondaryVideoRenderer(
         renderer: Renderer,
         context: Context,
-        extensionRendererMode: @ExtensionRendererMode Int,
+        extensionRendererMode:  Int,
         mediaCodecSelector: MediaCodecSelector?,
         enableDecoderFallback: Boolean,
         eventHandler: Handler?,

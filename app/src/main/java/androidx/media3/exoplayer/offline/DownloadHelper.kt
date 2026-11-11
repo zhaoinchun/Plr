@@ -145,14 +145,6 @@ class DownloadHelper(
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [MODE_NOT_PREPARE, MODE_PREPARE_PROGRESSIVE_SOURCE, MODE_PREPARE_NON_PROGRESSIVE_SOURCE_AND_SELECT_TRACKS]
-    )
-    private annotation class Mode
-
     interface Callback {
         fun onPrepared(helper: DownloadHelper, tracksInfoAvailable: Boolean)
         fun onPrepareError(helper: DownloadHelper, e: IOException)
@@ -161,7 +153,7 @@ class DownloadHelper(
     class LiveContentUnsupportedException : IOException()
 
     private val localConfiguration = mediaItem.localConfiguration!!
-    private val mode: @Mode Int = when (mediaSource) {
+    private val mode: Int = when (mediaSource) {
         null -> MODE_NOT_PREPARE
         is ProgressiveMediaSource -> MODE_PREPARE_PROGRESSIVE_SOURCE
         else -> MODE_PREPARE_NON_PROGRESSIVE_SOURCE_AND_SELECT_TRACKS
@@ -298,7 +290,7 @@ class DownloadHelper(
             parametersBuilder.setForceHighestSupportedBitrate(true)
             // Disable all non-audio track types supported by the renderers.
             for (capabilities in rendererCapabilities.rendererCapabilities!!) {
-                val trackType: @C.TrackType Int = capabilities.trackType
+                val trackType: Int = capabilities.trackType
                 parametersBuilder.setTrackTypeDisabled(
                     trackType, trackType != C.TRACK_TYPE_AUDIO
                 )
@@ -331,7 +323,7 @@ class DownloadHelper(
             parametersBuilder.setForceHighestSupportedBitrate(true)
             // Disable all non-text track types supported by the renderers.
             for (capabilities in rendererCapabilities.rendererCapabilities!!) {
-                val trackType: @C.TrackType Int = capabilities.trackType
+                val trackType: Int = capabilities.trackType
                 parametersBuilder.setTrackTypeDisabled(
                     trackType, trackType != C.TRACK_TYPE_TEXT
                 )
@@ -926,7 +918,7 @@ class DownloadHelper(
         override val selectedIndex: Int
             get() = 0
 
-        override val selectionReason: @C.SelectionReason Int
+        override val selectionReason:  Int
             get() = C.SELECTION_REASON_UNKNOWN
 
         override val selectionData: Any?

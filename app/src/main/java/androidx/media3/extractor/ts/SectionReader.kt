@@ -34,7 +34,7 @@ class SectionReader(private val reader: SectionPayloadReader) : TsPayloadReader 
         waitingForPayloadStart = true
     }
 
-    override fun consume(data: ParsableByteArray, flags: @TsPayloadReader.Flags Int) {
+    override fun consume(data: ParsableByteArray, flags:  Int) {
         val payloadUnitStartIndicator =
             (flags and TsPayloadReader.FLAG_PAYLOAD_UNIT_START_INDICATOR) != 0
         var payloadStartPosition = C.INDEX_UNSET

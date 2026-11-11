@@ -15,7 +15,7 @@ class FilteringMediaSource(mediaSource: MediaSource, trackTypes: Set<Int>) :
     WrappingMediaSource(mediaSource) {
     private val trackTypes: Set<Int> = trackTypes.toSet()
 
-    constructor(mediaSource: MediaSource, trackType: @C.TrackType Int) : this(
+    constructor(mediaSource: MediaSource, trackType: Int) : this(
         mediaSource,
         setOf(trackType)
     )

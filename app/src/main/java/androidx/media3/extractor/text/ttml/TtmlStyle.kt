@@ -8,58 +8,31 @@ import androidx.media3.common.text.TextAnnotation
 import com.google.errorprone.annotations.CanIgnoreReturnValue
 
 internal class TtmlStyle {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [UNSPECIFIED, STYLE_NORMAL, STYLE_BOLD, STYLE_ITALIC, STYLE_BOLD_ITALIC]
-    )
-    annotation class StyleFlags
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [UNSPECIFIED, FONT_SIZE_UNIT_PIXEL, FONT_SIZE_UNIT_EM, FONT_SIZE_UNIT_PERCENT])
-    annotation class FontSizeUnit
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [UNSPECIFIED, OFF, ON])
-    private annotation class OptionalBoolean
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [UNSPECIFIED, RUBY_TYPE_CONTAINER, RUBY_TYPE_BASE, RUBY_TYPE_TEXT, RUBY_TYPE_DELIMITER])
-    annotation class RubyType
-
     var fontFamily: String? = null
         private set
     private var fontColor = 0
     private var hasFontColor = false
     private var backgroundColor = 0
     private var hasBackgroundColor = false
-    private var linethrough: @OptionalBoolean Int
-    private var underline: @OptionalBoolean Int
-    private var bold: @OptionalBoolean Int
-    private var italic: @OptionalBoolean Int
-    var fontSizeUnit: @FontSizeUnit Int
+    private var linethrough:  Int
+    private var underline:  Int
+    private var bold:  Int
+    private var italic:  Int
+    var fontSizeUnit:  Int
         private set
     var fontSize: Float = 0f
         private set
     var id: String? = null
         private set
-    var rubyType: @RubyType Int
+    var rubyType:  Int
         private set
-    var rubyPosition: @TextAnnotation.Position Int
+    var rubyPosition:  Int
         private set
     var textAlign: Layout.Alignment? = null
         private set
     var multiRowAlign: Layout.Alignment? = null
         private set
-    private var textCombine: @OptionalBoolean Int
+    private var textCombine:  Int
     var textEmphasis: TextEmphasis? = null
         private set
     var shearPercentage: Float
@@ -83,7 +56,7 @@ internal class TtmlStyle {
         shearPercentage = UNSPECIFIED_SHEAR
     }
 
-    val style: @StyleFlags Int
+    val style:  Int
         
         get() {
             if (bold == UNSPECIFIED && italic == UNSPECIFIED) {
@@ -235,12 +208,12 @@ internal class TtmlStyle {
         return this
     }
 
-    fun setRubyType(rubyType: @RubyType Int): TtmlStyle {
+    fun setRubyType(rubyType:  Int): TtmlStyle {
         this.rubyType = rubyType
         return this
     }
 
-    fun setRubyPosition(position: @TextAnnotation.Position Int): TtmlStyle {
+    fun setRubyPosition(position:  Int): TtmlStyle {
         this.rubyPosition = position
         return this
     }

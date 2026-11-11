@@ -48,24 +48,15 @@ import kotlin.math.max
 
 class FragmentedMp4Extractor constructor(
     subtitleParserFactory: SubtitleParser.Factory,
-    flags: @Flags Int = 0,
+    flags:  Int = 0,
     timestampAdjuster: TimestampAdjuster? = null,
     sideloadedTrack: Track? = null,
     closedCaptionFormats: List<Format> = listOf(),
     additionalEmsgTrackOutput: TrackOutput? = null
 ) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_WORKAROUND_EVERY_VIDEO_FRAME_IS_SYNC_FRAME, FLAG_WORKAROUND_IGNORE_TFDT_BOX, FLAG_ENABLE_EMSG_TRACK, FLAG_WORKAROUND_IGNORE_EDIT_LISTS, FLAG_EMIT_RAW_SUBTITLE_DATA, FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES, FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES_H265, FLAG_MERGE_FRAGMENTED_SIDX, FLAG_READ_MFRA_FOR_SEEK_MAP, FLAG_DISABLE_ARTWORK_METADATA
-        ]
-    )
-    annotation class Flags
 
     private val subtitleParserFactory: SubtitleParser.Factory
-    private val flags: @Flags Int
+    private val flags:  Int
     private val sideloadedTrack: Track?
 
     // Sideloaded data.
@@ -1004,7 +995,7 @@ class FragmentedMp4Extractor constructor(
             }
         }
 
-        var sampleFlags: @C.BufferFlags Int = trackBundle.currentSampleFlags
+        var sampleFlags:  Int = trackBundle.currentSampleFlags
         if (!isSampleDependedOn) {
             sampleFlags = sampleFlags or C.BUFFER_FLAG_NOT_DEPENDED_ON
         }
@@ -1626,9 +1617,9 @@ class FragmentedMp4Extractor constructor(
         private const val MFRO_FIXED_BOX_SIZE = 16
 
         fun codecsToParseWithinGopSampleDependenciesAsFlags(
-            videoCodecFlags: @C.VideoCodecFlags Int
-        ): @Flags Int {
-            var flags: @Flags Int = 0
+            videoCodecFlags:  Int
+        ):  Int {
+            var flags:  Int = 0
             if ((videoCodecFlags and C.VIDEO_CODEC_FLAG_H264) != 0) {
                 flags = flags or FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES
             }
@@ -1669,7 +1660,7 @@ class FragmentedMp4Extractor constructor(
             moof: Mp4Box.ContainerBox,
             trackBundles: SparseArray<TrackBundle>,
             haveSideloadedTrack: Boolean,
-            flags: @Flags Int,
+            flags:  Int,
             extendedTypeScratch: ByteArray?
         ) {
             val moofContainerChildrenSize: Int = moof.containerChildren.size
@@ -1687,7 +1678,7 @@ class FragmentedMp4Extractor constructor(
             traf: Mp4Box.ContainerBox,
             trackBundles: SparseArray<TrackBundle>,
             haveSideloadedTrack: Boolean,
-            flags: @Flags Int,
+            flags:  Int,
             extendedTypeScratch: ByteArray?
         ) {
             val tfhd: Mp4Box.LeafBox = traf.getLeafBoxOfType(Mp4Box.TYPE_tfhd)!!
@@ -1756,7 +1747,7 @@ class FragmentedMp4Extractor constructor(
         private fun parseTruns(
             traf: Mp4Box.ContainerBox,
             trackBundle: TrackBundle,
-            flags: @Flags Int
+            flags:  Int
         ) {
             var trunCount = 0
             var totalSampleCount = 0
@@ -1943,7 +1934,7 @@ class FragmentedMp4Extractor constructor(
         private fun parseTrun(
             trackBundle: TrackBundle,
             index: Int,
-            flags: @Flags Int,
+            flags:  Int,
             trun: ParsableByteArray,
             trackRunStart: Int
         ): Int {

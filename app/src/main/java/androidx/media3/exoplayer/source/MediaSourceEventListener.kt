@@ -82,7 +82,7 @@ interface MediaSourceEventListener {
             }
         }
 
-        fun loadStarted(loadEventInfo: LoadEventInfo, dataType: @C.DataType Int, retryCount: Int) {
+        fun loadStarted(loadEventInfo: LoadEventInfo, dataType: Int, retryCount: Int) {
             loadStarted(
                 loadEventInfo,
                 dataType,  
@@ -98,10 +98,10 @@ interface MediaSourceEventListener {
 
         fun loadStarted(
             loadEventInfo: LoadEventInfo,
-            dataType: @C.DataType Int,
-            trackType: @C.TrackType Int,
+            dataType: Int,
+            trackType: Int,
             trackFormat: Format?,
-            trackSelectionReason: @C.SelectionReason Int,
+            trackSelectionReason:  Int,
             trackSelectionData: Any?,
             mediaStartTimeUs: Long,
             mediaEndTimeUs: Long,
@@ -134,10 +134,10 @@ interface MediaSourceEventListener {
 
         fun loadCompleted(
             loadEventInfo: LoadEventInfo,
-            dataType: @C.DataType Int,
-            trackType: @C.TrackType Int = C.TRACK_TYPE_UNKNOWN,
+            dataType: Int,
+            trackType: Int = C.TRACK_TYPE_UNKNOWN,
             trackFormat: Format? = null,
-            trackSelectionReason: @C.SelectionReason Int = C.SELECTION_REASON_UNKNOWN,
+            trackSelectionReason:  Int = C.SELECTION_REASON_UNKNOWN,
             trackSelectionData: Any? = null,
             mediaStartTimeUs: Long = C.TIME_UNSET,
             mediaEndTimeUs: Long = C.TIME_UNSET
@@ -169,10 +169,10 @@ interface MediaSourceEventListener {
 
         fun loadCanceled(
             loadEventInfo: LoadEventInfo,
-            dataType: @C.DataType Int,
-            trackType: @C.TrackType Int = C.TRACK_TYPE_UNKNOWN,
+            dataType: Int,
+            trackType: Int = C.TRACK_TYPE_UNKNOWN,
             trackFormat: Format? = null,
-            trackSelectionReason: @C.SelectionReason Int = C.SELECTION_REASON_UNKNOWN,
+            trackSelectionReason:  Int = C.SELECTION_REASON_UNKNOWN,
             trackSelectionData: Any? = null,
             mediaStartTimeUs: Long = C.TIME_UNSET,
             mediaEndTimeUs: Long = C.TIME_UNSET
@@ -204,7 +204,7 @@ interface MediaSourceEventListener {
 
         fun loadError(
             loadEventInfo: LoadEventInfo,
-            dataType: @C.DataType Int,
+            dataType: Int,
             error: IOException,
             wasCanceled: Boolean
         ) {
@@ -224,10 +224,10 @@ interface MediaSourceEventListener {
 
         fun loadError(
             loadEventInfo: LoadEventInfo,
-            dataType: @C.DataType Int,
-            trackType: @C.TrackType Int,
+            dataType: Int,
+            trackType: Int,
             trackFormat: Format?,
-            trackSelectionReason: @C.SelectionReason Int,
+            trackSelectionReason:  Int,
             trackSelectionData: Any?,
             mediaStartTimeUs: Long,
             mediaEndTimeUs: Long,
@@ -289,9 +289,9 @@ interface MediaSourceEventListener {
         }
 
         fun downstreamFormatChanged(
-            trackType: @C.TrackType Int,
+            trackType: Int,
             trackFormat: Format?,
-            trackSelectionReason: @C.SelectionReason Int,
+            trackSelectionReason:  Int,
             trackSelectionData: Any?,
             mediaTimeUs: Long
         ) {

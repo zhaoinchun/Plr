@@ -9,8 +9,6 @@ import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.LoadingInfo
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.exoplayer.source.ExternalLoader.LoadRequest
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import com.google.common.util.concurrent.FutureCallback
 import com.google.common.util.concurrent.Futures
@@ -151,8 +149,8 @@ internal class ExternallyLoadedMediaPeriod(
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
-        ): @ReadDataResult Int {
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
+        ):  Int {
             if (streamState == STREAM_STATE_END_OF_STREAM) {
                 buffer.addFlag(C.BUFFER_FLAG_END_OF_STREAM)
                 return C.RESULT_BUFFER_READ

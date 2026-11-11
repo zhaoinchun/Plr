@@ -16,7 +16,7 @@
 package androidx.media3.extractor.text
 
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.DataReader
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
@@ -26,7 +26,7 @@ import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.common.util.Util
 import androidx.media3.extractor.TrackOutput
 import androidx.media3.extractor.TrackOutput.CryptoData
-import androidx.media3.extractor.TrackOutput.SampleDataPart
+
 import androidx.media3.extractor.text.SubtitleParser.OutputOptions
 import com.google.common.base.Preconditions
 
@@ -98,7 +98,7 @@ internal class SubtitleTranscodingTrackOutput(
         input: DataReader,
         length: Int,
         allowEndOfInput: Boolean,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ): Int {
         if (currentSubtitleParser == null) {
             return delegate.sampleData(input, length, allowEndOfInput, sampleDataPart)
@@ -120,7 +120,7 @@ internal class SubtitleTranscodingTrackOutput(
     override fun sampleData(
         data: ParsableByteArray,
         length: Int,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ) {
         if (currentSubtitleParser == null) {
             delegate.sampleData(data, length, sampleDataPart)
@@ -133,7 +133,7 @@ internal class SubtitleTranscodingTrackOutput(
 
     override fun sampleMetadata(
         timeUs: Long,
-        flags: @BufferFlags Int,
+        flags:  Int,
         size: Int,
         offset: Int,
         cryptoData: CryptoData?
@@ -171,7 +171,7 @@ internal class SubtitleTranscodingTrackOutput(
     private fun outputSample(
         cuesWithTiming: CuesWithTiming,
         timeUs: Long,
-        flags: @BufferFlags Int
+        flags:  Int
     ) {
         // format() must be called before sampleMetadata()
         currentFormat!!

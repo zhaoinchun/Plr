@@ -43,8 +43,6 @@ import androidx.media3.exoplayer.audio.AudioOutputProvider.FormatConfig
 import androidx.media3.exoplayer.audio.AudioOutputProvider.OutputConfig
 import androidx.media3.exoplayer.audio.AudioSink.AudioSinkConfig
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
-import androidx.media3.exoplayer.audio.AudioSink.OffloadMode
-import androidx.media3.exoplayer.audio.AudioSink.SinkFormatSupport
 import androidx.media3.exoplayer.audio.AudioSink.UnexpectedDiscontinuityException
 import androidx.media3.extractor.AacUtil
 import androidx.media3.extractor.Ac3Util
@@ -122,8 +120,8 @@ class DefaultAudioSink(
     interface AudioTrackBufferSizeProvider {
         fun getBufferSizeInBytes(
             minBufferSizeInBytes: Int,
-            encoding: @C.Encoding Int,
-            outputMode: @OutputMode Int,
+            encoding: Int,
+            outputMode:  Int,
             pcmFrameSize: Int,
             sampleRate: Int,
             bitrate: Int,
@@ -146,12 +144,6 @@ class DefaultAudioSink(
         audioProcessorChain = (DefaultAudioProcessorChain(audioProcessors))
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [OUTPUT_MODE_PCM, OUTPUT_MODE_OFFLOAD, OUTPUT_MODE_PASSTHROUGH])
-    annotation class OutputMode
-
     private val context: Context? = context?.applicationContext
     var enableFloatOutput: Boolean = false
     private val channelMappingAudioProcessor = ChannelMappingAudioProcessor()
@@ -162,7 +154,7 @@ class DefaultAudioSink(
         listOf(trimmingAudioProcessor, channelMappingAudioProcessor)
     private val mediaPositionParametersCheckpoints = ArrayDeque<MediaPositionParameters>()
     var preferAudioOutputPlaybackParameters: Boolean = false
-    private var offloadMode: @OffloadMode Int = AudioSink.OFFLOAD_MODE_DISABLED
+    private var offloadMode:  Int = AudioSink.OFFLOAD_MODE_DISABLED
     private var audioOutputListener: AudioOutputListener? = null
     private val initializationExceptionPendingExceptionHolder: PendingExceptionHolder<AudioSink.InitializationException> =
         PendingExceptionHolder()
@@ -302,7 +294,7 @@ class DefaultAudioSink(
         return getFormatSupport(format) != AudioSink.SINK_FORMAT_UNSUPPORTED
     }
 
-    override fun getFormatSupport(format: Format): @SinkFormatSupport Int {
+    override fun getFormatSupport(format: Format): Int {
         // For PCM formats, convert the format to what our audio processors will produce.
         var format = format
         var transcodingViaAudioProcessors = false
@@ -1043,7 +1035,7 @@ class DefaultAudioSink(
     }
 
     @RequiresApi(29)
-    override fun setOffloadMode(offloadMode: @OffloadMode Int) {
+    override fun setOffloadMode(offloadMode:  Int) {
         Preconditions.checkState(Build.VERSION.SDK_INT >= 29)
         this.offloadMode = offloadMode
     }
@@ -1251,7 +1243,7 @@ class DefaultAudioSink(
         return configuration != null && configuration!!.outputConfig.usePlaybackParameters
     }
 
-    private fun shouldUseFloatOutput(pcmEncoding: @C.PcmEncoding Int): Boolean {
+    private fun shouldUseFloatOutput(pcmEncoding: Int): Boolean {
         return enableFloatOutput && isEncodingHighResolutionPcm(pcmEncoding)
     }
 
@@ -1626,7 +1618,7 @@ class DefaultAudioSink(
         private const val TAG = "DefaultAudioSink"
         private val pendingReleaseCount = AtomicInteger()
 
-        fun getFramesPerEncodedSample(encoding: @C.Encoding Int, buffer: ByteBuffer): Int {
+        fun getFramesPerEncodedSample(encoding: Int, buffer: ByteBuffer): Int {
             when (encoding) {
                 C.ENCODING_MP3 -> {
                     val headerDataInBigEndian = getBigEndianInt(buffer, buffer.position())
@@ -1682,7 +1674,7 @@ class DefaultAudioSink(
                 C.INDEX_UNSET
         }
 
-        private fun getNonPcmMaximumEncodedRateBytesPerSecond(encoding: @C.Encoding Int): Int {
+        private fun getNonPcmMaximumEncodedRateBytesPerSecond(encoding: Int): Int {
             val rate = getMaximumEncodedRateBytesPerSecond(encoding)
             Preconditions.checkState(rate != C.RATE_UNSET_INT)
             return rate

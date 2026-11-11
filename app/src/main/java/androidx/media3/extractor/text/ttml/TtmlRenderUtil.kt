@@ -70,7 +70,7 @@ internal object TtmlRenderUtil {
         style: TtmlStyle,
         parent: TtmlNode?,
         globalStyles: MutableMap<String, TtmlStyle>,
-        @Cue.VerticalType verticalType: @Cue.VerticalType Int
+         verticalType:  Int
     ) {
         if (style.style != TtmlStyle.UNSPECIFIED) {
             builder.setSpan(
@@ -112,8 +112,8 @@ internal object TtmlRenderUtil {
         }
         if (style.textEmphasis != null) {
             val textEmphasis = style.textEmphasis!!
-            val markShape: @TextEmphasisSpan.MarkShape Int
-            val markFill: @TextEmphasisSpan.MarkFill Int
+            val markShape:  Int
+            val markFill:  Int
             if (textEmphasis.markShape == TextEmphasis.MARK_SHAPE_AUTO) {
                 // If a vertical writing mode applies, then 'auto' is equivalent to 'filled sesame';
                 // otherwise, it's equivalent to 'filled circle':
@@ -129,7 +129,7 @@ internal object TtmlRenderUtil {
                 markFill = textEmphasis.markFill
             }
 
-            val position: @TextEmphasis.Position Int
+            val position: Int
             if (textEmphasis.position == TextEmphasis.POSITION_OUTSIDE) {
                 // 'outside' is not supported by TextEmphasisSpan, so treat it as 'before':
                 // https://www.w3.org/TR/ttml2/#style-value-annotation-position
@@ -160,7 +160,7 @@ internal object TtmlRenderUtil {
                             val textStyle = resolveStyle(textNode.style, textNode.styleIds, globalStyles)
 
                             // Use position from ruby text node if defined.
-                            var rubyPosition: @TextAnnotation.Position Int =
+                            var rubyPosition:  Int =
                                 if (textStyle != null) textStyle.rubyPosition else TextAnnotation.POSITION_UNKNOWN
 
                             if (rubyPosition == TextAnnotation.POSITION_UNKNOWN) {

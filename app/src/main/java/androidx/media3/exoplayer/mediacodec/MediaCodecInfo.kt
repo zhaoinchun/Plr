@@ -22,8 +22,6 @@ import androidx.media3.common.util.Util.ceilDivide
 import androidx.media3.common.util.Util.getSystemProperty
 import androidx.media3.common.util.Util.isAutomotive
 import androidx.media3.exoplayer.DecoderReuseEvaluation
-import androidx.media3.exoplayer.DecoderReuseEvaluation.DecoderDiscardReasons
-import androidx.media3.exoplayer.mediacodec.MediaCodecPerformancePointCoverageProvider.PerformancePointCoverageResult
 import com.google.common.base.Strings
 import com.google.common.base.Supplier
 import com.google.common.base.Suppliers
@@ -223,7 +221,7 @@ class MediaCodecInfo private constructor(
     }
 
     fun canReuseCodec(oldFormat: Format, newFormat: Format): DecoderReuseEvaluation {
-        var discardReasons: @DecoderDiscardReasons Int = 0
+        var discardReasons:  Int = 0
         if (oldFormat.sampleMimeType != newFormat.sampleMimeType) {
             discardReasons =
                 discardReasons or DecoderReuseEvaluation.DISCARD_REASON_MIME_TYPE_CHANGED
@@ -397,7 +395,7 @@ class MediaCodecInfo private constructor(
         }
 
         if (Build.VERSION.SDK_INT >= 29) {
-            val evaluation: @PerformancePointCoverageResult Int =
+            val evaluation:  Int =
                 MediaCodecPerformancePointCoverageProvider.areResolutionAndFrameRateCovered(
                     videoCapabilities, width, height, frameRate
                 )

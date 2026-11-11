@@ -36,7 +36,7 @@ internal class TsDurationReader(private val timestampSearchBytes: Int) {
     @Throws(IOException::class)
     fun readDuration(
         input: ExtractorInput, seekPositionHolder: PositionHolder, pcrPid: Int
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         if (pcrPid <= 0) {
             return finishReadDuration(input)
         }

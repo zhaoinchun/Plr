@@ -22,11 +22,11 @@ data class MediaMetadata(
     val overallRating: Rating? = null,
     var artworkData: ByteArray? = null,
     var bundleableArtworkData: BundleableByteArray? = null,
-    var artworkDataType: @PictureType Int? = null,
+    var artworkDataType: Int? = null,
     var artworkUri: Uri? = null,
     var trackNumber: Int? = null,
     var totalTrackCount: Int? = null,
-    var folderType: @FolderType Int? = null,
+    var folderType: Int? = null,
     var isBrowsable: Boolean? = null,
     val isPlayable: Boolean? = null,
     var recordingYear: Int = 0,
@@ -45,56 +45,10 @@ data class MediaMetadata(
     var genre: CharSequence? = null,
     val compilation: CharSequence? = null,
     var station: CharSequence? = null,
-    var mediaType: @MediaType Int = 0,
+    var mediaType: Int = 0,
     val extras: Bundle? = null,
     var supportedCommands: List<String> = listOf(),
 ) {
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [MEDIA_TYPE_MIXED, MEDIA_TYPE_MUSIC, MEDIA_TYPE_AUDIO_BOOK_CHAPTER, MEDIA_TYPE_PODCAST_EPISODE, MEDIA_TYPE_RADIO_STATION, MEDIA_TYPE_NEWS, MEDIA_TYPE_VIDEO, MEDIA_TYPE_TRAILER, MEDIA_TYPE_MOVIE, MEDIA_TYPE_TV_SHOW, MEDIA_TYPE_ALBUM, MEDIA_TYPE_ARTIST, MEDIA_TYPE_GENRE, MEDIA_TYPE_PLAYLIST, MEDIA_TYPE_YEAR, MEDIA_TYPE_AUDIO_BOOK, MEDIA_TYPE_PODCAST, MEDIA_TYPE_TV_CHANNEL, MEDIA_TYPE_TV_SERIES, MEDIA_TYPE_TV_SEASON, MEDIA_TYPE_FOLDER_MIXED, MEDIA_TYPE_FOLDER_ALBUMS, MEDIA_TYPE_FOLDER_ARTISTS, MEDIA_TYPE_FOLDER_GENRES, MEDIA_TYPE_FOLDER_PLAYLISTS, MEDIA_TYPE_FOLDER_YEARS, MEDIA_TYPE_FOLDER_AUDIO_BOOKS, MEDIA_TYPE_FOLDER_PODCASTS, MEDIA_TYPE_FOLDER_TV_CHANNELS, MEDIA_TYPE_FOLDER_TV_SERIES, MEDIA_TYPE_FOLDER_TV_SHOWS, MEDIA_TYPE_FOLDER_RADIO_STATIONS, MEDIA_TYPE_FOLDER_NEWS, MEDIA_TYPE_FOLDER_VIDEOS, MEDIA_TYPE_FOLDER_TRAILERS, MEDIA_TYPE_FOLDER_MOVIES]
-    )
-    annotation class MediaType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @Deprecated("")
-    @Suppress("deprecation") // Defining deprecated constants.
-    @IntDef(
-        value = [FOLDER_TYPE_NONE, FOLDER_TYPE_MIXED, FOLDER_TYPE_TITLES, FOLDER_TYPE_ALBUMS, FOLDER_TYPE_ARTISTS, FOLDER_TYPE_GENRES, FOLDER_TYPE_PLAYLISTS, FOLDER_TYPE_YEARS]
-    )
-    annotation class FolderType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [PICTURE_TYPE_OTHER, PICTURE_TYPE_FILE_ICON, PICTURE_TYPE_FILE_ICON_OTHER, PICTURE_TYPE_FRONT_COVER, PICTURE_TYPE_BACK_COVER, PICTURE_TYPE_LEAFLET_PAGE, PICTURE_TYPE_MEDIA, PICTURE_TYPE_LEAD_ARTIST_PERFORMER, PICTURE_TYPE_ARTIST_PERFORMER, PICTURE_TYPE_CONDUCTOR, PICTURE_TYPE_BAND_ORCHESTRA, PICTURE_TYPE_COMPOSER, PICTURE_TYPE_LYRICIST, PICTURE_TYPE_RECORDING_LOCATION, PICTURE_TYPE_DURING_RECORDING, PICTURE_TYPE_DURING_PERFORMANCE, PICTURE_TYPE_MOVIE_VIDEO_SCREEN_CAPTURE, PICTURE_TYPE_A_BRIGHT_COLORED_FISH, PICTURE_TYPE_ILLUSTRATION, PICTURE_TYPE_BAND_ARTIST_LOGO, PICTURE_TYPE_PUBLISHER_STUDIO_LOGO]
-    )
-    annotation class PictureType
 
     init {
         // Handle compatibility for deprecated fields.
@@ -245,7 +199,7 @@ data class MediaMetadata(
 
     fun maybeSetArtworkData(
         artworkData: ByteArray,
-        @PictureType artworkDataType: @PictureType Int
+        artworkDataType: Int
     ) {
         if (this.artworkData == null || artworkDataType == PICTURE_TYPE_FRONT_COVER || (this.artworkDataType != PICTURE_TYPE_FRONT_COVER)) {
             this.artworkData = artworkData.clone()
@@ -255,7 +209,7 @@ data class MediaMetadata(
     }
 
     fun setArtworkData(
-        artworkData: ByteArray?, @PictureType artworkDataType: @PictureType Int?
+        artworkData: ByteArray?, artworkDataType: Int?
     ) {
         this.artworkData = artworkData?.clone()
         this.bundleableArtworkData = null
@@ -552,8 +506,8 @@ data class MediaMetadata(
         }
 
         @Suppress("deprecation") // Converting deprecated field.
-        @FolderType
-        fun getFolderTypeFromMediaType(mediaType: @MediaType Int): @FolderType Int {
+        
+        fun getFolderTypeFromMediaType(mediaType: Int): Int {
             when (mediaType) {
                 MEDIA_TYPE_ALBUM, MEDIA_TYPE_ARTIST, MEDIA_TYPE_AUDIO_BOOK, MEDIA_TYPE_AUDIO_BOOK_CHAPTER, MEDIA_TYPE_FOLDER_MOVIES, MEDIA_TYPE_FOLDER_NEWS, MEDIA_TYPE_FOLDER_RADIO_STATIONS, MEDIA_TYPE_FOLDER_TRAILERS, MEDIA_TYPE_FOLDER_VIDEOS, MEDIA_TYPE_GENRE, MEDIA_TYPE_MOVIE, MEDIA_TYPE_MUSIC, MEDIA_TYPE_NEWS, MEDIA_TYPE_PLAYLIST, MEDIA_TYPE_PODCAST, MEDIA_TYPE_PODCAST_EPISODE, MEDIA_TYPE_RADIO_STATION, MEDIA_TYPE_TRAILER, MEDIA_TYPE_TV_CHANNEL, MEDIA_TYPE_TV_SEASON, MEDIA_TYPE_TV_SERIES, MEDIA_TYPE_TV_SHOW, MEDIA_TYPE_VIDEO, MEDIA_TYPE_YEAR -> return FOLDER_TYPE_TITLES
                 MEDIA_TYPE_FOLDER_ALBUMS -> return FOLDER_TYPE_ALBUMS
@@ -567,7 +521,7 @@ data class MediaMetadata(
         }
 
         @Suppress("deprecation") // Converting deprecated field.
-        fun getMediaTypeFromFolderType(@FolderType folderType: @FolderType Int): @MediaType Int {
+        fun getMediaTypeFromFolderType(folderType: Int): Int {
             when (folderType) {
                 FOLDER_TYPE_ALBUMS -> return MEDIA_TYPE_FOLDER_ALBUMS
                 FOLDER_TYPE_ARTISTS -> return MEDIA_TYPE_FOLDER_ARTISTS

@@ -52,7 +52,7 @@ object TrackSelectionUtil {
                     rendererIndex, groupIndex, false
                 )
                 val adaptiveSupported = support != RendererCapabilities.ADAPTIVE_NOT_SUPPORTED
-                @C.FormatSupport
+                
                 val trackSupport = IntArray(trackGroup!!.length)
                 val selected = BooleanArray(trackGroup.length)
 
@@ -86,7 +86,7 @@ object TrackSelectionUtil {
         val unmappedTrackGroups = mappedTrackInfo.unmappedTrackGroups
         for (groupIndex in 0..<unmappedTrackGroups.length) {
             val trackGroup = unmappedTrackGroups.get(groupIndex)
-            @C.FormatSupport
+            
             val trackSupport = IntArray(trackGroup!!.length)
             trackSupport.fill(C.FORMAT_UNSUPPORTED_TYPE)
             val selected = BooleanArray(trackGroup.length)

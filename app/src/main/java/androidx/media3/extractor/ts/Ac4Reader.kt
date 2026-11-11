@@ -2,7 +2,7 @@ package androidx.media3.extractor.ts
 
 import androidx.annotation.IntDef
 import androidx.media3.common.C
-import androidx.media3.common.C.RoleFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.ParsableBitArray
@@ -20,21 +20,15 @@ import kotlin.math.min
 
 class Ac4Reader(
     language: String?,
-    @RoleFlags roleFlags: @RoleFlags Int,
+    roleFlags: Int,
     containerMimeType: String?
 ) : ElementaryStreamReader {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [STATE_FINDING_SYNC, STATE_READING_HEADER, STATE_READING_SAMPLE])
-    private annotation class State
-
     private val headerScratchBits: ParsableBitArray
     private val headerScratchBytes: ParsableByteArray
     private val language: String?
 
-    @RoleFlags
-    private val roleFlags: @RoleFlags Int
+    
+    private val roleFlags: Int
     private val containerMimeType: String?
 
     private var formatId: String? = null
@@ -84,7 +78,7 @@ class Ac4Reader(
         output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO)
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         timeUs = pesTimeUs
     }
 

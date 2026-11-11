@@ -74,7 +74,7 @@ object ExtractorUtil {
         }
     }
 
-    fun getMaximumEncodedRateBytesPerSecond(encoding: @C.Encoding Int): Int {
+    fun getMaximumEncodedRateBytesPerSecond(encoding: Int): Int {
         when (encoding) {
             C.ENCODING_MP3 -> return MpegAudioUtil.MAX_RATE_BYTES_PER_SECOND
             C.ENCODING_AAC_LC -> return AacUtil.AAC_LC_MAX_RATE_BYTES_PER_SECOND

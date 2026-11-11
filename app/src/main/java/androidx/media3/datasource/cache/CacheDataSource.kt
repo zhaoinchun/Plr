@@ -27,9 +27,9 @@ class CacheDataSource private constructor(
     cacheReadDataSource: DataSource,
     cacheWriteDataSink: DataSink?,
     cacheKeyFactory: CacheKeyFactory?,
-    flags: @Flags Int,
+    flags:  Int,
     upstreamPriorityTaskManager: PriorityTaskManager?,
-    upstreamPriority: @C.Priority Int,
+    upstreamPriority: Int,
     eventListener: EventListener?
 ) : DataSource {
     class Factory : DataSource.Factory {
@@ -42,8 +42,8 @@ class CacheDataSource private constructor(
         private var cacheIsReadOnly = false
         private var upstreamDataSourceFactory: DataSource.Factory? = null
         private var upstreamPriorityTaskManager: PriorityTaskManager? = null
-        private var upstreamPriority: @C.Priority Int = 0
-        private var flags: @Flags Int = 0
+        private var upstreamPriority: Int = 0
+        private var flags:  Int = 0
         private var eventListener: EventListener? = null
 
         fun setCache(cache: Cache): Factory {
@@ -87,12 +87,12 @@ class CacheDataSource private constructor(
             return upstreamPriorityTaskManager
         }
 
-        fun setUpstreamPriority(upstreamPriority: @C.Priority Int): Factory {
+        fun setUpstreamPriority(upstreamPriority: Int): Factory {
             this.upstreamPriority = upstreamPriority
             return this
         }
 
-        fun setFlags(flags: @Flags Int): Factory {
+        fun setFlags(flags:  Int): Factory {
             this.flags = flags
             return this
         }
@@ -126,8 +126,8 @@ class CacheDataSource private constructor(
 
         private fun createDataSourceInternal(
             upstreamDataSource: DataSource?,
-            flags: @Flags Int,
-            upstreamPriority: @C.Priority Int
+            flags:  Int,
+            upstreamPriority: Int
         ): CacheDataSource {
             val cache = this.cache!!
             val cacheWriteDataSink: DataSink?
@@ -154,35 +154,8 @@ class CacheDataSource private constructor(
 
     interface EventListener {
         fun onCachedBytesRead(cacheSizeBytes: Long, cachedBytesRead: Long)
-        fun onCacheIgnored(@CacheIgnoredReason reason: @CacheIgnoredReason Int)
+        fun onCacheIgnored( reason:  Int)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_BLOCK_ON_CACHE, FLAG_IGNORE_CACHE_ON_ERROR, FLAG_IGNORE_CACHE_FOR_UNSET_LENGTH_REQUESTS]
-    )
-    annotation class Flags
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [CACHE_IGNORED_REASON_ERROR, CACHE_IGNORED_REASON_UNSET_LENGTH])
-    annotation class CacheIgnoredReason
 
     val cache: Cache
     private val cacheReadDataSource: DataSource
@@ -209,7 +182,7 @@ class CacheDataSource private constructor(
     private var totalCachedBytesRead: Long = 0
     private var checkCachePosition: Long = 0
 
-    constructor(cache: Cache, upstreamDataSource: DataSource?, flags: @Flags Int = 0) : this(
+    constructor(cache: Cache, upstreamDataSource: DataSource?, flags:  Int = 0) : this(
         cache,
         upstreamDataSource,
         FileDataSource(),
@@ -223,7 +196,7 @@ class CacheDataSource private constructor(
         upstreamDataSource: DataSource?,
         cacheReadDataSource: DataSource,
         cacheWriteDataSink: DataSink?,
-        flags: @Flags Int,
+        flags:  Int,
         eventListener: EventListener?,
         cacheKeyFactory: CacheKeyFactory? = null
     ) : this(
@@ -557,7 +530,7 @@ class CacheDataSource private constructor(
         }
     }
 
-    private fun notifyCacheIgnored(@CacheIgnoredReason reason: @CacheIgnoredReason Int) {
+    private fun notifyCacheIgnored( reason:  Int) {
         if (eventListener != null) {
             eventListener.onCacheIgnored(reason)
         }

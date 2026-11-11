@@ -27,8 +27,8 @@ internal class WebViewSubtitleOutput  constructor(
     private var style: CaptionStyleCompat
     private var defaultTextSize: Float
 
-    @Cue.TextSizeType
-    private var defaultTextSizeType: @Cue.TextSizeType Int
+    
+    private var defaultTextSizeType:  Int
     private var bottomPaddingFraction: Float
 
     init {
@@ -64,7 +64,7 @@ internal class WebViewSubtitleOutput  constructor(
         cues: List<Cue>,
         style: CaptionStyleCompat,
         textSize: Float,
-        @Cue.TextSizeType textSizeType: @Cue.TextSizeType Int,
+         textSizeType:  Int,
         bottomPaddingFraction: Float
     ) {
         this.style = style
@@ -318,7 +318,7 @@ internal class WebViewSubtitleOutput  constructor(
     }
 
     private fun convertTextSizeToCss(
-        @Cue.TextSizeType type: @Cue.TextSizeType Int,
+         type:  Int,
         size: Float
     ): String {
         val sizePx =
@@ -377,7 +377,7 @@ internal class WebViewSubtitleOutput  constructor(
             }
         }
 
-        private fun convertVerticalTypeToCss(@Cue.VerticalType verticalType: @Cue.VerticalType Int): String {
+        private fun convertVerticalTypeToCss( verticalType:  Int): String {
             when (verticalType) {
                 Cue.VERTICAL_TYPE_LR -> return "vertical-lr"
                 Cue.VERTICAL_TYPE_RL -> return "vertical-rl"
@@ -398,7 +398,7 @@ internal class WebViewSubtitleOutput  constructor(
             }
         }
 
-        private fun anchorTypeToTranslatePercent(@Cue.AnchorType anchorType: @Cue.AnchorType Int): Int {
+        private fun anchorTypeToTranslatePercent( anchorType:  Int): Int {
             when (anchorType) {
                 Cue.ANCHOR_TYPE_END -> return -100
                 Cue.ANCHOR_TYPE_MIDDLE -> return -50

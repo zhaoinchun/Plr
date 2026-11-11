@@ -1,12 +1,12 @@
 package androidx.media3.extractor
 
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.DataReader
 import androidx.media3.common.Format
 import androidx.media3.common.util.ParsableByteArray
 
 import androidx.media3.extractor.TrackOutput.CryptoData
-import androidx.media3.extractor.TrackOutput.SampleDataPart
+
 import java.io.IOException
 
 open class ForwardingTrackOutput(private val trackOutput: TrackOutput) :
@@ -33,7 +33,7 @@ open class ForwardingTrackOutput(private val trackOutput: TrackOutput) :
         input: DataReader,
         length: Int,
         allowEndOfInput: Boolean,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ): Int {
         return trackOutput.sampleData(input, length, allowEndOfInput, sampleDataPart)
     }
@@ -41,14 +41,14 @@ open class ForwardingTrackOutput(private val trackOutput: TrackOutput) :
     override fun sampleData(
         data: ParsableByteArray,
         length: Int,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ) {
         trackOutput.sampleData(data, length, sampleDataPart)
     }
 
     override fun sampleMetadata(
         timeUs: Long,
-        flags: @BufferFlags Int,
+        flags:  Int,
         size: Int,
         offset: Int,
         cryptoData: CryptoData?

@@ -26,7 +26,7 @@ interface AnalyticsCollector : Player.Listener, MediaSourceEventListener,
 
     fun notifySeekStarted()
     fun onRendererReadyChanged(
-        rendererIndex: Int, rendererTrackType: @C.TrackType Int, isRendererReady: Boolean
+        rendererIndex: Int, rendererTrackType: Int, isRendererReady: Boolean
     )
 
     fun onAudioEnabled(counters: DecoderCounters)

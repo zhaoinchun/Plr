@@ -16,7 +16,7 @@ import kotlin.math.min
 class ContentDataSource(context: Context) : BaseDataSource( false) {
     class ContentDataSourceException(
         cause: IOException?,
-        @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+         errorCode:  Int
     ) : DataSourceException(cause, errorCode)
 
     private val resolver: ContentResolver = context.contentResolver

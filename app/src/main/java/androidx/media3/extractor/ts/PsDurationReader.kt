@@ -40,7 +40,7 @@ internal class PsDurationReader {
     @Throws(IOException::class)
     fun readDuration(
         input: ExtractorInput, seekPositionHolder: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         if (!isLastScrValueRead) {
             return readLastScrValue(input, seekPositionHolder)
         }

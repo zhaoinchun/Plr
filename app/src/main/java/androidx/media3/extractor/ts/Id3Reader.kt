@@ -49,7 +49,7 @@ class Id3Reader(private val containerMimeType: String?) : ElementaryStreamReader
         )
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         if ((flags and TsPayloadReader.FLAG_DATA_ALIGNMENT_INDICATOR) == 0) {
             return
         }

@@ -47,15 +47,6 @@ import android.view.WindowManager
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
-import androidx.media3.common.C.AudioUsage
-import androidx.media3.common.C.AuxiliaryTrackType
-import androidx.media3.common.C.BufferFlags
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
-import androidx.media3.common.C.FormatSupport
-import androidx.media3.common.C.PcmEncoding
-import androidx.media3.common.C.RoleFlags
-import androidx.media3.common.C.SelectionFlags
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
@@ -1296,7 +1287,7 @@ object Util {
                 + MediaLibraryInfo.VERSION_SLASHY)
     }
 
-    fun getCodecCountOfType(codecs: String?, trackType: @C.TrackType Int): Int {
+    fun getCodecCountOfType(codecs: String?, trackType: Int): Int {
         val codecArray = splitCodecs(codecs)
         var count = 0
         for (codec in codecArray) {
@@ -1307,7 +1298,7 @@ object Util {
         return count
     }
 
-    fun getCodecsOfType(codecs: String?, trackType: @C.TrackType Int): String? {
+    fun getCodecsOfType(codecs: String?, trackType: Int): String? {
         val codecArray = splitCodecs(codecs)
         if (codecArray.size == 0) {
             return null
@@ -1333,9 +1324,9 @@ object Util {
             return null
         }
 
-        var colorSpace: @C.ColorSpace Int = Format.NO_VALUE
-        var colorRange: @ColorRange Int = Format.NO_VALUE
-        var colorTransfer: @ColorTransfer Int = Format.NO_VALUE
+        var colorSpace: Int = Format.NO_VALUE
+        var colorRange: Int = Format.NO_VALUE
+        var colorTransfer: Int = Format.NO_VALUE
 
         if (!isDolbyVisionCodec(codecs, supplementalCodecs)) {
             return null
@@ -1371,7 +1362,7 @@ object Util {
         )
     }
 
-    fun getCodecsWithoutType(codecs: String?, trackType: @C.TrackType Int): String? {
+    fun getCodecsWithoutType(codecs: String?, trackType: Int): String? {
         val codecArray = splitCodecs(codecs)
         if (codecArray.size == 0) {
             return null
@@ -1395,7 +1386,7 @@ object Util {
         return split(codecs!!.trim { it <= ' ' }, "(\\s*,\\s*)")
     }
 
-    fun getPcmFormat(pcmEncoding: @PcmEncoding Int, channels: Int, sampleRate: Int): Format {
+    fun getPcmFormat(pcmEncoding: Int, channels: Int, sampleRate: Int): Format {
         return Format(
             sampleMimeType = MimeTypes.AUDIO_RAW,
             channelCount = channels,
@@ -1408,11 +1399,11 @@ object Util {
         return getPcmFormat(audioFormat.encoding, audioFormat.channelCount, audioFormat.sampleRate)
     }
 
-    fun getPcmEncoding(bitDepth: Int): @PcmEncoding Int {
+    fun getPcmEncoding(bitDepth: Int): Int {
         return getPcmEncoding(bitDepth, ByteOrder.LITTLE_ENDIAN)
     }
 
-    fun getPcmEncoding(bitDepth: Int, byteOrder: ByteOrder): @PcmEncoding Int {
+    fun getPcmEncoding(bitDepth: Int, byteOrder: ByteOrder): Int {
         when (bitDepth) {
             8 ->                 // Byte order has no effect for single-byte encodings.
                 return C.ENCODING_PCM_8BIT
@@ -1436,11 +1427,11 @@ object Util {
         }
     }
 
-    fun getFloatPcmEncoding(bitDepth: Int): @PcmEncoding Int {
+    fun getFloatPcmEncoding(bitDepth: Int): Int {
         return getFloatPcmEncoding(bitDepth, ByteOrder.LITTLE_ENDIAN)
     }
 
-    fun getFloatPcmEncoding(bitDepth: Int, byteOrder: ByteOrder): @PcmEncoding Int {
+    fun getFloatPcmEncoding(bitDepth: Int, byteOrder: ByteOrder): Int {
         when (bitDepth) {
             32 -> return if (byteOrder == ByteOrder.LITTLE_ENDIAN)
                 C.ENCODING_PCM_FLOAT
@@ -1456,7 +1447,7 @@ object Util {
         }
     }
 
-    fun getEncodingString(encoding: @C.Encoding Int): String {
+    fun getEncodingString(encoding: Int): String {
         when (encoding) {
             C.ENCODING_AAC_ELD -> return "aac-eld"
             C.ENCODING_AAC_ER_BSAC -> return "aac-er-bsac"
@@ -1492,11 +1483,11 @@ object Util {
         }
     }
 
-    fun isEncodingLinearPcm(encoding: @C.Encoding Int): Boolean {
+    fun isEncodingLinearPcm(encoding: Int): Boolean {
         return encoding == C.ENCODING_PCM_8BIT || encoding == C.ENCODING_PCM_16BIT || encoding == C.ENCODING_PCM_16BIT_BIG_ENDIAN || encoding == C.ENCODING_PCM_24BIT || encoding == C.ENCODING_PCM_24BIT_BIG_ENDIAN || encoding == C.ENCODING_PCM_32BIT || encoding == C.ENCODING_PCM_32BIT_BIG_ENDIAN || encoding == C.ENCODING_PCM_FLOAT || encoding == C.ENCODING_PCM_FLOAT_BIG_ENDIAN || encoding == C.ENCODING_PCM_DOUBLE || encoding == C.ENCODING_PCM_DOUBLE_BIG_ENDIAN
     }
 
-    fun isEncodingHighResolutionPcm(encoding: @PcmEncoding Int): Boolean {
+    fun isEncodingHighResolutionPcm(encoding: Int): Boolean {
         return encoding == C.ENCODING_PCM_24BIT || encoding == C.ENCODING_PCM_24BIT_BIG_ENDIAN || encoding == C.ENCODING_PCM_32BIT || encoding == C.ENCODING_PCM_32BIT_BIG_ENDIAN || encoding == C.ENCODING_PCM_FLOAT || encoding == C.ENCODING_PCM_FLOAT_BIG_ENDIAN || encoding == C.ENCODING_PCM_DOUBLE || encoding == C.ENCODING_PCM_DOUBLE_BIG_ENDIAN
     }
 
@@ -1604,11 +1595,11 @@ object Util {
     }
 
     @Pure
-    fun getPcmFrameSize(pcmEncoding: @PcmEncoding Int, channelCount: Int): Int {
+    fun getPcmFrameSize(pcmEncoding: Int, channelCount: Int): Int {
         return getByteDepth(pcmEncoding) * channelCount
     }
 
-    fun getByteDepth(pcmEncoding: @PcmEncoding Int): Int {
+    fun getByteDepth(pcmEncoding: Int): Int {
         when (pcmEncoding) {
             C.ENCODING_PCM_8BIT -> return 1
             C.ENCODING_PCM_16BIT, C.ENCODING_PCM_16BIT_BIG_ENDIAN -> return 2
@@ -1620,8 +1611,8 @@ object Util {
         }
     }
 
-    @AudioUsage
-    fun getAudioUsageForStreamType(@C.StreamType streamType: @C.StreamType Int): @AudioUsage Int {
+    
+    fun getAudioUsageForStreamType(streamType: Int): Int {
         when (streamType) {
             C.STREAM_TYPE_ALARM -> return C.USAGE_ALARM
             C.STREAM_TYPE_DTMF -> return C.USAGE_VOICE_COMMUNICATION_SIGNALLING
@@ -1653,10 +1644,10 @@ object Util {
         }
     }
 
-    @PlaybackException.ErrorCode
+    
     fun getErrorCodeForMediaDrmErrorCode(
         mediaDrmErrorCode: Int
-    ): @PlaybackException.ErrorCode Int {
+    ):  Int {
         when (mediaDrmErrorCode) {
             MediaDrm.ErrorCodes.ERROR_PROVISIONING_CONFIG, MediaDrm.ErrorCodes.ERROR_PROVISIONING_PARSE, MediaDrm.ErrorCodes.ERROR_PROVISIONING_REQUEST_REJECTED, MediaDrm.ErrorCodes.ERROR_PROVISIONING_CERTIFICATE, MediaDrm.ErrorCodes.ERROR_PROVISIONING_RETRY -> return PlaybackException.ERROR_CODE_DRM_PROVISIONING_FAILED
             MediaDrm.ErrorCodes.ERROR_LICENSE_PARSE, MediaDrm.ErrorCodes.ERROR_LICENSE_RELEASE, MediaDrm.ErrorCodes.ERROR_LICENSE_REQUEST_REJECTED, MediaDrm.ErrorCodes.ERROR_LICENSE_RESTORE, MediaDrm.ErrorCodes.ERROR_LICENSE_STATE, MediaDrm.ErrorCodes.ERROR_CERTIFICATE_MALFORMED -> return PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED
@@ -1666,8 +1657,8 @@ object Util {
         }
     }
 
-    @C.ContentType
-    fun inferContentType(uri: Uri): @C.ContentType Int {
+    
+    fun inferContentType(uri: Uri):  Int {
         val scheme = uri.getScheme()
         if (scheme != null
             && (Ascii.equalsIgnoreCase("rtsp", scheme) || Ascii.equalsIgnoreCase("rtspt", scheme))
@@ -1681,7 +1672,7 @@ object Util {
         }
         val lastDotIndex = lastPathSegment.lastIndexOf('.')
         if (lastDotIndex >= 0) {
-            @C.ContentType val contentType: @C.ContentType Int =
+             val contentType:  Int =
                 inferContentTypeForExtension(lastPathSegment.substring(lastDotIndex + 1))
             if (contentType != C.CONTENT_TYPE_OTHER) {
                 // If contentType is TYPE_SS that indicates the extension is .ism or .isml and shows the ISM
@@ -1709,8 +1700,8 @@ object Util {
         return C.CONTENT_TYPE_OTHER
     }
 
-    @C.ContentType
-    fun inferContentTypeForExtension(fileExtension: String): @C.ContentType Int {
+    
+    fun inferContentTypeForExtension(fileExtension: String):  Int {
         var fileExtension = fileExtension
         fileExtension = Ascii.toLowerCase(fileExtension)
         when (fileExtension) {
@@ -1721,10 +1712,10 @@ object Util {
         }
     }
 
-    @C.ContentType
+    
     fun inferContentTypeForUriAndMimeType(
         uri: Uri, mimeType: String?
-    ): @C.ContentType Int {
+    ):  Int {
         if (mimeType == null) {
             return inferContentType(uri)
         }
@@ -1737,7 +1728,7 @@ object Util {
         }
     }
 
-    fun getAdaptiveMimeTypeForContentType(@C.ContentType contentType: @C.ContentType Int): String? {
+    fun getAdaptiveMimeTypeForContentType( contentType:  Int): String? {
         when (contentType) {
             C.CONTENT_TYPE_DASH -> return MimeTypes.APPLICATION_MPD
             C.CONTENT_TYPE_HLS -> return MimeTypes.APPLICATION_M3U8
@@ -2114,7 +2105,7 @@ object Util {
         return displaySize
     }
 
-    fun getTrackTypeString(trackType: @C.TrackType Int): String {
+    fun getTrackTypeString(trackType: Int): String {
         when (trackType) {
             C.TRACK_TYPE_DEFAULT -> return "default"
             C.TRACK_TYPE_AUDIO -> return "audio"
@@ -2138,7 +2129,7 @@ object Util {
         }
     }
 
-    fun getSelectionFlagStrings(@SelectionFlags selectionFlags: @SelectionFlags Int): MutableList<String?> {
+    fun getSelectionFlagStrings(selectionFlags: Int): MutableList<String?> {
         val result: MutableList<String?> = ArrayList<String?>()
         // LINT.IfChange(selection_flags)
         if ((selectionFlags and C.SELECTION_FLAG_AUTOSELECT) != 0) {
@@ -2154,7 +2145,7 @@ object Util {
         return result
     }
 
-    fun getRoleFlagStrings(@RoleFlags roleFlags: @RoleFlags Int): MutableList<String?> {
+    fun getRoleFlagStrings(roleFlags: Int): MutableList<String?> {
         val result: MutableList<String?> = ArrayList<String?>()
         // LINT.IfChange(role_flags)
         if ((roleFlags and C.ROLE_FLAG_MAIN) != 0) {
@@ -2209,7 +2200,7 @@ object Util {
         return result
     }
 
-    fun getAuxiliaryTrackTypeString(@AuxiliaryTrackType auxiliaryTrackType: @AuxiliaryTrackType Int): String {
+    fun getAuxiliaryTrackTypeString(auxiliaryTrackType: Int): String {
         // LINT.IfChange(auxiliary_track_type)
         when (auxiliaryTrackType) {
             C.AUXILIARY_TRACK_TYPE_UNDEFINED -> return "undefined"
@@ -2293,8 +2284,8 @@ object Util {
         }
     }
 
-    fun getBufferFlagsFromMediaCodecFlags(mediaCodecFlags: Int): @BufferFlags Int {
-        var flags: @BufferFlags Int = 0
+    fun getBufferFlagsFromMediaCodecFlags(mediaCodecFlags: Int):  Int {
+        var flags:  Int = 0
         if ((mediaCodecFlags and MediaCodec.BUFFER_FLAG_KEY_FRAME) == MediaCodec.BUFFER_FLAG_KEY_FRAME) {
             flags = flags or C.BUFFER_FLAG_KEY_FRAME
         }
@@ -2342,7 +2333,7 @@ object Util {
         return 5
     }
 
-    fun getFormatSupportString(@FormatSupport formatSupport: @FormatSupport Int): String {
+    fun getFormatSupportString( formatSupport:  Int): String {
         when (formatSupport) {
             C.FORMAT_HANDLED -> return "YES"
             C.FORMAT_EXCEEDS_CAPABILITIES -> return "NO_EXCEEDS_CAPABILITIES"

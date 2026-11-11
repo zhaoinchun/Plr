@@ -15,7 +15,7 @@ interface ExoTrackSelection : TrackSelection {
     class Definition(
         val group: TrackGroup,
         val tracks: IntArray,
-        val type: @TrackSelection.Type Int = TrackSelection.TYPE_UNSET
+        val type:  Int = TrackSelection.TYPE_UNSET
     ) {
         init {
             if (tracks.isEmpty()) {
@@ -43,7 +43,7 @@ interface ExoTrackSelection : TrackSelection {
     val selectedFormat: Format
     val selectedIndexInTrackGroup: Int
     val selectedIndex: Int
-    val selectionReason: @C.SelectionReason Int
+    val selectionReason:  Int
     val selectionData: Any?
     fun onPlaybackSpeed(playbackSpeed: Float)
     fun onDiscontinuity() {}

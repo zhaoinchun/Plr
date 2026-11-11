@@ -17,24 +17,10 @@ class Mp3InfoReplayGain private constructor(
 ) : Metadata.Entry {
     class GainField // Lint incorrectly thinks we're doing bitwise flag manipulation.
     private constructor(
-        val name: @Name Int,
-        val originator: @Originator Int,
+        val name:  Int,
+        val originator:  Int,
         val gain: Float
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(value = [NAME_RADIO, NAME_AUDIOPHILE], open = true)
-        annotation class Name
-
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [ORIGINATOR_UNSET, ORIGINATOR_ARTIST, ORIGINATOR_USER, ORIGINATOR_REPLAYGAIN, ORIGINATOR_SIMPLE_RMS
-            ], open = true
-        )
-        annotation class Originator
 
         override fun toString(): String {
             return "GainField{" + "name=" + name + ", originator=" + originator + ", gain=" + gain + '}'

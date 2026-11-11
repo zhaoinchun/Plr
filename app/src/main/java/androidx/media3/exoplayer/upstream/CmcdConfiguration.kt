@@ -12,31 +12,8 @@ class CmcdConfiguration(
     sessionId: String?,
     contentId: String?,
     requestConfig: RequestConfig,
-    dataTransmissionMode: @DataTransmissionMode Int = MODE_REQUEST_HEADER
+    dataTransmissionMode:  Int = MODE_REQUEST_HEADER
 ) {
-    @Retention(AnnotationRetention.SOURCE)
-    @StringDef(value = [KEY_CMCD_OBJECT, KEY_CMCD_REQUEST, KEY_CMCD_SESSION, KEY_CMCD_STATUS])
-    @MustBeDocumented
-    @Target(
-        AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER
-    )
-    annotation class HeaderKey
-
-    @Retention(AnnotationRetention.SOURCE)
-    @StringDef(
-        value = [KEY_BITRATE, KEY_BUFFER_LENGTH, KEY_CONTENT_ID, KEY_SESSION_ID, KEY_MAXIMUM_REQUESTED_BITRATE, KEY_STREAMING_FORMAT, KEY_STREAM_TYPE, KEY_VERSION, KEY_TOP_BITRATE, KEY_OBJECT_DURATION, KEY_MEASURED_THROUGHPUT, KEY_OBJECT_TYPE, KEY_BUFFER_STARVATION, KEY_DEADLINE, KEY_PLAYBACK_RATE, KEY_STARTUP, KEY_NEXT_OBJECT_REQUEST, KEY_NEXT_RANGE_REQUEST]
-    )
-    @MustBeDocumented
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    annotation class CmcdKey
-
-    @Retention(AnnotationRetention.SOURCE)
-    @IntDef(value = [MODE_REQUEST_HEADER, MODE_QUERY_PARAMETER])
-    @MustBeDocumented
-    @Target(
-        AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER
-    )
-    annotation class DataTransmissionMode
 
     fun interface Factory {
         fun createCmcdConfiguration(mediaItem: MediaItem?): CmcdConfiguration?
@@ -53,12 +30,12 @@ class CmcdConfiguration(
 
     interface RequestConfig {
 
-        fun isKeyAllowed(key: @CmcdKey String?): Boolean {
+        fun isKeyAllowed(key: String?): Boolean {
             return true
         }
 
         val customData: Map<String, List<String>>
-            get() = mapOf<@HeaderKey String, List<String>>()
+            get() = mapOf< String, List<String>>()
 
         fun getRequestedMaximumThroughputKbps(throughputKbps: Int): Int {
             return C.RATE_UNSET_INT
@@ -68,7 +45,7 @@ class CmcdConfiguration(
     val sessionId: String?
     val contentId: String?
     val requestConfig: RequestConfig
-    val dataTransmissionMode: @DataTransmissionMode Int
+    val dataTransmissionMode:  Int
 
     init {
         Preconditions.checkArgument(sessionId == null || sessionId.length <= MAX_ID_LENGTH)

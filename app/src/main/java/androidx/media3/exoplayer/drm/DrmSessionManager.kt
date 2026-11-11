@@ -37,7 +37,7 @@ interface DrmSessionManager {
         eventDispatcher: DrmSessionEventListener.EventDispatcher?, format: Format
     ): DrmSession?
 
-    fun getCryptoType(format: Format): @C.CryptoType Int
+    fun getCryptoType(format: Format):  Int
 
     companion object {
         
@@ -59,7 +59,7 @@ interface DrmSessionManager {
                 }
             }
 
-            override fun getCryptoType(format: Format): @C.CryptoType Int {
+            override fun getCryptoType(format: Format):  Int {
                 return if (format.drmInitData != null) C.CRYPTO_TYPE_UNSUPPORTED else C.CRYPTO_TYPE_NONE
             }
         }

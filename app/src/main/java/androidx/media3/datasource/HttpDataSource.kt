@@ -88,19 +88,13 @@ interface HttpDataSource : DataSource {
     }
 
     open class HttpDataSourceException : DataSourceException {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(value = [TYPE_OPEN, TYPE_READ, TYPE_CLOSE])
-        annotation class Type
-
         val dataSpec: DataSpec?
-        val type: @Type Int
+        val type: Int
 
         constructor(
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
-            type: @Type Int
+             errorCode:  Int,
+            type: Int
         ) : super(
             assignErrorCode(errorCode, type)
         ) {
@@ -111,8 +105,8 @@ interface HttpDataSource : DataSource {
         constructor(
             message: String?,
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
-            type: @Type Int
+             errorCode:  Int,
+            type: Int
         ) : super(message, assignErrorCode(errorCode, type)) {
             this.dataSpec = dataSpec
             this.type = type
@@ -121,8 +115,8 @@ interface HttpDataSource : DataSource {
         constructor(
             cause: IOException?,
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
-            type: @Type Int
+             errorCode:  Int,
+            type: Int
         ) : super(cause, assignErrorCode(errorCode, type)) {
             this.dataSpec = dataSpec
             this.type = type
@@ -132,8 +126,8 @@ interface HttpDataSource : DataSource {
             message: String?,
             cause: IOException?,
             dataSpec: DataSpec?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
-            type: @Type Int
+             errorCode:  Int,
+            type: Int
         ) : super(message, cause, assignErrorCode(errorCode, type)) {
             this.dataSpec = dataSpec
             this.type = type
@@ -145,9 +139,9 @@ interface HttpDataSource : DataSource {
             const val TYPE_CLOSE: Int = 3
 
             fun createForIOException(
-                cause: IOException, dataSpec: DataSpec?, type: @Type Int
+                cause: IOException, dataSpec: DataSpec?, type: Int
             ): HttpDataSourceException {
-                @PlaybackException.ErrorCode val errorCode: @PlaybackException.ErrorCode Int
+                 val errorCode:  Int
                 val message = cause.message
                 if (cause is SocketTimeoutException) {
                     errorCode = PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT
@@ -169,11 +163,11 @@ interface HttpDataSource : DataSource {
                     HttpDataSourceException(cause, dataSpec, errorCode, type)
             }
 
-            @PlaybackException.ErrorCode
+            
             private fun assignErrorCode(
-                @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int,
-                type: @Type Int
-            ): @PlaybackException.ErrorCode Int {
+                 errorCode:  Int,
+                type: Int
+            ):  Int {
                 return if (errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED && type == TYPE_OPEN)
                     PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
                 else

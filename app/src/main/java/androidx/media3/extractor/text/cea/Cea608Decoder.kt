@@ -14,7 +14,7 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.text.Cue
-import androidx.media3.common.text.Cue.AnchorType
+
 import androidx.media3.common.util.Log.w
 import androidx.media3.common.util.ParsableByteArray
 
@@ -402,7 +402,7 @@ class Cea608Decoder(mimeType: String?, accessibilityChannel: Int, validDataChann
             // on the amount of whitespace either side of the text. To avoid consecutive cues being aligned
             // differently, we force all cues to have the same alignment, with start alignment given
             // preference, then middle alignment, then end alignment.
-            @AnchorType var positionAnchor: @AnchorType Int = Cue.ANCHOR_TYPE_END
+             var positionAnchor:  Int = Cue.ANCHOR_TYPE_END
             val cueBuilderCount = cueBuilders.size
             val cueBuilderCues: MutableList<Cue?> =
                 ArrayList<Cue?>(cueBuilderCount)
@@ -561,7 +561,7 @@ class Cea608Decoder(mimeType: String?, accessibilityChannel: Int, validDataChann
             }
         }
 
-        fun build(@AnchorType forcedPositionAnchor: @AnchorType Int): Cue? {
+        fun build( forcedPositionAnchor:  Int): Cue? {
             val cueString = SpannableStringBuilder()
             // Add any rolled up captions, separated by new lines.
             for (i in rolledUpCaptions.indices) {

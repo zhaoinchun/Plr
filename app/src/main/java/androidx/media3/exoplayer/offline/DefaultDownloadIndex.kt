@@ -44,7 +44,7 @@ class DefaultDownloadIndex(
     }
 
     @Throws(DatabaseIOException::class)
-    override fun getDownloads(@Download.State vararg states: Int): DownloadCursor {
+    override fun getDownloads( vararg states: Int): DownloadCursor {
         ensureInitialized()
         val cursor = getCursor(getStateQuery(*states), null)
         return DownloadCursorImpl(cursor)
@@ -405,7 +405,7 @@ class DefaultDownloadIndex(
             return stringBuilder.toString()
         }
 
-        private fun getStateQuery(@Download.State vararg states: Int): String {
+        private fun getStateQuery( vararg states: Int): String {
             if (states.isEmpty()) {
                 return TRUE
             }
@@ -435,10 +435,10 @@ class DefaultDownloadIndex(
             val downloadProgress = DownloadProgress()
             downloadProgress.bytesDownloaded = cursor.getLong(COLUMN_INDEX_BYTES_DOWNLOADED)
             downloadProgress.percentDownloaded = cursor.getFloat(COLUMN_INDEX_PERCENT_DOWNLOADED)
-            @Download.State val state: @Download.State Int = cursor.getInt(COLUMN_INDEX_STATE)
+             val state:  Int = cursor.getInt(COLUMN_INDEX_STATE)
             // It's possible the database contains failure reasons for non-failed downloads, which is
             // invalid. Clear them here. See https://github.com/google/ExoPlayer/issues/6785.
-            @Download.FailureReason val failureReason: @Download.FailureReason Int =
+             val failureReason:  Int =
                 if (state == Download.STATE_FAILED)
                     cursor.getInt(COLUMN_INDEX_FAILURE_REASON)
                 else
@@ -486,10 +486,10 @@ class DefaultDownloadIndex(
             val downloadProgress = DownloadProgress()
             downloadProgress.bytesDownloaded = cursor.getLong(13)
             downloadProgress.percentDownloaded = cursor.getFloat(12)
-            @Download.State val state: @Download.State Int = cursor.getInt(6)
+             val state:  Int = cursor.getInt(6)
             // It's possible the database contains failure reasons for non-failed downloads, which is
             // invalid. Clear them here. See https://github.com/google/ExoPlayer/issues/6785.
-            @Download.FailureReason val failureReason: @Download.FailureReason Int =
+             val failureReason:  Int =
                 if (state == Download.STATE_FAILED) cursor.getInt(11) else Download.FAILURE_REASON_NONE
             return Download(
                 request,

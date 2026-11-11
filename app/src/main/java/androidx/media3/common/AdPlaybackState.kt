@@ -21,26 +21,6 @@ class AdPlaybackState private constructor(
     val removedAdGroupCount: Int
 ) {
 
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [AD_STATE_UNAVAILABLE, AD_STATE_AVAILABLE, AD_STATE_SKIPPED, AD_STATE_PLAYED, AD_STATE_ERROR]
-    )
-    annotation class AdState
-
     class SkipInfo(skipOffsetUs: Long, skipDurationUs: Long, labelId: String?) {
         val skipOffsetUs: Long
         val skipDurationUs: Long
@@ -732,7 +712,7 @@ class AdPlaybackState private constructor(
         timeUs: Long,
         count: Int,
         originalCount: Int,
-        @AdState states: IntArray,
+       states: IntArray,
         mediaItems: Array<MediaItem?>,
         durationsUs: LongArray,
         contentResumeOffsetUs: Long,
@@ -746,7 +726,7 @@ class AdPlaybackState private constructor(
         val originalCount: Int
         val mediaItems: Array<MediaItem?>
 
-        @AdState
+        
         val states: IntArray
         val durationsUs: LongArray
         val ids: Array<String?>
@@ -857,7 +837,7 @@ class AdPlaybackState private constructor(
         }
 
         fun withAdCount(count: Int): AdGroup {
-            @AdState val states = copyStatesWithSpaceForAdCount(this.states, count)
+           val states = copyStatesWithSpaceForAdCount(this.states, count)
             val durationsUs = copyDurationsUsWithSpaceForAdCount(this.durationsUs, count)
             val mediaItems = this.mediaItems.copyOf<MediaItem?>(count)
             val ids = this.ids.copyOf<String?>(count)
@@ -878,7 +858,7 @@ class AdPlaybackState private constructor(
         }
 
         fun withAdMediaItem(mediaItem: MediaItem?, @IntRange(from = 0) index: Int): AdGroup {
-            @AdState val states = copyStatesWithSpaceForAdCount(this.states, index + 1)
+           val states = copyStatesWithSpaceForAdCount(this.states, index + 1)
             val durationsUs =
                 if (this.durationsUs.size == states.size)
                     this.durationsUs
@@ -911,9 +891,9 @@ class AdPlaybackState private constructor(
             )
         }
 
-        fun withAdState(@AdState state: @AdState Int, @IntRange(from = 0) index: Int): AdGroup {
+        fun withAdState( state:Int, @IntRange(from = 0) index: Int): AdGroup {
             Preconditions.checkArgument(count == C.LENGTH_UNSET || index < count)
-            @AdState val states = copyStatesWithSpaceForAdCount(this.states,  index + 1)
+           val states = copyStatesWithSpaceForAdCount(this.states,  index + 1)
             Preconditions.checkArgument(
                 states[index] == AD_STATE_UNAVAILABLE || states[index] == AD_STATE_AVAILABLE || states[index] == state
             )
@@ -974,7 +954,7 @@ class AdPlaybackState private constructor(
         }
 
         fun withAdId(adId: String?, @IntRange(from = 0) index: Int): AdGroup {
-            @AdState val states = copyStatesWithSpaceForAdCount(this.states, index + 1)
+           val states = copyStatesWithSpaceForAdCount(this.states, index + 1)
             val durationsUs =
                 if (this.durationsUs.size == states.size)
                     this.durationsUs
@@ -1002,7 +982,7 @@ class AdPlaybackState private constructor(
         }
 
         fun withAdSkipInfo(skipInfo: SkipInfo?, @IntRange(from = 0) index: Int): AdGroup {
-            @AdState val states = copyStatesWithSpaceForAdCount(this.states, index + 1)
+           val states = copyStatesWithSpaceForAdCount(this.states, index + 1)
             val durationsUs =
                 if (this.durationsUs.size == states.size)
                     this.durationsUs
@@ -1098,7 +1078,7 @@ class AdPlaybackState private constructor(
                 )
             }
             val count = this.states.size
-            @AdState val states = this.states.copyOf(count)
+           val states = this.states.copyOf(count)
             for (i in 0..<count) {
                 if (states[i] == AD_STATE_AVAILABLE || states[i] == AD_STATE_UNAVAILABLE) {
                     states[i] = AD_STATE_SKIPPED
@@ -1124,7 +1104,7 @@ class AdPlaybackState private constructor(
                 return this
             }
             val count = this.states.size
-            @AdState val states = this.states.copyOf(count)
+           val states = this.states.copyOf(count)
             for (i in 0..<count) {
                 if (states[i] == AD_STATE_PLAYED || states[i] == AD_STATE_SKIPPED || states[i] == AD_STATE_ERROR) {
                     states[i] =
@@ -1172,7 +1152,7 @@ class AdPlaybackState private constructor(
             if (count == C.LENGTH_UNSET) {
                 return this
             }
-            @AdState val states = IntArray(this.states.size)
+           val states = IntArray(this.states.size)
             Arrays.fill(states, AD_STATE_UNAVAILABLE)
             val durationsUs = LongArray(states.size)
             Arrays.fill(durationsUs, C.TIME_UNSET)
@@ -1302,9 +1282,9 @@ class AdPlaybackState private constructor(
 
         companion object {
             
-            @AdState
+            
             private fun copyStatesWithSpaceForAdCount(
-                @AdState states: IntArray,
+               states: IntArray,
                 count: Int
             ): IntArray {
                 var states = states
@@ -1362,7 +1342,7 @@ class AdPlaybackState private constructor(
                 val uriList = bundle.getParcelableArrayList<Uri?>(FIELD_URIS)
                 val mediaItemBundleList =
                     bundle.getParcelableArrayList<Bundle?>(FIELD_MEDIA_ITEMS)
-                @AdState val states = bundle.getIntArray(FIELD_STATES)
+               val states = bundle.getIntArray(FIELD_STATES)
                 val durationsUs = bundle.getLongArray(FIELD_DURATIONS_US)
                 val contentResumeOffsetUs = bundle.getLong(FIELD_CONTENT_RESUME_OFFSET_US)
                 val isServerSideInserted = bundle.getBoolean(FIELD_IS_SERVER_SIDE_INSERTED)

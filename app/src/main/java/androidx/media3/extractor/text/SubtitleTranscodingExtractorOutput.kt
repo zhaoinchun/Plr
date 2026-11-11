@@ -42,7 +42,7 @@ class SubtitleTranscodingExtractorOutput(
     }
 
     // ExtractorOutput implementation
-    override fun track(id: Int, type: @C.TrackType Int): TrackOutput {
+    override fun track(id: Int, type: Int): TrackOutput {
         if (type != C.TRACK_TYPE_TEXT && type != C.TRACK_TYPE_METADATA) {
             hasTracksOtherThanTextAndMetadata = true
         }

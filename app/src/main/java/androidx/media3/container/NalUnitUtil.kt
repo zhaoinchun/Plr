@@ -1,8 +1,6 @@
 package androidx.media3.container
 
 import androidx.media3.common.C
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
@@ -320,9 +318,9 @@ object NalUnitUtil {
             frameHeight -= (frameCropTopOffset + frameCropBottomOffset) * cropUnitY
         }
 
-        var colorSpace: @C.ColorSpace Int = Format.NO_VALUE
-        var colorRange: @ColorRange Int = Format.NO_VALUE
-        var colorTransfer: @ColorTransfer Int = Format.NO_VALUE
+        var colorSpace: Int = Format.NO_VALUE
+        var colorRange: Int = Format.NO_VALUE
+        var colorTransfer: Int = Format.NO_VALUE
         var pixelWidthHeightRatio = 1f
         // Initialize to the default value defined in section E.2.1 of the H.264 spec. Precisely
         // calculating MaxDpbFrames is complicated, so we short-circuit to the max value of 16 here
@@ -1098,9 +1096,9 @@ object NalUnitUtil {
             }
         }
         data.skipBits(2) // sps_temporal_mvp_enabled_flag, strong_intra_smoothing_enabled_flag
-        var colorSpace: @C.ColorSpace Int = Format.NO_VALUE
-        var colorRange: @ColorRange Int = Format.NO_VALUE
-        var colorTransfer: @ColorTransfer Int = Format.NO_VALUE
+        var colorSpace: Int = Format.NO_VALUE
+        var colorRange: Int = Format.NO_VALUE
+        var colorTransfer: Int = Format.NO_VALUE
         var pixelWidthHeightRatio = 1f
         if (data.readBit()) { // vui_parameters_present_flag
             if (data.readBit()) { // aspect_ratio_info_present_flag
@@ -1738,11 +1736,11 @@ object NalUnitUtil {
 
     private fun parseH265VideoSignalInfo(data: ParsableNalUnitBitArray): H265VideoSignalInfo {
         data.skipBits(3) // video_vps_format
-        val colorRange: @ColorRange Int =
+        val colorRange: Int =
             if (data.readBit()) C.COLOR_RANGE_FULL else C.COLOR_RANGE_LIMITED // video_full_range_vps_flag
-        val colorSpace: @C.ColorSpace Int =
+        val colorSpace: Int =
             ColorInfo.isoColorPrimariesToColorSpace(data.readBits(8)) // colour_primaries_vps
-        val colorTransfer: @ColorTransfer Int =
+        val colorTransfer: Int =
             ColorInfo.isoTransferCharacteristicsToColorTransfer(
                 data.readBits(8)
             ) // transfer_characteristics_vps
@@ -1928,9 +1926,9 @@ object NalUnitUtil {
         val picOrderCountType: Int,
         val picOrderCntLsbLength: Int,
         val deltaPicOrderAlwaysZeroFlag: Boolean,
-        val colorSpace: @C.ColorSpace Int,
-        val colorRange: @ColorRange Int,
-        val colorTransfer: @ColorTransfer Int,
+        val colorSpace: Int,
+        val colorRange: Int,
+        val colorTransfer: Int,
         val maxNumReorderFrames: Int
     )
 
@@ -1977,9 +1975,9 @@ object NalUnitUtil {
     }
 
     class H265VideoSignalInfo(
-        val colorSpace: @C.ColorSpace Int,
-        val colorRange: @ColorRange Int,
-        val colorTransfer: @ColorTransfer Int
+        val colorSpace: Int,
+        val colorRange: Int,
+        val colorTransfer: Int
     )
 
     class H265VideoSignalInfosAndIndices(
@@ -2026,9 +2024,9 @@ object NalUnitUtil {
         val decodedHeight: Int,
         val pixelWidthHeightRatio: Float,
         val maxNumReorderPics: Int,
-        val colorSpace: @C.ColorSpace Int,
-        val colorRange: @ColorRange Int,
-        val colorTransfer: @ColorTransfer Int
+        val colorSpace: Int,
+        val colorRange: Int,
+        val colorTransfer: Int
     )
 
     class PpsData(

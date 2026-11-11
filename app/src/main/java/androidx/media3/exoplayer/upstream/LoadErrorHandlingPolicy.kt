@@ -7,11 +7,6 @@ import com.google.common.base.Preconditions
 import java.io.IOException
 
 interface LoadErrorHandlingPolicy {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [FALLBACK_TYPE_LOCATION, FALLBACK_TYPE_TRACK])
-    annotation class FallbackType
 
     class LoadErrorInfo(
         val loadEventInfo: LoadEventInfo,
@@ -27,7 +22,7 @@ interface LoadErrorHandlingPolicy {
         val numberOfExcludedTracks: Int,
         val locationSteeringActive: Boolean
     ) {
-        fun isFallbackAvailable(type: @FallbackType Int): Boolean {
+        fun isFallbackAvailable(type:  Int): Boolean {
             return if (type == FALLBACK_TYPE_LOCATION)
                 numberOfLocations - numberOfExcludedLocations > 1
             else
@@ -35,8 +30,8 @@ interface LoadErrorHandlingPolicy {
         }
     }
 
-    class FallbackSelection(type: @FallbackType Int, exclusionDurationMs: Long) {
-        val type: @FallbackType Int
+    class FallbackSelection(type:  Int, exclusionDurationMs: Long) {
+        val type:  Int
         val exclusionDurationMs: Long
 
         init {

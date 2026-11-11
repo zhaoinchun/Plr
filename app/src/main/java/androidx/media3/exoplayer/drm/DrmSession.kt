@@ -8,29 +8,9 @@ import java.util.UUID
 
 interface DrmSession {
     class DrmSessionException(
-        cause: Throwable,
-        @field:PlaybackException.ErrorCode @param:PlaybackException.ErrorCode val errorCode: @PlaybackException.ErrorCode Int
+        cause: Throwable,val errorCode:  Int
     ) : IOException(cause)
 
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [STATE_RELEASED, STATE_ERROR, STATE_OPENING, STATE_OPENED, STATE_OPENED_WITH_KEYS])
-    annotation class State
-
-    @get:State
     val state:  Int
 
     fun playClearSamplesWithoutKeys(): Boolean {

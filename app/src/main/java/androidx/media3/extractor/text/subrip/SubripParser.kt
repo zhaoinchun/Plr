@@ -179,7 +179,7 @@ class SubripParser : SubtitleParser {
         get() = Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
     companion object {
         
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
 
         // Fractional positions for use when alignment tags are present.
@@ -226,7 +226,7 @@ class SubripParser : SubtitleParser {
         // TODO(b/289983417): Make package-private again, once it is no longer needed in
         // DelegatingSubtitleDecoderWithSubripParserTest.java (i.e. legacy subtitle flow is removed)
         @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        fun getFractionalPositionForAnchorType(@Cue.AnchorType anchorType: @Cue.AnchorType Int): Float {
+        fun getFractionalPositionForAnchorType( anchorType:  Int): Float {
             when (anchorType) {
                 Cue.ANCHOR_TYPE_START -> return START_FRACTION
                 Cue.ANCHOR_TYPE_MIDDLE -> return MID_FRACTION

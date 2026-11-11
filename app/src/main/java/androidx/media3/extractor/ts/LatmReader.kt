@@ -1,7 +1,7 @@
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
-import androidx.media3.common.C.RoleFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.ParserException
@@ -19,7 +19,7 @@ import kotlin.math.min
 
 class LatmReader(
     private val language: String?,
-    @field:RoleFlags @param:RoleFlags private val roleFlags: @RoleFlags Int,
+    private val roleFlags: Int,
     private val containerMimeType: String?
 ) : ElementaryStreamReader {
     private val sampleDataBuffer: ParsableByteArray
@@ -67,7 +67,7 @@ class LatmReader(
         formatId = idGenerator.getFormatId()
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         timeUs = pesTimeUs
     }
 

@@ -13,7 +13,7 @@ interface ElementaryStreamReader {
 
     fun createTracks(extractorOutput: ExtractorOutput, idGenerator: TrackIdGenerator)
 
-    fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int)
+    fun packetStarted(pesTimeUs: Long, flags:  Int)
 
     @Throws(ParserException::class)
     fun consume(data: ParsableByteArray)

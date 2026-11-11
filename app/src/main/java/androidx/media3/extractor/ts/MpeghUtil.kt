@@ -461,16 +461,7 @@ internal object MpeghUtil {
     }
 
     class MhasPacketHeader {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [PACTYP_FILLDATA, PACTYP_MPEGH3DACFG, PACTYP_MPEGH3DAFRAME, PACTYP_AUDIOSCENEINFO, PACTYP_SYNC, PACTYP_SYNCGAP, PACTYP_MARKER, PACTYP_CRC16, PACTYP_CRC32, PACTYP_DESCRIPTOR, PACTYP_USERINTERACTION, PACTYP_LOUDNESS_DRC, PACTYP_BUFFERINFO, PACTYP_GLOBAL_CRC16, PACTYP_GLOBAL_CRC32, PACTYP_AUDIOTRUNCATION, PACTYP_GENDATA, PACTYPE_EARCON, PACTYPE_PCMCONFIG, PACTYPE_PCMDATA, PACTYP_LOUDNESS
-            ]
-        )
-        annotation class Type
-
-        var packetType: @Type Int = 0
+        var packetType: Int = 0
 
         var packetLabel: kotlin.Long = 0
 

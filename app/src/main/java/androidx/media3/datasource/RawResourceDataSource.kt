@@ -29,7 +29,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
         constructor(
             message: String?,
             cause: Throwable?,
-            @PlaybackException.ErrorCode errorCode: @PlaybackException.ErrorCode Int
+             errorCode:  Int
         ) : super(message, cause, errorCode)
     }
 

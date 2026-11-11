@@ -28,10 +28,10 @@ object DrmUtil {
     const val ERROR_SOURCE_LICENSE_ACQUISITION: Int = 2
     const val ERROR_SOURCE_PROVISIONING: Int = 3
 
-    @PlaybackException.ErrorCode
+    
     fun getErrorCodeForMediaDrmException(
-        exception: Throwable?, @ErrorSource errorSource: @ErrorSource Int
-    ): @PlaybackException.ErrorCode Int {
+        exception: Throwable?,  errorSource:  Int
+    ):  Int {
         if (exception is MediaDrmStateException) {
             val diagnosticsInfo: String = exception.diagnosticInfo
             val drmErrorCode = getErrorCodeFromPlatformDiagnosticsInfo(diagnosticsInfo)
@@ -149,24 +149,4 @@ object DrmUtil {
         }
         return null
     }
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [ERROR_SOURCE_EXO_MEDIA_DRM, ERROR_SOURCE_LICENSE_ACQUISITION, ERROR_SOURCE_PROVISIONING]
-    )
-    annotation class ErrorSource
 }

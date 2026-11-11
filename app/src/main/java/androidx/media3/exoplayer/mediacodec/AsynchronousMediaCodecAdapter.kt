@@ -36,7 +36,7 @@ internal class AsynchronousMediaCodecAdapter private constructor(
         private var enableSynchronousBufferQueueingWithAsyncCryptoFlag = true
         private var enableAsyncCryptoSynchronization = false
 
-        constructor(trackType: @C.TrackType Int) : this(
+        constructor(trackType: Int) : this(
             Supplier { HandlerThread(createCallbackThreadLabel(trackType)) },
             Supplier { HandlerThread(createQueueingThreadLabel(trackType)) })
 
@@ -104,12 +104,6 @@ internal class AsynchronousMediaCodecAdapter private constructor(
             }
         }
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [STATE_CREATED, STATE_INITIALIZED, STATE_SHUT_DOWN])
-    private annotation class State
 
     private val asynchronousMediaCodecCallback = AsynchronousMediaCodecCallback(callbackThread)
     private val bufferEnqueuer: MediaCodecBufferEnqueuer by lazy { bufferEnqueuer }
@@ -261,7 +255,7 @@ internal class AsynchronousMediaCodecAdapter private constructor(
         bufferEnqueuer.setParameters(params)
     }
 
-    override fun setVideoScalingMode(scalingMode: @C.VideoScalingMode Int) {
+    override fun setVideoScalingMode(scalingMode:  Int) {
         codec.setVideoScalingMode(scalingMode)
     }
 
@@ -294,15 +288,15 @@ internal class AsynchronousMediaCodecAdapter private constructor(
         private const val STATE_INITIALIZED = 1
         private const val STATE_SHUT_DOWN = 2
 
-        private fun createCallbackThreadLabel(trackType: @C.TrackType Int): String {
+        private fun createCallbackThreadLabel(trackType: Int): String {
             return createThreadLabel(trackType,  "ExoPlayer:MediaCodecAsyncAdapter:")
         }
 
-        private fun createQueueingThreadLabel(trackType: @C.TrackType Int): String {
+        private fun createQueueingThreadLabel(trackType: Int): String {
             return createThreadLabel(trackType,  "ExoPlayer:MediaCodecQueueingThread:")
         }
 
-        private fun createThreadLabel(trackType: @C.TrackType Int, prefix: String): String {
+        private fun createThreadLabel(trackType: Int, prefix: String): String {
             val labelBuilder = StringBuilder(prefix)
             when (trackType) {
                 C.TRACK_TYPE_AUDIO -> {

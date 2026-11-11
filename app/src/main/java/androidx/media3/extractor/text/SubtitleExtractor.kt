@@ -23,15 +23,6 @@ import java.util.Collections
 import java.util.concurrent.atomic.AtomicLong
 
 class SubtitleExtractor(private val subtitleParser: SubtitleParser, format: Format?) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_CREATED, STATE_INITIALIZED, STATE_EXTRACTING, STATE_SEEKING, STATE_FINISHED, STATE_RELEASED
-        ]
-    )
-    private annotation class State
-
     private val cueEncoder: CueEncoder
     private val format: Format?
     private val samples: MutableList<Sample>

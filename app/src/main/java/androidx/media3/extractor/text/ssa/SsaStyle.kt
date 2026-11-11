@@ -18,7 +18,7 @@ import java.util.regex.Pattern
 
 internal class SsaStyle private constructor(
     val name: String?,
-    val alignment: @SsaAlignment Int,
+    val alignment:  Int,
     @field:ColorInt @param:ColorInt val primaryColor: Int?,
     @field:ColorInt @param:ColorInt val outlineColor: Int?,
     val fontSize: Float,
@@ -26,26 +26,8 @@ internal class SsaStyle private constructor(
     val italic: Boolean,
     val underline: Boolean,
     val strikeout: Boolean,
-    val borderStyle: @SsaBorderStyle Int
+    val borderStyle:  Int
 ) {
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [SSA_ALIGNMENT_UNKNOWN, SSA_ALIGNMENT_BOTTOM_LEFT, SSA_ALIGNMENT_BOTTOM_CENTER, SSA_ALIGNMENT_BOTTOM_RIGHT, SSA_ALIGNMENT_MIDDLE_LEFT, SSA_ALIGNMENT_MIDDLE_CENTER, SSA_ALIGNMENT_MIDDLE_RIGHT, SSA_ALIGNMENT_TOP_LEFT, SSA_ALIGNMENT_TOP_CENTER, SSA_ALIGNMENT_TOP_RIGHT
-        ]
-    )
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    annotation class SsaAlignment
-
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [SSA_BORDER_STYLE_UNKNOWN, SSA_BORDER_STYLE_OUTLINE, SSA_BORDER_STYLE_BOX
-        ]
-    )
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    annotation class SsaBorderStyle
-
     internal class Format private constructor(
         val nameIndex: Int,
         val alignmentIndex: Int,
@@ -112,7 +94,7 @@ internal class SsaStyle private constructor(
     }
 
     internal class Overrides private constructor(
-        val alignment: @SsaAlignment Int,
+        val alignment:  Int,
         val position: PointF?
     ) {
         companion object {
@@ -140,7 +122,7 @@ internal class SsaStyle private constructor(
             private val ALIGNMENT_OVERRIDE_PATTERN: Pattern = Pattern.compile("\\\\an(\\d+)")
 
             fun parseFromDialogue(text: String): Overrides {
-                var alignment: @SsaAlignment Int = SSA_ALIGNMENT_UNKNOWN
+                var alignment:  Int = SSA_ALIGNMENT_UNKNOWN
                 var position: PointF? = null
                 val matcher: Matcher = BRACES_PATTERN.matcher(text)
                 while (matcher.find()) {
@@ -154,7 +136,7 @@ internal class SsaStyle private constructor(
                         // Ignore invalid \pos() or \move() function.
                     }
                     try {
-                        val parsedAlignment: @SsaAlignment Int =
+                        val parsedAlignment:  Int =
                             parseAlignmentOverride(braceContents)
                         if (parsedAlignment != SSA_ALIGNMENT_UNKNOWN) {
                             alignment = parsedAlignment
@@ -201,7 +183,7 @@ internal class SsaStyle private constructor(
                 )
             }
 
-            private fun parseAlignmentOverride(braceContents: String): @SsaAlignment Int {
+            private fun parseAlignmentOverride(braceContents: String):  Int {
                 val matcher: Matcher = ALIGNMENT_OVERRIDE_PATTERN.matcher(braceContents)
                 return if (matcher.find())
                     parseAlignment(matcher.group(1)!!)
@@ -283,9 +265,9 @@ internal class SsaStyle private constructor(
             }
         }
 
-        private fun parseAlignment(alignmentStr: String): @SsaAlignment Int {
+        private fun parseAlignment(alignmentStr: String):  Int {
             try {
-                val alignment: @SsaAlignment Int = alignmentStr.trim { it <= ' ' }.toInt()
+                val alignment:  Int = alignmentStr.trim { it <= ' ' }.toInt()
                 if (isValidAlignment(alignment)) {
                     return alignment
                 }
@@ -296,7 +278,7 @@ internal class SsaStyle private constructor(
             return SSA_ALIGNMENT_UNKNOWN
         }
 
-        private fun isValidAlignment(alignment: @SsaAlignment Int): Boolean {
+        private fun isValidAlignment(alignment:  Int): Boolean {
             when (alignment) {
                 SSA_ALIGNMENT_BOTTOM_CENTER, SSA_ALIGNMENT_BOTTOM_LEFT, SSA_ALIGNMENT_BOTTOM_RIGHT, SSA_ALIGNMENT_MIDDLE_CENTER, SSA_ALIGNMENT_MIDDLE_LEFT, SSA_ALIGNMENT_MIDDLE_RIGHT, SSA_ALIGNMENT_TOP_CENTER, SSA_ALIGNMENT_TOP_LEFT, SSA_ALIGNMENT_TOP_RIGHT -> return true
                 SSA_ALIGNMENT_UNKNOWN -> return false
@@ -304,9 +286,9 @@ internal class SsaStyle private constructor(
             }
         }
 
-        private fun parseBorderStyle(borderStyleStr: String): @SsaBorderStyle Int {
+        private fun parseBorderStyle(borderStyleStr: String):  Int {
             try {
-                val borderStyle: @SsaBorderStyle Int = borderStyleStr.trim { it <= ' ' }.toInt()
+                val borderStyle:  Int = borderStyleStr.trim { it <= ' ' }.toInt()
                 if (isValidBorderStyle(borderStyle)) {
                     return borderStyle
                 }
@@ -317,7 +299,7 @@ internal class SsaStyle private constructor(
             return SSA_BORDER_STYLE_UNKNOWN
         }
 
-        private fun isValidBorderStyle(alignment: @SsaBorderStyle Int): Boolean {
+        private fun isValidBorderStyle(alignment:  Int): Boolean {
             when (alignment) {
                 SSA_BORDER_STYLE_OUTLINE, SSA_BORDER_STYLE_BOX -> return true
                 SSA_BORDER_STYLE_UNKNOWN -> return false

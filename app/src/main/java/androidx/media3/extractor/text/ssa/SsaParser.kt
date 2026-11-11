@@ -238,7 +238,7 @@ class SsaParser  constructor(initializationData: List<ByteArray>? = null) :
     override val cueReplacementBehavior: Int
         get() = Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
     companion object {
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_MERGE
 
         private const val TAG = "SsaParser"
@@ -408,8 +408,8 @@ class SsaParser  constructor(initializationData: List<ByteArray>? = null) :
             }
         }
 
-        @Cue.AnchorType
-        private fun toLineAnchor(alignment: Int): @Cue.AnchorType Int {
+        
+        private fun toLineAnchor(alignment: Int):  Int {
             when (alignment) {
                 SsaStyle.SSA_ALIGNMENT_BOTTOM_LEFT, SsaStyle.SSA_ALIGNMENT_BOTTOM_CENTER, SsaStyle.SSA_ALIGNMENT_BOTTOM_RIGHT -> return Cue.ANCHOR_TYPE_END
                 SsaStyle.SSA_ALIGNMENT_MIDDLE_LEFT, SsaStyle.SSA_ALIGNMENT_MIDDLE_CENTER, SsaStyle.SSA_ALIGNMENT_MIDDLE_RIGHT -> return Cue.ANCHOR_TYPE_MIDDLE
@@ -422,8 +422,8 @@ class SsaParser  constructor(initializationData: List<ByteArray>? = null) :
             }
         }
 
-        @Cue.AnchorType
-        private fun toPositionAnchor(alignment: Int): @Cue.AnchorType Int {
+        
+        private fun toPositionAnchor(alignment: Int):  Int {
             when (alignment) {
                 SsaStyle.SSA_ALIGNMENT_BOTTOM_LEFT, SsaStyle.SSA_ALIGNMENT_MIDDLE_LEFT, SsaStyle.SSA_ALIGNMENT_TOP_LEFT -> return Cue.ANCHOR_TYPE_START
                 SsaStyle.SSA_ALIGNMENT_BOTTOM_CENTER, SsaStyle.SSA_ALIGNMENT_MIDDLE_CENTER, SsaStyle.SSA_ALIGNMENT_TOP_CENTER -> return Cue.ANCHOR_TYPE_MIDDLE
@@ -436,7 +436,7 @@ class SsaParser  constructor(initializationData: List<ByteArray>? = null) :
             }
         }
 
-        private fun computeDefaultLineOrPosition(@Cue.AnchorType anchor: @Cue.AnchorType Int): Float {
+        private fun computeDefaultLineOrPosition( anchor:  Int): Float {
             when (anchor) {
                 Cue.ANCHOR_TYPE_START -> return DEFAULT_MARGIN
                 Cue.ANCHOR_TYPE_MIDDLE -> return 0.5f

@@ -18,7 +18,7 @@ import kotlin.math.max
 
 interface Player {
     data class Events(private val flags: FlagSet) {
-        fun contains(event: @Event Int): Boolean {
+        fun contains(event: Int): Boolean {
             return flags.contains(event)
         }
 
@@ -34,7 +34,7 @@ interface Player {
             return flags.size()
         }
 
-        fun get(index: Int): @Event Int {
+        fun get(index: Int): Int {
             return flags.get(index)
         }
     }
@@ -149,17 +149,17 @@ interface Player {
                 flagsBuilder.addAll(commands.flags)
             }
 
-            fun add(command: @Command Int): Builder {
+            fun add(command: Int): Builder {
                 flagsBuilder.add(command)
                 return this
             }
 
-            fun addIf(command: @Command Int, condition: Boolean): Builder {
+            fun addIf(command: Int, condition: Boolean): Builder {
                 flagsBuilder.addIf(command, condition)
                 return this
             }
 
-            fun addAll(@Command vararg commands: Int): Builder {
+            fun addAll(vararg commands: Int): Builder {
                 flagsBuilder.addAll(*commands)
                 return this
             }
@@ -179,17 +179,17 @@ interface Player {
                 return this
             }
 
-            fun remove(command: @Command Int): Builder {
+            fun remove(command: Int): Builder {
                 flagsBuilder.remove(command)
                 return this
             }
 
-            fun removeIf(command: @Command Int, condition: Boolean): Builder {
+            fun removeIf(command: Int, condition: Boolean): Builder {
                 flagsBuilder.removeIf(command, condition)
                 return this
             }
 
-            fun removeAll(@Command vararg commands: Int): Builder {
+            fun removeAll(vararg commands: Int): Builder {
                 flagsBuilder.removeAll(*commands)
                 return this
             }
@@ -248,7 +248,7 @@ interface Player {
             return Builder(this)
         }
 
-        fun contains(command: @Command Int): Boolean {
+        fun contains(command: Int): Boolean {
             return flags.contains(command)
         }
 
@@ -260,7 +260,7 @@ interface Player {
             return flags.size()
         }
 
-        fun get(index: Int): @Command Int {
+        fun get(index: Int): Int {
             return flags.get(index)
         }
 
@@ -293,12 +293,12 @@ interface Player {
         fun onEvents(player: Player, events: Events) {}
 
         fun onTimelineChanged(
-            timeline: Timeline, reason: @TimelineChangeReason Int
+            timeline: Timeline, reason: Int
         ) {
         }
 
         fun onMediaItemTransition(
-            mediaItem: MediaItem?, reason: @MediaItemTransitionReason Int
+            mediaItem: MediaItem?, reason: Int
         ) {
         }
 
@@ -310,24 +310,24 @@ interface Player {
         fun onTrackSelectionParametersChanged(parameters: TrackSelectionParameters) {}
         fun onPlaybackStateChanged(playbackState: Int) {}
         fun onPlayWhenReadyChanged(
-            playWhenReady: Boolean, reason: @PlayWhenReadyChangeReason Int
+            playWhenReady: Boolean, reason: Int
         ) {
         }
 
         fun onPlaybackSuppressionReasonChanged(
-            playbackSuppressionReason: @PlaybackSuppressionReason Int
+            playbackSuppressionReason: Int
         ) {
         }
 
         fun onIsPlayingChanged(isPlaying: Boolean) {}
-        fun onRepeatModeChanged(repeatMode: @RepeatMode Int) {}
+        fun onRepeatModeChanged(repeatMode: Int) {}
         fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {}
         fun onPlayerError(error: PlaybackException) {}
         fun onPlayerErrorChanged(error: PlaybackException?) {}
         fun onPositionDiscontinuity(
             oldPosition: PositionInfo,
             newPosition: PositionInfo,
-            reason: @DiscontinuityReason Int
+            reason: Int
         ) {
         }
 
@@ -347,166 +347,6 @@ interface Player {
         fun onCues(cueGroup: CueGroup) {}
         fun onMetadata(metadata: Metadata) {}
     }
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST, PLAY_WHEN_READY_CHANGE_REASON_AUDIO_FOCUS_LOSS,
-            PLAY_WHEN_READY_CHANGE_REASON_AUDIO_BECOMING_NOISY, PLAY_WHEN_READY_CHANGE_REASON_REMOTE,
-            PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM, PLAY_WHEN_READY_CHANGE_REASON_SUPPRESSED_TOO_LONG]
-    )
-    annotation class PlayWhenReadyChangeReason
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [PLAYBACK_SUPPRESSION_REASON_NONE, PLAYBACK_SUPPRESSION_REASON_TRANSIENT_AUDIO_FOCUS_LOSS,
-            PLAYBACK_SUPPRESSION_REASON_UNSUITABLE_AUDIO_OUTPUT, PLAYBACK_SUPPRESSION_REASON_SCRUBBING]
-    )
-    annotation class PlaybackSuppressionReason
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [REPEAT_MODE_OFF, REPEAT_MODE_ONE, REPEAT_MODE_ALL])
-    annotation class RepeatMode
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [DISCONTINUITY_REASON_AUTO_TRANSITION, DISCONTINUITY_REASON_SEEK,
-            DISCONTINUITY_REASON_SEEK_ADJUSTMENT, DISCONTINUITY_REASON_SKIP,
-            DISCONTINUITY_REASON_REMOVE, DISCONTINUITY_REASON_INTERNAL,
-            DISCONTINUITY_REASON_SILENCE_SKIP]
-    )
-    annotation class DiscontinuityReason
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED, TIMELINE_CHANGE_REASON_SOURCE_UPDATE])
-    annotation class TimelineChangeReason
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [MEDIA_ITEM_TRANSITION_REASON_REPEAT, MEDIA_ITEM_TRANSITION_REASON_AUTO, MEDIA_ITEM_TRANSITION_REASON_SEEK, MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED]
-    )
-    annotation class MediaItemTransitionReason
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [EVENT_TIMELINE_CHANGED, EVENT_MEDIA_ITEM_TRANSITION, EVENT_TRACKS_CHANGED, EVENT_IS_LOADING_CHANGED, EVENT_PLAYBACK_STATE_CHANGED, EVENT_PLAY_WHEN_READY_CHANGED, EVENT_PLAYBACK_SUPPRESSION_REASON_CHANGED, EVENT_IS_PLAYING_CHANGED, EVENT_REPEAT_MODE_CHANGED, EVENT_SHUFFLE_MODE_ENABLED_CHANGED, EVENT_PLAYER_ERROR, EVENT_POSITION_DISCONTINUITY, EVENT_PLAYBACK_PARAMETERS_CHANGED, EVENT_AVAILABLE_COMMANDS_CHANGED, EVENT_MEDIA_METADATA_CHANGED, EVENT_PLAYLIST_METADATA_CHANGED, EVENT_SEEK_BACK_INCREMENT_CHANGED, EVENT_SEEK_FORWARD_INCREMENT_CHANGED, EVENT_MAX_SEEK_TO_PREVIOUS_POSITION_CHANGED, EVENT_TRACK_SELECTION_PARAMETERS_CHANGED, EVENT_AUDIO_ATTRIBUTES_CHANGED, EVENT_AUDIO_SESSION_ID, EVENT_VOLUME_CHANGED, EVENT_SKIP_SILENCE_ENABLED_CHANGED, EVENT_SURFACE_SIZE_CHANGED, EVENT_VIDEO_SIZE_CHANGED, EVENT_RENDERED_FIRST_FRAME, EVENT_CUES, EVENT_METADATA, EVENT_DEVICE_INFO_CHANGED, EVENT_DEVICE_VOLUME_CHANGED]
-    )
-    annotation class Event
-
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [COMMAND_INVALID, COMMAND_ADJUST_DEVICE_VOLUME, COMMAND_SET_DEVICE_VOLUME, COMMAND_PLAY_PAUSE, COMMAND_PREPARE, COMMAND_STOP, COMMAND_SEEK_TO_DEFAULT_POSITION, COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM, COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM, COMMAND_SEEK_TO_PREVIOUS, COMMAND_SEEK_TO_NEXT_MEDIA_ITEM, COMMAND_SEEK_TO_NEXT, COMMAND_SEEK_TO_MEDIA_ITEM, COMMAND_SEEK_BACK, COMMAND_SEEK_FORWARD, COMMAND_SET_SPEED_AND_PITCH, COMMAND_SET_SHUFFLE_MODE, COMMAND_SET_REPEAT_MODE, COMMAND_GET_CURRENT_MEDIA_ITEM, COMMAND_GET_TIMELINE, COMMAND_GET_METADATA, COMMAND_SET_PLAYLIST_METADATA, COMMAND_SET_MEDIA_ITEM, COMMAND_CHANGE_MEDIA_ITEMS, COMMAND_GET_AUDIO_ATTRIBUTES, COMMAND_GET_VOLUME, COMMAND_GET_DEVICE_VOLUME, COMMAND_SET_VOLUME, COMMAND_SET_DEVICE_VOLUME_WITH_FLAGS, COMMAND_ADJUST_DEVICE_VOLUME_WITH_FLAGS, COMMAND_SET_AUDIO_ATTRIBUTES, COMMAND_SET_VIDEO_SURFACE, COMMAND_GET_TEXT, COMMAND_SET_TRACK_SELECTION_PARAMETERS, COMMAND_GET_TRACKS, COMMAND_RELEASE]
-    )
-    annotation class Command
 
     val applicationLooper: Looper?
     fun addListener(listener: Listener)
@@ -528,18 +368,18 @@ interface Player {
     fun removeMediaItem(index: Int)
     fun removeMediaItems(fromIndex: Int, toIndex: Int)
     fun clearMediaItems()
-    fun isCommandAvailable(command: @Command Int): Boolean
+    fun isCommandAvailable(command: Int): Boolean
     fun canAdvertiseSession(): Boolean
     val availableCommands: Commands?
     fun prepare()
     val playbackState: Int
-    val playbackSuppressionReason: @PlaybackSuppressionReason Int
+    val playbackSuppressionReason: Int
     val isPlaying: Boolean
     val playerError: PlaybackException?
     fun play()
     fun pause()
     var playWhenReady: Boolean
-    var repeatMode: @RepeatMode Int
+    var repeatMode: Int
     var shuffleModeEnabled: Boolean
     val isLoading: Boolean
     fun seekToDefaultPosition()
@@ -613,10 +453,10 @@ interface Player {
     val deviceInfo: DeviceInfo?
     val deviceVolume: Int
     val isDeviceMuted: Boolean
-    fun setDeviceVolume(@IntRange(from = 0) volume: Int, flags: @C.VolumeFlags Int)
-    fun increaseDeviceVolume(flags: @C.VolumeFlags Int)
-    fun decreaseDeviceVolume(flags: @C.VolumeFlags Int)
-    fun setDeviceMuted(muted: Boolean, flags: @C.VolumeFlags Int)
+    fun setDeviceVolume(@IntRange(from = 0) volume: Int, flags: Int)
+    fun increaseDeviceVolume(flags: Int)
+    fun decreaseDeviceVolume(flags: Int)
+    fun setDeviceMuted(muted: Boolean, flags: Int)
     fun setAudioAttributes(audioAttributes: AudioAttributes, handleAudioFocus: Boolean)
 
     companion object {

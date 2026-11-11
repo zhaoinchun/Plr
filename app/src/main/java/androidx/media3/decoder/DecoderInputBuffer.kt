@@ -8,7 +8,7 @@ import androidx.media3.common.MediaLibraryInfo.registerModule
 import java.nio.ByteBuffer
 
 open class DecoderInputBuffer  constructor(
-    private val bufferReplacementMode: @BufferReplacementMode Int,
+    private val bufferReplacementMode:  Int,
     private val paddingSize: Int = 0
 ) : Buffer() {
 
@@ -17,15 +17,6 @@ open class DecoderInputBuffer  constructor(
         val currentCapacity: Int,
         val requiredCapacity: Int
     ) : IllegalStateException("Buffer too small (" + currentCapacity + " < " + requiredCapacity + ")")
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [BUFFER_REPLACEMENT_MODE_DISABLED, BUFFER_REPLACEMENT_MODE_NORMAL, BUFFER_REPLACEMENT_MODE_DIRECT
-        ]
-    )
-    annotation class BufferReplacementMode
 
     var format: Format? = null
     val cryptoInfo: CryptoInfo

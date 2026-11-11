@@ -4,7 +4,6 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Clock
-import androidx.media3.exoplayer.RendererCapabilities.AdaptiveSupport
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
@@ -20,7 +19,7 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
     override var stream: SampleStream? = null
     private var streamIsFinal = false
 
-    override val trackType: @C.TrackType Int = C.TRACK_TYPE_NONE
+    override val trackType: Int = C.TRACK_TYPE_NONE
     override val capabilities: RendererCapabilities?
         get() = this
 
@@ -117,18 +116,18 @@ abstract class NoSampleRenderer : Renderer, RendererCapabilities {
 
     // RendererCapabilities implementation.
     @Throws(ExoPlaybackException::class)
-    override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+    override fun supportsFormat(format: Format):  Int {
         return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
     }
 
     @Throws(ExoPlaybackException::class)
-    override fun supportsMixedMimeTypeAdaptation(): @AdaptiveSupport Int {
+    override fun supportsMixedMimeTypeAdaptation(): Int {
         return RendererCapabilities.ADAPTIVE_NOT_SUPPORTED
     }
 
     // PlayerMessage.Target implementation.
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         // Do nothing.
     }
 

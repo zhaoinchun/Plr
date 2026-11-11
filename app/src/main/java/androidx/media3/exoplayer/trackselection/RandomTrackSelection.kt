@@ -13,7 +13,7 @@ import java.util.Random
 class RandomTrackSelection(
     group: TrackGroup,
     tracks: IntArray,
-    type: @TrackSelection.Type Int,
+    type:  Int,
     private val random: Random
 ) : BaseTrackSelection(group, tracks, type) {
     class Factory : ExoTrackSelection.Factory {
@@ -42,7 +42,7 @@ class RandomTrackSelection(
     }
 
     override var selectedIndex: Int = random.nextInt(length)
-    override val selectionReason: @C.SelectionReason Int = C.SELECTION_REASON_ADAPTIVE
+    override val selectionReason:  Int = C.SELECTION_REASON_ADAPTIVE
     override val selectionData: Any? = null
 
     override fun updateSelectedTrack(

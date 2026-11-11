@@ -9,7 +9,7 @@ import androidx.media3.exoplayer.BaseRenderer
 import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
+
 import java.lang.Float
 import java.nio.ByteBuffer
 import kotlin.Any
@@ -27,7 +27,7 @@ class CameraMotionRenderer : BaseRenderer(C.TRACK_TYPE_CAMERA_MOTION) {
     private var lastTimestampUs: Long = 0
     override val name = TAG
 
-    override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+    override fun supportsFormat(format: Format):  Int {
         return if (MimeTypes.APPLICATION_CAMERA_MOTION == format.sampleMimeType)
             RendererCapabilities.create(C.FORMAT_HANDLED)
         else
@@ -35,7 +35,7 @@ class CameraMotionRenderer : BaseRenderer(C.TRACK_TYPE_CAMERA_MOTION) {
     }
 
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         if (messageType == Renderer.MSG_SET_CAMERA_MOTION_LISTENER) {
             listener = message as CameraMotionListener?
         } else {
@@ -59,7 +59,7 @@ class CameraMotionRenderer : BaseRenderer(C.TRACK_TYPE_CAMERA_MOTION) {
         while (!hasReadStreamToEnd() && lastTimestampUs < positionUs + SAMPLE_WINDOW_DURATION_US) {
             buffer.clear()
             val formatHolder = getFormatHolder()
-            val result: @ReadDataResult Int = readSource(formatHolder, buffer,  0)
+            val result:  Int = readSource(formatHolder, buffer,  0)
             if (result != C.RESULT_BUFFER_READ || buffer.isEndOfStream) {
                 return
             }

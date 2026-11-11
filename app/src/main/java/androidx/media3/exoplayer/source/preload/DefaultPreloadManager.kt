@@ -61,19 +61,11 @@ class DefaultPreloadManager(
     ) {
 
     class PreloadStatus private constructor(
-        stage: @Stage Int,
+        stage: Int,
         startPositionMs: Long,
         durationMs: Long
     ) {
-
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [STAGE_NOT_PRELOADED, STAGE_SPECIFIED_RANGE_CACHED, STAGE_SOURCE_PREPARED, STAGE_TRACKS_SELECTED, STAGE_SPECIFIED_RANGE_LOADED]
-        )
-        annotation class Stage
-        val stage: @Stage Int
+        val stage: Int
 
         val startPositionMs: Long
         val durationMs: Long

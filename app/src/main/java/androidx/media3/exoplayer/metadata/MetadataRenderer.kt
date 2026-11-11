@@ -11,7 +11,6 @@ import androidx.media3.exoplayer.BaseRenderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
 import androidx.media3.extractor.metadata.MetadataDecoder
 import androidx.media3.extractor.metadata.MetadataInputBuffer
 import com.google.common.base.Preconditions
@@ -36,7 +35,7 @@ class MetadataRenderer constructor(
     private var outputStreamOffsetUs = C.TIME_UNSET
     override val name: String = TAG
 
-    override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+    override fun supportsFormat(format: Format):  Int {
         return if (decoderFactory.supportsFormat(format)) {
             RendererCapabilities.create(
                 if (format.cryptoType == C.CRYPTO_TYPE_NONE) C.FORMAT_HANDLED else C.FORMAT_UNSUPPORTED_DRM
@@ -131,7 +130,7 @@ class MetadataRenderer constructor(
         if (!inputStreamEnded && pendingMetadata == null) {
             buffer.clear()
             val formatHolder = getFormatHolder()
-            var result: @ReadDataResult Int =
+            var result:  Int =
                 readSource(
                     formatHolder,
                     buffer,

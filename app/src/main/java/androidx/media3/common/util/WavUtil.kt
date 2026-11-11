@@ -1,7 +1,6 @@
 package androidx.media3.common.util
 
 import androidx.media3.common.C
-import androidx.media3.common.C.PcmEncoding
 import androidx.media3.common.Format
 import androidx.media3.common.util.Util.getFloatPcmEncoding
 import androidx.media3.common.util.Util.getPcmEncoding
@@ -30,7 +29,7 @@ object WavUtil {
     const val TYPE_WAVE_FORMAT_EXTENSIBLE: Int = 0xFFFE
 
     // TODO: b/474575207 - Consider returning short value.
-    fun getTypeForPcmEncoding(pcmEncoding: @PcmEncoding Int): Int {
+    fun getTypeForPcmEncoding(pcmEncoding: Int): Int {
         when (pcmEncoding) {
             C.ENCODING_PCM_8BIT, C.ENCODING_PCM_16BIT, C.ENCODING_PCM_24BIT, C.ENCODING_PCM_32BIT -> return TYPE_PCM
             C.ENCODING_PCM_FLOAT, C.ENCODING_PCM_DOUBLE -> return TYPE_FLOAT
@@ -39,7 +38,7 @@ object WavUtil {
         }
     }
 
-    fun getPcmEncodingForType(type: Int, bitsPerSample: Int): @PcmEncoding Int {
+    fun getPcmEncodingForType(type: Int, bitsPerSample: Int): Int {
         when (type) {
             TYPE_PCM, TYPE_WAVE_FORMAT_EXTENSIBLE -> return getPcmEncoding(bitsPerSample)
             TYPE_FLOAT -> return getFloatPcmEncoding(bitsPerSample)

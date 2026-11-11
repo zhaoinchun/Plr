@@ -14,7 +14,7 @@ import android.text.style.UnderlineSpan
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
-import androidx.media3.common.text.Cue.AnchorType
+
 import androidx.media3.common.util.CodecSpecificDataUtil
 import androidx.media3.common.util.CodecSpecificDataUtil.parseCea708InitializationData
 import androidx.media3.common.util.Log.d
@@ -1051,7 +1051,7 @@ class Cea708Decoder(accessibilityChannel: Int, initializationData: List<ByteArra
             //   3     4     5
             //   |           |
             //   6-----7-----8
-            @AnchorType val verticalAnchorType: @AnchorType Int
+             val verticalAnchorType:  Int
             if (anchorId / 3 == 0) {
                 verticalAnchorType = Cue.ANCHOR_TYPE_START
             } else if (anchorId / 3 == 1) {
@@ -1060,7 +1060,7 @@ class Cea708Decoder(accessibilityChannel: Int, initializationData: List<ByteArra
                 verticalAnchorType = Cue.ANCHOR_TYPE_END
             }
             // TODO: Add support for right-to-left languages (i.e. where start is on the right).
-            @AnchorType val horizontalAnchorType: @AnchorType Int
+             val horizontalAnchorType:  Int
             if (anchorId % 3 == 0) {
                 horizontalAnchorType = Cue.ANCHOR_TYPE_START
             } else if (anchorId % 3 == 1) {
@@ -1216,10 +1216,10 @@ class Cea708Decoder(accessibilityChannel: Int, initializationData: List<ByteArra
         text: CharSequence?,
         textAlignment: Layout.Alignment?,
         line: Float,
-        @Cue.LineType lineType: @Cue.LineType Int,
-        @AnchorType lineAnchor: @AnchorType Int,
+         lineType:  Int,
+         lineAnchor:  Int,
         position: Float,
-        @AnchorType positionAnchor: @AnchorType Int,
+         positionAnchor:  Int,
         size: Float,
         windowColorSet: Boolean,
         windowColor: Int,

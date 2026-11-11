@@ -40,7 +40,7 @@ class AvifExtractor : Extractor {
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         return imageExtractor.read(input, seekPosition)
     }
 

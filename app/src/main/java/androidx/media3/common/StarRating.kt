@@ -52,7 +52,7 @@ class StarRating : Rating {
     }
 
     companion object {
-        private val TYPE: @RatingType Int = RATING_TYPE_STAR
+        private val TYPE: Int = RATING_TYPE_STAR
         private const val MAX_STARS_DEFAULT = 5
 
         private val FIELD_MAX_STARS = intToStringMaxRadix(1)

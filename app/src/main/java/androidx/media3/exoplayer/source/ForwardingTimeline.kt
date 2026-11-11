@@ -9,7 +9,7 @@ abstract class ForwardingTimeline(val timeline: Timeline) : Timeline() {
 
     override fun getNextWindowIndex(
         windowIndex: Int,
-        repeatMode: @Player.RepeatMode Int,
+        repeatMode: Int,
         shuffleModeEnabled: Boolean
     ): Int {
         return timeline.getNextWindowIndex(windowIndex, repeatMode, shuffleModeEnabled)
@@ -17,7 +17,7 @@ abstract class ForwardingTimeline(val timeline: Timeline) : Timeline() {
 
     override fun getPreviousWindowIndex(
         windowIndex: Int,
-        repeatMode: @Player.RepeatMode Int,
+        repeatMode: Int,
         shuffleModeEnabled: Boolean
     ): Int {
         return timeline.getPreviousWindowIndex(windowIndex, repeatMode, shuffleModeEnabled)

@@ -4,32 +4,14 @@ package androidx.media3.exoplayer.drm
 import androidx.annotation.IntDef
 
 class UnsupportedDrmException : Exception {
-    // @Target list includes both 'default' targets and TYPE_USE, to ensure backwards compatibility
-    // with Kotlin usages from before TYPE_USE was added.
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [REASON_UNSUPPORTED_SCHEME, REASON_INSTANTIATION_ERROR])
-    annotation class Reason
+    
+    val reason:  Int
 
-    @Reason
-    val reason: @Reason Int
-
-    constructor(@Reason reason: @Reason Int) {
+    constructor( reason:  Int) {
         this.reason = reason
     }
 
-    constructor(@Reason reason: @Reason Int, cause: Exception?) : super(cause) {
+    constructor( reason:  Int, cause: Exception?) : super(cause) {
         this.reason = reason
     }
 

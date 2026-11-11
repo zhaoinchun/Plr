@@ -243,19 +243,10 @@ abstract class BinarySearchSeeker protected constructor(
     }
 
     class TimestampSearchResult private constructor(
-         val type: @Type Int,
+         val type: Int,
          val timestampToUpdate: Long,
          val bytePositionToUpdate: Long
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [TYPE_TARGET_TIMESTAMP_FOUND, TYPE_POSITION_OVERESTIMATED, TYPE_POSITION_UNDERESTIMATED, TYPE_NO_TIMESTAMP
-            ]
-        )
-        internal annotation class Type
-
         companion object {
             const val TYPE_TARGET_TIMESTAMP_FOUND: Int = 0
             const val TYPE_POSITION_OVERESTIMATED: Int = -1

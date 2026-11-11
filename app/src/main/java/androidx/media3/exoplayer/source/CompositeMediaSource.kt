@@ -211,7 +211,7 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
         override fun onDrmSessionAcquired(
             windowIndex: Int,
             mediaPeriodId: MediaPeriodId?,
-            state: @DrmSession.State Int
+            state:  Int
         ) {
             if (maybeUpdateEventDispatcher(windowIndex, mediaPeriodId)) {
                 drmEventDispatcher.drmSessionAcquired(state)

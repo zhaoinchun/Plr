@@ -412,7 +412,7 @@ class VobsubParser(initializationData: List<ByteArray>) : SubtitleParser {
 
     companion object {
         
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_REPLACE
 
         private const val TAG = "VobsubParser"

@@ -58,15 +58,9 @@ import androidx.media3.extractor.metadata.ChapterImpl
 
 class MatroskaExtractor internal constructor(
     private val reader: EbmlReader,
-    flags: @Flags Int,
+    flags:  Int,
     subtitleParserFactory: SubtitleParser.Factory
 ) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(flag = true, value = [FLAG_DISABLE_SEEK_FOR_CUES, FLAG_EMIT_RAW_SUBTITLE_DATA])
-    annotation class Flags
-
     private val varintReader: VarintReader
     private val tracks: SparseArray<Track>
     private val chapters: LongSparseArray<ChapterEntry>
@@ -137,7 +131,7 @@ class MatroskaExtractor internal constructor(
     private var blockSampleSizes: IntArray
     private var blockTrackNumber = 0
     private var blockTrackNumberLength = 0
-    private var blockFlags: @C.BufferFlags Int = 0
+    private var blockFlags:  Int = 0
     private var blockAdditionalId = 0
     private var blockHasReferenceBlock = false
     private var blockGroupDiscardPaddingNs: Long = 0
@@ -162,7 +156,7 @@ class MatroskaExtractor internal constructor(
         subtitleParserFactory!!
     )
 
-    constructor(subtitleParserFactory: SubtitleParser.Factory?, flags: @Flags Int) : this(
+    constructor(subtitleParserFactory: SubtitleParser.Factory?, flags:  Int) : this(
         DefaultEbmlReader(),
         flags,
         subtitleParserFactory!!
@@ -256,7 +250,7 @@ class MatroskaExtractor internal constructor(
     }
 
     @CallSuper
-    protected fun getElementType(id: Int): @EbmlProcessor.ElementType Int {
+    protected fun getElementType(id: Int):  Int {
         when (id) {
             ID_EBML, ID_SEGMENT, ID_CHAPTERS, ID_EDITION_ENTRY, ID_CHAPTER_ATOM, ID_CHAPTER_TRACK, ID_CHAPTER_DISPLAY, ID_SEEK_HEAD, ID_SEEK, ID_INFO, ID_CLUSTER, ID_TRACKS, ID_TRACK_ENTRY, ID_BLOCK_ADDITION_MAPPING, ID_AUDIO, ID_VIDEO, ID_CONTENT_ENCODINGS, ID_CONTENT_ENCODING, ID_CONTENT_COMPRESSION, ID_CONTENT_ENCRYPTION, ID_CONTENT_ENCRYPTION_AES_SETTINGS, ID_CUES, ID_CUE_POINT, ID_CUE_TRACK_POSITIONS, ID_BLOCK_GROUP, ID_BLOCK_ADDITIONS, ID_BLOCK_MORE, ID_PROJECTION, ID_COLOUR, ID_MASTERING_METADATA -> return EbmlProcessor.ELEMENT_TYPE_MASTER
             ID_EBML_READ_VERSION, ID_DOC_TYPE_READ_VERSION, ID_SEEK_POSITION, ID_TIMECODE_SCALE, ID_TIME_CODE, ID_BLOCK_DURATION, ID_PIXEL_WIDTH, ID_PIXEL_HEIGHT, ID_DISPLAY_WIDTH, ID_DISPLAY_HEIGHT, ID_DISPLAY_UNIT, ID_TRACK_NUMBER, ID_TRACK_UID, ID_TRACK_TYPE, ID_CHAPTER_FLAG_HIDDEN, ID_CHAPTER_TIME_START, ID_CHAPTER_TIME_END, ID_CHAPTER_UID, ID_CHAPTER_TRACK_UID, ID_FLAG_DEFAULT, ID_FLAG_FORCED, ID_DEFAULT_DURATION, ID_MAX_BLOCK_ADDITION_ID, ID_BLOCK_ADD_ID_TYPE, ID_CODEC_DELAY, ID_SEEK_PRE_ROLL, ID_DISCARD_PADDING, ID_CHANNELS, ID_AUDIO_BIT_DEPTH, ID_CONTENT_ENCODING_ORDER, ID_CONTENT_ENCODING_SCOPE, ID_CONTENT_COMPRESSION_ALGORITHM, ID_CONTENT_ENCRYPTION_ALGORITHM, ID_CONTENT_ENCRYPTION_AES_SETTINGS_CIPHER_MODE, ID_CUE_TIME, ID_CUE_CLUSTER_POSITION, ID_CUE_RELATIVE_POSITION, ID_CUE_TRACK, ID_REFERENCE_BLOCK, ID_STEREO_MODE, ID_COLOUR_BITS_PER_CHANNEL, ID_COLOUR_RANGE, ID_COLOUR_TRANSFER, ID_COLOUR_PRIMARIES, ID_MAX_CLL, ID_MAX_FALL, ID_PROJECTION_TYPE, ID_BLOCK_ADD_ID -> return EbmlProcessor.ELEMENT_TYPE_UNSIGNED_INT
@@ -581,7 +575,7 @@ class MatroskaExtractor internal constructor(
                 while (i < tracks.size()) {
                     val trackItem = tracks.valueAt(i)
 
-                    val trackType: @C.TrackType Int = trackItem.type
+                    val trackType: Int = trackItem.type
                     if (trackType == C.TRACK_TYPE_VIDEO) {
                         if (trackItem.flagDefault) {
                             defaultVideoTrackNumber = trackItem.number
@@ -1177,7 +1171,7 @@ class MatroskaExtractor internal constructor(
 
     @RequiresNonNull("#1.output")
     private fun commitSampleToOutput(
-        track: Track, timeUs: Long, flags: @C.BufferFlags Int, size: Int, offset: Int
+        track: Track, timeUs: Long, flags:  Int, size: Int, offset: Int
     ) {
         var size = size
         if (track.trueHdSampleRechunker != null) {
@@ -1598,7 +1592,7 @@ class MatroskaExtractor internal constructor(
     }
 
     private inner class InnerEbmlProcessor : EbmlProcessor {
-        override fun getElementType(id: Int): @EbmlProcessor.ElementType Int {
+        override fun getElementType(id: Int):  Int {
             return this@MatroskaExtractor.getElementType(id)
         }
 
@@ -1661,7 +1655,7 @@ class MatroskaExtractor internal constructor(
         var codecId: String? = null
         var number: Int = 0
         var uid: Long = 0
-        var type: @C.TrackType Int = 0
+        var type: Int = 0
         var defaultSampleDurationNs: Int = 0
         var maxBlockAdditionId: Int = 0
         var blockAddIdType = 0
@@ -1678,15 +1672,15 @@ class MatroskaExtractor internal constructor(
         var displayWidth: Int = Format.NO_VALUE
         var displayHeight: Int = Format.NO_VALUE
         var displayUnit: Int = DISPLAY_UNIT_PIXELS
-        var projectionType: @C.Projection Int = Format.NO_VALUE
+        var projectionType:  Int = Format.NO_VALUE
         var projectionPoseYaw: Float = 0f
         var projectionPosePitch: Float = 0f
         var projectionPoseRoll: Float = 0f
         var projectionData: ByteArray? = null
-        var stereoMode: @C.StereoMode Int = Format.NO_VALUE
-        var containerColorSpace: @C.ColorSpace Int = Format.NO_VALUE
-        var containerColorTransfer: @C.ColorTransfer Int = Format.NO_VALUE
-        var containerColorRange: @C.ColorRange Int = Format.NO_VALUE
+        var stereoMode:  Int = Format.NO_VALUE
+        var containerColorSpace: Int = Format.NO_VALUE
+        var containerColorTransfer:  Int = Format.NO_VALUE
+        var containerColorRange:  Int = Format.NO_VALUE
         var maxContentLuminance: Int = DEFAULT_MAX_CLL
         var maxFrameAverageLuminance: Int = DEFAULT_MAX_FALL
         var primaryRChromaticityX: Float = Format.NO_VALUE.toFloat()
@@ -1730,12 +1724,12 @@ class MatroskaExtractor internal constructor(
         fun initializeFormat(trackId: Int) {
             var mimeType: String?
             var maxInputSize = Format.NO_VALUE
-            var pcmEncoding: @C.PcmEncoding Int = Format.NO_VALUE
+            var pcmEncoding: Int = Format.NO_VALUE
             var initializationData: List<ByteArray>? = null
             var codecs: String? = null
-            var bitstreamColorSpace: @C.ColorSpace Int = Format.NO_VALUE
-            var bitstreamColorTransfer: @C.ColorTransfer Int = Format.NO_VALUE
-            var bitstreamColorRange: @C.ColorRange Int = Format.NO_VALUE
+            var bitstreamColorSpace: Int = Format.NO_VALUE
+            var bitstreamColorTransfer:  Int = Format.NO_VALUE
+            var bitstreamColorRange:  Int = Format.NO_VALUE
             var bitstreamLumaBitdepth = Format.NO_VALUE
             var bitstreamChromaBitdepth = Format.NO_VALUE
             l@
@@ -1986,7 +1980,7 @@ class MatroskaExtractor internal constructor(
                 }
             }
 
-            @C.SelectionFlags var selectionFlags: @C.SelectionFlags Int = 0
+             var selectionFlags:  Int = 0
             selectionFlags = selectionFlags or if (flagDefault) C.SELECTION_FLAG_DEFAULT else 0
             selectionFlags = selectionFlags or if (flagForced) C.SELECTION_FLAG_FORCED else 0
 
@@ -2011,9 +2005,9 @@ class MatroskaExtractor internal constructor(
                         ((height * displayWidth).toFloat()) / (width * displayHeight)
                 }
 
-                val colorSpace: @C.ColorSpace Int
-                val colorTransfer: @C.ColorTransfer Int
-                val colorRange: @C.ColorRange Int
+                val colorSpace: Int
+                val colorTransfer:  Int
+                val colorRange:  Int
 
                 // Bitstream color space/transfer override container values as a block.
                 if (bitstreamColorSpace != Format.NO_VALUE || bitstreamColorTransfer != Format.NO_VALUE) {

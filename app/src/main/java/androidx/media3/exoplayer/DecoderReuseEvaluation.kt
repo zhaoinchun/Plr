@@ -10,31 +10,14 @@ class DecoderReuseEvaluation(
     decoderName: String,
     oldFormat: Format,
     newFormat: Format,
-    result: @DecoderReuseResult Int,
-    discardReasons: @DecoderDiscardReasons Int
+    result:  Int,
+    discardReasons:  Int
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [REUSE_RESULT_NO, REUSE_RESULT_YES_WITH_FLUSH, REUSE_RESULT_YES_WITH_RECONFIGURATION, REUSE_RESULT_YES_WITHOUT_RECONFIGURATION]
-    )
-    annotation class DecoderReuseResult
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [DISCARD_REASON_REUSE_NOT_IMPLEMENTED, DISCARD_REASON_WORKAROUND, DISCARD_REASON_APP_OVERRIDE, DISCARD_REASON_MIME_TYPE_CHANGED, DISCARD_REASON_OPERATING_RATE_CHANGED, DISCARD_REASON_INITIALIZATION_DATA_CHANGED, DISCARD_REASON_DRM_SESSION_CHANGED, DISCARD_REASON_MAX_INPUT_SIZE_EXCEEDED, DISCARD_REASON_VIDEO_MAX_RESOLUTION_EXCEEDED, DISCARD_REASON_VIDEO_RESOLUTION_CHANGED, DISCARD_REASON_VIDEO_ROTATION_CHANGED, DISCARD_REASON_VIDEO_COLOR_INFO_CHANGED, DISCARD_REASON_AUDIO_CHANNEL_COUNT_CHANGED, DISCARD_REASON_AUDIO_SAMPLE_RATE_CHANGED, DISCARD_REASON_AUDIO_ENCODING_CHANGED, DISCARD_REASON_AUDIO_BYPASS_POSSIBLE, DISCARD_REASON_VIDEO_FRAME_RATE_CHANGED]
-    )
-    annotation class DecoderDiscardReasons
-
     val decoderName: String
     val oldFormat: Format
     val newFormat: Format
-    val result: @DecoderReuseResult Int
-    val discardReasons: @DecoderDiscardReasons Int
+    val result:  Int
+    val discardReasons:  Int
 
     init {
         Preconditions.checkArgument(result == REUSE_RESULT_NO || discardReasons == 0)

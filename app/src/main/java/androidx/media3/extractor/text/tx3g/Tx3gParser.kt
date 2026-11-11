@@ -165,7 +165,7 @@ class Tx3gParser(initializationData: List<ByteArray>) : SubtitleParser {
         get() = Format.CUE_REPLACEMENT_BEHAVIOR_REPLACE
 
     companion object {
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_REPLACE
 
         private const val TAG = "Tx3gParser"

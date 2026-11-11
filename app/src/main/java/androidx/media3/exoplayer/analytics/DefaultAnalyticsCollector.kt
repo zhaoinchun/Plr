@@ -108,7 +108,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
     }
 
     override fun onRendererReadyChanged(
-        rendererIndex: Int, rendererTrackType: @C.TrackType Int, isRendererReady: Boolean
+        rendererIndex: Int, rendererTrackType: Int, isRendererReady: Boolean
     ) {
         val eventTime = generateReadingMediaPeriodEventTime()
         sendEvent(
@@ -555,7 +555,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
     // different real times.
     override fun onTimelineChanged(
         timeline: Timeline,
-        @Player.TimelineChangeReason reason: @Player.TimelineChangeReason Int
+         reason:  Int
     ) {
         mediaPeriodQueueTracker.onTimelineChanged(player!!)
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
@@ -572,7 +572,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
 
     override fun onMediaItemTransition(
         mediaItem: MediaItem?,
-        @Player.MediaItemTransitionReason reason: @Player.MediaItemTransitionReason Int
+         reason:  Int
     ) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
         sendEvent(
@@ -639,7 +639,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
 
     override fun onPlayWhenReadyChanged(
         playWhenReady: Boolean,
-        @Player.PlayWhenReadyChangeReason reason: @Player.PlayWhenReadyChangeReason Int
+         reason:  Int
     ) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
         sendEvent(
@@ -655,7 +655,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
     }
 
     override fun onPlaybackSuppressionReasonChanged(
-        @Player.PlaybackSuppressionReason playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
+         playbackSuppressionReason:  Int
     ) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
         sendEvent(
@@ -682,7 +682,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
         }
     }
 
-    override fun onRepeatModeChanged(@Player.RepeatMode repeatMode: @Player.RepeatMode Int) {
+    override fun onRepeatModeChanged(repeatMode: Int) {
         val eventTime = generateCurrentPlayerMediaPeriodEventTime()
         sendEvent(
             eventTime,
@@ -737,7 +737,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
     override fun onPositionDiscontinuity(
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+         reason:  Int
     ) {
         if (reason == Player.DISCONTINUITY_REASON_SEEK) {
             isSeeking = false
@@ -975,7 +975,7 @@ class DefaultAnalyticsCollector(private val clock: Clock) : AnalyticsCollector {
     override fun onDrmSessionAcquired(
         windowIndex: Int,
         mediaPeriodId: MediaPeriodId?,
-        @DrmSession.State state: @DrmSession.State Int
+         state:  Int
     ) {
         val eventTime = generateMediaPeriodEventTime(windowIndex, mediaPeriodId)
         sendEvent(

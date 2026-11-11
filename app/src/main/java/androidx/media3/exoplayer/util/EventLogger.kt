@@ -57,7 +57,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
     override fun onPlayWhenReadyChanged(
         eventTime: EventTime,
         playWhenReady: Boolean,
-        @Player.PlayWhenReadyChangeReason reason: @Player.PlayWhenReadyChangeReason Int
+         reason:  Int
     ) {
         logd(
             eventTime,
@@ -68,7 +68,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
 
     override fun onPlaybackSuppressionReasonChanged(
         eventTime: EventTime,
-        @Player.PlaybackSuppressionReason playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
+         playbackSuppressionReason:  Int
     ) {
         logd(
             eventTime,
@@ -83,7 +83,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
 
     override fun onRepeatModeChanged(
         eventTime: EventTime,
-        @Player.RepeatMode repeatMode: @Player.RepeatMode Int
+        repeatMode: Int
     ) {
         logd(eventTime, "repeatMode", getRepeatModeString(repeatMode))
     }
@@ -96,7 +96,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
         eventTime: EventTime,
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+         reason:  Int
     ) {
         val details =
             ("reason="
@@ -117,7 +117,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
 
     override fun onTimelineChanged(
         eventTime: EventTime,
-        @Player.TimelineChangeReason reason: @Player.TimelineChangeReason Int
+         reason:  Int
     ) {
         val periodCount = eventTime.timeline!!.periodCount
         val windowCount = eventTime.timeline.windowCount
@@ -381,7 +381,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
 
     override fun onDrmSessionAcquired(
         eventTime: EventTime,
-        @DrmSession.State state: @DrmSession.State Int
+         state:  Int
     ) {
         logd(eventTime, "drmSessionAcquired", "state=" + state)
     }
@@ -409,7 +409,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
     override fun onRendererReadyChanged(
         eventTime: EventTime,
         rendererIndex: Int,
-        rendererTrackType: @C.TrackType Int,
+        rendererTrackType: Int,
         isRendererReady: Boolean
     ) {
         logd(
@@ -545,7 +545,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
             return if (selected) "[X]" else "[ ]"
         }
 
-        private fun getRepeatModeString(@Player.RepeatMode repeatMode: @Player.RepeatMode Int): String {
+        private fun getRepeatModeString(repeatMode: Int): String {
             when (repeatMode) {
                 Player.REPEAT_MODE_OFF -> return "OFF"
                 Player.REPEAT_MODE_ONE -> return "ONE"
@@ -554,7 +554,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
             }
         }
 
-        private fun getDiscontinuityReasonString(@Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int): String {
+        private fun getDiscontinuityReasonString( reason:  Int): String {
             when (reason) {
                 Player.DISCONTINUITY_REASON_AUTO_TRANSITION -> return "AUTO_TRANSITION"
                 Player.DISCONTINUITY_REASON_SEEK -> return "SEEK"
@@ -567,7 +567,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
             }
         }
 
-        private fun getTimelineChangeReasonString(@Player.TimelineChangeReason reason: @Player.TimelineChangeReason Int): String {
+        private fun getTimelineChangeReasonString( reason:  Int): String {
             when (reason) {
                 Player.TIMELINE_CHANGE_REASON_SOURCE_UPDATE -> return "SOURCE_UPDATE"
                 Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED -> return "PLAYLIST_CHANGED"
@@ -576,7 +576,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
         }
 
         private fun getMediaItemTransitionReasonString(
-            @Player.MediaItemTransitionReason reason: @Player.MediaItemTransitionReason Int
+             reason:  Int
         ): String {
             when (reason) {
                 Player.MEDIA_ITEM_TRANSITION_REASON_AUTO -> return "AUTO"
@@ -588,7 +588,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
         }
 
         private fun getPlaybackSuppressionReasonString(
-            @Player.PlaybackSuppressionReason playbackSuppressionReason: @Player.PlaybackSuppressionReason Int
+             playbackSuppressionReason:  Int
         ): String {
             when (playbackSuppressionReason) {
                 Player.PLAYBACK_SUPPRESSION_REASON_NONE -> return "NONE"
@@ -600,7 +600,7 @@ class EventLogger(private val tag: String? = DEFAULT_TAG) :
         }
 
         private fun getPlayWhenReadyChangeReasonString(
-            @Player.PlayWhenReadyChangeReason reason: @Player.PlayWhenReadyChangeReason Int
+             reason:  Int
         ): String {
             when (reason) {
                 Player.PLAY_WHEN_READY_CHANGE_REASON_AUDIO_BECOMING_NOISY -> return "AUDIO_BECOMING_NOISY"

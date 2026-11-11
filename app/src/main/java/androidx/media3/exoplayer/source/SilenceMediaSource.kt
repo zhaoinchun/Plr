@@ -17,7 +17,7 @@ import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.LoadingInfo
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
+
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.Allocator
 import com.google.common.base.Preconditions
@@ -181,7 +181,7 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
         override fun maybeThrowError() {}
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
         ): Int {
             if (!sentFormat || (readFlags and SampleStream.FLAG_REQUIRE_FORMAT) != 0) {
                 formatHolder.format = FORMAT
@@ -219,7 +219,7 @@ class SilenceMediaSource private constructor(private var durationUs: Long, media
         const val MEDIA_ID: String = "SilenceMediaSource"
 
         private const val SAMPLE_RATE_HZ = 44100
-        private val PCM_ENCODING: @C.PcmEncoding Int = C.ENCODING_PCM_16BIT
+        private val PCM_ENCODING: Int = C.ENCODING_PCM_16BIT
         private const val CHANNEL_COUNT = 2
         private val FORMAT = Format(
             sampleMimeType = MimeTypes.AUDIO_RAW,

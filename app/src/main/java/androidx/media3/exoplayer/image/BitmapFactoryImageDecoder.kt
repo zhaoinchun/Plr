@@ -32,7 +32,7 @@ private constructor(private val context: Context?, private val maxOutputSize: In
             return this
         }
 
-        override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+        override fun supportsFormat(format: Format):  Int {
             if (format.sampleMimeType == null || !isImage(format.sampleMimeType)) {
                 return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
             }

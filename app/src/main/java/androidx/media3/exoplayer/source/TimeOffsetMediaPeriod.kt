@@ -6,7 +6,7 @@ import androidx.media3.decoder.DecoderInputBuffer
 import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.LoadingInfo
 import androidx.media3.exoplayer.SeekParameters
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
+
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import java.io.IOException
 
@@ -157,7 +157,7 @@ internal class TimeOffsetMediaPeriod(
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
         ): Int {
             val readResult = childStream.readData(formatHolder, buffer, readFlags)
             if (readResult == C.RESULT_BUFFER_READ) {
@@ -170,7 +170,7 @@ internal class TimeOffsetMediaPeriod(
             return childStream.skipData(positionUs - timeOffsetUs)
         }
 
-        override val flags: @SampleStream.Flags Int
+        override val flags:  Int
             get() = childStream.flags
     }
 }

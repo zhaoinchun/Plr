@@ -14,7 +14,6 @@ import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
 import com.google.common.base.Preconditions
 import java.util.ArrayDeque
 import kotlin.math.max
@@ -23,14 +22,6 @@ import kotlin.math.min
 class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutput: ImageOutput?) :
     BaseRenderer(C.TRACK_TYPE_IMAGE) {
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [REINITIALIZATION_STATE_NONE, REINITIALIZATION_STATE_SIGNAL_END_OF_STREAM_THEN_WAIT, REINITIALIZATION_STATE_WAIT_END_OF_STREAM]
-    )
-    private annotation class ReinitializationState
-
     private val flagsOnlyBuffer = DecoderInputBuffer.newNoDataInstance()
     private val pendingOutputStreamChanges = ArrayDeque<OutputStreamInfo>()
     private var inputStreamEnded = false
@@ -38,9 +29,9 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     private var outputStreamInfo = OutputStreamInfo.UNSET
     private var lastProcessedOutputBufferTimeUs = C.TIME_UNSET
     private var largestQueuedPresentationTimeUs = C.TIME_UNSET
-    private var decoderReinitializationState: @ReinitializationState Int =
+    private var decoderReinitializationState:  Int =
         REINITIALIZATION_STATE_NONE
-    private var firstFrameState: @C.FirstFrameState Int = C.FIRST_FRAME_NOT_RENDERED
+    private var firstFrameState:  Int = C.FIRST_FRAME_NOT_RENDERED
     private var inputFormat: Format? = null
     private var decoder: ImageDecoder? = null
     private var inputBuffer: DecoderInputBuffer? = null
@@ -54,7 +45,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     private var codecNeedsInitialization = false
     override val name: String = TAG
 
-    override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+    override fun supportsFormat(format: Format):  Int {
         return decoderFactory.supportsFormat(format)
     }
 
@@ -67,7 +58,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             // We don't have a format yet, so try and read one.
             val formatHolder = getFormatHolder()
             flagsOnlyBuffer.clear()
-            val result: @ReadDataResult Int =
+            val result:  Int =
                 readSource(formatHolder, flagsOnlyBuffer, SampleStream.FLAG_REQUIRE_FORMAT)
             when (result) {
                 C.RESULT_FORMAT_READ -> {
@@ -182,7 +173,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     }
 
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_IMAGE_OUTPUT -> {
                 val imageOutput = message as? ImageOutput
@@ -404,13 +395,13 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     }
 
     private fun canCreateDecoderForFormat(format: Format): Boolean {
-        val supportsFormat: @RendererCapabilities.Capabilities Int =
+        val supportsFormat:  Int =
             decoderFactory.supportsFormat(format)
         return supportsFormat == RendererCapabilities.create(C.FORMAT_HANDLED)
                 || supportsFormat == RendererCapabilities.create(C.FORMAT_EXCEEDS_CAPABILITIES)
     }
 
-    private fun lowerFirstFrameState(firstFrameState: @C.FirstFrameState Int) {
+    private fun lowerFirstFrameState(firstFrameState:  Int) {
         this.firstFrameState = min(this.firstFrameState, firstFrameState)
     }
 

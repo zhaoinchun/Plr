@@ -28,25 +28,6 @@ import com.google.common.base.Splitter
 import java.io.IOException
 
 internal class SefReader {
-    
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_SHOULD_CHECK_FOR_SEF, STATE_CHECKING_FOR_SEF, STATE_READING_SDRS, STATE_READING_SEF_DATA
-        ]
-    )
-    private annotation class State
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [TYPE_SLOW_MOTION_DATA, TYPE_SUPER_SLOW_MOTION_DATA, TYPE_SUPER_SLOW_MOTION_BGM, TYPE_SUPER_SLOW_MOTION_EDIT_DATA, TYPE_SUPER_SLOW_DEFLICKERING_ON
-        ]
-    )
-    private annotation class DataType
-
     private val dataReferences: MutableList<DataReference>
     private var readerState:  Int
     private var tailLength = 0
@@ -66,7 +47,7 @@ internal class SefReader {
         input: ExtractorInput,
         seekPosition: PositionHolder,
         slowMotionMetadataEntries: MutableList<Metadata.Entry>
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         when (readerState) {
             STATE_SHOULD_CHECK_FOR_SEF -> {
                 val inputLength = input.length
@@ -115,7 +96,7 @@ internal class SefReader {
 
         for (i in 0..<sdrsLength / LENGTH_OF_ONE_SDR) {
             scratch.skipBytes(2) // SDR data sub info flag and reserved bits (2).
-            val dataType: @DataType Int = scratch.readLittleEndianShort().toInt()
+            val dataType:  Int = scratch.readLittleEndianShort().toInt()
             when (dataType) {
                 TYPE_SLOW_MOTION_DATA, TYPE_SUPER_SLOW_MOTION_DATA, TYPE_SUPER_SLOW_MOTION_BGM, TYPE_SUPER_SLOW_MOTION_EDIT_DATA, TYPE_SUPER_SLOW_DEFLICKERING_ON -> {
                     // The read int is the distance from the tail info to the start of the metadata.
@@ -158,7 +139,7 @@ internal class SefReader {
             data.skipBytes(4) // data type (2), data sub info (2).
             val nameLength = data.readLittleEndianInt()
             val name = data.readString(nameLength)
-            val dataType: @DataType Int = nameToDataType(name)
+            val dataType:  Int = nameToDataType(name)
 
             val remainingDataLength = dataReference.size - (8 + nameLength)
             when (dataType) {
@@ -175,7 +156,7 @@ internal class SefReader {
         }
     }
 
-    private class DataReference(val dataType: @DataType Int, val startOffset: Long, val size: Int)
+    private class DataReference(val dataType:  Int, val startOffset: Long, val size: Int)
     companion object {
         private const val STATE_SHOULD_CHECK_FOR_SEF = 0
         private const val STATE_CHECKING_FOR_SEF = 1
@@ -229,7 +210,7 @@ internal class SefReader {
         }
 
         @Throws(ParserException::class)
-        private fun nameToDataType(name: String): @DataType Int {
+        private fun nameToDataType(name: String):  Int {
             when (name) {
                 "SlowMotion_Data" -> return TYPE_SLOW_MOTION_DATA
                 "Super_SlowMotion_Data" -> return TYPE_SUPER_SLOW_MOTION_DATA

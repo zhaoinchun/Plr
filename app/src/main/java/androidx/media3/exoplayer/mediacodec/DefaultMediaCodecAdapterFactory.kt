@@ -12,16 +12,11 @@ import com.google.common.base.Supplier
 import java.io.IOException
 
 class DefaultMediaCodecAdapterFactory : MediaCodecAdapter.Factory {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [MODE_DEFAULT, MODE_ENABLED, MODE_DISABLED])
-    private annotation class Mode
 
     private val context: Context?
     private val callbackThreadSupplier: Supplier<HandlerThread>?
     private val queueingThreadSupplier: Supplier<HandlerThread>?
-    private var asynchronousMode: @Mode Int
+    private var asynchronousMode: Int
     private var asyncCryptoFlagEnabled = false
     private var asyncCryptoSynchronizationEnabled = false
 

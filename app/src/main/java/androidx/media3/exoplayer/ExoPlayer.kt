@@ -43,7 +43,7 @@ interface ExoPlayer : Player {
     fun addAnalyticsListener(listener: AnalyticsListener)
     fun removeAnalyticsListener(listener: AnalyticsListener)
     val rendererCount: Int
-    fun getRendererType(index: Int): @C.TrackType Int
+    fun getRendererType(index: Int): Int
     fun getRenderer(index: Int): Renderer?
     fun getSecondaryRenderer(index: Int): Renderer?
     val trackSelector: TrackSelector?
@@ -83,8 +83,8 @@ interface ExoPlayer : Player {
     var isScrubbingModeEnabled: Boolean
     var scrubbingModeParameters: ScrubbingModeParameters?
     fun setVideoEffects(videoEffects: List<Effect>?)
-    var videoScalingMode: @C.VideoScalingMode Int
-    var videoChangeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+    var videoScalingMode:  Int
+    var videoChangeFrameRateStrategy:  Int
     fun setVideoFrameMetadataListener(listener: VideoFrameMetadataListener?)
     fun clearVideoFrameMetadataListener(listener: VideoFrameMetadataListener?)
     fun setCameraMotionListener(listener: CameraMotionListener?)
@@ -102,8 +102,8 @@ interface ExoPlayer : Player {
     val audioDecoderCounters: DecoderCounters?
     val videoDecoderCounters: DecoderCounters?
     fun setHandleAudioBecomingNoisy(handleAudioBecomingNoisy: Boolean)
-    fun setWakeMode(@C.WakeMode wakeMode: @C.WakeMode Int)
-    fun setPriority(priority: @C.Priority Int)
+    fun setWakeMode( wakeMode:  Int)
+    fun setPriority(priority: Int)
     fun setPriorityTaskManager(priorityTaskManager: PriorityTaskManager?)
     val isSleepingForOffload: Boolean
     val isTunnelingEnabled: Boolean

@@ -130,7 +130,7 @@ class DebugTextViewHelper(private val player: ExoPlayer, private val textView: T
 
         override fun onPlayWhenReadyChanged(
             playWhenReady: Boolean,
-            @Player.PlayWhenReadyChangeReason reason: @Player.PlayWhenReadyChangeReason Int
+             reason:  Int
         ) {
             updateAndPost()
         }
@@ -138,7 +138,7 @@ class DebugTextViewHelper(private val player: ExoPlayer, private val textView: T
         override fun onPositionDiscontinuity(
             oldPosition: Player.PositionInfo,
             newPosition: Player.PositionInfo,
-            @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+             reason:  Int
         ) {
             updateAndPost()
         }

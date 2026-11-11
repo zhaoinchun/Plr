@@ -32,7 +32,6 @@ import androidx.media3.common.util.TimedValueQueue
 import androidx.media3.common.util.TimestampIterator
 import androidx.media3.common.util.Util.formatInvariant
 import androidx.media3.common.util.Util.getMaxPendingFramesCountForMediaCodecDecoders
-import androidx.media3.exoplayer.video.VideoSink.FirstFrameReleaseInstruction
 import androidx.media3.exoplayer.video.VideoSink.VideoFrameHandler
 import androidx.media3.exoplayer.video.VideoSink.VideoSinkException
 import com.google.common.base.Preconditions
@@ -67,12 +66,6 @@ class PlaybackVideoGraphWrapper(
     var clock: Clock = Clock.DEFAULT
     var built = false
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [STATE_CREATED, STATE_INITIALIZED, STATE_RELEASED])
-    private annotation class State
-
     private val inputVideoSinks: SparseArray<InputVideoSink?> = SparseArray<InputVideoSink?>()
     private val defaultVideoSink: VideoSink = DefaultVideoSink(
         videoFrameReleaseControl, videoFrameReleaseEarlyTimeForecaster, clock
@@ -102,7 +95,7 @@ class PlaybackVideoGraphWrapper(
     private var requestOpenGlToneMapping = false
     private var isInputSdrToneMapped = false
     private var outputStreamStartPositionUs: Long = C.TIME_UNSET
-    private var outputStreamFirstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int = 0
+    private var outputStreamFirstFrameReleaseInstruction:  Int = 0
     private var currentSurfaceAndSize: Pair<Surface?, Size>? = null
     private var pendingFlushCount = 0
     private var state:  Int = STATE_CREATED
@@ -448,7 +441,7 @@ class PlaybackVideoGraphWrapper(
     }
 
     private fun setChangeFrameRateStrategy(
-        @C.VideoChangeFrameRateStrategy changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+         changeFrameRateStrategy:  Int
     ) {
         defaultVideoSink.setChangeFrameRateStrategy(changeFrameRateStrategy)
     }
@@ -482,7 +475,7 @@ class PlaybackVideoGraphWrapper(
 
         private var videoEffects: List<Effect>
         private var inputFormat: Format? = null
-        private var inputType: @VideoSink.InputType Int = 0
+        private var inputType:  Int = 0
         private var inputBufferTimestampAdjustmentUs: Long = 0
         private var lastFramePresentationTimeUs: Long
         private var consecutiveDroppedFrames = 0
@@ -583,10 +576,10 @@ class PlaybackVideoGraphWrapper(
             get() = isInitialized && this@PlaybackVideoGraphWrapper.isEnded
 
         override fun onInputStreamChanged(
-            inputType: @VideoSink.InputType Int,
+            inputType:  Int,
             format: Format,
             startPositionUs: Long,
-            firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int,
+            firstFrameReleaseInstruction:  Int,
             videoEffects: List<Effect>
         ) {
             Preconditions.checkState(isInitialized)
@@ -707,7 +700,7 @@ class PlaybackVideoGraphWrapper(
         }
 
         override fun setChangeFrameRateStrategy(
-            @C.VideoChangeFrameRateStrategy changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int
+             changeFrameRateStrategy:  Int
         ) {
             if (inputIndex == PRIMARY_SEQUENCE_INDEX) {
                 this@PlaybackVideoGraphWrapper.setChangeFrameRateStrategy(changeFrameRateStrategy)
@@ -834,7 +827,7 @@ class PlaybackVideoGraphWrapper(
         fun registerInputStream(inputFormat: Format) {
             val adjustedInputFormat =
                 inputFormat.copy(colorInfo = getAdjustedInputColorInfo(inputFormat.colorInfo))
-            val videoGraphInputType: @VideoFrameProcessor.InputType Int =
+            val videoGraphInputType: Int =
                 if (inputType == VideoSink.INPUT_TYPE_SURFACE)
                     VideoFrameProcessor.INPUT_TYPE_SURFACE
                 else
@@ -878,7 +871,7 @@ class PlaybackVideoGraphWrapper(
 
     private class StreamChangeInfo(
         val startPositionUs: Long,
-        val firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int,
+        val firstFrameReleaseInstruction:  Int,
         val fromTimestampUs: Long
     )
 

@@ -12,27 +12,6 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue
 import java.util.Arrays
 
 class WebvttCssStyle {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [UNSPECIFIED, STYLE_NORMAL, STYLE_BOLD, STYLE_ITALIC, STYLE_BOLD_ITALIC]
-    )
-    annotation class StyleFlags
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [UNSPECIFIED, FONT_SIZE_UNIT_PIXEL, FONT_SIZE_UNIT_EM, FONT_SIZE_UNIT_PERCENT])
-    annotation class FontSizeUnit
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [UNSPECIFIED, OFF, ON])
-    private annotation class OptionalBoolean
-
     // Selector properties.
     private var targetId = ""
     private var targetTag = ""
@@ -48,15 +27,15 @@ class WebvttCssStyle {
     private var hasFontColor = false
     private var backgroundColor = 0
     private var hasBackgroundColor = false
-    private var linethrough: @OptionalBoolean Int
-    private var underline: @OptionalBoolean Int
-    private var bold: @OptionalBoolean Int
-    private var italic: @OptionalBoolean Int
-    var fontSizeUnit: @FontSizeUnit Int
+    private var linethrough:  Int
+    private var underline:  Int
+    private var bold:  Int
+    private var italic:  Int
+    var fontSizeUnit:  Int
         private set
     var fontSize: Float = 0f
         private set
-    var rubyPosition: @TextAnnotation.Position Int
+    var rubyPosition:  Int
         private set
     var combineUpright: Boolean = false
         private set
@@ -111,7 +90,7 @@ class WebvttCssStyle {
         return score
     }
 
-    val style: @StyleFlags Int
+    val style:  Int
         
         get() {
             if (bold == UNSPECIFIED && italic == UNSPECIFIED) {
@@ -188,12 +167,12 @@ class WebvttCssStyle {
         return this
     }
 
-    fun setFontSizeUnit(unit: @FontSizeUnit Int): WebvttCssStyle {
+    fun setFontSizeUnit(unit:  Int): WebvttCssStyle {
         this.fontSizeUnit = unit
         return this
     }
 
-    fun setRubyPosition(rubyPosition: @TextAnnotation.Position Int): WebvttCssStyle {
+    fun setRubyPosition(rubyPosition:  Int): WebvttCssStyle {
         this.rubyPosition = rubyPosition
         return this
     }

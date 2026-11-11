@@ -91,7 +91,7 @@ class SphericalGLSurfaceView(
     val cameraMotionListener: CameraMotionListener
         get() = scene
 
-    fun setDefaultStereoMode(stereoMode: @C.StereoMode Int) {
+    fun setDefaultStereoMode(stereoMode:  Int) {
         scene.setDefaultStereoMode(stereoMode)
     }
 

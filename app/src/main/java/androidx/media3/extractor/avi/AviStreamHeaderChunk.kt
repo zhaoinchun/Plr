@@ -16,7 +16,7 @@ internal class AviStreamHeaderChunk private constructor(
 ) : AviChunk {
     override val type: Int=AviExtractor.FOURCC_strh
 
-    val trackType: @C.TrackType Int
+    val trackType: Int
         get() {
             when (streamType) {
                 AviExtractor.FOURCC_auds -> return C.TRACK_TYPE_AUDIO

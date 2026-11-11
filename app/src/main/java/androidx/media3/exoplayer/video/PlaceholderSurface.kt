@@ -8,7 +8,6 @@ import android.os.HandlerThread
 import android.os.Message
 import android.view.Surface
 import androidx.media3.common.util.EGLSurfaceTexture
-import androidx.media3.common.util.EGLSurfaceTexture.SecureMode
 import androidx.media3.common.util.GlUtil
 import androidx.media3.common.util.GlUtil.GlException
 import androidx.media3.common.util.Log.e
@@ -44,7 +43,7 @@ class PlaceholderSurface private constructor(
         private var initException: RuntimeException? = null
         private var surface: PlaceholderSurface? = null
 
-        fun init(secureMode: @SecureMode Int): PlaceholderSurface {
+        fun init(secureMode:  Int): PlaceholderSurface {
             start()
             handler = Handler(getLooper(),  this)
             eglSurfaceTexture = EGLSurfaceTexture(handler!!)
@@ -114,7 +113,7 @@ class PlaceholderSurface private constructor(
         }
 
         @Throws(GlException::class)
-        fun initInternal(secureMode: @SecureMode Int) {
+        fun initInternal(secureMode:  Int) {
             eglSurfaceTexture!!.init(secureMode)
             this.surface =
                 PlaceholderSurface(
@@ -137,7 +136,7 @@ class PlaceholderSurface private constructor(
     companion object {
         private const val TAG = "PlaceholderSurface"
 
-        private var secureMode: @SecureMode Int = 0
+        private var secureMode:  Int = 0
         private var secureModeInitialized = false
 
         @Synchronized
@@ -155,7 +154,7 @@ class PlaceholderSurface private constructor(
             return thread.init(if (secure) secureMode else EGLSurfaceTexture.SECURE_MODE_NONE)
         }
 
-        private fun getSecureMode(context: Context): @SecureMode Int {
+        private fun getSecureMode(context: Context):  Int {
             try {
                 if (GlUtil.isProtectedContentExtensionSupported(context)) {
                     if (GlUtil.isSurfacelessContextExtensionSupported) {

@@ -23,7 +23,7 @@ import kotlin.math.min
 open class AdaptiveTrackSelection(
     group: TrackGroup,
     tracks: IntArray,
-    type: @TrackSelection.Type Int,
+    type:  Int,
     private val bandwidthMeter: BandwidthMeter,
     minDurationForQualityIncreaseMs: Long,
     maxDurationForQualityDecreaseMs: Long,
@@ -161,7 +161,7 @@ open class AdaptiveTrackSelection(
     private val adaptationCheckpoints: List<AdaptationCheckpoint> = adaptationCheckpoints.toList()
     private var playbackSpeed = 1f
     override var selectedIndex = 0
-    private var reason: @C.SelectionReason Int = C.SELECTION_REASON_UNKNOWN
+    private var reason:  Int = C.SELECTION_REASON_UNKNOWN
     private var lastBufferEvaluationMs = C.TIME_UNSET
     private var lastBufferEvaluationMediaChunk: MediaChunk? = null
     override var latestBitrateEstimate = C.RATE_UNSET_INT.toLong()
@@ -201,7 +201,7 @@ open class AdaptiveTrackSelection(
         }
 
         var previousSelectedIndex = selectedIndex
-        var previousReason: @C.SelectionReason Int = reason
+        var previousReason:  Int = reason
         val formatIndexOfPreviousChunk =
             if (queue.isEmpty()) C.INDEX_UNSET else indexOf(Iterables.getLast(queue).trackFormat)
         if (formatIndexOfPreviousChunk != C.INDEX_UNSET) {
@@ -235,7 +235,7 @@ open class AdaptiveTrackSelection(
         selectedIndex = newSelectedIndex
     }
 
-    override val selectionReason: @C.SelectionReason Int
+    override val selectionReason:  Int
         get() = reason
 
     override val selectionData = null

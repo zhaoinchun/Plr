@@ -35,7 +35,7 @@ object SmtaAtomUtil {
 
                 // Each field is stored as a key (1  byte) value (1 byte) pairs.
                 // The order of the fields is not guaranteed.
-                var recordingMode: @RecordingMode Int = NO_VALUE
+                var recordingMode:  Int = NO_VALUE
                 var svcTemporalLayerCount = 0
                 for (i in 0..1) {
                     val key = smta.readUnsignedByte()
@@ -65,7 +65,7 @@ object SmtaAtomUtil {
     }
 
     private fun getCaptureFrameRate(
-        recordingMode: @RecordingMode Int, smta: ParsableByteArray, limit: Int
+        recordingMode:  Int, smta: ParsableByteArray, limit: Int
     ): Int {
         // V2 and V2_120 have fixed capture frame rates.
         if (recordingMode == CAMCORDER_SLOW_MOTION_V2) {
@@ -88,14 +88,4 @@ object SmtaAtomUtil {
         // Capture frame rate is in Q16 format.
         return smta.readUnsignedFixedPoint1616()
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        open = true,
-        value = [NO_VALUE, CAMCORDER_NORMAL, CAMCORDER_SINGLE_SUPERSLOW_MOTION, CAMCORDER_FRC_SUPERSLOW_MOTION, CAMCORDER_SLOW_MOTION_V2, CAMCORDER_SLOW_MOTION_V2_120, CAMCORDER_SLOW_MOTION_V2_HEVC, CAMCORDER_FRC_SUPERSLOW_MOTION_HEVC, CAMCORDER_QFRC_SUPERSLOW_MOTION
-        ]
-    )
-    private annotation class RecordingMode
 }

@@ -15,30 +15,8 @@ interface Renderer : PlayerMessage.Target {
         fun onSleep()
         fun onWakeup()
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        open = true,
-        value = [MSG_SET_VIDEO_OUTPUT, MSG_SET_VOLUME, MSG_SET_AUDIO_ATTRIBUTES, MSG_SET_SCALING_MODE,
-            MSG_SET_CHANGE_FRAME_RATE_STRATEGY, MSG_SET_AUX_EFFECT_INFO, MSG_SET_VIDEO_FRAME_METADATA_LISTENER,
-            MSG_SET_CAMERA_MOTION_LISTENER, MSG_SET_SKIP_SILENCE_ENABLED, MSG_SET_AUDIO_SESSION_ID,
-            MSG_SET_WAKEUP_LISTENER, MSG_SET_PREFERRED_AUDIO_DEVICE, MSG_SET_VIDEO_EFFECTS,
-            MSG_SET_VIDEO_OUTPUT_RESOLUTION, MSG_SET_IMAGE_OUTPUT, MSG_SET_PRIORITY, MSG_TRANSFER_RESOURCES,
-            MSG_SET_SCRUBBING_MODE, MSG_SET_VIRTUAL_DEVICE_ID, MSG_SET_AUDIO_OUTPUT_PROVIDER,
-            MSG_SET_CODEC_PARAMETERS, MSG_SET_SUBSCRIBED_CODEC_PARAMETER_KEYS, MSG_SET_IMAGE_METADATA_LISTENER]
-    )
-    annotation class MessageType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [STATE_DISABLED, STATE_ENABLED, STATE_STARTED])
-    annotation class State
-
     val name: String?
-    val trackType: @C.TrackType Int
+    val trackType: Int
     val capabilities: RendererCapabilities?
     fun init(index: Int, playerId: PlayerId?, clock: Clock?)
     val mediaClock: MediaClock?

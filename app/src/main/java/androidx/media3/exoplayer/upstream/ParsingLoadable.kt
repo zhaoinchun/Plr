@@ -21,7 +21,7 @@ class ParsingLoadable<T> : Loadable {
 
     val loadTaskId: Long= LoadEventInfo.newId
     val dataSpec: DataSpec
-    val type: @C.DataType Int
+    val type: Int
     val steeredPathwayId: String?= null
     private val dataSource: StatsDataSource
     private val parser: Parser<out T?>
@@ -33,7 +33,7 @@ class ParsingLoadable<T> : Loadable {
     constructor(
         dataSource: DataSource,
         uri: Uri,
-        type: @C.DataType Int,
+        type: Int,
         parser: Parser<out T?>
     ) : this(
         dataSource,
@@ -46,7 +46,7 @@ class ParsingLoadable<T> : Loadable {
     constructor(
         dataSource: DataSource,
         dataSpec: DataSpec,
-        type: @C.DataType Int,
+        type: Int,
         parser: Parser<out T?>
     ) {
         this.dataSource = StatsDataSource(dataSource)
@@ -86,7 +86,7 @@ class ParsingLoadable<T> : Loadable {
     companion object {
         @Throws(IOException::class)
         fun <T> load(
-            dataSource: DataSource, parser: Parser<out T>, uri: Uri, type: @C.DataType Int
+            dataSource: DataSource, parser: Parser<out T>, uri: Uri, type: Int
         ): T? {
             val loadable = ParsingLoadable<T>(dataSource, uri, type, parser)
             loadable.load()
@@ -98,7 +98,7 @@ class ParsingLoadable<T> : Loadable {
             dataSource: DataSource,
             parser: Parser<out T>,
             dataSpec: DataSpec,
-            type: @C.DataType Int
+            type: Int
         ): T {
             val loadable = ParsingLoadable<T>(dataSource, dataSpec, type, parser)
             loadable.load()

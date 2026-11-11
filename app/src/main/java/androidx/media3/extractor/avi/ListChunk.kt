@@ -21,7 +21,7 @@ internal class ListChunk private constructor(
         fun parseFrom(listType: Int, body: ParsableByteArray): ListChunk {
             val builder = mutableListOf<AviChunk>()
             val listBodyEndPosition = body.limit()
-            var currentTrackType: @C.TrackType Int = C.TRACK_TYPE_NONE
+            var currentTrackType: Int = C.TRACK_TYPE_NONE
             while (body.bytesLeft() > 8) {
                 val type = body.readLittleEndianInt()
                 val size = body.readLittleEndianInt()
@@ -47,7 +47,7 @@ internal class ListChunk private constructor(
         }
 
         private fun createBox(
-            chunkType: Int, trackType: @C.TrackType Int, body: ParsableByteArray
+            chunkType: Int, trackType: Int, body: ParsableByteArray
         ): AviChunk? {
             when (chunkType) {
                 AviExtractor.FOURCC_avih -> return AviMainHeaderChunk.parseFrom(

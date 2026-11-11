@@ -16,7 +16,6 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.scheduler.Requirements
-import androidx.media3.exoplayer.scheduler.Requirements.RequirementFlags
 import androidx.media3.exoplayer.scheduler.RequirementsWatcher
 import com.google.common.base.Preconditions
 import java.io.IOException
@@ -56,7 +55,7 @@ class DownloadManager(
         fun onRequirementsStateChanged(
             downloadManager: DownloadManager?,
             requirements: Requirements?,
-            @RequirementFlags notMetRequirements: @RequirementFlags Int
+             notMetRequirements:  Int
         ) {
         }
 
@@ -84,7 +83,6 @@ class DownloadManager(
     private var maxParallelDownloads = DEFAULT_MAX_PARALLEL_DOWNLOADS
     private var minRetryCount = DEFAULT_MIN_RETRY_COUNT
 
-    @get:RequirementFlags
     var notMetRequirements: Int
         private set
 
@@ -294,7 +292,7 @@ class DownloadManager(
 
     private fun onRequirementsStateChanged(
         requirementsWatcher: RequirementsWatcher,
-        @RequirementFlags notMetRequirements: @RequirementFlags Int
+         notMetRequirements:  Int
     ) {
         val requirements = requirementsWatcher.requirements
         if (this.notMetRequirements != notMetRequirements) {
@@ -411,7 +409,7 @@ class DownloadManager(
 
         private val downloads = ArrayList<Download>()
         private val activeTasks = HashMap<String?, Task>()
-        private var notMetRequirements: @RequirementFlags Int = 0
+        private var notMetRequirements:  Int = 0
         private var activeDownloadTaskCount = 0
         private var hasActiveRemoveTask = false
 
@@ -528,7 +526,7 @@ class DownloadManager(
             syncTasks()
         }
 
-        fun setNotMetRequirements(@RequirementFlags notMetRequirements: @RequirementFlags Int) {
+        fun setNotMetRequirements( notMetRequirements:  Int) {
             this.notMetRequirements = notMetRequirements
             syncTasks()
         }
@@ -570,7 +568,7 @@ class DownloadManager(
                     )
                 }
             } else if (stopReason != download.stopReason) {
-                @Download.State var state: @Download.State Int = download.state
+                 var state:  Int = download.state
                 if (state == Download.STATE_QUEUED || state == Download.STATE_DOWNLOADING) {
                     state = Download.STATE_STOPPED
                 }
@@ -927,7 +925,7 @@ class DownloadManager(
 
         fun onRemoveTaskStopped(download: Download) {
             if (download.state == Download.STATE_RESTARTING) {
-                @Download.State val state: @Download.State Int =
+                 val state:  Int =
                     if (download.stopReason == Download.STOP_REASON_NONE) Download.STATE_QUEUED else Download.STATE_STOPPED
                 putDownloadWithState(download, state, download.stopReason)
                 syncTasks()
@@ -971,7 +969,7 @@ class DownloadManager(
         }
 
         fun putDownloadWithState(
-            download: Download, @Download.State state: @Download.State Int, stopReason: Int
+            download: Download,  state:  Int, stopReason: Int
         ): Download {
             // Downloads in terminal states shouldn't be in the downloads list.
             Preconditions.checkState(state != Download.STATE_COMPLETED && state != Download.STATE_FAILED)
@@ -1051,7 +1049,7 @@ class DownloadManager(
             private const val UPDATE_PROGRESS_INTERVAL_MS = 5000
 
             private fun copyDownloadWithState(
-                download: Download, @Download.State state: @Download.State Int, stopReason: Int
+                download: Download,  state:  Int, stopReason: Int
             ): Download {
                 return Download(
                     download.request,
@@ -1197,7 +1195,7 @@ class DownloadManager(
         fun mergeRequest(
             download: Download, request: DownloadRequest, stopReason: Int, nowMs: kotlin.Long
         ): Download {
-            @Download.State var state: @Download.State Int = download.state
+             var state:  Int = download.state
             // Treat the merge as creating a new download if we're currently removing the existing one, or
             // if the existing download is in a terminal state. Else treat the merge as updating the
             // existing download.

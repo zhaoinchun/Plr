@@ -25,18 +25,10 @@ import java.io.EOFException
 import java.io.IOException
 import kotlin.math.abs
 
-class AmrExtractor constructor(flags: @Flags Int = 0) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_ENABLE_CONSTANT_BITRATE_SEEKING, FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS, FLAG_ENABLE_INDEX_SEEKING]
-    )
-    annotation class Flags
+class AmrExtractor constructor(flags:  Int = 0) : Extractor {
 
     private val scratch: ByteArray
-    private val flags: @Flags Int
+    private val flags:  Int
     private val skippingTrackOutput: TrackOutput
 
     private var isWideBand = false

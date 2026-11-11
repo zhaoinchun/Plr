@@ -17,7 +17,7 @@ import kotlin.Throws
 class ToInt16PcmAudioProcessor : BaseAudioProcessor() {
     @Throws(AudioProcessor.UnhandledAudioFormatException::class)
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
-        val encoding: @C.PcmEncoding Int = inputAudioFormat.encoding
+        val encoding: Int = inputAudioFormat.encoding
         if (!isEncodingLinearPcm(encoding)) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)
         }

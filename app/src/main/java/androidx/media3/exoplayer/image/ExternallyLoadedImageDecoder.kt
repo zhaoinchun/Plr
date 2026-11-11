@@ -25,7 +25,7 @@ class ExternallyLoadedImageDecoder(private val bitmapResolver: BitmapResolver) :
 
     class Factory
         (private val bitmapResolver: BitmapResolver) : ImageDecoder.Factory {
-        override fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int {
+        override fun supportsFormat(format: Format):  Int {
             val isExternallyLoadedImage =
                 format.sampleMimeType == MimeTypes.APPLICATION_EXTERNALLY_LOADED_IMAGE
             return RendererCapabilities.create(

@@ -468,7 +468,7 @@ object Ac4Util {
     }
 
     private fun getAdjustedChannelCount(
-        channelMode: @ChannelMode Int, hasBackChannels: Boolean, topChannelPairs: Int
+        channelMode:  Int, hasBackChannels: Boolean, topChannelPairs: Int
     ): Int {
         var channelCount = getChannelCountFromChannelMode(channelMode)
         if (channelMode == CHANNEL_MODE_7_0_4 || channelMode == CHANNEL_MODE_7_1_4 || channelMode == CHANNEL_MODE_9_0_4 || channelMode == CHANNEL_MODE_9_1_4) {
@@ -485,7 +485,7 @@ object Ac4Util {
         return channelCount
     }
 
-    private fun getChannelCountFromChannelMode(channelMode: @ChannelMode Int): Int {
+    private fun getChannelCountFromChannelMode(channelMode:  Int): Int {
         when (channelMode) {
             CHANNEL_MODE_MONO -> return 1
             CHANNEL_MODE_STEREO -> return 2
@@ -627,19 +627,9 @@ object Ac4Util {
         val frameSize: Int,
         val sampleCount: Int
     )
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [CHANNEL_MODE_UNKNOWN, CHANNEL_MODE_MONO, CHANNEL_MODE_STEREO, CHANNEL_MODE_3_0, CHANNEL_MODE_5_0, CHANNEL_MODE_5_1, CHANNEL_MODE_7_0_34, CHANNEL_MODE_7_1_34, CHANNEL_MODE_7_0_52, CHANNEL_MODE_7_1_52, CHANNEL_MODE_7_0_322, CHANNEL_MODE_7_1_322, CHANNEL_MODE_7_0_4, CHANNEL_MODE_7_1_4, CHANNEL_MODE_9_0_4, CHANNEL_MODE_9_1_4, CHANNEL_MODE_22_2
-        ]
-    )
-    private annotation class ChannelMode
-
     private class Ac4Presentation {
         var isChannelCoded: Boolean = true
-        var channelMode: @ChannelMode Int
+        var channelMode:  Int
         var numOfUmxObjects: Int
         var hasBackChannels: Boolean = true
         var topChannelPairs: Int = 2

@@ -51,7 +51,7 @@ class PesReader(private val reader: ElementaryStreamReader) : TsPayloadReader {
     }
 
     @Throws(ParserException::class)
-    override fun consume(data: ParsableByteArray, flags: @TsPayloadReader.Flags Int) {
+    override fun consume(data: ParsableByteArray, flags:  Int) {
         // Asserts init has been called.
         var flags = flags
         timestampAdjuster!!

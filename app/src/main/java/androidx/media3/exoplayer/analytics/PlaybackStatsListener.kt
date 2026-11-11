@@ -10,7 +10,6 @@ import androidx.media3.common.Timeline
 import androidx.media3.common.VideoSize
 
 import androidx.media3.common.util.Util.usToMs
-import androidx.media3.exoplayer.analytics.AnalyticsListener.EventFlags
 import androidx.media3.exoplayer.analytics.AnalyticsListener.EventTime
 import androidx.media3.exoplayer.analytics.PlaybackStats.EventTimeAndException
 import androidx.media3.exoplayer.analytics.PlaybackStats.EventTimeAndFormat
@@ -37,8 +36,8 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
     private var discontinuityFromSession: String? = null
     private var discontinuityFromPositionMs: Long = 0
 
-    @Player.DiscontinuityReason
-    private var discontinuityReason: @Player.DiscontinuityReason Int = 0
+    
+    private var discontinuityReason:  Int = 0
     private var droppedFrames = 0
     private var nonFatalException: Exception? = null
     private var bandwidthTimeMs: Long = 0
@@ -111,7 +110,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
         eventTime: EventTime,
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+         reason:  Int
     ) {
         if (discontinuityFromSession == null) {
             discontinuityFromSession = sessionManager.activeSessionId
@@ -221,7 +220,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
 
     private fun maybeAddSessions(events: AnalyticsListener.Events) {
         for (i in 0..<events.size()) {
-            @EventFlags val event: @EventFlags Int = events.get(i)
+             val event:  Int = events.get(i)
             val eventTime = events.getEventTime(event)
             if (event == AnalyticsListener.EVENT_TIMELINE_CHANGED) {
                 sessionManager.updateSessionsWithTimelineChange(eventTime)
@@ -240,7 +239,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
         var eventTime: EventTime? = null
         var belongsToPlayback = false
         for (i in 0..<events.size()) {
-            @EventFlags val event: @EventFlags Int = events.get(i)
+             val event:  Int = events.get(i)
             val newEventTime = events.getEventTime(event)
             val newBelongsToPlayback = sessionManager.belongsToSession(newEventTime, session)
             if (eventTime == null || (newBelongsToPlayback && !belongsToPlayback)
@@ -288,7 +287,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
     private fun hasEvent(
         events: AnalyticsListener.Events,
         session: String,
-        @EventFlags event: @EventFlags Int
+         event:  Int
     ): Boolean {
         return events.contains(event)
                 && sessionManager.belongsToSession(events.getEventTime(event), session)
@@ -332,7 +331,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
         private var nonFatalErrorCount = 0
 
         // Current player state tracking.
-        private var currentPlaybackState: @PlaybackStats.PlaybackState Int
+        private var currentPlaybackState:  Int
         private var currentPlaybackStateStartTimeMs: Long
         private var isSeeking = false
         private var isForeground = false
@@ -383,7 +382,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
             eventTime: EventTime, automaticTransition: Boolean, discontinuityFromPositionMs: Long
         ) {
             // Simulate state change to ENDED to record natural ending of playback.
-            val finalPlaybackState: @PlaybackStats.PlaybackState Int =
+            val finalPlaybackState:  Int =
                 if (currentPlaybackState == PlaybackStats.PLAYBACK_STATE_ENDED || automaticTransition)
                     PlaybackStats.PLAYBACK_STATE_ENDED
                 else
@@ -467,7 +466,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
                 }
             }
 
-            val newPlaybackState: @PlaybackStats.PlaybackState Int = resolveNewPlaybackState(player)
+            val newPlaybackState:  Int = resolveNewPlaybackState(player)
             val newPlaybackSpeed = player.playbackParameters!!.speed
             if (currentPlaybackState != newPlaybackState || currentPlaybackSpeed != newPlaybackSpeed) {
                 maybeUpdateMediaTimeHistory(
@@ -563,7 +562,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
         }
 
         fun updatePlaybackState(
-            newPlaybackState: @PlaybackStats.PlaybackState Int,
+            newPlaybackState:  Int,
             eventTime: EventTime
         ) {
             Preconditions.checkArgument(eventTime.realtimeMs >= currentPlaybackStateStartTimeMs)
@@ -601,7 +600,7 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
             }
         }
 
-        fun resolveNewPlaybackState(player: Player): @PlaybackStats.PlaybackState Int {
+        fun resolveNewPlaybackState(player: Player):  Int {
              val playerPlaybackState:  Int = player.playbackState
             if (isSeeking && isForeground) {
                 // Seeking takes precedence over errors such that we report a seek while in error state.
@@ -751,22 +750,22 @@ class PlaybackStatsListener(private val keepHistory: Boolean, private val callba
         }
 
         companion object {
-            private fun isReadyState(state: @PlaybackStats.PlaybackState Int): Boolean {
+            private fun isReadyState(state:  Int): Boolean {
                 return state == PlaybackStats.PLAYBACK_STATE_PLAYING || state == PlaybackStats.PLAYBACK_STATE_PAUSED || state == PlaybackStats.PLAYBACK_STATE_SUPPRESSED
             }
 
-            private fun isPausedState(state: @PlaybackStats.PlaybackState Int): Boolean {
+            private fun isPausedState(state:  Int): Boolean {
                 return state == PlaybackStats.PLAYBACK_STATE_PAUSED
                         || state == PlaybackStats.PLAYBACK_STATE_PAUSED_BUFFERING
             }
 
-            private fun isRebufferingState(state: @PlaybackStats.PlaybackState Int): Boolean {
+            private fun isRebufferingState(state:  Int): Boolean {
                 return state == PlaybackStats.PLAYBACK_STATE_BUFFERING || state == PlaybackStats.PLAYBACK_STATE_PAUSED_BUFFERING || state == PlaybackStats.PLAYBACK_STATE_SUPPRESSED_BUFFERING
             }
 
             private fun isInvalidJoinTransition(
-                oldState: @PlaybackStats.PlaybackState Int,
-                newState: @PlaybackStats.PlaybackState Int
+                oldState:  Int,
+                newState:  Int
             ): Boolean {
                 if (oldState != PlaybackStats.PLAYBACK_STATE_JOINING_BACKGROUND && oldState != PlaybackStats.PLAYBACK_STATE_JOINING_FOREGROUND && oldState != PlaybackStats.PLAYBACK_STATE_INTERRUPTED_BY_AD) {
                     return false

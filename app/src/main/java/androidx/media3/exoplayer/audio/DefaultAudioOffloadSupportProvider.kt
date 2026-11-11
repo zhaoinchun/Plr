@@ -31,7 +31,7 @@ class DefaultAudioOffloadSupportProvider(context: Context? = null) : AudioOffloa
         // the constructor so that the platform will be queried from the playback thread.
         val isOffloadVariableRateSupported = isOffloadVariableRateSupported(context)
 
-        val encoding: @C.Encoding Int = getEncoding(
+        val encoding: Int = getEncoding(
             format.sampleMimeType!!,
             format.codecs
         )

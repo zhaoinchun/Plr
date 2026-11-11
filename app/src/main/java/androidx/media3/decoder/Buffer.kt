@@ -2,10 +2,9 @@ package androidx.media3.decoder
 
 import androidx.annotation.CallSuper
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
 
 abstract class Buffer {
-    private var flags: @BufferFlags Int = 0
+    private var flags:  Int = 0
 
     @CallSuper
     open fun clear() {
@@ -32,19 +31,19 @@ abstract class Buffer {
         return getFlag(C.BUFFER_FLAG_NOT_DEPENDED_ON)
     }
 
-    fun setFlags(flags: @BufferFlags Int) {
+    fun setFlags(flags:  Int) {
         this.flags = flags
     }
 
-    fun addFlag(flag: @BufferFlags Int) {
+    fun addFlag(flag:  Int) {
         flags = flags or flag
     }
 
-    fun clearFlag(flag: @BufferFlags Int) {
+    fun clearFlag(flag:  Int) {
         flags = flags and flag.inv()
     }
 
-    protected fun getFlag(flag: @BufferFlags Int): Boolean {
+    protected fun getFlag(flag:  Int): Boolean {
         return (flags and flag) == flag
     }
 }

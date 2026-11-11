@@ -14,7 +14,7 @@ class DefaultDownloaderFactory(
     private val segmentDownloaderFactories = SparseArray<SegmentDownloaderFactory>()
 
     override fun createDownloader(request: DownloadRequest): Downloader {
-        @C.ContentType val contentType: @C.ContentType Int =
+         val contentType:  Int =
             inferContentTypeForUriAndMimeType(request.uri, request.mimeType)
         when (contentType) {
             C.CONTENT_TYPE_DASH, C.CONTENT_TYPE_HLS, C.CONTENT_TYPE_SS -> return createSegmentDownloader(
@@ -41,7 +41,7 @@ class DefaultDownloaderFactory(
     }
 
     private fun createSegmentDownloader(
-        request: DownloadRequest, @C.ContentType contentType: @C.ContentType Int
+        request: DownloadRequest,  contentType:  Int
     ): Downloader {
         val downloaderFactory =
             getSegmentDownloaderFactory(contentType, cacheDataSourceFactory)
@@ -61,7 +61,7 @@ class DefaultDownloaderFactory(
 
     // LINT.IfChange
     private fun getSegmentDownloaderFactory(
-        @C.ContentType contentType: @C.ContentType Int,
+         contentType:  Int,
         cacheDataSourceFactory: CacheDataSource.Factory?
     ): SegmentDownloaderFactory {
         if (segmentDownloaderFactories.contains(contentType)) {
@@ -79,7 +79,7 @@ class DefaultDownloaderFactory(
 
     @Throws(ClassNotFoundException::class)
     private fun loadSegmentDownloaderFactory(
-        @C.ContentType contentType: @C.ContentType Int,
+         contentType:  Int,
         cacheDataSourceFactory: CacheDataSource.Factory?
     ): SegmentDownloaderFactory {
         val factory: SegmentDownloaderFactory

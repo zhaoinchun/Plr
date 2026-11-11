@@ -15,15 +15,7 @@ import com.google.common.base.Preconditions
 
 import java.io.IOException
 
-class HeifExtractor  constructor(flags: @Flags Int = 0) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true, value = [FLAG_READ_IMAGE]
-    )
-    annotation class Flags
-
+class HeifExtractor  constructor(flags:  Int = 0) : Extractor {
     private val imageExtractor: Extractor
     private val videoExtractor: Extractor?
 
@@ -58,7 +50,7 @@ class HeifExtractor  constructor(flags: @Flags Int = 0) : Extractor {
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         if (activeExtractor == null) {
             assignActiveExtractor(input)
         }

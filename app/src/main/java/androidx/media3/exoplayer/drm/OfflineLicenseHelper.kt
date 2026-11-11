@@ -131,7 +131,7 @@ class OfflineLicenseHelper(
 
     @Throws(DrmSessionException::class)
     private fun acquireSessionAndGetOfflineLicenseKeySetIdOnHandlerThread(
-        licenseMode: @DefaultDrmSessionManager.Mode Int,
+        licenseMode:  Int,
         offlineLicenseKeySetId: ByteArray?,
         format: Format
     ): ByteArray {
@@ -160,7 +160,7 @@ class OfflineLicenseHelper(
 
     @Throws(DrmSessionException::class)
     private fun acquireFirstSessionOnHandlerThread(
-        licenseMode: @DefaultDrmSessionManager.Mode Int,
+        licenseMode:  Int,
         offlineLicenseKeySetId: ByteArray?,
         format: Format
     ): DrmSession {

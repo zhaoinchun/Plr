@@ -1,7 +1,7 @@
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
-import androidx.media3.common.C.RoleFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.ParserException
 import androidx.media3.common.util.ParsableByteArray
@@ -9,7 +9,6 @@ import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.common.util.Util.sampleCountToDurationUs
 import androidx.media3.extractor.DtsUtil
 import androidx.media3.extractor.DtsUtil.DtsHeader
-import androidx.media3.extractor.DtsUtil.FrameType
 import androidx.media3.extractor.DtsUtil.getDtsFrameSize
 import androidx.media3.extractor.DtsUtil.getFrameType
 import androidx.media3.extractor.DtsUtil.parseDtsAudioSampleCount
@@ -30,7 +29,7 @@ import kotlin.math.min
 
 class DtsReader(
     language: String?,
-    @RoleFlags roleFlags: @RoleFlags Int,
+    roleFlags: Int,
     maxHeaderSize: Int,
     containerMimeType: String?
 ) : ElementaryStreamReader {
@@ -40,8 +39,8 @@ class DtsReader(
 
     private val language: String?
 
-    @RoleFlags
-    private val roleFlags: @RoleFlags Int
+    
+    private val roleFlags: Int
     private val containerMimeType: String?
 
     private var formatId: String? = null
@@ -58,7 +57,7 @@ class DtsReader(
     private var format: Format? = null
     private var sampleSize = 0
     private var coreSampleSize = 0
-    private var frameType: @FrameType Int = 0
+    private var frameType: Int = 0
     private var extensionSubstreamHeaderSize: Int
     private var uhdHeaderSize: Int
 
@@ -101,7 +100,7 @@ class DtsReader(
         output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO)
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         if (pesTimeUs != C.TIME_UNSET) {
             if (state != STATE_FINDING_SYNC) {
                 pendingTimeUs = pesTimeUs

@@ -8,15 +8,6 @@ import androidx.media3.common.util.TimestampIterator
 import java.util.concurrent.Executor
 
 interface VideoFrameProcessor {
-    
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [INPUT_TYPE_SURFACE, INPUT_TYPE_BITMAP, INPUT_TYPE_TEXTURE_ID, INPUT_TYPE_SURFACE_AUTOMATIC_FRAME_REGISTRATION
-        ]
-    )
-    annotation class InputType
 
     interface Factory {
         @Throws(VideoFrameProcessingException::class)
@@ -33,7 +24,7 @@ interface VideoFrameProcessor {
     interface Listener {
         
         fun onInputStreamRegistered(
-            inputType: @InputType Int, format: Format?, effects: MutableList<Effect?>?
+            inputType: Int, format: Format?, effects: MutableList<Effect?>?
         ) {
         }
 
@@ -68,7 +59,7 @@ interface VideoFrameProcessor {
     fun redraw()
 
     fun registerInputStream(
-        inputType: @InputType Int,
+        inputType: Int,
         format: Format?,
         effects: MutableList<Effect?>?,
         offsetToAddUs: Long

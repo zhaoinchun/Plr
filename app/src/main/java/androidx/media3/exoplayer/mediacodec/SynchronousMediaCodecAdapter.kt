@@ -168,7 +168,7 @@ class SynchronousMediaCodecAdapter private constructor(
         codec.setParameters(params)
     }
 
-    override fun setVideoScalingMode(@C.VideoScalingMode scalingMode: @C.VideoScalingMode Int) {
+    override fun setVideoScalingMode( scalingMode:  Int) {
         codec.setVideoScalingMode(scalingMode)
     }
 

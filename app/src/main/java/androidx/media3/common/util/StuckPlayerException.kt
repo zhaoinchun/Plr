@@ -20,7 +20,7 @@ import androidx.annotation.IntDef
 class StuckPlayerException
 (
     
-    val stuckType: @StuckType Int,
+    val stuckType:  Int,
     
     val timeoutMs: Int
 ) : IllegalStateException(
@@ -29,16 +29,6 @@ class StuckPlayerException
         timeoutMs
     )
 ) {
-    
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STUCK_BUFFERING_NOT_LOADING, STUCK_BUFFERING_NO_PROGRESS, STUCK_PLAYING_NO_PROGRESS, STUCK_PLAYING_NOT_ENDING, STUCK_SUPPRESSED
-        ]
-    )
-    annotation class StuckType
-
     override fun equals(obj: Any?): Boolean {
         if (this === obj) {
             return true
@@ -69,7 +59,7 @@ class StuckPlayerException
 
         const val STUCK_SUPPRESSED: Int = 4
 
-        private fun getMessage(stuckType: @StuckType Int, timeoutMs: Int): String {
+        private fun getMessage(stuckType:  Int, timeoutMs: Int): String {
             when (stuckType) {
                 STUCK_BUFFERING_NOT_LOADING -> return "Player stuck buffering and not loading for " + timeoutMs + " ms"
                 STUCK_BUFFERING_NO_PROGRESS -> return "Player stuck buffering with no progress for " + timeoutMs + " ms"

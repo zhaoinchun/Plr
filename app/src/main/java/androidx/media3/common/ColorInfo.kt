@@ -1,15 +1,13 @@
 package androidx.media3.common
 
 import android.os.Bundle
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
 import androidx.media3.common.util.Util
 import org.checkerframework.dataflow.qual.Pure
 
 data class ColorInfo(
-    val colorSpace: @C.ColorSpace Int = Format.NO_VALUE,
-    val colorRange: @ColorRange Int = Format.NO_VALUE,
-    val colorTransfer: @ColorTransfer Int = Format.NO_VALUE,
+    val colorSpace: Int = Format.NO_VALUE,
+    val colorRange: Int = Format.NO_VALUE,
+    val colorTransfer: Int = Format.NO_VALUE,
     val hdrStaticInfo: ByteArray? = null,
     val lumaBitdepth: Int = Format.NO_VALUE,
     val chromaBitdepth: Int = Format.NO_VALUE
@@ -123,7 +121,7 @@ data class ColorInfo(
         }
 
         @Pure
-        fun isoColorPrimariesToColorSpace(isoColorPrimaries: Int): @C.ColorSpace Int {
+        fun isoColorPrimariesToColorSpace(isoColorPrimaries: Int): Int {
             when (isoColorPrimaries) {
                 1 -> return C.COLOR_SPACE_BT709
                 4, 5, 6, 7 -> return C.COLOR_SPACE_BT601
@@ -133,7 +131,7 @@ data class ColorInfo(
             }
         }
 
-        fun colorSpaceToIsoColorPrimaries(colorSpace: @C.ColorSpace Int): Int {
+        fun colorSpaceToIsoColorPrimaries(colorSpace: Int): Int {
             when (colorSpace) {
                 Format.NO_VALUE, C.COLOR_SPACE_BT709 -> return 1
                 C.COLOR_SPACE_BT601 -> return 5
@@ -142,7 +140,7 @@ data class ColorInfo(
             return 1
         }
 
-        fun colorSpaceToIsoMatrixCoefficients(colorSpace: @C.ColorSpace Int): Int {
+        fun colorSpaceToIsoMatrixCoefficients(colorSpace: Int): Int {
             when (colorSpace) {
                 Format.NO_VALUE, C.COLOR_SPACE_BT709 -> return 1
                 C.COLOR_SPACE_BT601 -> return 6
@@ -154,7 +152,7 @@ data class ColorInfo(
         @Pure
         fun isoTransferCharacteristicsToColorTransfer(
             isoTransferCharacteristics: Int
-        ): @ColorTransfer Int {
+        ): Int {
             when (isoTransferCharacteristics) {
                 1, 6, 7 -> return C.COLOR_TRANSFER_SDR
                 4 -> return C.COLOR_TRANSFER_GAMMA_2_2
@@ -165,7 +163,7 @@ data class ColorInfo(
             }
         }
 
-        fun colorTransferToIsoTransferCharacteristics(colorTransfer: @ColorTransfer Int): Int {
+        fun colorTransferToIsoTransferCharacteristics(colorTransfer: Int): Int {
             when (colorTransfer) {
                 C.COLOR_TRANSFER_LINEAR -> return 8
                 C.COLOR_TRANSFER_SRGB -> return 13
@@ -191,7 +189,7 @@ data class ColorInfo(
             return if (`val` != Format.NO_VALUE) `val`.toString() + "bit Chroma" else "NA"
         }
 
-        private fun colorSpaceToString(colorSpace: @C.ColorSpace Int): String {
+        private fun colorSpaceToString(colorSpace: Int): String {
             // LINT.IfChange(color_space)
             when (colorSpace) {
                 Format.NO_VALUE -> return "Unset color space"
@@ -203,7 +201,7 @@ data class ColorInfo(
             // LINT.ThenChange(C.java:color_space)
         }
 
-        private fun colorTransferToString(colorTransfer: @ColorTransfer Int): String {
+        private fun colorTransferToString(colorTransfer: Int): String {
             when (colorTransfer) {
                 Format.NO_VALUE -> return "Unset color transfer"
                 C.COLOR_TRANSFER_LINEAR -> return "Linear"
@@ -216,7 +214,7 @@ data class ColorInfo(
             }
         }
 
-        private fun colorRangeToString(colorRange: @ColorRange Int): String {
+        private fun colorRangeToString(colorRange: Int): String {
             when (colorRange) {
                 Format.NO_VALUE -> return "Unset color range"
                 C.COLOR_RANGE_LIMITED -> return "Limited range"

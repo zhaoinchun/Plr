@@ -23,15 +23,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class WavExtractor : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_READING_FILE_TYPE, STATE_READING_RF64_SAMPLE_DATA_SIZE, STATE_READING_FORMAT, STATE_SKIPPING_TO_SAMPLE_DATA, STATE_READING_SAMPLE_DATA
-        ]
-    )
-    private annotation class State
-
     private lateinit var extractorOutput: ExtractorOutput
     private lateinit var trackOutput: TrackOutput
     private var state:  Int
@@ -73,7 +64,7 @@ class WavExtractor : Extractor {
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         assertInitialized()
         when (state) {
             STATE_READING_FILE_TYPE -> {
@@ -155,7 +146,7 @@ class WavExtractor : Extractor {
                     Format.NO_VALUE
                 )
         } else {
-            val pcmEncoding: @C.PcmEncoding Int =
+            val pcmEncoding: Int =
                 WavUtil.getPcmEncodingForType(wavFormat.formatType, wavFormat.bitsPerSample)
             if (pcmEncoding == C.ENCODING_INVALID) {
                 throw ParserException.createForUnsupportedContainerFeature(
@@ -191,7 +182,7 @@ class WavExtractor : Extractor {
     }
 
     @Throws(IOException::class)
-    private fun readSampleData(input: ExtractorInput): @Extractor.ReadResult Int {
+    private fun readSampleData(input: ExtractorInput):  Int {
         Preconditions.checkState(dataEndPosition != C.INDEX_UNSET.toLong())
         val bytesLeft: Long = dataEndPosition - input.position
         return if (outputWriter!!.sampleData(input, bytesLeft))
@@ -216,7 +207,7 @@ class WavExtractor : Extractor {
         trackOutput: TrackOutput,
         val wavFormat: WavFormat,
         mimeType: String?,
-        pcmEncoding: @C.PcmEncoding Int
+        pcmEncoding: Int
     ) : OutputWriter {
         private val extractorOutput: ExtractorOutput
         private val trackOutput: TrackOutput

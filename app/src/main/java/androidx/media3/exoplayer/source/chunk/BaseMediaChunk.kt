@@ -9,7 +9,7 @@ abstract class BaseMediaChunk(
     dataSource: DataSource,
     dataSpec: DataSpec,
     trackFormat: Format,
-    trackSelectionReason: @C.SelectionReason Int,
+    trackSelectionReason:  Int,
     trackSelectionData: Any?,
     startTimeUs: Long,
     endTimeUs: Long,

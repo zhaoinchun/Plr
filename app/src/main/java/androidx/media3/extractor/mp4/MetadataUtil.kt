@@ -64,7 +64,7 @@ internal object MetadataUtil {
     private const val TYPE_TOP_BYTE_REPLACEMENT = 0xFD // Truncated value of \uFFFD.
 
     fun setFormatMetadata(
-        trackType: @C.TrackType Int,
+        trackType: Int,
         mdtaMetadata: Metadata?,
         existingMetadata: Metadata?,
         vararg additionalMetadata: Metadata?

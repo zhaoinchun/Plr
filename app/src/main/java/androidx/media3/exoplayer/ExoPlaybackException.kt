@@ -17,48 +17,30 @@ import java.io.IOException
 class ExoPlaybackException private constructor(
     message: String?,
     cause: Throwable?,
-    @ErrorCode errorCode: @ErrorCode Int,
-    @Type type: @Type Int,
+    errorCode: Int,
+    type: Int,
     rendererName: String?,
     rendererIndex: Int,
     rendererFormat: Format?,
-    @C.FormatSupport rendererFormatSupport: @C.FormatSupport Int,
+     rendererFormatSupport:  Int,
     mediaPeriodId: MediaPeriodId?,
     timestampMs: Long,
     isRecoverable: Boolean
 ) : PlaybackException(message, cause, errorCode, Bundle.EMPTY, timestampMs) {
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [TYPE_SOURCE, TYPE_RENDERER, TYPE_UNEXPECTED, TYPE_REMOTE])
-    annotation class Type
-
-    @Type
-    val type: @Type Int
+    val type: Int
     val rendererName: String?
     val rendererIndex: Int
     val rendererFormat: Format?
 
-    @C.FormatSupport
-    val rendererFormatSupport: @C.FormatSupport Int
+    
+    val rendererFormatSupport:  Int
     val mediaPeriodId: MediaPeriodId?
     val isRecoverable: Boolean
 
     private constructor(
-        @Type type: @Type Int,
+        type: Int,
         cause: Throwable?,
-        @ErrorCode errorCode: @ErrorCode Int
+        errorCode: Int
     ) : this(
         type,
         cause,  
@@ -73,14 +55,14 @@ class ExoPlaybackException private constructor(
     )
 
     private constructor(
-        @Type type: @Type Int,
+        type: Int,
         cause: Throwable?,
         customMessage: String?,
-        @ErrorCode errorCode: @ErrorCode Int,
+        errorCode: Int,
         rendererName: String?,
         rendererIndex: Int,
         rendererFormat: Format?,
-        @C.FormatSupport rendererFormatSupport: @C.FormatSupport Int,
+         rendererFormatSupport:  Int,
         mediaPeriodId: MediaPeriodId?,
         isRecoverable: Boolean
     ) : this(
@@ -178,10 +160,10 @@ class ExoPlaybackException private constructor(
             rendererName: String?,
             rendererIndex: Int,
             rendererFormat: Format?,
-            @C.FormatSupport rendererFormatSupport: @C.FormatSupport Int,
+             rendererFormatSupport:  Int,
             mediaPeriodId: MediaPeriodId?,
             isRecoverable: Boolean,
-            @ErrorCode errorCode: @ErrorCode Int
+            errorCode: Int
         ): ExoPlaybackException {
             return ExoPlaybackException(
                 TYPE_RENDERER,
@@ -198,7 +180,7 @@ class ExoPlaybackException private constructor(
         }
 
         fun createForUnexpected(
-            cause: java.lang.RuntimeException?, @ErrorCode errorCode: @ErrorCode Int
+            cause: java.lang.RuntimeException?, errorCode: Int
         ): ExoPlaybackException {
             return ExoPlaybackException(TYPE_UNEXPECTED, cause, errorCode)
         }
@@ -219,12 +201,12 @@ class ExoPlaybackException private constructor(
         }
 
         private fun deriveMessage(
-            @Type type: @Type Int,
+            type: Int,
             customMessage: String?,
             rendererName: String?,
             rendererIndex: Int,
             rendererFormat: Format?,
-            @C.FormatSupport rendererFormatSupport: @C.FormatSupport Int
+             rendererFormatSupport:  Int
         ): String {
             var message: String
             when (type) {

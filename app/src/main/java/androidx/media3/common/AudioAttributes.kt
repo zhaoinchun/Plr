@@ -5,19 +5,14 @@ import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
-import androidx.media3.common.C.AudioAllowedCapturePolicy
-import androidx.media3.common.C.AudioContentType
-import androidx.media3.common.C.AudioFlags
-import androidx.media3.common.C.AudioUsage
-import androidx.media3.common.C.SpatializationBehavior
 import androidx.media3.common.util.Util.intToStringMaxRadix
 
 class AudioAttributes private constructor(
-    var contentType: @AudioContentType Int = C.AUDIO_CONTENT_TYPE_UNKNOWN,
-    var flags: @AudioFlags Int = 0,
-    var usage: @AudioUsage Int = C.USAGE_MEDIA,
-    var allowedCapturePolicy: @AudioAllowedCapturePolicy Int = C.ALLOW_CAPTURE_BY_ALL,
-    var spatializationBehavior: @SpatializationBehavior Int = C.SPATIALIZATION_BEHAVIOR_AUTO,
+    var contentType: Int = C.AUDIO_CONTENT_TYPE_UNKNOWN,
+    var flags: Int = 0,
+    var usage: Int = C.USAGE_MEDIA,
+    var allowedCapturePolicy: Int = C.ALLOW_CAPTURE_BY_ALL,
+    var spatializationBehavior: Int = C.SPATIALIZATION_BEHAVIOR_AUTO,
     var isContentSpatialized: Boolean = false,
     var hapticChannelsMuted: Boolean = true,
 ) {
@@ -50,13 +45,13 @@ class AudioAttributes private constructor(
         }
         private set
 
-    @get:C.StreamType
-    val volumeControlStream: @C.StreamType Int
+    
+    val volumeControlStream: Int
         get() = this.streamTypeInternal
 
     @get:Deprecated("Use {@link #getVolumeControlStream()} instead.")
-    @get:C.StreamType
-    val streamType: @C.StreamType Int
+    
+    val streamType: Int
         get() = this.streamTypeInternal
 
     override fun equals(obj: Any?): Boolean {
@@ -108,8 +103,8 @@ class AudioAttributes private constructor(
         return bundle
     }
 
-    @get:C.StreamType
-    private val streamTypeInternal: @C.StreamType Int
+    
+    private val streamTypeInternal: Int
         get() {
             if (Build.VERSION.SDK_INT >= 26) {
                 val platformStreamType: Int
@@ -147,7 +142,7 @@ class AudioAttributes private constructor(
         @SuppressLint("WrongConstant") // Setting C.AudioAllowedCapturePolicy to platform API.
         fun setAllowedCapturePolicy(
             builder: android.media.AudioAttributes.Builder,
-            @AudioAllowedCapturePolicy allowedCapturePolicy: @AudioAllowedCapturePolicy Int
+            allowedCapturePolicy: Int
         ) {
             builder.setAllowedCapturePolicy(allowedCapturePolicy)
         }
@@ -165,7 +160,7 @@ class AudioAttributes private constructor(
         @SuppressLint("WrongConstant") // Setting C.SpatializationBehavior to platform API.
         fun setSpatializationBehavior(
             builder: android.media.AudioAttributes.Builder,
-            spatializationBehavior: @SpatializationBehavior Int
+            spatializationBehavior: Int
         ) {
             builder.setSpatializationBehavior(spatializationBehavior)
         }

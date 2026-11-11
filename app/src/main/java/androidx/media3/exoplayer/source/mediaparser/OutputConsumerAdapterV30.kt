@@ -31,7 +31,7 @@ import java.util.regex.Pattern
 @RequiresApi(30)
 class OutputConsumerAdapterV30(
     private val primaryTrackManifestFormat: Format? = null,
-    private val primaryTrackType: @C.TrackType Int = C.TRACK_TYPE_NONE,
+    private val primaryTrackType: Int = C.TRACK_TYPE_NONE,
     private val expectDummySeekMap: Boolean = false
 ) : MediaParser.OutputConsumer {
     private val trackOutputs = mutableListOf<TrackOutput?>()
@@ -430,7 +430,7 @@ class OutputConsumerAdapterV30(
         private val REGEX_CRYPTO_INFO_PATTERN: Pattern =
             Pattern.compile("pattern \\(encrypt: (\\d+), skip: (\\d+)\\)")
 
-        private fun toTrackTypeConstant(string: String?): @C.TrackType Int {
+        private fun toTrackTypeConstant(string: String?): Int {
             if (string == null) {
                 return C.TRACK_TYPE_UNKNOWN
             }
@@ -465,7 +465,7 @@ class OutputConsumerAdapterV30(
             return DrmInitData(schemeType, schemeDatas as Array<DrmInitData.SchemeData>)
         }
 
-        private fun getSelectionFlags(mediaFormat: MediaFormat): @C.SelectionFlags Int {
+        private fun getSelectionFlags(mediaFormat: MediaFormat):  Int {
             var selectionFlags = 0
             selectionFlags = selectionFlags or
                     getFlag(

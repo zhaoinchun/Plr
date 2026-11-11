@@ -190,7 +190,7 @@ object GlUtil {
         }
 
     @Throws(GlException::class)
-    fun isColorTransferSupported(colorTransfer: @C.ColorTransfer Int): Boolean {
+    fun isColorTransferSupported(colorTransfer:  Int): Boolean {
         if (colorTransfer == C.COLOR_TRANSFER_ST2084) {
             return isBt2020PqExtensionSupported
         } else if (colorTransfer == C.COLOR_TRANSFER_HLG) {
@@ -286,7 +286,7 @@ object GlUtil {
     fun createEglSurface(
         eglDisplay: EGLDisplay?,
         surface: Any?,
-        colorTransfer: @C.ColorTransfer Int,
+        colorTransfer:  Int,
         isEncoderInputSurface: Boolean
     ): EGLSurface? {
         val configAttributes: IntArray?

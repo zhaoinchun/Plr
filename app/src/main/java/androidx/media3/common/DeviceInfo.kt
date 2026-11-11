@@ -7,17 +7,11 @@ import androidx.media3.common.util.Util
 import com.google.common.base.Preconditions
 
 data class DeviceInfo(
-    val playbackType: @PlaybackType Int,
+    val playbackType: Int,
     var minVolume: Int = 0,
     var maxVolume: Int = 0,
     var routingControllerId: String? = null,
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [PLAYBACK_TYPE_LOCAL, PLAYBACK_TYPE_REMOTE])
-    annotation class PlaybackType
-
     fun toBundle(): Bundle {
         val bundle = Bundle()
         if (playbackType != PLAYBACK_TYPE_LOCAL) {

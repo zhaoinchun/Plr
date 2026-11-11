@@ -31,7 +31,6 @@ import androidx.media3.exoplayer.Renderer.WakeupListener
 import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
 import com.google.common.base.Preconditions
 import java.util.ArrayDeque
 import java.util.concurrent.Executor
@@ -44,13 +43,6 @@ abstract class DecoderVideoRenderer protected constructor(
     eventListener: VideoRendererEventListener?,
     private val maxDroppedFramesToNotify: Int
 ) : BaseRenderer(C.TRACK_TYPE_VIDEO), Decoder.Callback {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [REINITIALIZATION_STATE_NONE, REINITIALIZATION_STATE_SIGNAL_END_OF_STREAM, REINITIALIZATION_STATE_WAIT_END_OF_STREAM]
-    )
-    private annotation class ReinitializationState
 
     private val eventDispatcher: VideoRendererEventListener.EventDispatcher =
         VideoRendererEventListener.EventDispatcher(eventHandler, eventListener)
@@ -69,7 +61,7 @@ abstract class DecoderVideoRenderer protected constructor(
     private var inputBuffer: DecoderInputBuffer? = null
     private var largestQueuedPresentationTimeUs: Long = C.TIME_UNSET
     private var outputBuffer: VideoDecoderOutputBuffer? = null
-    private var outputMode: @C.VideoOutputMode Int = C.VIDEO_OUTPUT_MODE_NONE
+    private var outputMode:  Int = C.VIDEO_OUTPUT_MODE_NONE
     private var output: Any? = null
     private var outputSurface: Surface? = null
     private var outputBufferRenderer: VideoDecoderOutputBufferRenderer? = null
@@ -78,11 +70,11 @@ abstract class DecoderVideoRenderer protected constructor(
     private var decoderDrmSession: DrmSession? = null
     private var sourceDrmSession: DrmSession? = null
 
-    private var decoderReinitializationState: @ReinitializationState Int =
+    private var decoderReinitializationState:  Int =
         REINITIALIZATION_STATE_NONE
     private var decoderReceivedBuffers = false
 
-    private var firstFrameState: @C.FirstFrameState Int =
+    private var firstFrameState:  Int =
         C.FIRST_FRAME_NOT_RENDERED_ONLY_ALLOWED_IF_STARTED
     private var initialPositionUs: Long = 0
     private var joiningDeadlineMs: Long = C.TIME_UNSET
@@ -111,7 +103,7 @@ abstract class DecoderVideoRenderer protected constructor(
             // We don't have a format yet, so try and read one.
             val formatHolder = getFormatHolder()
             flagsOnlyBuffer.clear()
-            val result: @ReadDataResult Int =
+            val result:  Int =
                 readSource(formatHolder, flagsOnlyBuffer, SampleStream.FLAG_REQUIRE_FORMAT)
             if (result == C.RESULT_FORMAT_READ) {
                 onInputFormatChanged(formatHolder)
@@ -178,7 +170,7 @@ abstract class DecoderVideoRenderer protected constructor(
 
     // PlayerMessage.Target implementation.
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VIDEO_OUTPUT -> {
                 setOutput(message)
@@ -293,7 +285,7 @@ abstract class DecoderVideoRenderer protected constructor(
         // TODO: This code should make sure to render the first frame of the next stream if the playback
         //  position reached the new stream.
         super.onStreamChanged(formats, startPositionUs, offsetUs, mediaPeriodId)
-        val streamFlags: @SampleStream.Flags Int = stream!!.flags
+        val streamFlags:  Int = stream!!.flags
         if (outputStreamInfo == null
             || (pendingOutputStreamChanges.isEmpty() && buffersInCodecCount == 0)
         ) {
@@ -560,7 +552,7 @@ abstract class DecoderVideoRenderer protected constructor(
         }
     }
 
-    protected abstract fun setDecoderOutputMode(outputMode: @C.VideoOutputMode Int)
+    protected abstract fun setDecoderOutputMode(outputMode:  Int)
 
     protected fun canReuseDecoder(
         decoderName: String, oldFormat: Format, newFormat: Format
@@ -855,7 +847,7 @@ abstract class DecoderVideoRenderer protected constructor(
                 C.TIME_UNSET
     }
 
-    private fun lowerFirstFrameState(firstFrameState: @C.FirstFrameState Int) {
+    private fun lowerFirstFrameState(firstFrameState:  Int) {
         this.firstFrameState = min(this.firstFrameState, firstFrameState)
     }
 
@@ -909,7 +901,7 @@ abstract class DecoderVideoRenderer protected constructor(
         val previousStreamLastBufferTimeUs: Long,
         val streamOffsetUs: Long,
         var durationUs: Long,
-        var streamFlags: @SampleStream.Flags Int
+        var streamFlags:  Int
     ) {
         val isDurationStrict: Boolean
             get() = (streamFlags and SampleStream.FLAG_STRICT_DURATION) != 0

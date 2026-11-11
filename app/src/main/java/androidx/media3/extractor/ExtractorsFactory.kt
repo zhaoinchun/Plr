@@ -9,7 +9,7 @@ fun interface ExtractorsFactory {
     }
 
     fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-        codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+        codecsToParseWithinGopSampleDependencies:  Int
     ): ExtractorsFactory? {
         return this
     }

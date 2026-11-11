@@ -280,13 +280,13 @@ class StuckPlayerDetector(
     }
 
     private inner class StuckSuppressedDetector(private val stuckSuppressedTimeoutMs: Int) {
-        @Player.PlaybackSuppressionReason
-        private var suppressionReason: @Player.PlaybackSuppressionReason Int = 0
+        
+        private var suppressionReason:  Int = 0
         private var isSuppressed = false
         private var startRealtimeMs: Long = 0
 
         fun update() {
-            @Player.PlaybackSuppressionReason val suppressionReason: @Player.PlaybackSuppressionReason Int =
+             val suppressionReason:  Int =
                 player.playbackSuppressionReason
             if (!player.playWhenReady || player.playbackState == Player.STATE_IDLE || player.playbackState == Player.STATE_ENDED || suppressionReason == Player.PLAYBACK_SUPPRESSION_REASON_NONE || suppressionReason == Player.PLAYBACK_SUPPRESSION_REASON_TRANSIENT_AUDIO_FOCUS_LOSS) {
                 // Preconditions for stuck suppressed not met. Clear any pending timeout and ignore.

@@ -24,7 +24,7 @@ interface AdsLoader {
 
     fun setPlayer(player: Player?)
     fun release()
-    fun setSupportedContentTypes(@C.ContentType contentTypes: IntArray)
+    fun setSupportedContentTypes( contentTypes: IntArray)
 
     fun start(
         adsMediaSource: AdsMediaSource,

@@ -39,7 +39,7 @@ class ThumbRating : Rating {
     }
 
     companion object {
-        private val TYPE: @RatingType Int = RATING_TYPE_THUMB
+        private val TYPE: Int = RATING_TYPE_THUMB
 
         private val FIELD_RATED = intToStringMaxRadix(1)
         private val FIELD_IS_THUMBS_UP = intToStringMaxRadix(2)

@@ -24,12 +24,6 @@ class EGLSurfaceTexture  constructor(
         fun onFrameAvailable()
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [SECURE_MODE_NONE, SECURE_MODE_SURFACELESS_CONTEXT, SECURE_MODE_PROTECTED_PBUFFER])
-    annotation class SecureMode
-
     private val textureIdHolder: IntArray
 
     private var display: EGLDisplay? = null
@@ -42,7 +36,7 @@ class EGLSurfaceTexture  constructor(
     }
 
     @Throws(GlException::class)
-    fun init(secureMode: @SecureMode Int) {
+    fun init(secureMode:  Int) {
         display = defaultDisplay
         val config: EGLConfig? = chooseEGLConfig(display)
         context = createEGLContext(display, config, secureMode)
@@ -182,7 +176,7 @@ class EGLSurfaceTexture  constructor(
 
         @Throws(GlException::class)
         private fun createEGLContext(
-            display: EGLDisplay?, config: EGLConfig?, secureMode: @SecureMode Int
+            display: EGLDisplay?, config: EGLConfig?, secureMode:  Int
         ): EGLContext? {
             val glAttributes: IntArray?
             if (secureMode == SECURE_MODE_NONE) {
@@ -210,7 +204,7 @@ class EGLSurfaceTexture  constructor(
             display: EGLDisplay?,
             config: EGLConfig?,
             context: EGLContext?,
-            secureMode: @SecureMode Int
+            secureMode:  Int
         ): EGLSurface? {
             val surface: EGLSurface?
             if (secureMode == SECURE_MODE_SURFACELESS_CONTEXT) {

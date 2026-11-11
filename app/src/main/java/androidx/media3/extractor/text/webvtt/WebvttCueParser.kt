@@ -331,8 +331,8 @@ object WebvttCueParser {
         }
     }
 
-    @Cue.AnchorType
-    private fun parseLineAnchor(s: String): @Cue.AnchorType Int {
+    
+    private fun parseLineAnchor(s: String):  Int {
         when (s) {
             "start" -> return Cue.ANCHOR_TYPE_START
             "center", "middle" -> return Cue.ANCHOR_TYPE_MIDDLE
@@ -354,8 +354,8 @@ object WebvttCueParser {
         builder.position = parsePercentage(s)
     }
 
-    @Cue.AnchorType
-    private fun parsePositionAnchor(s: String): @Cue.AnchorType Int {
+    
+    private fun parsePositionAnchor(s: String):  Int {
         when (s) {
             "line-left", "start" -> return Cue.ANCHOR_TYPE_START
             "center", "middle" -> return Cue.ANCHOR_TYPE_MIDDLE
@@ -367,8 +367,8 @@ object WebvttCueParser {
         }
     }
 
-    @Cue.VerticalType
-    private fun parseVerticalAttribute(s: String): @Cue.VerticalType Int {
+    
+    private fun parseVerticalAttribute(s: String):  Int {
         when (s) {
             "rl" -> return Cue.VERTICAL_TYPE_RL
             "lr" -> return Cue.VERTICAL_TYPE_LR
@@ -379,7 +379,7 @@ object WebvttCueParser {
         }
     }
 
-    private fun parseTextAlignment(s: String): @TextAlignment Int {
+    private fun parseTextAlignment(s: String): Int {
         when (s) {
             "start" -> return TEXT_ALIGNMENT_START
             "left" -> return TEXT_ALIGNMENT_LEFT
@@ -469,7 +469,7 @@ object WebvttCueParser {
         nestedElements: MutableList<Element>,
         styles: MutableList<WebvttCssStyle>
     ) {
-        val rubyTagPosition: @TextAnnotation.Position Int = getRubyPosition(styles, cueId, startTag)
+        val rubyTagPosition:  Int = getRubyPosition(styles, cueId, startTag)
         val sortedNestedElements: MutableList<Element> = ArrayList<Element>(nestedElements.size)
         sortedNestedElements.addAll(nestedElements)
         Collections.sort<Element?>(sortedNestedElements, Element.BY_START_POSITION_ASC)
@@ -482,7 +482,7 @@ object WebvttCueParser {
             val rubyTextElement = sortedNestedElements[i]
             // Use the <rt> element's ruby-position if set, otherwise the <ruby> element's and otherwise
             // default to OVER.
-            val rubyPosition: @TextAnnotation.Position Int =
+            val rubyPosition:  Int =
                 firstKnownRubyPosition(
                     getRubyPosition(styles, cueId, rubyTextElement.startTag),
                     rubyTagPosition,
@@ -507,7 +507,7 @@ object WebvttCueParser {
 
     private fun getRubyPosition(
         styles: MutableList<WebvttCssStyle>, cueId: String?, startTag: StartTag
-    ): @TextAnnotation.Position Int {
+    ):  Int {
         val styleMatches: MutableList<StyleMatch> = getApplicableStyles(styles, cueId, startTag)
         for (i in styleMatches.indices) {
             val style = styleMatches[i]!!.style
@@ -519,10 +519,10 @@ object WebvttCueParser {
     }
 
     private fun firstKnownRubyPosition(
-        position1: @TextAnnotation.Position Int,
-        position2: @TextAnnotation.Position Int,
-        position3: @TextAnnotation.Position Int
-    ): @TextAnnotation.Position Int {
+        position1:  Int,
+        position2:  Int,
+        position3:  Int
+    ):  Int {
         if (position1 != TextAnnotation.POSITION_UNKNOWN) {
             return position1
         }
@@ -668,38 +668,28 @@ object WebvttCueParser {
         Collections.sort<StyleMatch>(applicableStyles)
         return applicableStyles
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [TEXT_ALIGNMENT_START, TEXT_ALIGNMENT_CENTER, TEXT_ALIGNMENT_END, TEXT_ALIGNMENT_LEFT, TEXT_ALIGNMENT_RIGHT
-        ]
-    )
-    private annotation class TextAlignment
-
     private class WebvttCueInfoBuilder {
         var startTimeUs: Long = 0
         var endTimeUs: Long = 0
         var text:CharSequence? = null
-        var textAlignment: @TextAlignment Int
+        var textAlignment: Int
         var line: Float
 
         // Equivalent to WebVTT's snap-to-lines flag:
         // https://www.w3.org/TR/webvtt1/#webvtt-cue-snap-to-lines-flag
-        @Cue.LineType
-        var lineType: @Cue.LineType Int
+        
+        var lineType:  Int
 
-        @Cue.AnchorType
-        var lineAnchor: @Cue.AnchorType Int
+        
+        var lineAnchor:  Int
         var position: Float
 
-        @Cue.AnchorType
-        var positionAnchor: @Cue.AnchorType Int
+        
+        var positionAnchor:  Int
         var size: Float = 1.0f
 
-        @Cue.VerticalType
-        var verticalType: @Cue.VerticalType Int
+        
+        var verticalType:  Int
 
         init {
             // Default: https://www.w3.org/TR/webvtt1/#webvtt-cue-text-alignment
@@ -724,7 +714,7 @@ object WebvttCueParser {
                 if (this.position != Cue.DIMEN_UNSET) this.position else derivePosition(
                     textAlignment
                 )
-            @Cue.AnchorType val positionAnchor: @Cue.AnchorType Int =
+             val positionAnchor:  Int =
                 if (this.positionAnchor != Cue.TYPE_UNSET)
                     this.positionAnchor
                 else
@@ -748,7 +738,7 @@ object WebvttCueParser {
 
         companion object {
             // https://www.w3.org/TR/webvtt1/#webvtt-cue-line
-            private fun computeLine(line: Float, @Cue.LineType lineType: @Cue.LineType Int): Float {
+            private fun computeLine(line: Float,  lineType:  Int): Float {
                 if (line != Cue.DIMEN_UNSET && lineType == Cue.LINE_TYPE_FRACTION && (line < 0.0f || line > 1.0f)) {
                     return 1.0f // Step 1
                 } else if (line != Cue.DIMEN_UNSET) {
@@ -764,7 +754,7 @@ object WebvttCueParser {
             }
 
             // https://www.w3.org/TR/webvtt1/#webvtt-cue-position
-            private fun derivePosition(textAlignment: @TextAlignment Int): Float {
+            private fun derivePosition(textAlignment: Int): Float {
                 when (textAlignment) {
                     TEXT_ALIGNMENT_LEFT -> return 0.0f
                     TEXT_ALIGNMENT_RIGHT -> return 1.0f
@@ -774,8 +764,8 @@ object WebvttCueParser {
             }
 
             // https://www.w3.org/TR/webvtt1/#webvtt-cue-position-alignment
-            @Cue.AnchorType
-            private fun derivePositionAnchor(textAlignment: @TextAlignment Int): @Cue.AnchorType Int {
+            
+            private fun derivePositionAnchor(textAlignment: Int):  Int {
                 when (textAlignment) {
                     TEXT_ALIGNMENT_LEFT, TEXT_ALIGNMENT_START -> return Cue.ANCHOR_TYPE_START
                     TEXT_ALIGNMENT_RIGHT, TEXT_ALIGNMENT_END -> return Cue.ANCHOR_TYPE_END
@@ -784,7 +774,7 @@ object WebvttCueParser {
                 }
             }
 
-            private fun convertTextAlignment(textAlignment: @TextAlignment Int): Layout.Alignment? {
+            private fun convertTextAlignment(textAlignment: Int): Layout.Alignment? {
                 when (textAlignment) {
                     TEXT_ALIGNMENT_START, TEXT_ALIGNMENT_LEFT -> return Layout.Alignment.ALIGN_NORMAL
                     TEXT_ALIGNMENT_CENTER -> return Layout.Alignment.ALIGN_CENTER
@@ -798,7 +788,7 @@ object WebvttCueParser {
 
             // Step 2 here: https://www.w3.org/TR/webvtt1/#processing-cue-settings
             private fun deriveMaxSize(
-                @Cue.AnchorType positionAnchor: @Cue.AnchorType Int,
+                 positionAnchor:  Int,
                 position: Float
             ): Float {
                 when (positionAnchor) {

@@ -15,7 +15,7 @@
  */
 package androidx.media3.extractor
 
-import androidx.media3.common.C.BufferFlags
+
 
 import androidx.media3.extractor.TrackOutput.CryptoData
 import com.google.common.base.Preconditions
@@ -27,7 +27,7 @@ class TrueHdSampleRechunker {
     private var foundSyncframe = false
     private var chunkSampleCount = 0
     private var chunkTimeUs: Long = 0
-    private var chunkFlags: @BufferFlags Int = 0
+    private var chunkFlags:  Int = 0
     private var chunkSize = 0
     private var chunkOffset = 0
 
@@ -56,7 +56,7 @@ class TrueHdSampleRechunker {
     fun sampleMetadata(
         trackOutput: TrackOutput,
         timeUs: Long,
-        flags: @BufferFlags Int,
+        flags:  Int,
         size: Int,
         offset: Int,
         cryptoData: CryptoData?

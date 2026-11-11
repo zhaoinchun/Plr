@@ -9,22 +9,17 @@ import kotlin.math.sin
 internal class Projection(
     val leftMesh: Mesh,
     val rightMesh: Mesh,
-    val stereoMode: @C.StereoMode Int
+    val stereoMode:  Int
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [DRAW_MODE_TRIANGLES, DRAW_MODE_TRIANGLES_STRIP, DRAW_MODE_TRIANGLES_FAN])
-    annotation class DrawMode
 
     val singleMesh = leftMesh == rightMesh
 
     constructor(mesh: Mesh, stereoMode: Int) : this(mesh, mesh, stereoMode)
 
     class SubMesh(
-        val textureId: Int, vertices: FloatArray, textureCoords: FloatArray, mode: @DrawMode Int
+        val textureId: Int, vertices: FloatArray, textureCoords: FloatArray, mode:  Int
     ) {
-        val mode: @DrawMode Int
+        val mode:  Int
         val vertices: FloatArray
         val textureCoords: FloatArray
 
@@ -62,7 +57,7 @@ internal class Projection(
         const val TEXTURE_COORDS_PER_VERTEX: Int = 2
         const val POSITION_COORDS_PER_VERTEX: Int = 3
 
-        fun createEquirectangular(stereoMode: @C.StereoMode Int): Projection {
+        fun createEquirectangular(stereoMode:  Int): Projection {
             return createEquirectangular( 
                 50f,  // Should be large enough that there are no stereo artifacts.
                 
@@ -82,7 +77,7 @@ internal class Projection(
             longitudes: Int,
             verticalFovDegrees: Float,
             horizontalFovDegrees: Float,
-            stereoMode: @C.StereoMode Int
+            stereoMode:  Int
         ): Projection {
             Preconditions.checkArgument(radius > 0)
             Preconditions.checkArgument(latitudes >= 1)

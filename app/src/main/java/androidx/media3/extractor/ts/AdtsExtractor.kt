@@ -24,17 +24,9 @@ import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import java.io.EOFException
 import java.io.IOException
 
-class AdtsExtractor  constructor(flags: @Flags Int = 0) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        flag = true,
-        value = [FLAG_ENABLE_CONSTANT_BITRATE_SEEKING, FLAG_ENABLE_CONSTANT_BITRATE_SEEKING_ALWAYS]
-    )
-    annotation class Flags
+class AdtsExtractor  constructor(flags:  Int = 0) : Extractor {
 
-    private val flags: @Flags Int
+    private val flags:  Int
 
     private val reader: AdtsReader
     private val packetBuffer: ParsableByteArray

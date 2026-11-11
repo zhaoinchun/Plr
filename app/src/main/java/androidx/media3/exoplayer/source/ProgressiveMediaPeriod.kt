@@ -31,7 +31,7 @@ import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.DrmSessionManager
 import androidx.media3.exoplayer.source.ProgressiveMediaPeriod.ExtractingLoadable
 import androidx.media3.exoplayer.source.SampleQueue.UpstreamFormatChangedListener
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
+
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.Allocator
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
@@ -117,7 +117,7 @@ internal class ProgressiveMediaPeriod
     private var seekMap: SeekMap? = null
     private var durationUs: Long = 0
     private var isLive = false
-    private var dataType: @C.DataType Int = C.DATA_TYPE_MEDIA
+    private var dataType: Int = C.DATA_TYPE_MEDIA
     private var endPositionUs: Long = C.TIME_END_OF_SOURCE
 
     private var seenFirstTrackSelection = false
@@ -568,7 +568,7 @@ internal class ProgressiveMediaPeriod
         sampleQueueIndex: Int,
         formatHolder: FormatHolder,
         buffer: DecoderInputBuffer,
-        readFlags: @ReadFlags Int
+        readFlags:  Int
     ): Int {
         if (suppressRead()) {
             return C.RESULT_NOTHING_READ
@@ -885,9 +885,9 @@ internal class ProgressiveMediaPeriod
         loadCondition.close()
         val trackCount = sampleQueues.size
         var primaryTrackIndex = 0
-        var primaryTrackIndexType: @C.TrackType Int = C.TRACK_TYPE_UNKNOWN
+        var primaryTrackIndexType: Int = C.TRACK_TYPE_UNKNOWN
         for (i in 0..<trackCount) {
-            val trackType: @C.TrackType Int =
+            val trackType: Int =
                 getTrackType(sampleQueues[i].getUpstreamFormat()!!.sampleMimeType)
             if (getTrackTypePriority(trackType) > getTrackTypePriority(primaryTrackIndexType)) {
                 primaryTrackIndex = i
@@ -1088,7 +1088,7 @@ internal class ProgressiveMediaPeriod
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
         ): Int {
             return this@ProgressiveMediaPeriod.readData(track, formatHolder, buffer, readFlags)
         }
@@ -1097,7 +1097,7 @@ internal class ProgressiveMediaPeriod
             return this@ProgressiveMediaPeriod.skipData(track, positionUs)
         }
 
-        override val flags: @SampleStream.Flags Int
+        override val flags:  Int
             get() = if (hasPreroll) SampleStream.FLAG_HAS_PREROLL else 0
 
     }
@@ -1296,7 +1296,7 @@ internal class ProgressiveMediaPeriod
             input: DataReader,
             length: Int,
             allowEndOfInput: Boolean,
-            sampleDataPart: @TrackOutput.SampleDataPart Int
+            sampleDataPart:  Int
         ): Int {
             return this.currentOutput.sampleData(input, length, allowEndOfInput, sampleDataPart)
         }
@@ -1308,14 +1308,14 @@ internal class ProgressiveMediaPeriod
         override fun sampleData(
             data: ParsableByteArray,
             length: Int,
-            sampleDataPart: @TrackOutput.SampleDataPart Int
+            sampleDataPart:  Int
         ) {
             this.currentOutput.sampleData(data, length, sampleDataPart)
         }
 
         override fun sampleMetadata(
             timeUs: Long,
-            flags: @C.BufferFlags Int,
+            flags:  Int,
             size: Int,
             offset: Int,
             cryptoData: TrackOutput.CryptoData?
@@ -1360,7 +1360,7 @@ internal class ProgressiveMediaPeriod
             return Collections.unmodifiableMap(headers)
         }
 
-        private fun getTrackTypePriority(trackType: @C.TrackType Int): Int {
+        private fun getTrackTypePriority(trackType: Int): Int {
             return when (trackType) {
                 C.TRACK_TYPE_VIDEO -> 4
                 C.TRACK_TYPE_AUDIO -> 3

@@ -6,9 +6,9 @@ import androidx.media3.common.util.Clock
 import androidx.media3.common.util.LongArrayQueue
 import androidx.media3.common.util.TimedValueQueue
 import androidx.media3.exoplayer.ExoPlaybackException
-import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseAction
+
 import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseInfo
-import androidx.media3.exoplayer.video.VideoSink.FirstFrameReleaseInstruction
+
 import com.google.common.base.Preconditions
 
 internal class VideoFrameRenderControl(
@@ -75,7 +75,7 @@ internal class VideoFrameRenderControl(
                 )
             }
             frameRateEstimator.onNextFrame(presentationTimeUs * 1000)
-            val frameReleaseAction: @FrameReleaseAction Int =
+            val frameReleaseAction:  Int =
                 videoFrameReleaseControl.getFrameReleaseAction(
                     presentationTimeUs,
                     positionUs,
@@ -125,7 +125,7 @@ internal class VideoFrameRenderControl(
     }
 
     fun onStreamChanged(
-        firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int,
+        firstFrameReleaseInstruction:  Int,
         streamStartPositionUs: Long
     ) {
         if (presentationTimestampsUs.isEmpty) {

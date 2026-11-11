@@ -1,10 +1,9 @@
 package androidx.media3.exoplayer
 
 import androidx.media3.exoplayer.audio.AudioSink
-import androidx.media3.exoplayer.audio.AudioSink.OffloadMode
 
 class RendererConfiguration {
-    val offloadModePreferred: @OffloadMode Int
+    val offloadModePreferred:  Int
     val tunneling: Boolean
 
     constructor(tunneling: Boolean) {
@@ -12,7 +11,7 @@ class RendererConfiguration {
         this.tunneling = tunneling
     }
 
-    constructor(offloadModePreferred: @OffloadMode Int, tunneling: Boolean) {
+    constructor(offloadModePreferred:  Int, tunneling: Boolean) {
         this.offloadModePreferred = offloadModePreferred
         this.tunneling = tunneling
     }

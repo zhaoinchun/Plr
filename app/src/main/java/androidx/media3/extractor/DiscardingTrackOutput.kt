@@ -1,13 +1,13 @@
 package androidx.media3.extractor
 
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.DataReader
 import androidx.media3.common.Format
 import androidx.media3.common.util.ParsableByteArray
 
 import androidx.media3.extractor.TrackOutput.CryptoData
-import androidx.media3.extractor.TrackOutput.SampleDataPart
+
 import java.io.EOFException
 import java.io.IOException
 import kotlin.math.min
@@ -31,7 +31,7 @@ class DiscardingTrackOutput : TrackOutput {
         input: DataReader,
         length: Int,
         allowEndOfInput: Boolean,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ): Int {
         val bytesToSkipByReading = min(readBuffer.size, length)
         val bytesSkipped = input.read(readBuffer,  0, bytesToSkipByReading)
@@ -47,14 +47,14 @@ class DiscardingTrackOutput : TrackOutput {
     override fun sampleData(
         data: ParsableByteArray,
         length: Int,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ) {
         data.skipBytes(length)
     }
 
     override fun sampleMetadata(
         timeUs: Long,
-        flags: @BufferFlags Int,
+        flags:  Int,
         size: Int,
         offset: Int,
         cryptoData: CryptoData?

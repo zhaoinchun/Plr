@@ -9,56 +9,14 @@ interface RendererCapabilities {
     interface Listener {
         fun onRendererCapabilitiesChanged(renderer: Renderer)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [ADAPTIVE_SEAMLESS, ADAPTIVE_NOT_SEAMLESS, ADAPTIVE_NOT_SUPPORTED])
-    annotation class AdaptiveSupport
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [TUNNELING_SUPPORTED, TUNNELING_NOT_SUPPORTED])
-    annotation class TunnelingSupport
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [HARDWARE_ACCELERATION_SUPPORTED, HARDWARE_ACCELERATION_NOT_SUPPORTED
-        ]
-    )
-    annotation class HardwareAccelerationSupport
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [DECODER_SUPPORT_FALLBACK_MIMETYPE, DECODER_SUPPORT_PRIMARY, DECODER_SUPPORT_FALLBACK])
-    annotation class DecoderSupport
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [AUDIO_OFFLOAD_SPEED_CHANGE_SUPPORTED, AUDIO_OFFLOAD_GAPLESS_SUPPORTED, AUDIO_OFFLOAD_SUPPORTED, AUDIO_OFFLOAD_NOT_SUPPORTED
-        ]
-    )
-    annotation class AudioOffloadSupport
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE) // Intentionally empty to prevent assignment or comparison with individual flags without masking.
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    annotation class Capabilities
-
     val name: String
-    val trackType: @C.TrackType Int
+    val trackType: Int
 
     @Throws(ExoPlaybackException::class)
-    fun supportsFormat(format: Format): @Capabilities Int
+    fun supportsFormat(format: Format):  Int
 
     @Throws(ExoPlaybackException::class)
-    fun supportsMixedMimeTypeAdaptation(): @AdaptiveSupport Int
+    fun supportsMixedMimeTypeAdaptation(): Int
 
     fun setListener(listener: Listener?) {
         // Do nothing.
@@ -70,10 +28,10 @@ interface RendererCapabilities {
 
     companion object {
         fun create(
-            @C.FormatSupport formatSupport: @C.FormatSupport Int,
-            adaptiveSupport: @AdaptiveSupport Int,
-            tunnelingSupport: @TunnelingSupport Int
-        ): @Capabilities Int {
+             formatSupport:  Int,
+            adaptiveSupport: Int,
+            tunnelingSupport:  Int
+        ):  Int {
             return create(
                 formatSupport,
                 adaptiveSupport,
@@ -85,11 +43,11 @@ interface RendererCapabilities {
         }
 
         fun create(
-            @C.FormatSupport formatSupport: @C.FormatSupport Int,
-            adaptiveSupport: @AdaptiveSupport Int = ADAPTIVE_NOT_SUPPORTED,
-            tunnelingSupport: @TunnelingSupport Int = TUNNELING_NOT_SUPPORTED,
-            audioOffloadSupport: @AudioOffloadSupport Int = AUDIO_OFFLOAD_NOT_SUPPORTED
-        ): @Capabilities Int {
+             formatSupport:  Int,
+            adaptiveSupport: Int = ADAPTIVE_NOT_SUPPORTED,
+            tunnelingSupport:  Int = TUNNELING_NOT_SUPPORTED,
+            audioOffloadSupport:  Int = AUDIO_OFFLOAD_NOT_SUPPORTED
+        ):  Int {
             return create(
                 formatSupport,
                 adaptiveSupport,
@@ -101,12 +59,12 @@ interface RendererCapabilities {
         }
 
         fun create(
-            @C.FormatSupport formatSupport: @C.FormatSupport Int,
-            adaptiveSupport: @AdaptiveSupport Int,
-            tunnelingSupport: @TunnelingSupport Int,
-            hardwareAccelerationSupport: @HardwareAccelerationSupport Int,
-            decoderSupport: @DecoderSupport Int
-        ): @Capabilities Int {
+             formatSupport:  Int,
+            adaptiveSupport: Int,
+            tunnelingSupport:  Int,
+            hardwareAccelerationSupport: Int,
+            decoderSupport:  Int
+        ):  Int {
             return create(
                 formatSupport,
                 adaptiveSupport,
@@ -120,13 +78,13 @@ interface RendererCapabilities {
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
         fun create(
-            @C.FormatSupport formatSupport: @C.FormatSupport Int,
-            adaptiveSupport: @AdaptiveSupport Int,
-            tunnelingSupport: @TunnelingSupport Int,
-            hardwareAccelerationSupport: @HardwareAccelerationSupport Int,
-            decoderSupport: @DecoderSupport Int,
-            audioOffloadSupport: @AudioOffloadSupport Int
-        ): @Capabilities Int {
+             formatSupport:  Int,
+            adaptiveSupport: Int,
+            tunnelingSupport:  Int,
+            hardwareAccelerationSupport: Int,
+            decoderSupport:  Int,
+            audioOffloadSupport:  Int
+        ):  Int {
             return (formatSupport
                     or adaptiveSupport
                     or tunnelingSupport
@@ -137,15 +95,15 @@ interface RendererCapabilities {
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        @C.FormatSupport
-        fun getFormatSupport(supportFlags: @Capabilities Int): @C.FormatSupport Int {
+        
+        fun getFormatSupport(supportFlags:  Int):  Int {
             return supportFlags and FORMAT_SUPPORT_MASK
         }
 
         fun isFormatSupported(
-            supportFlags: @Capabilities Int, allowExceedsCapabilities: Boolean
+            supportFlags:  Int, allowExceedsCapabilities: Boolean
         ): Boolean {
-            @C.FormatSupport val formatSupport: @C.FormatSupport Int =
+             val formatSupport:  Int =
                 getFormatSupport(supportFlags)
             return formatSupport == C.FORMAT_HANDLED
                     || (allowExceedsCapabilities && formatSupport == C.FORMAT_EXCEEDS_CAPABILITIES)
@@ -153,33 +111,33 @@ interface RendererCapabilities {
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getAdaptiveSupport(supportFlags: @Capabilities Int): @AdaptiveSupport Int {
+        fun getAdaptiveSupport(supportFlags:  Int): Int {
             return supportFlags and ADAPTIVE_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getTunnelingSupport(supportFlags: @Capabilities Int): @TunnelingSupport Int {
+        fun getTunnelingSupport(supportFlags:  Int):  Int {
             return supportFlags and TUNNELING_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
         fun getHardwareAccelerationSupport(
-            supportFlags: @Capabilities Int
-        ): @HardwareAccelerationSupport Int {
+            supportFlags:  Int
+        ): Int {
             return supportFlags and HARDWARE_ACCELERATION_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getDecoderSupport(supportFlags: @Capabilities Int): @DecoderSupport Int {
+        fun getDecoderSupport(supportFlags:  Int):  Int {
             return supportFlags and DECODER_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getAudioOffloadSupport(supportFlags: @Capabilities Int): @AudioOffloadSupport Int {
+        fun getAudioOffloadSupport(supportFlags:  Int):  Int {
             return supportFlags and AUDIO_OFFLOAD_SUPPORT_MASK
         }
 

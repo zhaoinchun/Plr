@@ -12,7 +12,6 @@ import android.os.Handler
 import android.os.PowerManager
 import androidx.annotation.RequiresApi
 import androidx.media3.common.util.Util.createHandlerForCurrentOrMainLooper
-import androidx.media3.exoplayer.scheduler.Requirements.RequirementFlags
 
 class RequirementsWatcher(
     context: Context, private val listener: Listener,
@@ -22,7 +21,7 @@ class RequirementsWatcher(
     fun interface Listener {
         fun onRequirementsStateChanged(
             requirementsWatcher: RequirementsWatcher?,
-            notMetRequirements: @RequirementFlags Int
+            notMetRequirements:  Int
         )
     }
 
@@ -30,10 +29,10 @@ class RequirementsWatcher(
     private val handler: Handler = createHandlerForCurrentOrMainLooper()
     private var receiver: DeviceStatusChangeReceiver? = null
 
-    private var notMetRequirements: @RequirementFlags Int = 0
+    private var notMetRequirements:  Int = 0
     private var networkCallback: NetworkCallback? = null
 
-    fun start(): @RequirementFlags Int {
+    fun start():  Int {
         notMetRequirements = requirements.getNotMetRequirements(context)
         val filter = IntentFilter()
         if (requirements.isNetworkRequired) {
@@ -84,7 +83,7 @@ class RequirementsWatcher(
     }
 
     private fun checkRequirements() {
-        @RequirementFlags val notMetRequirements: @RequirementFlags Int =
+         val notMetRequirements:  Int =
             requirements.getNotMetRequirements(context)
         if (this.notMetRequirements != notMetRequirements) {
             this.notMetRequirements = notMetRequirements

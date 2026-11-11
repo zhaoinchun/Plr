@@ -2,8 +2,8 @@
 package androidx.media3.extractor
 
 import androidx.media3.common.C
-import androidx.media3.common.C.ColorRange
-import androidx.media3.common.C.ColorTransfer
+
+
 import androidx.media3.common.Format
 import androidx.media3.common.ParserException
 import androidx.media3.common.util.CodecSpecificDataUtil.buildAvcCodecString
@@ -20,9 +20,9 @@ class AvcConfig private constructor(
    val height: Int,
    val bitdepthLuma: Int,
    val bitdepthChroma: Int,
-   val colorSpace: @C.ColorSpace Int,
-   val colorRange: @ColorRange Int,
-   val colorTransfer: @ColorTransfer Int,
+   val colorSpace: Int,
+   val colorRange: Int,
+   val colorTransfer: Int,
    val maxNumReorderFrames: Int,
    val pixelWidthHeightRatio: Float,
    val codecs: String?
@@ -49,9 +49,9 @@ class AvcConfig private constructor(
                 var height = Format.NO_VALUE
                 var bitdepthLuma = Format.NO_VALUE
                 var bitdepthChroma = Format.NO_VALUE
-                var colorSpace: @C.ColorSpace Int = Format.NO_VALUE
-                var colorRange: @ColorRange Int = Format.NO_VALUE
-                var colorTransfer: @ColorTransfer Int = Format.NO_VALUE
+                var colorSpace: Int = Format.NO_VALUE
+                var colorRange: Int = Format.NO_VALUE
+                var colorTransfer: Int = Format.NO_VALUE
                 var pixelWidthHeightRatio = 1f
                 var codecs: String? = null
                 // Max possible value defined in section E.2.1 of the H.264 spec.

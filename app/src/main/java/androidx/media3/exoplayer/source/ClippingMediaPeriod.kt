@@ -9,8 +9,6 @@ import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.LoadingInfo
 import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.exoplayer.source.ClippingMediaSource.IllegalClippingException
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import com.google.common.base.Preconditions
 import java.io.IOException
@@ -281,13 +279,13 @@ class ClippingMediaPeriod(
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
         ): Int {
             if (isPendingInitialDiscontinuity) {
                 return C.RESULT_NOTHING_READ
             }
             if (isPeriodClippingEndPosition) {
-                val result: @ReadDataResult Int =
+                val result:  Int =
                     childStream.readData(formatHolder, buffer, readFlags)
                 if (result == C.RESULT_FORMAT_READ) {
                     updateDecoderDelayPaddingForClipping(formatHolder, startUs, endUs)
@@ -300,7 +298,7 @@ class ClippingMediaPeriod(
                 return C.RESULT_BUFFER_READ
             }
             val bufferedPositionUs = bufferedPositionUs
-            val result: @ReadDataResult Int = childStream.readData(formatHolder, buffer, readFlags)
+            val result:  Int = childStream.readData(formatHolder, buffer, readFlags)
             if (lastReportedDiscontinuityUs != C.TIME_UNSET && result != C.RESULT_NOTHING_READ) {
                 // We read something, so don't suppress further discontinuities even if they are to the same
                 // position as the last one.
@@ -329,7 +327,7 @@ class ClippingMediaPeriod(
             return childStream.skipData(positionUs)
         }
 
-        override val flags: @SampleStream.Flags Int
+        override val flags:  Int
             get() {
                 var flags = childStream.flags
                 if (endUs != C.TIME_END_OF_SOURCE) {

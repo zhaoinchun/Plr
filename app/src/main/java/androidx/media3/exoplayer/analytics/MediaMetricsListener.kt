@@ -44,7 +44,6 @@ import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException
 import androidx.media3.datasource.UdpDataSource.UdpDataSourceException
 import androidx.media3.exoplayer.DecoderCounters
 import androidx.media3.exoplayer.ExoPlaybackException
-import androidx.media3.exoplayer.analytics.AnalyticsListener.EventFlags
 import androidx.media3.exoplayer.analytics.AnalyticsListener.EventTime
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.drm.DefaultDrmSessionManager.MissingSchemeDataException
@@ -78,8 +77,8 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
     private var activeSessionId: String? = null
     private var metricsBuilder: PlaybackMetrics.Builder? = null
 
-    @Player.DiscontinuityReason
-    private var discontinuityReason: @Player.DiscontinuityReason Int = 0
+    
+    private var discontinuityReason:  Int = 0
     private var currentPlaybackState = PlaybackStateEvent.STATE_NOT_STARTED
     private var currentNetworkType = NetworkEvent.NETWORK_TYPE_UNKNOWN
     private var pendingPlayerError: PlaybackException? = null
@@ -145,7 +144,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
         eventTime: EventTime,
         oldPosition: Player.PositionInfo,
         newPosition: Player.PositionInfo,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+         reason:  Int
     ) {
         if (reason == Player.DISCONTINUITY_REASON_SEEK) {
             isSeeking = true
@@ -251,7 +250,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
 
     private fun maybeAddSessions(events: AnalyticsListener.Events) {
         for (i in 0..<events.size()) {
-            @EventFlags val event: @EventFlags Int = events.get(i)
+             val event:  Int = events.get(i)
             val eventTime = events.getEventTime(event)
             when (event) {
                 AnalyticsListener.EVENT_TIMELINE_CHANGED -> {
@@ -451,7 +450,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
     }
 
     private fun maybeUpdateVideoFormat(
-        realtimeMs: Long, videoFormat: Format?, trackSelectionReason: @C.SelectionReason Int
+        realtimeMs: Long, videoFormat: Format?, trackSelectionReason:  Int
     ) {
         var trackSelectionReason = trackSelectionReason
         if (currentVideoFormat == videoFormat) {
@@ -467,7 +466,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
     }
 
     private fun maybeUpdateAudioFormat(
-        realtimeMs: Long, audioFormat: Format?, trackSelectionReason: @C.SelectionReason Int
+        realtimeMs: Long, audioFormat: Format?, trackSelectionReason:  Int
     ) {
         var trackSelectionReason = trackSelectionReason
         if (currentAudioFormat == audioFormat) {
@@ -483,7 +482,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
     }
 
     private fun maybeUpdateTextFormat(
-        realtimeMs: Long, textFormat: Format?, trackSelectionReason: @C.SelectionReason Int
+        realtimeMs: Long, textFormat: Format?, trackSelectionReason:  Int
     ) {
         var trackSelectionReason = trackSelectionReason
         if (currentTextFormat == textFormat) {
@@ -502,7 +501,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
         type: Int,
         realtimeMs: Long,
         format: Format?,
-        trackSelectionReason: @C.SelectionReason Int
+        trackSelectionReason:  Int
     ) {
         val builder =
             TrackChangeEvent.Builder(type).setTimeSinceCreatedMillis(realtimeMs - startTimeMs)
@@ -616,7 +615,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
 
     private class PendingFormatUpdate(
         val format: Format,
-        val selectionReason: @C.SelectionReason Int,
+        val selectionReason:  Int,
         val sessionId: String
     )
 
@@ -630,7 +629,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
                 MediaMetricsListener(context, mediaMetricsManager.createPlaybackSession())
         }
 
-        private fun getTrackChangeReason(trackSelectionReason: @C.SelectionReason Int): Int {
+        private fun getTrackChangeReason(trackSelectionReason:  Int): Int {
             return when (trackSelectionReason) {
                 C.SELECTION_REASON_INITIAL -> TrackChangeEvent.TRACK_CHANGE_REASON_INITIAL
                 C.SELECTION_REASON_ADAPTIVE -> TrackChangeEvent.TRACK_CHANGE_REASON_ADAPTIVE
@@ -667,7 +666,7 @@ private constructor(context: Context, private val playbackSession: PlaybackSessi
             if (mediaItem.localConfiguration == null) {
                 return PlaybackMetrics.STREAM_TYPE_UNKNOWN
             }
-            @C.ContentType val contentType: @C.ContentType Int =
+             val contentType:  Int =
                 inferContentTypeForUriAndMimeType(
                     mediaItem.localConfiguration.uri, mediaItem.localConfiguration.mimeType
                 )

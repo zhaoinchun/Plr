@@ -44,7 +44,7 @@ interface AudioSink {
     )
 
     class AudioTrackConfig(
-        val encoding: @C.Encoding Int,
+        val encoding: Int,
         val sampleRate: Int,
         val channelConfig: Int,
         val tunneling: Boolean,
@@ -103,27 +103,11 @@ interface AudioSink {
         "Unexpected audio track timestamp discontinuity: expected $expectedPresentationTimeUs, got $actualPresentationTimeUs"
     )
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [SINK_FORMAT_SUPPORTED_DIRECTLY, SINK_FORMAT_SUPPORTED_WITH_TRANSCODING, SINK_FORMAT_UNSUPPORTED]
-    )
-    annotation class SinkFormatSupport
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [OFFLOAD_MODE_DISABLED, OFFLOAD_MODE_ENABLED_GAPLESS_REQUIRED, OFFLOAD_MODE_ENABLED_GAPLESS_NOT_REQUIRED]
-    )
-    annotation class OffloadMode
-
     fun setListener(listener: Listener)
     fun setPlayerId(playerId: PlayerId?) {}
     fun setClock(clock: Clock) {}
     fun supportsFormat(format: Format): Boolean
-    fun getFormatSupport(format: Format): @SinkFormatSupport Int
+    fun getFormatSupport(format: Format): Int
     fun getFormatOffloadSupport(format: Format): AudioOffloadSupport {
         return AudioOffloadSupport.DEFAULT_UNSUPPORTED
     }
@@ -187,7 +171,7 @@ interface AudioSink {
     fun disableTunneling()
 
     @RequiresApi(29)
-    fun setOffloadMode(offloadMode: @OffloadMode Int) {
+    fun setOffloadMode(offloadMode:  Int) {
     }
 
     @RequiresApi(29)

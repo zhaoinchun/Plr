@@ -19,13 +19,13 @@ import com.google.common.base.Preconditions
 internal class StreamVolumeManager(
     context: Context,
     private val listener: Listener,
-    @C.StreamType streamType: @C.StreamType Int,
+    streamType: Int,
     audioManagerLooper: Looper,
     listenerLooper: Looper,
     clock: Clock
 ) {
     interface Listener {
-        fun onStreamTypeChanged(@C.StreamType streamType: @C.StreamType Int)
+        fun onStreamTypeChanged(streamType: Int)
         fun onStreamVolumeChanged(streamVolume: Int, streamMuted: Boolean)
     }
 
@@ -73,7 +73,7 @@ internal class StreamVolumeManager(
             })
     }
 
-    fun setStreamType(@C.StreamType streamType: @C.StreamType Int) {
+    fun setStreamType(streamType: Int) {
         stateHandler.updateStateAsync( 
              { state: StreamVolumeState ->
                 StreamVolumeState(
@@ -100,7 +100,7 @@ internal class StreamVolumeManager(
         get() = stateHandler.get()!!.muted
 
     @SuppressLint("WrongConstant") // Setting C.VolumeFlags as audio system volume flags.
-    fun setVolume(volume: Int, flags: @C.VolumeFlags Int) {
+    fun setVolume(volume: Int, flags: Int) {
         stateHandler.updateStateAsync( 
              { state: StreamVolumeState ->
                 StreamVolumeState(
@@ -121,7 +121,7 @@ internal class StreamVolumeManager(
     }
 
     @SuppressLint("WrongConstant") // Setting C.VolumeFlags as audio system volume flags.
-    fun increaseVolume(flags: @C.VolumeFlags Int) {
+    fun increaseVolume(flags: Int) {
         stateHandler.updateStateAsync( 
              { state: StreamVolumeState ->
                 StreamVolumeState(
@@ -142,7 +142,7 @@ internal class StreamVolumeManager(
     }
 
     @SuppressLint("WrongConstant") // Setting C.VolumeFlags as audio system volume flags.
-    fun decreaseVolume(flags: @C.VolumeFlags Int) {
+    fun decreaseVolume(flags: Int) {
         stateHandler.updateStateAsync( 
              { state: StreamVolumeState? ->
                 StreamVolumeState(
@@ -163,7 +163,7 @@ internal class StreamVolumeManager(
     }
 
     @SuppressLint("WrongConstant") // Setting C.VolumeFlags as audio system volume flags.
-    fun setMuted(muted: Boolean, flags: @C.VolumeFlags Int) {
+    fun setMuted(muted: Boolean, flags: Int) {
         stateHandler.updateStateAsync( 
              { state: StreamVolumeState? ->
                 StreamVolumeState(
@@ -218,7 +218,7 @@ internal class StreamVolumeManager(
         }
     }
 
-    private fun generateState(@C.StreamType streamType: @C.StreamType Int): StreamVolumeState {
+    private fun generateState(streamType: Int): StreamVolumeState {
         val audioManager  = audioManager!!
         val volume = AudioManagerCompat.getStreamVolume(audioManager!!, streamType)
         val muted = AudioManagerCompat.isStreamMute(audioManager!!, streamType)
@@ -228,7 +228,7 @@ internal class StreamVolumeManager(
     }
 
     private class StreamVolumeState(
-        @field:C.StreamType @param:C.StreamType val streamType: @C.StreamType Int,
+        val streamType: Int,
         val volume: Int,
         val muted: Boolean,
         val minVolume: Int,

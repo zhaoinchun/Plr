@@ -43,7 +43,7 @@ class PercentageRating : Rating {
     }
 
     companion object {
-        private val TYPE: @RatingType Int = RATING_TYPE_PERCENTAGE
+        private val TYPE: Int = RATING_TYPE_PERCENTAGE
 
         private val FIELD_PERCENT = intToStringMaxRadix(1)
 

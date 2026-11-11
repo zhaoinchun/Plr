@@ -7,7 +7,7 @@ import androidx.media3.exoplayer.RendererCapabilities
 
 interface ImageDecoder : Decoder<DecoderInputBuffer, ImageOutputBuffer, ImageDecoderException> {
     interface Factory {
-        fun supportsFormat(format: Format): @RendererCapabilities.Capabilities Int
+        fun supportsFormat(format: Format):  Int
         fun createImageDecoder(): ImageDecoder
     }
 

@@ -44,15 +44,10 @@ import androidx.media3.common.util.Util.toLong
 import androidx.media3.decoder.DecoderInputBuffer
 import androidx.media3.exoplayer.CodecParameters
 import androidx.media3.exoplayer.DecoderReuseEvaluation
-import androidx.media3.exoplayer.DecoderReuseEvaluation.DecoderDiscardReasons
 import androidx.media3.exoplayer.ExoPlaybackException
 import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
-import androidx.media3.exoplayer.RendererCapabilities.AdaptiveSupport
-import androidx.media3.exoplayer.RendererCapabilities.DecoderSupport
-import androidx.media3.exoplayer.RendererCapabilities.HardwareAccelerationSupport
-import androidx.media3.exoplayer.RendererCapabilities.TunnelingSupport
 import androidx.media3.exoplayer.ScrubbingModeParameters
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter.Configuration
@@ -66,15 +61,12 @@ import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.DecoderQueryException
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getAlternativeDecoderInfos
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getDecoderInfosSoftMatch
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseAction
 import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameReleaseInfo
 import androidx.media3.exoplayer.video.VideoFrameReleaseControl.FrameTimingEvaluator
-import androidx.media3.exoplayer.video.VideoSink.FirstFrameReleaseInstruction
 import androidx.media3.exoplayer.video.VideoSink.VideoFrameHandler
 import androidx.media3.exoplayer.video.VideoSink.VideoSinkException
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.MoreExecutors
-import org.checkerframework.checker.initialization.qual.Initialized
 import org.checkerframework.checker.nullness.qual.RequiresNonNull
 import java.nio.ByteBuffer
 import java.util.PriorityQueue
@@ -126,7 +118,7 @@ class MediaCodecVideoRenderer(
     private var codecHandlesHdr10PlusOutOfBandMetadata = false
     private var isApplyingContainerHagcMetadata = false
     private var hasSetVideoSink = false
-    private var nextVideoSinkFirstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int = 0
+    private var nextVideoSinkFirstFrameReleaseInstruction:  Int = 0
     private var videoEffects: List<Effect>? =
         null// TODO(b/260702159) Consider renaming the method to getOutputSurface().
 
@@ -143,10 +135,10 @@ class MediaCodecVideoRenderer(
     private var outputResolution: Size = Size.UNKNOWN
     private var haveReportedFirstFrameRenderedForCurrentSurface = false
 
-    @C.VideoScalingMode
-    private var scalingMode: @C.VideoScalingMode Int = C.VIDEO_SCALING_MODE_DEFAULT
+    
+    private var scalingMode:  Int = C.VIDEO_SCALING_MODE_DEFAULT
 
-    private var changeFrameRateStrategy: @C.VideoChangeFrameRateStrategy Int =
+    private var changeFrameRateStrategy:  Int =
         C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
     private var droppedFrameAccumulationStartTimeMs: Long = 0
     private var droppedFrames = 0
@@ -225,7 +217,7 @@ class MediaCodecVideoRenderer(
     override fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector,
         format: Format
-    ): @RendererCapabilities.Capabilities Int {
+    ):  Int {
         return supportsFormatInternal(context, mediaCodecSelector, format)
     }
 
@@ -544,7 +536,7 @@ class MediaCodecVideoRenderer(
     }
 
     @Throws(ExoPlaybackException::class)
-    override fun handleMessage(messageType: @Renderer.MessageType Int, message: Any?) {
+    override fun handleMessage(messageType:  Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VIDEO_OUTPUT -> setOutput(message)
             Renderer.MSG_SET_SCALING_MODE -> {
@@ -640,7 +632,7 @@ class MediaCodecVideoRenderer(
             }
             haveReportedFirstFrameRenderedForCurrentSurface = false
 
-            val state: @Renderer.State Int = state
+            val state:  Int = state
             val codec = codec
             var surfaceReplacedSeamlessly = false
             if (codec != null) {
@@ -732,7 +724,7 @@ class MediaCodecVideoRenderer(
     ): DecoderReuseEvaluation {
         val evaluation = codecInfo.canReuseCodec(oldFormat, newFormat)
 
-        var discardReasons: @DecoderDiscardReasons Int = evaluation.discardReasons
+        var discardReasons:  Int = evaluation.discardReasons
         val codecMaxValues: CodecMaxValues = this.codecMaxValues!!
         if (newFormat.width > codecMaxValues.width || newFormat.height > codecMaxValues.height) {
             discardReasons =
@@ -829,7 +821,7 @@ class MediaCodecVideoRenderer(
         }
 
         try {
-            val frameReleaseAction: @FrameReleaseAction Int =
+            val frameReleaseAction:  Int =
                 videoFrameReleaseControl.getFrameReleaseAction(
                     nextOutputBufferToProcessPresentationTimeUs,
                     positionUs,
@@ -1205,9 +1197,9 @@ class MediaCodecVideoRenderer(
 
     protected fun changeVideoSinkInputStream(
         videoSink: VideoSink,
-        inputType: @VideoSink.InputType Int,
+        inputType:  Int,
         format: Format,
-        firstFrameReleaseInstruction: @FirstFrameReleaseInstruction Int
+        firstFrameReleaseInstruction:  Int
     ) {
         val videoEffectsToApply =
             (if (videoEffects != null) videoEffects else listOf())!!
@@ -1312,7 +1304,7 @@ class MediaCodecVideoRenderer(
                 })
         }
 
-        val frameReleaseAction: @FrameReleaseAction Int =
+        val frameReleaseAction:  Int =
             videoFrameReleaseControl.getFrameReleaseAction(
                 bufferPresentationTimeUs,
                 positionUs,
@@ -2064,14 +2056,14 @@ class MediaCodecVideoRenderer(
         @Throws(DecoderQueryException::class)
         fun supportsFormat(
             context: Context, mediaCodecSelector: MediaCodecSelector, format: Format
-        ): @RendererCapabilities.Capabilities Int {
+        ):  Int {
             return supportsFormatInternal(context, mediaCodecSelector, format)
         }
 
         @Throws(DecoderQueryException::class)
         private fun supportsFormatInternal(
             context: Context, mediaCodecSelector: MediaCodecSelector, format: Format
-        ): @RendererCapabilities.Capabilities Int {
+        ):  Int {
             val mimeType = format.sampleMimeType
             if (!isVideo(mimeType)) {
                 return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
@@ -2121,19 +2113,19 @@ class MediaCodecVideoRenderer(
                     }
                 }
             }
-            @C.FormatSupport val formatSupport: @C.FormatSupport Int =
+             val formatSupport:  Int =
                 if (isFormatSupported) C.FORMAT_HANDLED else C.FORMAT_EXCEEDS_CAPABILITIES
-            val adaptiveSupport: @AdaptiveSupport Int =
+            val adaptiveSupport: Int =
                 if (decoderInfo.isSeamlessAdaptationSupported(format))
                     RendererCapabilities.ADAPTIVE_SEAMLESS
                 else
                     RendererCapabilities.ADAPTIVE_NOT_SEAMLESS
-            val hardwareAccelerationSupport: @HardwareAccelerationSupport Int =
+            val hardwareAccelerationSupport: Int =
                 if (decoderInfo.hardwareAccelerated)
                     RendererCapabilities.HARDWARE_ACCELERATION_SUPPORTED
                 else
                     RendererCapabilities.HARDWARE_ACCELERATION_NOT_SUPPORTED
-            var decoderSupport: @DecoderSupport Int =
+            var decoderSupport:  Int =
                 if (isPreferredDecoder) RendererCapabilities.DECODER_SUPPORT_PRIMARY else RendererCapabilities.DECODER_SUPPORT_FALLBACK
 
             if (Build.VERSION.SDK_INT >= 26 && MimeTypes.VIDEO_DOLBY_VISION == format.sampleMimeType
@@ -2142,7 +2134,7 @@ class MediaCodecVideoRenderer(
                 decoderSupport = RendererCapabilities.DECODER_SUPPORT_FALLBACK_MIMETYPE
             }
 
-            var tunnelingSupport: @TunnelingSupport Int =
+            var tunnelingSupport:  Int =
                 RendererCapabilities.TUNNELING_NOT_SUPPORTED
             if (isFormatSupported) {
                 val tunnelingDecoderInfos: List<MediaCodecInfo> =
@@ -2344,7 +2336,7 @@ class MediaCodecVideoRenderer(
         }
 
         private fun debugLogForBufferRelease(
-            frameReleaseAction: @FrameReleaseAction Int,
+            frameReleaseAction:  Int,
             bufferPresentationTimeUs: Long,
             positionUs: Long,
             isDecodeOnlyBuffer: Boolean,

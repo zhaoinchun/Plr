@@ -64,7 +64,7 @@ class WaveformAudioBufferSink(
     private var channelMixingMatrix:ChannelMixingMatrix? = null
     private var samplesPerBar = 0
 
-    override fun flush(sampleRateHz: Int, channelCount: Int, encoding: @C.PcmEncoding Int) {
+    override fun flush(sampleRateHz: Int, channelCount: Int, encoding: Int) {
         samplesPerBar = sampleRateHz / barsPerSecond
         inputAudioFormat = AudioProcessor.AudioFormat(sampleRateHz, channelCount, encoding)
         mixingAudioFormat =

@@ -32,13 +32,13 @@ class ExperimentalBandwidthMeter private constructor(
     private val resetOnNetworkTypeChange: Boolean = true
 ) : BandwidthMeter, TransferListener {
 
-    @C.NetworkType
-    private var networkType: @C.NetworkType Int
+    
+    private var networkType:  Int
     private var initialBitrateEstimate: Long
     private var networkTypeOverrideSet = false
 
-    @C.NetworkType
-    private var networkTypeOverride: @C.NetworkType Int = 0
+    
+    private var networkTypeOverride:  Int = 0
     private var countryCode: String? = null
     private val context: Context? = context.applicationContext
     private val initialBitrateEstimates = HashMap<Int, Long?>(8)
@@ -68,7 +68,7 @@ class ExperimentalBandwidthMeter private constructor(
     }
 
     fun setInitialBitrateEstimate(
-        @C.NetworkType networkType: @C.NetworkType Int, initialBitrateEstimate: Long
+         networkType:  Int, initialBitrateEstimate: Long
     ) {
         initialBitrateEstimates.put(networkType, initialBitrateEstimate)
     }
@@ -84,7 +84,7 @@ class ExperimentalBandwidthMeter private constructor(
     }
 
     @Synchronized
-    fun setNetworkTypeOverride(@C.NetworkType networkType: @C.NetworkType Int) {
+    fun setNetworkTypeOverride( networkType:  Int) {
         networkTypeOverride = networkType
         networkTypeOverrideSet = true
         onNetworkTypeChanged(networkType)
@@ -161,7 +161,7 @@ class ExperimentalBandwidthMeter private constructor(
     }
 
     @Synchronized
-    private fun onNetworkTypeChanged(@C.NetworkType networkType: @C.NetworkType Int) {
+    private fun onNetworkTypeChanged( networkType:  Int) {
         var networkType = networkType
         if (this.networkType != C.NETWORK_TYPE_UNKNOWN && !resetOnNetworkTypeChange) {
             // Reset on network change disabled. Ignore all updates except the initial one.
@@ -191,7 +191,7 @@ class ExperimentalBandwidthMeter private constructor(
         timeToFirstByteEstimator.reset()
     }
 
-    private fun getInitialBitrateEstimateForNetworkType(@C.NetworkType networkType: @C.NetworkType Int): Long {
+    private fun getInitialBitrateEstimateForNetworkType( networkType:  Int): Long {
         var initialBitrateEstimate = initialBitrateEstimates.get(networkType)
         if (initialBitrateEstimate == null) {
             initialBitrateEstimate = initialBitrateEstimates.get(C.NETWORK_TYPE_UNKNOWN)
@@ -232,7 +232,7 @@ class ExperimentalBandwidthMeter private constructor(
         }
 
         private fun getInitialBitrateEstimatesForCountry(
-            countryCode: String?, @C.NetworkType networkType: @C.NetworkType Int
+            countryCode: String?,  networkType:  Int
         ): Long {
             val groupIndices: IntArray =
                 getInitialBitrateCountryGroupAssignment(Strings.nullToEmpty(countryCode))

@@ -124,7 +124,7 @@ object Ac3Util {
         val isEac3 = data.readBits(5) > 10
         data.position = (initialPosition)
         var mimeType: String?
-        var streamType: @SyncFrameInfo.StreamType Int =
+        var streamType:  Int =
             SyncFrameInfo.STREAM_TYPE_UNDEFINED
         val sampleRate: Int
         val acmod: Int
@@ -421,18 +421,13 @@ object Ac3Util {
 
     class SyncFrameInfo constructor(
         val mimeType: String?,
-        val streamType: @StreamType Int,
+        val streamType:  Int,
         val channelCount: Int,
         val sampleRate: Int,
         val frameSize: Int,
         val sampleCount: Int,
         val bitrate: Int
     ) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(value = [STREAM_TYPE_UNDEFINED, STREAM_TYPE_TYPE0, STREAM_TYPE_TYPE1, STREAM_TYPE_TYPE2])
-        annotation class StreamType
 
         companion object {
             const val STREAM_TYPE_UNDEFINED: Int = -1

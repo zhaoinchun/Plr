@@ -22,12 +22,7 @@ class MergingMediaSource(
     private val compositeSequenceableLoaderFactory: CompositeSequenceableLoaderFactory,
     private val mediaSources: Array<MediaSource>
 ) : CompositeMediaSource<Int>() {
-    class IllegalMergeException(val reason: @Reason Int) : IOException() {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(value = [REASON_PERIOD_COUNT_MISMATCH])
-        annotation class Reason
+    class IllegalMergeException(val reason:  Int) : IOException() {
 
         companion object {
             const val REASON_PERIOD_COUNT_MISMATCH: Int = 0

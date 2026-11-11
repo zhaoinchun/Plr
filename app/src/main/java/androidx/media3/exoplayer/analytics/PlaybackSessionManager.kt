@@ -27,7 +27,7 @@ interface PlaybackSessionManager {
     fun updateSessionsWithTimelineChange(eventTime: EventTime)
     fun updateSessionsWithDiscontinuity(
         eventTime: EventTime,
-        @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+         reason:  Int
     )
 
     val activeSessionId: String?

@@ -25,7 +25,7 @@ internal object ProjectionDecoder {
     private val MAX_TRIANGLE_INDICES = 128 * 1000
     private val LOG2 = ln(2.0)
 
-    fun decode(projectionData: ByteArray, stereoMode: @C.StereoMode Int): Projection? {
+    fun decode(projectionData: ByteArray, stereoMode:  Int): Projection? {
         val input = ParsableByteArray(projectionData)
         // MP4 containers include the proj box but webm containers do not.
         // Both containers use mshp.

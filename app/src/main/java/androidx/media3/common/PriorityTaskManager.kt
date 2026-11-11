@@ -6,21 +6,21 @@ import java.util.PriorityQueue
 import kotlin.math.max
 
 class PriorityTaskManager {
-    class PriorityTooLowException(priority: @C.Priority Int, highestPriority: @C.Priority Int) :
+    class PriorityTooLowException(priority: Int, highestPriority: Int) :
         IOException("Priority too low [priority=" + priority + ", highest=" + highestPriority + "]")
 
     private val lock = Any()
 
     // Guarded by lock.
     private val queue: PriorityQueue<Int?>
-    private var highestPriority: @C.Priority Int
+    private var highestPriority: Int
 
     init {
-        queue = PriorityQueue<Int?>(10, Collections.reverseOrder<@C.Priority Int?>())
+        queue = PriorityQueue<Int?>(10, Collections.reverseOrder<Int?>())
         highestPriority = Int.MIN_VALUE
     }
 
-    fun add(priority: @C.Priority Int) {
+    fun add(priority: Int) {
         synchronized(lock) {
             queue.add(priority)
             highestPriority = max(highestPriority, priority)
@@ -28,7 +28,7 @@ class PriorityTaskManager {
     }
 
     @Throws(InterruptedException::class)
-    fun proceed(priority: @C.Priority Int) {
+    fun proceed(priority: Int) {
         synchronized(lock) {
             while (highestPriority != priority) {
                 (lock as Object).wait()
@@ -36,14 +36,14 @@ class PriorityTaskManager {
         }
     }
 
-    fun proceedNonBlocking(priority: @C.Priority Int): Boolean {
+    fun proceedNonBlocking(priority: Int): Boolean {
         synchronized(lock) {
             return highestPriority == priority
         }
     }
 
     @Throws(PriorityTooLowException::class)
-    fun proceedOrThrow(priority: @C.Priority Int) {
+    fun proceedOrThrow(priority: Int) {
         synchronized(lock) {
             if (highestPriority != priority) {
                 throw PriorityTooLowException(priority, highestPriority)
@@ -51,7 +51,7 @@ class PriorityTaskManager {
         }
     }
 
-    fun remove(priority: @C.Priority Int) {
+    fun remove(priority: Int) {
         synchronized(lock) {
             queue.remove(priority)
             highestPriority =

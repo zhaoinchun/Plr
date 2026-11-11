@@ -26,90 +26,20 @@ class Cue private constructor(
     multiRowAlignment: Layout.Alignment?,
     bitmap: Bitmap?,
     line: Float,
-    @LineType lineType: @LineType Int,
-    @AnchorType lineAnchor: @AnchorType Int,
+     lineType:  Int,
+     lineAnchor:  Int,
     position: Float,
-    @AnchorType positionAnchor: @AnchorType Int,
-    @TextSizeType textSizeType: @TextSizeType Int,
+     positionAnchor:  Int,
+     textSizeType:  Int,
     textSize: Float,
     size: Float,
     bitmapHeight: Float,
     windowColorSet: Boolean,
     windowColor: Int,
-    @VerticalType verticalType: @VerticalType Int,
+     verticalType:  Int,
     shearDegrees: Float,
     zIndex: Int
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [TYPE_UNSET, ANCHOR_TYPE_START, ANCHOR_TYPE_MIDDLE, ANCHOR_TYPE_END])
-    annotation class AnchorType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(value = [TYPE_UNSET, LINE_TYPE_FRACTION, LINE_TYPE_NUMBER])
-    annotation class LineType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [TYPE_UNSET, TEXT_SIZE_TYPE_FRACTIONAL, TEXT_SIZE_TYPE_FRACTIONAL_IGNORE_PADDING, TEXT_SIZE_TYPE_ABSOLUTE
-        ]
-    )
-    annotation class TextSizeType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(
-        AnnotationTarget.FIELD,
-        AnnotationTarget.FUNCTION,
-        AnnotationTarget.PROPERTY_GETTER,
-        AnnotationTarget.PROPERTY_SETTER,
-        AnnotationTarget.VALUE_PARAMETER,
-        AnnotationTarget.LOCAL_VARIABLE,
-        AnnotationTarget.CLASS,
-        AnnotationTarget.TYPE,
-        AnnotationTarget.TYPE_PARAMETER
-    )
-    @IntDef(
-        value = [TYPE_UNSET, VERTICAL_TYPE_RL, VERTICAL_TYPE_LR
-        ]
-    )
-    annotation class VerticalType
-
     val text: CharSequence?
     val textAlignment: Layout.Alignment?
     val multiRowAlignment: Layout.Alignment?
@@ -117,16 +47,16 @@ class Cue private constructor(
 
     val line: Float
 
-    @LineType
-    val lineType: @LineType Int
+    
+    val lineType:  Int
 
-    @AnchorType
-    val lineAnchor: @AnchorType Int
+    
+    val lineAnchor:  Int
 
     val position: Float
 
-    @AnchorType
-    val positionAnchor: @AnchorType Int
+    
+    val positionAnchor:  Int
 
     val size: Float
 
@@ -134,12 +64,12 @@ class Cue private constructor(
     val windowColorSet: Boolean
     val windowColor: Int
 
-    @TextSizeType
-    val textSizeType: @TextSizeType Int
+    
+    val textSizeType:  Int
     val textSize: Float
 
-    @VerticalType
-    val verticalType: @VerticalType Int
+    
+    val verticalType:  Int
     val shearDegrees: Float
     val zIndex: Int
 
@@ -204,32 +134,32 @@ class Cue private constructor(
         var line: Float
             private set
 
-        @get:LineType
+        
         @get:Pure
-        @LineType
-        var lineType: @LineType Int
+        
+        var lineType:  Int
             private set
 
-        @get:AnchorType
+        
         @get:Pure
-        @AnchorType
-        var lineAnchor: @AnchorType Int
+        
+        var lineAnchor:  Int
             private set
 
         @get:Pure
         var position: Float
             private set
 
-        @get:AnchorType
+        
         @get:Pure
-        @AnchorType
-        var positionAnchor: @AnchorType Int
+        
+        var positionAnchor:  Int
             private set
 
-        @get:TextSizeType
+       
         @get:Pure
-        @TextSizeType
-        var textSizeType: @TextSizeType Int
+        
+        var textSizeType:  Int
             private set
 
         @get:Pure
@@ -252,10 +182,10 @@ class Cue private constructor(
         var windowColor: Int
             private set
 
-        @get:VerticalType
+       
         @get:Pure
-        @VerticalType
-        var verticalType: @VerticalType Int
+        
+        var verticalType:  Int
             private set
         private var shearDegrees = 0f
 
@@ -325,13 +255,13 @@ class Cue private constructor(
             return this
         }
 
-        fun setLine(line: Float, @LineType lineType: @LineType Int): Builder {
+        fun setLine(line: Float,  lineType:  Int): Builder {
             this.line = line
             this.lineType = lineType
             return this
         }
 
-        fun setLineAnchor(@AnchorType lineAnchor: @AnchorType Int): Builder {
+        fun setLineAnchor( lineAnchor:  Int): Builder {
             this.lineAnchor = lineAnchor
             return this
         }
@@ -341,12 +271,12 @@ class Cue private constructor(
             return this
         }
 
-        fun setPositionAnchor(@AnchorType positionAnchor: @AnchorType Int): Builder {
+        fun setPositionAnchor( positionAnchor:  Int): Builder {
             this.positionAnchor = positionAnchor
             return this
         }
 
-        fun setTextSize(textSize: Float, @TextSizeType textSizeType: @TextSizeType Int): Builder {
+        fun setTextSize(textSize: Float,  textSizeType:  Int): Builder {
             this.textSize = textSize
             this.textSizeType = textSizeType
             return this
@@ -373,7 +303,7 @@ class Cue private constructor(
             return this
         }
 
-        fun setVerticalType(@VerticalType verticalType: @VerticalType Int): Builder {
+        fun setVerticalType( verticalType:  Int): Builder {
             this.verticalType = verticalType
             return this
         }

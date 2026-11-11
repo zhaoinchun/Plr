@@ -3,7 +3,7 @@ package androidx.media3.extractor
 
 import androidx.annotation.IntDef
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.DataReader
 import androidx.media3.common.Format
 import androidx.media3.common.util.ParsableByteArray
@@ -12,7 +12,7 @@ import java.io.IOException
 
 interface TrackOutput {
     class CryptoData(
-        val cryptoMode: @C.CryptoMode Int,
+        val cryptoMode:  Int,
        val encryptionKey: ByteArray?,
        val encryptedBlocks: Int,
        val clearBlocks: Int
@@ -39,12 +39,6 @@ interface TrackOutput {
         }
     }
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [SAMPLE_DATA_PART_MAIN, SAMPLE_DATA_PART_ENCRYPTION, SAMPLE_DATA_PART_SUPPLEMENTAL])
-    annotation class SampleDataPart
-
     fun durationUs(durationUs: Long) {}
 
     fun format(format: Format)
@@ -63,13 +57,13 @@ interface TrackOutput {
         input: DataReader,
         length: Int,
         allowEndOfInput: Boolean,
-        sampleDataPart: @SampleDataPart Int
+        sampleDataPart:  Int
     ): Int
 
-    fun sampleData(data: ParsableByteArray, length: Int, sampleDataPart: @SampleDataPart Int)
+    fun sampleData(data: ParsableByteArray, length: Int, sampleDataPart:  Int)
 
     fun sampleMetadata(
-        timeUs: Long, flags: @BufferFlags Int, size: Int, offset: Int, cryptoData: CryptoData?
+        timeUs: Long, flags:  Int, size: Int, offset: Int, cryptoData: CryptoData?
     )
 
     companion object {

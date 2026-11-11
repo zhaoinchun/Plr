@@ -33,8 +33,6 @@ import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.MediaSource.MediaSourceCaller
 import androidx.media3.exoplayer.source.MediaSourceEventListener
 import androidx.media3.exoplayer.source.SampleStream
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
 import androidx.media3.exoplayer.source.TrackGroupArray
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.Allocator
@@ -290,7 +288,7 @@ class ServerSideAdInsertionMediaSource(
     override fun onDrmSessionAcquired(
         windowIndex: Int,
         mediaPeriodId: MediaPeriodId?,
-        @DrmSession.State state: @DrmSession.State Int
+         state:  Int
     ) {
         val mediaPeriod =
             getMediaPeriodForEvent(
@@ -847,12 +845,12 @@ class ServerSideAdInsertionMediaSource(
             streamIndex: Int,
             formatHolder: FormatHolder,
             buffer: DecoderInputBuffer,
-            readFlags: @ReadFlags Int
-        ): @ReadDataResult Int {
-            val peekingFlags: @ReadFlags Int =
+            readFlags:  Int
+        ):  Int {
+            val peekingFlags:  Int =
                 readFlags or SampleStream.FLAG_PEEK or SampleStream.FLAG_OMIT_SAMPLE_DATA
             val bufferedPositionUs = getBufferedPositionUs(mediaPeriod)
-            val result: @ReadDataResult Int =
+            val result:  Int =
                 sampleStreams[streamIndex]!!.readData(formatHolder, buffer, peekingFlags)
             val adjustedTimeUs =
                 getMediaPeriodPositionUsWithEndOfSourceHandling(mediaPeriod, buffer.timeUs)
@@ -1243,8 +1241,8 @@ class ServerSideAdInsertionMediaSource(
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
-        ): @ReadDataResult Int {
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
+        ):  Int {
             return mediaPeriod.sharedPeriod.readData(
                 mediaPeriod, streamIndex, formatHolder, buffer, readFlags
             )
@@ -1254,10 +1252,10 @@ class ServerSideAdInsertionMediaSource(
             return mediaPeriod.sharedPeriod.skipData(mediaPeriod, streamIndex, positionUs)
         }
 
-        override val flags: @SampleStream.Flags Int
+        override val flags:  Int
             get() {
                 val childStream = mediaPeriod.sharedPeriod.sampleStreams[streamIndex]
-                val childFlags: @SampleStream.Flags Int = childStream?.flags ?: 0
+                val childFlags:  Int = childStream?.flags ?: 0
                 // The strict duration flag should only be applied to the very last stream of the content,
                 // not for in-stream transitions (e.g. ad to content or content to ad).
                 val isAtEndOfSourceStream =

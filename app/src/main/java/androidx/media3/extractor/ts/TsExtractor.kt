@@ -25,25 +25,13 @@ import java.io.IOException
 import java.util.Arrays
 
 class TsExtractor(
-    private val mode: @Mode Int,
-    private val extractorFlags: @Flags Int,
+    private val mode: Int,
+    private val extractorFlags:  Int,
     private val subtitleParserFactory: SubtitleParser.Factory,
     timestampAdjuster: TimestampAdjuster,
     payloadReaderFactory: TsPayloadReader.Factory?,
     private val timestampSearchBytes: Int
 ) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [MODE_MULTI_PMT, MODE_SINGLE_PMT, MODE_HLS])
-    annotation class Mode
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(flag = true, value = [FLAG_EMIT_RAW_SUBTITLE_DATA])
-    annotation class Flags
-
     private val timestampAdjusters: MutableList<TimestampAdjuster>
     private val tsPacketBuffer: ParsableByteArray
     private val continuityCounters: SparseIntArray
@@ -73,7 +61,7 @@ class TsExtractor(
         DEFAULT_TIMESTAMP_SEARCH_BYTES
     )
 
-    constructor(extractorFlags: @Flags Int, subtitleParserFactory: SubtitleParser.Factory) : this(
+    constructor(extractorFlags:  Int, subtitleParserFactory: SubtitleParser.Factory) : this(
         MODE_SINGLE_PMT,
         extractorFlags,
         subtitleParserFactory,
@@ -174,7 +162,7 @@ class TsExtractor(
     override fun read(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ): @Extractor.ReadResult Int {
+    ):  Int {
         val inputLength: Long = input.length
         val isModeHls = mode == MODE_HLS
         if (tracksEnded) {
@@ -221,7 +209,7 @@ class TsExtractor(
             return Extractor.RESULT_CONTINUE
         }
 
-        var packetHeaderFlags: @TsPayloadReader.Flags Int = 0
+        var packetHeaderFlags:  Int = 0
 
         // Note: See ISO/IEC 13818-1, section 2.4.3.2 for details of the header format.
         val tsPacketHeader = tsPacketBuffer.readInt()
@@ -596,7 +584,7 @@ class TsExtractor(
             val descriptorsEndPosition = descriptorsStartPosition + length
             var streamType = -1
             var language: String? = null
-            var audioType: @TsPayloadReader.EsInfo.AudioType Int = TsPayloadReader.EsInfo.AUDIO_TYPE_UNDEFINED
+            var audioType:  Int = TsPayloadReader.EsInfo.AUDIO_TYPE_UNDEFINED
             var dvbSubtitleInfos: MutableList<TsPayloadReader.DvbSubtitleInfo?>? = null
             while (data.getPosition() < descriptorsEndPosition) {
                 val descriptorTag: Int = data.readUnsignedByte()

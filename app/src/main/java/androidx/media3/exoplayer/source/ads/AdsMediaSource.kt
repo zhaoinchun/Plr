@@ -43,13 +43,8 @@ class AdsMediaSource(
     private val useAdMediaSourceClipping: Boolean = false
 ) : CompositeMediaSource<MediaPeriodId>() {
     class AdLoadException private constructor(
-        val type: @Type Int, cause: Exception?
+        val type: Int, cause: Exception?
     ) : IOException(cause) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(value = [TYPE_AD, TYPE_AD_GROUP, TYPE_ALL_ADS, TYPE_UNEXPECTED])
-        annotation class Type
 
         val runtimeExceptionForUnexpected: RuntimeException
             get() {

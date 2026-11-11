@@ -57,7 +57,7 @@ class Mp4WebvttParser : SubtitleParser {
         get() = Mp4WebvttParser.cueReplacementBehavior
 
     companion object {
-        val cueReplacementBehavior: @Format.CueReplacementBehavior Int =
+        val cueReplacementBehavior:  Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_REPLACE
 
         private const val BOX_HEADER_SIZE = 8

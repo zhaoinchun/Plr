@@ -32,7 +32,7 @@ import java.io.IOException
 
 class BundledChunkExtractor(
     private val extractor: Extractor,
-    private val primaryTrackType: @C.TrackType Int,
+    private val primaryTrackType: Int,
     private val primaryTrackManifestFormat: Format?,
     private val primaryTrackManifestFormatInfoMerger: ManifestFormatMerger = ManifestFormatMerger.DEFAULT
 ) : ExtractorOutput, ChunkExtractor {
@@ -53,7 +53,7 @@ class BundledChunkExtractor(
     class Factory : ChunkExtractor.Factory {
         private var subtitleParserFactory: SubtitleParser.Factory
         private var parseSubtitlesDuringExtraction = false
-        private var codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+        private var codecsToParseWithinGopSampleDependencies:  Int
 
         init {
             subtitleParserFactory = DefaultSubtitleParserFactory()
@@ -74,7 +74,7 @@ class BundledChunkExtractor(
         }
 
         override fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-            codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+            codecsToParseWithinGopSampleDependencies:  Int
         ): Factory {
             this.codecsToParseWithinGopSampleDependencies = codecsToParseWithinGopSampleDependencies
             return this
@@ -98,7 +98,7 @@ class BundledChunkExtractor(
         }
 
         override fun createProgressiveMediaExtractor(
-            primaryTrackType: @C.TrackType Int,
+            primaryTrackType: Int,
             representationFormat: Format,
             enableEventMessageTrack: Boolean,
             closedCaptionFormats: List<Format>,
@@ -119,7 +119,7 @@ class BundledChunkExtractor(
                         )
                 }
             } else if (isMatroska(containerMimeType)) {
-                var flags: @MatroskaExtractor.Flags Int =
+                var flags:  Int =
                     MatroskaExtractor.FLAG_DISABLE_SEEK_FOR_CUES
                 if (!parseSubtitlesDuringExtraction) {
                     flags = flags or MatroskaExtractor.FLAG_EMIT_RAW_SUBTITLE_DATA
@@ -130,7 +130,7 @@ class BundledChunkExtractor(
             } else if (containerMimeType == MimeTypes.IMAGE_PNG) {
                 extractor = PngExtractor()
             } else {
-                var flags: @FragmentedMp4Extractor.Flags Int = 0
+                var flags:  Int = 0
                 if (enableEventMessageTrack) {
                     flags = flags or FragmentedMp4Extractor.FLAG_ENABLE_EMSG_TRACK
                 }
@@ -266,7 +266,7 @@ class BundledChunkExtractor(
             input: DataReader,
             length: Int,
             allowEndOfInput: Boolean,
-            sampleDataPart: @TrackOutput.SampleDataPart Int
+            sampleDataPart:  Int
         ): Int {
             return trackOutput!!.sampleData(input, length, allowEndOfInput)
         }
@@ -274,14 +274,14 @@ class BundledChunkExtractor(
         override fun sampleData(
             data: ParsableByteArray,
             length: Int,
-            sampleDataPart: @TrackOutput.SampleDataPart Int
+            sampleDataPart:  Int
         ) {
             trackOutput!!.sampleData(data, length)
         }
 
         override fun sampleMetadata(
             timeUs: Long,
-            flags: @C.BufferFlags Int,
+            flags:  Int,
             size: Int,
             offset: Int,
             cryptoData: TrackOutput.CryptoData?

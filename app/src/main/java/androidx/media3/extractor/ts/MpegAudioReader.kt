@@ -1,7 +1,7 @@
 package androidx.media3.extractor.ts
 
 import androidx.media3.common.C
-import androidx.media3.common.C.RoleFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.util.ParsableByteArray
 
@@ -16,15 +16,15 @@ import kotlin.math.min
 
 class MpegAudioReader(
     language: String?,
-    @RoleFlags roleFlags: @RoleFlags Int,
+    roleFlags: Int,
     containerMimeType: String?
 ) : ElementaryStreamReader {
     private val headerScratch: ParsableByteArray
     private val header: MpegAudioUtil.Header
     private val language: String?
 
-    @RoleFlags
-    private val roleFlags: @RoleFlags Int
+    
+    private val roleFlags: Int
     private val containerMimeType: String?
 
     private var output: TrackOutput? = null
@@ -71,7 +71,7 @@ class MpegAudioReader(
         output = extractorOutput.track(idGenerator.getTrackId(), C.TRACK_TYPE_AUDIO)
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         timeUs = pesTimeUs
     }
 

@@ -2,7 +2,7 @@ package androidx.media3.extractor.ts
 
 import androidx.annotation.IntDef
 import androidx.media3.common.C
-import androidx.media3.common.C.BufferFlags
+
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.Log.w
@@ -79,7 +79,7 @@ class H263Reader internal constructor(
         }
     }
 
-    override fun packetStarted(pesTimeUs: Long, flags: @TsPayloadReader.Flags Int) {
+    override fun packetStarted(pesTimeUs: Long, flags:  Int) {
         // TODO (Internal b/32267012): Consider using random access indicator.
         this.pesTimeUs = pesTimeUs
     }
@@ -182,15 +182,6 @@ class H263Reader internal constructor(
     }
 
     private class CsdBuffer(initialCapacity: Int) {
-        @MustBeDocumented
-        @Retention(AnnotationRetention.SOURCE)
-        @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-        @IntDef(
-            value = [STATE_SKIP_TO_VISUAL_OBJECT_SEQUENCE_START, STATE_EXPECT_VISUAL_OBJECT_START, STATE_EXPECT_VIDEO_OBJECT_START, STATE_EXPECT_VIDEO_OBJECT_LAYER_START, STATE_WAIT_FOR_VOP_START
-            ]
-        )
-        private annotation class State
-
         private var isFilling = false
         private var state:  Int = 0
 
@@ -318,7 +309,7 @@ class H263Reader internal constructor(
             Preconditions.checkState(sampleTimeUs != C.TIME_UNSET)
             if (startCodeValue == START_CODE_VALUE_VOP && hasOutputFormat && readingSample) {
                 val size = (position - samplePosition).toInt()
-                val flags: @BufferFlags Int = if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
+                val flags:  Int = if (sampleIsKeyframe) C.BUFFER_FLAG_KEY_FRAME else 0
                 output.sampleMetadata(
                     sampleTimeUs, flags, size, bytesWrittenPastPosition,  null
                 )

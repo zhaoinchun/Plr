@@ -5,7 +5,7 @@ import androidx.media3.common.C
 
 interface ExtractorOutput {
 
-    fun track(id: Int, type: @C.TrackType Int): TrackOutput
+    fun track(id: Int, type: Int): TrackOutput
 
     fun endTracks()
 

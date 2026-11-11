@@ -19,15 +19,6 @@ import java.io.IOException
 import kotlin.math.max
 
 class FlvExtractor : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_READING_FLV_HEADER, STATE_SKIPPING_TO_TAG_HEADER, STATE_READING_TAG_HEADER, STATE_READING_TAG_DATA
-        ]
-    )
-    private annotation class States
-
     private val scratch: ParsableByteArray
     private val headerBuffer: ParsableByteArray
     private val tagHeaderBuffer: ParsableByteArray

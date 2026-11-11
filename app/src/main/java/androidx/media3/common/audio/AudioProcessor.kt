@@ -1,6 +1,5 @@
 package androidx.media3.common.audio
 
-import androidx.media3.common.C.PcmEncoding
 import androidx.media3.common.Format
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Util
@@ -13,7 +12,7 @@ interface AudioProcessor {
     class AudioFormat(
         val sampleRate: Int,
         val channelCount: Int,
-        val encoding: @PcmEncoding Int
+        val encoding: Int
     ) {
         val bytesPerFrame: Int
 

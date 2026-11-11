@@ -52,22 +52,22 @@ class DefaultExtractorsFactory : ExtractorsFactory {
     private var constantBitrateSeekingEnabled = false
     private var constantBitrateSeekingAlwaysEnabled = false
     private var disableArtworkMetadata = false
-    private var adtsFlags: @AdtsExtractor.Flags Int = 0
-    private var amrFlags: @AmrExtractor.Flags Int = 0
-    private var flacFlags: @FlacExtractor.Flags Int = 0
-    private var matroskaFlags: @MatroskaExtractor.Flags Int = 0
-    private var mp4Flags: @Mp4Extractor.Flags Int = 0
-    private var fragmentedMp4Flags: @FragmentedMp4Extractor.Flags Int = 0
-    private var mp3Flags: @Mp3Extractor.Flags Int = 0
-    private var tsMode: @TsExtractor.Mode Int
-    private var tsFlags: @DefaultTsPayloadReaderFactory.Flags Int = 0
+    private var adtsFlags: Int = 0
+    private var amrFlags:  Int = 0
+    private var flacFlags:  Int = 0
+    private var matroskaFlags:  Int = 0
+    private var mp4Flags:  Int = 0
+    private var fragmentedMp4Flags:  Int = 0
+    private var mp3Flags:  Int = 0
+    private var tsMode:  Int
+    private var tsFlags:  Int = 0
 
     private var tsSubtitleFormats: List<Format>? = null
     private var tsTimestampSearchBytes: Int
     private var subtitleParserFactory: SubtitleParser.Factory
-    private var codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
-    private var jpegFlags: @JpegExtractor.Flags Int = 0
-    private var heifFlags: @HeifExtractor.Flags Int = 0
+    private var codecsToParseWithinGopSampleDependencies:  Int
+    private var jpegFlags:  Int = 0
+    private var heifFlags:  Int = 0
 
     init {
         tsMode = TsExtractor.MODE_SINGLE_PMT
@@ -103,21 +103,21 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     @Synchronized
     fun setAdtsExtractorFlags(
-        flags: @AdtsExtractor.Flags Int
+        flags: Int
     ): DefaultExtractorsFactory {
         this.adtsFlags = flags
         return this
     }
 
     @Synchronized
-    fun setAmrExtractorFlags(flags: @AmrExtractor.Flags Int): DefaultExtractorsFactory {
+    fun setAmrExtractorFlags(flags:  Int): DefaultExtractorsFactory {
         this.amrFlags = flags
         return this
     }
 
     @Synchronized
     fun setFlacExtractorFlags(
-        flags: @FlacExtractor.Flags Int
+        flags:  Int
     ): DefaultExtractorsFactory {
         this.flacFlags = flags
         return this
@@ -125,41 +125,41 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     @Synchronized
     fun setMatroskaExtractorFlags(
-        flags: @MatroskaExtractor.Flags Int
+        flags:  Int
     ): DefaultExtractorsFactory {
         this.matroskaFlags = flags
         return this
     }
 
     @Synchronized
-    fun setMp4ExtractorFlags(flags: @Mp4Extractor.Flags Int): DefaultExtractorsFactory {
+    fun setMp4ExtractorFlags(flags:  Int): DefaultExtractorsFactory {
         this.mp4Flags = flags
         return this
     }
 
     @Synchronized
     fun setFragmentedMp4ExtractorFlags(
-        flags: @FragmentedMp4Extractor.Flags Int
+        flags:  Int
     ): DefaultExtractorsFactory {
         this.fragmentedMp4Flags = flags
         return this
     }
 
     @Synchronized
-    fun setMp3ExtractorFlags(flags: @Mp3Extractor.Flags Int): DefaultExtractorsFactory {
+    fun setMp3ExtractorFlags(flags:  Int): DefaultExtractorsFactory {
         mp3Flags = flags
         return this
     }
 
     @Synchronized
-    fun setTsExtractorMode(mode: @TsExtractor.Mode Int): DefaultExtractorsFactory {
+    fun setTsExtractorMode(mode:  Int): DefaultExtractorsFactory {
         tsMode = mode
         return this
     }
 
     @Synchronized
     fun setTsExtractorFlags(
-        flags: @DefaultTsPayloadReaderFactory.Flags Int
+        flags:  Int
     ): DefaultExtractorsFactory {
         tsFlags = flags
         return this
@@ -189,7 +189,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     @Synchronized
     override fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-        codecsToParseWithinGopSampleDependencies: @C.VideoCodecFlags Int
+        codecsToParseWithinGopSampleDependencies:  Int
     ): DefaultExtractorsFactory {
         this.codecsToParseWithinGopSampleDependencies = codecsToParseWithinGopSampleDependencies
         return this
@@ -197,7 +197,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     @Synchronized
     fun setJpegExtractorFlags(
-        flags: @JpegExtractor.Flags Int
+        flags:  Int
     ): DefaultExtractorsFactory {
         this.jpegFlags = flags
         return this
@@ -205,7 +205,7 @@ class DefaultExtractorsFactory : ExtractorsFactory {
 
     @Synchronized
     fun setHeifExtractorFlags(
-        flags: @HeifExtractor.Flags Int
+        flags:  Int
     ): DefaultExtractorsFactory {
         this.heifFlags = flags
         return this

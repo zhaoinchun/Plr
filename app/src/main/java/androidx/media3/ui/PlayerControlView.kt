@@ -29,8 +29,6 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.ViewProvider
 import androidx.media3.common.util.Log.w
 import androidx.media3.common.util.RepeatModeUtil
-import androidx.media3.common.util.RepeatModeUtil.RepeatToggleModes
-
 import androidx.media3.common.util.Util.constrainValue
 import androidx.media3.common.util.Util.createHandlerForCurrentLooper
 import androidx.media3.common.util.Util.getDrawable
@@ -165,7 +163,7 @@ class PlayerControlView  constructor(
     private var showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS
     private var timeBarScrubbingEnabled = false
     private var timeBarMinUpdateIntervalMs: Int = DEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS
-    private var repeatToggleModes: @RepeatToggleModes Int = DEFAULT_REPEAT_TOGGLE_MODES
+    private var repeatToggleModes:  Int = DEFAULT_REPEAT_TOGGLE_MODES
     private var adGroupTimesMs = LongArray(0)
     private var playedAdGroups = BooleanArray(0)
     private var extraAdGroupTimesMs: LongArray? = LongArray(0)
@@ -656,15 +654,15 @@ class PlayerControlView  constructor(
         }
     }
 
-    @RepeatToggleModes
-    fun getRepeatToggleModes(): @RepeatToggleModes Int {
+    
+    fun getRepeatToggleModes():  Int {
         return repeatToggleModes
     }
 
-    fun setRepeatToggleModes(@RepeatToggleModes repeatToggleModes: @RepeatToggleModes Int) {
+    fun setRepeatToggleModes( repeatToggleModes:  Int) {
         this.repeatToggleModes = repeatToggleModes
         if (player != null && player!!.isCommandAvailable(Player.COMMAND_SET_REPEAT_MODE)) {
-            @Player.RepeatMode val currentMode: @Player.RepeatMode Int = player!!.repeatMode
+            val currentMode: Int = player!!.repeatMode
             if (repeatToggleModes == RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
                 && currentMode != Player.REPEAT_MODE_OFF
             ) {
@@ -1003,7 +1001,7 @@ class PlayerControlView  constructor(
     }
 
     private fun gatherSupportedTrackInfosOfType(
-        tracks: Tracks, trackType: @C.TrackType Int
+        tracks: Tracks, trackType: Int
     ): MutableList<TrackInformation> {
         val trackInfos = mutableListOf<TrackInformation>()
         val trackGroups: MutableList<Tracks.Group> = tracks.groups
@@ -2036,8 +2034,8 @@ class PlayerControlView  constructor(
 
         const val DEFAULT_SHOW_TIMEOUT_MS: Int = 5000
 
-        @RepeatToggleModes
-        val DEFAULT_REPEAT_TOGGLE_MODES: @RepeatToggleModes Int =
+        
+        val DEFAULT_REPEAT_TOGGLE_MODES:  Int =
             RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
 
         const val DEFAULT_TIME_BAR_MIN_UPDATE_INTERVAL_MS: Int = 200
@@ -2101,10 +2099,10 @@ class PlayerControlView  constructor(
             }
         }
 
-        @RepeatToggleModes
+        
         private fun getRepeatToggleModes(
-            a: TypedArray, @RepeatToggleModes defaultValue: @RepeatToggleModes Int
-        ): @RepeatToggleModes Int {
+            a: TypedArray,  defaultValue:  Int
+        ):  Int {
             return a.getInt(R.styleable.PlayerControlView_repeat_toggle_modes, defaultValue)
         }
     }

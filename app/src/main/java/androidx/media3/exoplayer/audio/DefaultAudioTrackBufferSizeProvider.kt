@@ -19,8 +19,8 @@ class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
 
     override fun getBufferSizeInBytes(
         minBufferSizeInBytes: Int,
-        encoding: @C.Encoding Int,
-        outputMode: @DefaultAudioSink.OutputMode Int,
+        encoding: Int,
+        outputMode:  Int,
         pcmFrameSize: Int,
         sampleRate: Int,
         bitrate: Int,
@@ -74,7 +74,7 @@ class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
         return durationUsToBytes(targetPcmBufferDurationUs, samplingRate, frameSize)
     }
 
-    private fun getPassthroughBufferSizeInBytes(encoding: @C.Encoding Int, bitrate: Int): Int {
+    private fun getPassthroughBufferSizeInBytes(encoding: Int, bitrate: Int): Int {
         var bufferSizeUs = passthroughBufferDurationUs
         if (encoding == C.ENCODING_AC3) {
             bufferSizeUs *= ac3BufferMultiplicationFactor
@@ -93,7 +93,7 @@ class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
         return Ints.checkedCast(bufferSizeUs.toLong() * byteRate / C.MICROS_PER_SECOND)
     }
 
-    private fun getOffloadBufferSizeInBytes(encoding: @C.Encoding Int): Int {
+    private fun getOffloadBufferSizeInBytes(encoding: Int): Int {
         val maxByteRate: Int = getNonPcmMaximumEncodedRateBytesPerSecond(encoding)
         return Ints.checkedCast(offloadBufferDurationUs.toLong() * maxByteRate / C.MICROS_PER_SECOND)
     }
@@ -112,7 +112,7 @@ class DefaultAudioTrackBufferSizeProvider : AudioTrackBufferSizeProvider {
             return Ints.checkedCast(durationUs.toLong() * samplingRate * frameSize / C.MICROS_PER_SECOND)
         }
 
-        private fun getNonPcmMaximumEncodedRateBytesPerSecond(encoding: @C.Encoding Int): Int {
+        private fun getNonPcmMaximumEncodedRateBytesPerSecond(encoding: Int): Int {
             val rate = getMaximumEncodedRateBytesPerSecond(encoding)
             Preconditions.checkState(rate != C.RATE_UNSET_INT)
             return rate

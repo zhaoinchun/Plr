@@ -26,24 +26,9 @@ import kotlin.collections.toTypedArray
 import kotlin.math.max
 
 class AviExtractor(
-    extractorFlags: @Flags Int,
+    extractorFlags:  Int,
     private val subtitleParserFactory: SubtitleParser.Factory
 ) : Extractor {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [STATE_SKIPPING_TO_HDRL, STATE_READING_HDRL_HEADER, STATE_READING_HDRL_BODY, STATE_FINDING_MOVI_HEADER, STATE_FINDING_IDX1_HEADER, STATE_READING_IDX1_BODY, STATE_READING_SAMPLES
-        ]
-    )
-    private annotation class State
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(flag = true, value = [FLAG_EMIT_RAW_SUBTITLE_DATA])
-    annotation class Flags
-
     private val scratch: ParsableByteArray
     private val chunkHeaderHolder: ChunkHeaderHolder
     private val parseSubtitlesDuringExtraction: Boolean

@@ -45,12 +45,6 @@ class DefaultDrmSessionManager(
 
     class MissingSchemeDataException(uuid: UUID) : Exception("Media does not support uuid: $uuid")
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [MODE_PLAYBACK, MODE_QUERY, MODE_DOWNLOAD, MODE_RELEASE])
-    annotation class Mode
-
     private val provisioningManagerImpl = ProvisioningManagerImpl()
     private val referenceCountListener = ReferenceCountListenerImpl()
     private val sessions: MutableList<DefaultDrmSession> = ArrayList<DefaultDrmSession>()
@@ -75,7 +69,7 @@ class DefaultDrmSessionManager(
         Preconditions.checkArgument(C.COMMON_PSSH_UUID != uuid, "Use C.CLEARKEY_UUID instead")
     }
 
-    fun setMode(mode: @Mode Int, offlineLicenseKeySetId: ByteArray?) {
+    fun setMode(mode: Int, offlineLicenseKeySetId: ByteArray?) {
         Preconditions.checkState(sessions.isEmpty())
         if (mode == MODE_QUERY || mode == MODE_RELEASE) {
             offlineLicenseKeySetId!!
@@ -216,9 +210,9 @@ class DefaultDrmSessionManager(
         return session
     }
 
-    override fun getCryptoType(format: Format): @C.CryptoType Int {
+    override fun getCryptoType(format: Format):  Int {
         verifyPlaybackThread(false)
-        val cryptoType: @C.CryptoType Int = exoMediaDrm!!.cryptoType
+        val cryptoType:  Int = exoMediaDrm!!.cryptoType
         if (format.drmInitData == null) {
             val trackType = getTrackType(format.sampleMimeType)
             return if (linearSearch(

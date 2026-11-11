@@ -3,7 +3,7 @@ package androidx.media3.extractor
 import androidx.annotation.IntDef
 import androidx.annotation.StringDef
 import androidx.media3.common.C
-import androidx.media3.common.C.RoleFlags
+
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
@@ -95,7 +95,7 @@ object DtsUtil {
                 || mimeType == MimeTypes.AUDIO_DTS_HD
     }
 
-    fun getFrameType(word: Int): @FrameType Int {
+    fun getFrameType(word: Int): Int {
         if (word == SYNC_VALUE_BE || word == SYNC_VALUE_LE || word == SYNC_VALUE_14B_BE || word == SYNC_VALUE_14B_LE) {
             return FRAME_TYPE_CORE
         } else if (word == SYNC_VALUE_EXTSS_BE || word == SYNC_VALUE_EXTSS_LE) {
@@ -112,7 +112,7 @@ object DtsUtil {
         frame: ByteArray,
         trackId: String?,
         language: String?,
-        @RoleFlags roleFlags: @RoleFlags Int,
+        roleFlags: Int,
         containerMimeType: String?,
         drmInitData: DrmInitData?
     ): Format {
@@ -795,7 +795,7 @@ object DtsUtil {
     }
 
     class DtsHeader constructor(
-        val mimeType: @DtsAudioMimeType String?,
+        val mimeType: String?,
         val channelCount: Int,
         val sampleRate: Int,
         val frameSize: Int,
@@ -803,21 +803,4 @@ object DtsUtil {
         val bitrate: Int
     )
 
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @StringDef(
-        value = [MimeTypes.AUDIO_DTS, MimeTypes.AUDIO_DTS_EXPRESS, MimeTypes.AUDIO_DTS_HD, MimeTypes.AUDIO_DTS_UHD_P2
-        ]
-    )
-    annotation class DtsAudioMimeType
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [FRAME_TYPE_UNKNOWN, FRAME_TYPE_CORE, FRAME_TYPE_EXTENSION_SUBSTREAM, FRAME_TYPE_UHD_SYNC, FRAME_TYPE_UHD_NON_SYNC
-        ]
-    )
-    annotation class FrameType
 }

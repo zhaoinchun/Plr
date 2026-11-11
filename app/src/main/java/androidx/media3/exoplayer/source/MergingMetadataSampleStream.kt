@@ -5,8 +5,6 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.decoder.DecoderInputBuffer
 import androidx.media3.exoplayer.FormatHolder
-import androidx.media3.exoplayer.source.SampleStream.ReadDataResult
-import androidx.media3.exoplayer.source.SampleStream.ReadFlags
 import java.io.IOException
 import androidx.core.util.size
 
@@ -36,9 +34,9 @@ internal class MergingMetadataSampleStream(
     }
 
     override fun readData(
-        formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: @ReadFlags Int
-    ): @ReadDataResult Int {
-        val result: @ReadDataResult Int = primaryStream.readData(formatHolder, buffer, readFlags)
+        formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
+    ):  Int {
+        val result:  Int = primaryStream.readData(formatHolder, buffer, readFlags)
         if (result == C.RESULT_BUFFER_READ && !buffer.isEndOfStream && (readFlags and SampleStream.FLAG_OMIT_SAMPLE_DATA) == 0 && (readFlags and SampleStream.FLAG_PEEK) == 0 && !metadataTrackInvalid) {
             populateMetadataCache(buffer.timeUs)
             val metadata = findActiveMetadata(buffer.timeUs)
@@ -53,7 +51,7 @@ internal class MergingMetadataSampleStream(
         return primaryStream.skipData(positionUs)
     }
 
-    override val flags: @SampleStream.Flags Int
+    override val flags:  Int
         get() = primaryStream.flags
 
     fun reset() {
@@ -71,7 +69,7 @@ internal class MergingMetadataSampleStream(
         }
         while (true) {
             metadataBuffer.clear()
-            val result: @ReadDataResult Int =
+            val result:  Int =
                 metadataStream.readData(metadataFormatHolder, metadataBuffer,  0)
             if (result == C.RESULT_NOTHING_READ) {
                 break

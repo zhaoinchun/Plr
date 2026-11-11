@@ -26,7 +26,7 @@ class DefaultSubtitleParserFactory : SubtitleParser.Factory {
                 || mimeType == MimeTypes.APPLICATION_TTML
     }
 
-    override fun getCueReplacementBehavior(format: Format): @Format.CueReplacementBehavior Int {
+    override fun getCueReplacementBehavior(format: Format):  Int {
         val mimeType = format.sampleMimeType
         if (mimeType != null) {
             when (mimeType) {

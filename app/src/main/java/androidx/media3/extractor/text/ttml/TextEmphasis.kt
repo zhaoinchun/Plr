@@ -16,10 +16,8 @@
 package androidx.media3.extractor.text.ttml
 
 import android.text.TextUtils
-import androidx.annotation.IntDef
 import androidx.media3.common.text.TextAnnotation
 import androidx.media3.common.text.TextEmphasisSpan
-import androidx.media3.common.text.TextEmphasisSpan.MarkFill
 import com.google.common.base.Ascii
 import com.google.common.collect.Iterables
 import com.google.common.collect.Sets
@@ -27,30 +25,12 @@ import java.util.regex.Pattern
 
 internal class TextEmphasis private constructor(
     
-    val markShape: @MarkShape Int,
+    val markShape:  Int,
     
-    val markFill: @MarkFill Int,
+    val markFill:  Int,
     
-    val position: @TextAnnotation.Position Int
+    val position:  Int
 ) {
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [TextEmphasisSpan.MARK_SHAPE_NONE, TextEmphasisSpan.MARK_SHAPE_CIRCLE, TextEmphasisSpan.MARK_SHAPE_DOT, TextEmphasisSpan.MARK_SHAPE_SESAME, MARK_SHAPE_AUTO
-        ]
-    )
-    internal annotation class MarkShape
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(
-        value = [TextAnnotation.POSITION_UNKNOWN, TextAnnotation.POSITION_BEFORE, TextAnnotation.POSITION_AFTER, POSITION_OUTSIDE
-        ]
-    )
-    annotation class Position
-
     companion object {
         
         const val MARK_SHAPE_AUTO: Int = -1
@@ -105,7 +85,7 @@ internal class TextEmphasis private constructor(
             // If no emphasis position is specified, then the emphasis position must be interpreted as if
             // a position of outside were specified:
             // https://www.w3.org/TR/2018/REC-ttml2-20181108/#style-attribute-textEmphasis
-            val position: @Position Int
+            val position: Int
             when (Iterables.getFirst<String?>(
                 matchingPositions,
                 TtmlNode.ANNOTATION_POSITION_OUTSIDE
@@ -129,7 +109,7 @@ internal class TextEmphasis private constructor(
             if (!matchingSingleStyles.isEmpty()) {
                 // If "none" or "auto" are found in the description, ignore the other style (fill, shape)
                 // attributes.
-                val markShape: @MarkShape Int
+                val markShape:  Int
                 when (matchingSingleStyles.iterator().next()) {
                     TtmlNode.TEXT_EMPHASIS_NONE -> markShape =
                         TextEmphasisSpan.MARK_SHAPE_NONE
@@ -155,7 +135,7 @@ internal class TextEmphasis private constructor(
                 return TextEmphasis(MARK_SHAPE_AUTO, TextEmphasisSpan.MARK_FILL_UNKNOWN, position)
             }
 
-            val markFill: @MarkFill Int
+            val markFill:  Int
             when (Iterables.getFirst<String?>(
                 matchingFills,
                 TtmlNode.TEXT_EMPHASIS_MARK_FILLED
@@ -169,7 +149,7 @@ internal class TextEmphasis private constructor(
                 else -> markFill = TextEmphasisSpan.MARK_FILL_FILLED
             }
 
-            val markShape: @MarkShape Int
+            val markShape:  Int
             when (Iterables.getFirst<String?>(
                 matchingShapes,
                 TtmlNode.TEXT_EMPHASIS_MARK_CIRCLE

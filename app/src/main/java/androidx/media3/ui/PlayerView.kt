@@ -41,8 +41,6 @@ import androidx.media3.common.Tracks
 import androidx.media3.common.VideoSize
 import androidx.media3.common.ViewProvider
 import androidx.media3.common.text.CueGroup
-import androidx.media3.common.util.RepeatModeUtil.RepeatToggleModes
-
 import androidx.media3.common.util.Util.getDrawable
 import androidx.media3.ui.AspectRatioFrameLayout.AspectRatioListener
 import androidx.media3.ui.PlayerControlView.OnFullScreenModeChangedListener
@@ -66,24 +64,6 @@ class PlayerView(
     interface FullscreenButtonClickListener {
         fun onFullscreenButtonClick(isFullscreen: Boolean)
     }
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [ARTWORK_DISPLAY_MODE_OFF, ARTWORK_DISPLAY_MODE_FIT, ARTWORK_DISPLAY_MODE_FILL])
-    annotation class ArtworkDisplayMode
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [IMAGE_DISPLAY_MODE_FIT, IMAGE_DISPLAY_MODE_FILL])
-    annotation class ImageDisplayMode
-
-    @MustBeDocumented
-    @Retention(AnnotationRetention.SOURCE)
-    @Target(AnnotationTarget.CLASS, AnnotationTarget.TYPE, AnnotationTarget.TYPE_PARAMETER)
-    @IntDef(value = [SHOW_BUFFERING_NEVER, SHOW_BUFFERING_WHEN_PLAYING, SHOW_BUFFERING_ALWAYS])
-    annotation class ShowBuffering
 
     // LINT.ThenChange(../../../../res/values/attrs.xml)
     private val componentListener: ComponentListener
@@ -119,11 +99,11 @@ class PlayerView(
 
     private var fullscreenButtonClickListener: FullscreenButtonClickListener? = null
 
-    private var artworkDisplayMode: @ArtworkDisplayMode Int = 0
-    private var imageDisplayMode: @ImageDisplayMode Int = 0
+    private var artworkDisplayMode:  Int = 0
+    private var imageDisplayMode:  Int = 0
 
     private var defaultArtwork: Drawable? = null
-    private var showBuffering: @ShowBuffering Int = 0
+    private var showBuffering:  Int = 0
     private var keepContentOnPlayerReset = false
     private var errorMessageProvider: ErrorMessageProvider<in PlaybackException>? = null
     private var customErrorMessage: CharSequence? = null
@@ -502,7 +482,7 @@ class PlayerView(
         }
     }
 
-    var resizeMode: @AspectRatioFrameLayout.ResizeMode Int
+    var resizeMode:  Int
         get() {
             return contentFrame!!.getResizeMode()
         }
@@ -519,7 +499,7 @@ class PlayerView(
             setArtworkDisplayMode(if (useArtwork) ARTWORK_DISPLAY_MODE_OFF else ARTWORK_DISPLAY_MODE_FIT)
         }
 
-    fun setArtworkDisplayMode(artworkDisplayMode: @ArtworkDisplayMode Int) {
+    fun setArtworkDisplayMode(artworkDisplayMode:  Int) {
         Preconditions.checkState(artworkDisplayMode == ARTWORK_DISPLAY_MODE_OFF || artworkView != null)
         if (this.artworkDisplayMode != artworkDisplayMode) {
             this.artworkDisplayMode = artworkDisplayMode
@@ -527,7 +507,7 @@ class PlayerView(
         }
     }
 
-    fun getArtworkDisplayMode(): @ArtworkDisplayMode Int {
+    fun getArtworkDisplayMode():  Int {
         return artworkDisplayMode
     }
 
@@ -542,7 +522,7 @@ class PlayerView(
         }
     }
 
-    fun setImageDisplayMode(imageDisplayMode: @ImageDisplayMode Int) {
+    fun setImageDisplayMode(imageDisplayMode:  Int) {
         Preconditions.checkState(imageView != null)
         if (this.imageDisplayMode != imageDisplayMode) {
             this.imageDisplayMode = imageDisplayMode
@@ -550,7 +530,7 @@ class PlayerView(
         }
     }
 
-    fun getImageDisplayMode(): @ImageDisplayMode Int {
+    fun getImageDisplayMode():  Int {
         return imageDisplayMode
     }
 
@@ -587,7 +567,7 @@ class PlayerView(
         }
     }
 
-    fun setShowBuffering(showBuffering: @ShowBuffering Int) {
+    fun setShowBuffering(showBuffering:  Int) {
         if (this.showBuffering != showBuffering) {
             this.showBuffering = showBuffering
             updateBuffering()
@@ -748,7 +728,7 @@ class PlayerView(
         controller!!.setShowNextButton(showNextButton)
     }
 
-    fun setRepeatToggleModes(@RepeatToggleModes repeatToggleModes: @RepeatToggleModes Int) {
+    fun setRepeatToggleModes( repeatToggleModes:  Int) {
         controller!!.setRepeatToggleModes(repeatToggleModes)
     }
 
@@ -1271,7 +1251,7 @@ class PlayerView(
 
         override fun onPlayWhenReadyChanged(
             playWhenReady: Boolean,
-            @Player.PlayWhenReadyChangeReason reason: @Player.PlayWhenReadyChangeReason Int
+             reason:  Int
         ) {
             updateBuffering()
             updateControllerVisibility()
@@ -1280,7 +1260,7 @@ class PlayerView(
         override fun onPositionDiscontinuity(
             oldPosition: Player.PositionInfo,
             newPosition: Player.PositionInfo,
-            @Player.DiscontinuityReason reason: @Player.DiscontinuityReason Int
+             reason:  Int
         ) {
             if (this@PlayerView.isPlayingAd && controllerHideDuringAds) {
                 hideController()
