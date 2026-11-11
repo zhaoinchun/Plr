@@ -75,9 +75,7 @@ data class AdPlaybackState(
         val adjustedIndex = adGroupIndex - removedAdGroupCount
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = this.adGroups[adjustedIndex]!!.withTimeUs(adGroupTimeUs)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withNewAdGroup(adGroupIndex: Int, adGroupTimeUs: Long): AdPlaybackState {
@@ -93,9 +91,7 @@ data class AdPlaybackState(
             this.adGroups.size - adjustedIndex
         )
         adGroups[adjustedIndex] = newAdGroup
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withAdCount(adGroupIndex: Int, @IntRange(from = 1) adCount: Int): AdPlaybackState {
@@ -106,9 +102,7 @@ data class AdPlaybackState(
         }
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = this.adGroups[adjustedIndex]!!.withAdCount(adCount)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun copy(): AdPlaybackState {
@@ -116,9 +110,7 @@ data class AdPlaybackState(
         for (i in adGroups.indices) {
             adGroups[i] = this.adGroups[i]!!.copy()
         }
-        return AdPlaybackState(
-            adsId, adGroups.toList(), adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups.toList())
     }
 
     fun withAvailableAdMediaItem(
@@ -135,15 +127,7 @@ data class AdPlaybackState(
         )
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]!!.withAdMediaItem(mediaItem, adIndexInAdGroup)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
-    }
-
-    fun withAdsId(adsId: Any?): AdPlaybackState {
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withAvailableAd(adGroupIndex: Int, adIndexInAdGroup: Int): AdPlaybackState {
@@ -159,9 +143,7 @@ data class AdPlaybackState(
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]!!.withAdState(AD_STATE_PLAYED, adIndexInAdGroup)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withSkippedAd(adGroupIndex: Int, adIndexInAdGroup: Int): AdPlaybackState {
@@ -188,9 +170,7 @@ data class AdPlaybackState(
         val adjustedIndex = adGroupIndex - removedAdGroupCount
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = adGroups[adjustedIndex]!!.withAdId(adId, adIndexInAdGroup)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withAdSkipInfo(
@@ -202,18 +182,14 @@ data class AdPlaybackState(
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]!!.withAdSkipInfo(skipInfo, adIndexInAdGroup)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withSkippedAdGroup(adGroupIndex: Int): AdPlaybackState {
         val adjustedIndex = adGroupIndex - removedAdGroupCount
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = adGroups[adjustedIndex]!!.withAllAdsSkipped()
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withAdDurationsUs(adDurationUs: Array<LongArray?>): AdPlaybackState {
@@ -225,27 +201,21 @@ data class AdPlaybackState(
                     adDurationUs[removedAdGroupCount + correctedAdGroupIndex]!!
                 )
         }
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withAdDurationsUs(adGroupIndex: Int, vararg adDurationsUs: Long): AdPlaybackState {
         val adjustedIndex = adGroupIndex - removedAdGroupCount
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = adGroups[adjustedIndex]!!.withAdDurationsUs(adDurationsUs)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups = adGroups)
     }
 
     fun withAdResumePositionUs(adResumePositionUs: Long): AdPlaybackState {
         if (this.adResumePositionUs == adResumePositionUs) {
             return this
         } else {
-            return AdPlaybackState(
-                adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-            )
+            return copy(adResumePositionUs = adResumePositionUs)
         }
     }
 
@@ -253,9 +223,7 @@ data class AdPlaybackState(
         if (this.contentDurationUs == contentDurationUs) {
             return this
         } else {
-            return AdPlaybackState(
-                adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-            )
+            return copy(contentDurationUs = contentDurationUs)
         }
     }
 
@@ -272,9 +240,7 @@ data class AdPlaybackState(
                 0,
                 adGroups.size
             )
-            return AdPlaybackState(
-                adsId, adGroups.toList(), adResumePositionUs, contentDurationUs, removedAdGroupCount
-            )
+            return copy(adGroups=adGroups.toList())
         }
     }
 
@@ -298,9 +264,7 @@ data class AdPlaybackState(
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]!!.copy(contentResumeOffsetUs = contentResumeOffsetUs)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun withOriginalAdCount(adGroupIndex: Int, originalAdCount: Int): AdPlaybackState {
@@ -310,9 +274,7 @@ data class AdPlaybackState(
         }
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = adGroups[adjustedIndex]!!.copy(originalCount = originalAdCount)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun withIsServerSideInserted(
@@ -326,18 +288,14 @@ data class AdPlaybackState(
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]!!.copy(isServerSideInserted = isServerSideInserted)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun withResetAdGroup(adGroupIndex: Int): AdPlaybackState {
         val adjustedIndex = adGroupIndex - removedAdGroupCount
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = adGroups[adjustedIndex]!!.withAllAdsReset()
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun withRemovedAdsAfterIndex(adGroupIndex: Int, adIndexInAdGroup: Int): AdPlaybackState {
@@ -345,22 +303,14 @@ data class AdPlaybackState(
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]!!.withRemovedAdsAfterIndex(adIndexInAdGroup)
-        return AdPlaybackState(
-            adsId,
-            adGroups.toMutableList(),
-            adResumePositionUs,
-            contentDurationUs,
-            removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun withUnavailableAdGroup(adGroupIndex: Int): AdPlaybackState {
         val adjustedIndex = adGroupIndex - removedAdGroupCount
         val adGroups = this.adGroups.toMutableList()
         adGroups[adjustedIndex] = adGroups[adjustedIndex]?.withAllAdsUnavailable()
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun withLivePostrollPlaceholderAppended(isServerSideInserted: Boolean): AdPlaybackState {
@@ -380,9 +330,7 @@ data class AdPlaybackState(
         val adGroups = this.adGroups.toList().toMutableList()
         adGroups[adjustedIndex] =
             adGroups[adjustedIndex]?.withIsPlaceholder(isPlaceholder, isServerSideInserted)
-        return AdPlaybackState(
-            adsId, adGroups, adResumePositionUs, contentDurationUs, removedAdGroupCount
-        )
+        return copy(adGroups=adGroups)
     }
 
     fun endsWithLivePostrollPlaceHolder(): Boolean {
@@ -533,37 +481,6 @@ data class AdPlaybackState(
 
         val isLivePostrollPlaceholder: Boolean
             get() = isPlaceholder && timeUs == C.TIME_END_OF_SOURCE && count == C.LENGTH_UNSET
-
-        override fun equals(o: Any?): Boolean {
-            if (this === o) {
-                return true
-            }
-            if (o == null || javaClass != o.javaClass) {
-                return false
-            }
-            val adGroup = o as AdGroup
-            return timeUs == adGroup.timeUs && count == adGroup.count && originalCount == adGroup.originalCount && mediaItems.contentEquals(
-                adGroup.mediaItems
-            ) && states.contentEquals(adGroup.states) && durationsUs.contentEquals(adGroup.durationsUs) && contentResumeOffsetUs == adGroup.contentResumeOffsetUs && isServerSideInserted == adGroup.isServerSideInserted && ids.contentEquals(
-                adGroup.ids
-            ) && skipInfos.contentEquals(adGroup.skipInfos) && isPlaceholder == adGroup.isPlaceholder
-        }
-
-        override fun hashCode(): Int {
-            var result = count
-            result = 31 * result + originalCount
-            result = 31 * result + (timeUs xor (timeUs ushr 32)).toInt()
-            result = 31 * result + mediaItems.contentHashCode()
-            result = 31 * result + states.contentHashCode()
-            result = 31 * result + durationsUs.contentHashCode()
-            result =
-                31 * result + (contentResumeOffsetUs xor (contentResumeOffsetUs ushr 32)).toInt()
-            result = 31 * result + (if (isServerSideInserted) 1 else 0)
-            result = 31 * result + ids.contentHashCode()
-            result = 31 * result + skipInfos.contentHashCode()
-            result = 31 * result + (if (isPlaceholder) 1 else 0)
-            return result
-        }
 
         fun withTimeUs(timeUs: Long): AdGroup {
             return copy(timeUs = timeUs)
