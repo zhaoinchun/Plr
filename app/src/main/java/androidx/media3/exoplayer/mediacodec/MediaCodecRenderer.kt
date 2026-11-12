@@ -10,7 +10,6 @@ import android.media.metrics.LogSessionId
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.CallSuper
-import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
 import androidx.media3.common.Format
@@ -166,7 +165,7 @@ abstract class MediaCodecRenderer(
     private var preferredDecoderInitializationException: DecoderInitializationException? = null
     protected var codecInfo: MediaCodecInfo? = null
         private set
-    private var codecAdaptationWorkaroundMode:  Int =
+    private var codecAdaptationWorkaroundMode: Int =
         ADAPTATION_WORKAROUND_MODE_NEVER
     private var codecNeedsSosFlushWorkaround = false
     private var codecNeedsEosFlushWorkaround = false
@@ -185,9 +184,9 @@ abstract class MediaCodecRenderer(
     private var bypassSampleBufferPending = false
     private var bypassDrainAndReinitialize = false
     private var codecReconfigured = false
-    private var codecReconfigurationState:  Int = RECONFIGURATION_STATE_NONE
-    private var codecDrainState:  Int = DRAIN_STATE_NONE
-    private var codecDrainAction:  Int = DRAIN_STATE_NONE
+    private var codecReconfigurationState: Int = RECONFIGURATION_STATE_NONE
+    private var codecDrainState: Int = DRAIN_STATE_NONE
+    private var codecDrainAction: Int = DRAIN_STATE_NONE
     private var codecReceivedBuffers = false
     private var codecReceivedEos = false
     private var codecHasOutputMediaFormat = false
@@ -230,8 +229,7 @@ abstract class MediaCodecRenderer(
         return RendererCapabilities.ADAPTIVE_NOT_SEAMLESS
     }
 
-    
-    override fun supportsFormat(format: Format):  Int {
+    override fun supportsFormat(format: Format): Int {
         try {
             return supportsFormat(mediaCodecSelector, format)
         } catch (e: DecoderQueryException) {
@@ -243,10 +241,9 @@ abstract class MediaCodecRenderer(
         }
     }
 
-    
     protected abstract fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector, format: Format
-    ):  Int
+    ): Int
 
     override fun getDurationToProgressUs(positionUs: Long, elapsedRealtimeUs: Long): Long {
         return getDurationToProgressUs(
@@ -266,7 +263,6 @@ abstract class MediaCodecRenderer(
         return super.getDurationToProgressUs(positionUs, elapsedRealtimeUs)
     }
 
-    
     protected abstract fun getDecoderInfos(
         mediaCodecSelector: MediaCodecSelector, format: Format, requiresSecureDecoder: Boolean
     ): List<MediaCodecInfo>
@@ -278,7 +274,6 @@ abstract class MediaCodecRenderer(
         codecOperatingRate: Float
     ): MediaCodecAdapter.Configuration
 
-    
     protected fun maybeInitCodecOrBypass() {
         if (codec != null || this.isBypassEnabled || inputFormat == null) {
             // We have a codec, are bypassing it, or don't have a format to decide how to render.
@@ -333,7 +328,6 @@ abstract class MediaCodecRenderer(
         pendingPlaybackException = exception
     }
 
-    
     protected fun updateOutputFormatForTime(presentationTimeUs: Long) {
         var outputFormatChanged = false
         var format = outputStreamInfo.formatQueue.pollFloor(presentationTimeUs)
@@ -368,12 +362,10 @@ abstract class MediaCodecRenderer(
         }
     }
 
-    
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         decoderCounters = DecoderCounters()
     }
 
-    
     override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -392,7 +384,7 @@ abstract class MediaCodecRenderer(
         }
 
         val durationUs = streamEndPositionUs
-        val streamFlags:  Int = stream!!.flags
+        val streamFlags: Int = stream!!.flags
         if (outputStreamInfo.streamOffsetUs == C.TIME_UNSET) {
             // This is the first stream.
             setOutputStreamInfo(
@@ -438,7 +430,6 @@ abstract class MediaCodecRenderer(
         }
     }
 
-    
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -476,7 +467,6 @@ abstract class MediaCodecRenderer(
         lastOutputStreamInfo.durationUs = streamEndPositionUs
     }
 
-    
     override fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
         this.playbackSpeed = currentPlaybackSpeed
         this.targetPlaybackSpeed = targetPlaybackSpeed
@@ -546,8 +536,7 @@ abstract class MediaCodecRenderer(
         // Do nothing. Overridden to remove throws clause.
     }
 
-    
-    override fun handleMessage(messageType:  Int, message: Any?) {
+    override fun handleMessage(messageType: Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_WAKEUP_LISTENER -> wakeupListener = message as WakeupListener
 
@@ -568,7 +557,6 @@ abstract class MediaCodecRenderer(
         }
     }
 
-    
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (pendingOutputEndOfStream) {
             pendingOutputEndOfStream = false
@@ -631,7 +619,7 @@ abstract class MediaCodecRenderer(
                     e,
                     this.codecInfo
                 )
-                 val errorCode:  Int =
+                val errorCode: Int =
                     if (exception.errorCode == CodecException.ERROR_RECLAIMED)
                         PlaybackException.ERROR_CODE_DECODING_RESOURCES_RECLAIMED
                     else
@@ -642,7 +630,6 @@ abstract class MediaCodecRenderer(
         }
     }
 
-    
     protected fun flushOrReinitializeCodec(): Boolean {
         val released = flushOrReleaseCodec()
         if (released) {
@@ -803,11 +790,10 @@ abstract class MediaCodecRenderer(
         subscribedCodecParameterKeys = newKeys
     }
 
-    
-    private fun readSourceOmittingSampleData(readFlags:  Int): Boolean {
+    private fun readSourceOmittingSampleData(readFlags: Int): Boolean {
         val formatHolder = getFormatHolder()
         noDataBuffer.clear()
-        val result:  Int =
+        val result: Int =
             readSource(formatHolder, noDataBuffer, readFlags or SampleStream.FLAG_OMIT_SAMPLE_DATA)
         if (result == C.RESULT_FORMAT_READ) {
             onInputFormatChanged(formatHolder)
@@ -820,7 +806,7 @@ abstract class MediaCodecRenderer(
     }
 
     @RequiresNonNull("this.codecDrmSession")
-    
+
     private fun initMediaCryptoIfDrmSessionReady(): Boolean {
         Preconditions.checkState(mediaCrypto == null)
         val codecDrmSession = this.codecDrmSession
@@ -829,7 +815,7 @@ abstract class MediaCodecRenderer(
             && FrameworkCryptoConfig.WORKAROUND_DEVICE_NEEDS_KEYS_TO_CONFIGURE_CODEC
             && cryptoConfig is FrameworkCryptoConfig
         ) {
-             val drmSessionState:  Int = codecDrmSession.state
+            val drmSessionState: Int = codecDrmSession.state
             if (drmSessionState == DrmSession.STATE_ERROR) {
                 val drmSessionException = codecDrmSession.error!!
                 throw createRendererException(
@@ -863,6 +849,7 @@ abstract class MediaCodecRenderer(
         }
         return true
     }
+
     private fun maybeInitCodecWithFallback(
         crypto: MediaCrypto?, mediaCryptoRequiresSecureDecoder: Boolean
     ) {
@@ -937,7 +924,6 @@ abstract class MediaCodecRenderer(
         this.availableCodecInfos = null
     }
 
-    
     private fun getAvailableCodecInfos(mediaCryptoRequiresSecureDecoder: Boolean): List<MediaCodecInfo> {
         val inputFormat = this.inputFormat!!
         var codecInfos =
@@ -975,6 +961,7 @@ abstract class MediaCodecRenderer(
         }
         this.isBypassEnabled = true
     }
+
     private fun initCodec(codecInfo: MediaCodecInfo, crypto: MediaCrypto?) {
         this.codecInfo = codecInfo
         val inputFormat = this.inputFormat!!
@@ -1071,7 +1058,6 @@ abstract class MediaCodecRenderer(
         codecDrmSession = session
     }
 
-    
     private fun feedInputBuffer(): Boolean {
         this.lastOutputStreamInfo.streamFlags =
             stream!!.flags
@@ -1150,7 +1136,7 @@ abstract class MediaCodecRenderer(
             flushCodec()
             return true
         }
-        val result:  Int = readDataResultHolder.get()
+        val result: Int = readDataResultHolder.get()
 
         if (result == C.RESULT_NOTHING_READ) {
             if (hasReadStreamToEnd()) {
@@ -1314,7 +1300,6 @@ abstract class MediaCodecRenderer(
         else
             largestQueuedPresentationTimeUs
 
-    
     protected open fun maybeInitializeProcessingPipeline(format: Format): Boolean {
         // Do nothing.
         return true
@@ -1338,7 +1323,7 @@ abstract class MediaCodecRenderer(
     }
 
     @CallSuper
-    
+
     protected open fun onInputFormatChanged(formatHolder: FormatHolder): DecoderReuseEvaluation? {
         if (DEBUG_LOG_ENABLED) {
             d(
@@ -1423,7 +1408,7 @@ abstract class MediaCodecRenderer(
                 newFormat,
                 this.lastOutputStreamInfo.queuedBufferAfterReset
             )
-        var overridingDiscardReasons:  Int = 0
+        var overridingDiscardReasons: Int = 0
         when (evaluation.result) {
             DecoderReuseEvaluation.REUSE_RESULT_NO -> drainAndReinitializeCodec()
             DecoderReuseEvaluation.REUSE_RESULT_YES_WITH_FLUSH -> {
@@ -1484,17 +1469,14 @@ abstract class MediaCodecRenderer(
         return evaluation
     }
 
-    
     protected open fun onOutputFormatChanged(format: Format, mediaFormat: MediaFormat?) {
         // Do nothing.
     }
 
-    
     protected open fun handleInputBufferSupplementalData(buffer: DecoderInputBuffer) {
         // Do nothing.
     }
 
-    
     protected open fun onQueueInputBuffer(buffer: DecoderInputBuffer) {
         // Do nothing.
     }
@@ -1618,7 +1600,6 @@ abstract class MediaCodecRenderer(
         return true
     }
 
-    
     private fun drainAndUpdateCodecDrmSession(): Boolean {
         if (codecReceivedBuffers) {
             codecDrainState = DRAIN_STATE_SIGNAL_END_OF_STREAM
@@ -1635,7 +1616,6 @@ abstract class MediaCodecRenderer(
         return true
     }
 
-    
     private fun drainAndReinitializeCodec() {
         if (codecReceivedBuffers) {
             codecDrainState = DRAIN_STATE_SIGNAL_END_OF_STREAM
@@ -1646,7 +1626,6 @@ abstract class MediaCodecRenderer(
         }
     }
 
-    
     private fun drainOutputBuffer(positionUs: Long, elapsedRealtimeUs: Long): Boolean {
         val codec = this.codec!!
         if (!hasOutputBuffer()) {
@@ -1767,7 +1746,6 @@ abstract class MediaCodecRenderer(
         codecOutputMediaFormatChanged = true
     }
 
-    
     protected abstract fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -1784,12 +1762,10 @@ abstract class MediaCodecRenderer(
 
     protected abstract fun onCodecParametersChanged(codecParameters: CodecParameters?)
 
-    
     protected open fun renderToEndOfStream() {
         // Do nothing.
     }
 
-    
     private fun processEndOfStream() {
         if (DEBUG_LOG_ENABLED) {
             d(DEBUG_LOG_TAG, getTrackTypeString(trackType) + ", output process EOS")
@@ -1859,7 +1835,6 @@ abstract class MediaCodecRenderer(
             return outputStreamInfo
         }
 
-    
     private fun drmNeedsCodecReinitialization(
         codecInfo: MediaCodecInfo,
         newFormat: Format,
@@ -1929,13 +1904,11 @@ abstract class MediaCodecRenderer(
                 && newSession.requiresSecureDecoder(newFormat.sampleMimeType!!)))
     }
 
-    
     private fun reinitializeCodec() {
         releaseCodec()
         maybeInitCodecOrBypass()
     }
 
-    
     private fun updateDrmSession() {
         val cryptoConfig = sourceDrmSession!!.cryptoConfig
         if (cryptoConfig is FrameworkCryptoConfig) {
@@ -1952,7 +1925,6 @@ abstract class MediaCodecRenderer(
         codecDrainAction = DRAIN_ACTION_NONE
     }
 
-    
     private fun bypassRender(positionUs: Long, elapsedRealtimeUs: Long): Boolean {
         // Process any batched data.
 
@@ -2020,14 +1992,13 @@ abstract class MediaCodecRenderer(
         return bypassBatchBuffer.hasSamples() || inputStreamEnded || bypassDrainAndReinitialize
     }
 
-    
     private fun bypassRead() {
         Preconditions.checkState(!inputStreamEnded)
         val formatHolder = getFormatHolder()
         bypassSampleBuffer.clear()
         while (true) {
             bypassSampleBuffer.clear()
-            val result:  Int =
+            val result: Int =
                 readSource(formatHolder, bypassSampleBuffer, 0)
             when (result) {
                 C.RESULT_FORMAT_READ -> {
@@ -2125,7 +2096,7 @@ abstract class MediaCodecRenderer(
         ))
     }
 
-    private fun codecAdaptationWorkaroundMode(name: String?):  Int {
+    private fun codecAdaptationWorkaroundMode(name: String?): Int {
         if (!enableWorkarounds()) {
             return ADAPTATION_WORKAROUND_MODE_NEVER
         }
@@ -2153,11 +2124,11 @@ abstract class MediaCodecRenderer(
         val startPositionUs: Long,
         val streamOffsetUs: Long,
         var durationUs: Long,
-        var streamFlags:  Int
+        var streamFlags: Int
     ) {
-        val formatQueue =TimedValueQueue<Format>()
+        val formatQueue = TimedValueQueue<Format>()
         var queuedBufferAfterReset = false
-        var lastBufferTimeUs: Long= C.TIME_UNSET
+        var lastBufferTimeUs: Long = C.TIME_UNSET
         val isDurationStrict: Boolean
             get() = (streamFlags and SampleStream.FLAG_STRICT_DURATION) != 0
 

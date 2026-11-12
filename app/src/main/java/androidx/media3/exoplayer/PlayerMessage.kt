@@ -5,9 +5,7 @@ import androidx.media3.common.C
 import androidx.media3.common.IllegalSeekPositionException
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Clock
-
 import com.google.common.base.Preconditions
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 import java.util.concurrent.TimeoutException
 
 class PlayerMessage(
@@ -19,7 +17,6 @@ class PlayerMessage(
     var looper: Looper
 ) {
     interface Target {
-        
         fun handleMessage(messageType:  Int, message: Any?)
     }
 
@@ -31,7 +28,7 @@ class PlayerMessage(
         private set
     var payload: Any? = null
         private set
-    var positionMs: Long
+    var positionMs: Long = C.TIME_UNSET
         private set
     var deleteAfterDelivery: Boolean = true
         private set
@@ -42,10 +39,6 @@ class PlayerMessage(
     @get:Synchronized
     var isCanceled: Boolean = false
         private set
-
-    init {
-        this.positionMs = C.TIME_UNSET
-    }
 
     fun setType(messageType: Int): PlayerMessage {
         Preconditions.checkState(!isSent)
@@ -116,7 +109,6 @@ class PlayerMessage(
     }
 
     @Synchronized
-
     fun blockUntilDelivered(): Boolean {
         Preconditions.checkState(isSent)
         Preconditions.checkState(looper.getThread() !== Thread.currentThread())

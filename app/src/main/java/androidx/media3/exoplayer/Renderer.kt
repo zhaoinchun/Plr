@@ -1,28 +1,25 @@
 package androidx.media3.exoplayer
 
-import androidx.annotation.IntDef
-import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Clock
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
-import java.io.IOException
 
 interface Renderer : PlayerMessage.Target {
     interface WakeupListener {
         fun onSleep()
         fun onWakeup()
     }
+
     val name: String?
     val trackType: Int
     val capabilities: RendererCapabilities?
     fun init(index: Int, playerId: PlayerId?, clock: Clock?)
     val mediaClock: MediaClock?
-    val state:  Int
+    val state: Int
 
-    
     fun enable(
         configuration: RendererConfiguration,
         formats: Array<Format>,
@@ -35,10 +32,7 @@ interface Renderer : PlayerMessage.Target {
         mediaPeriodId: MediaPeriodId
     )
 
-    
     fun start()
-
-    
     fun replaceStream(
         formats: Array<Format>,
         stream: SampleStream,
@@ -50,7 +44,6 @@ interface Renderer : PlayerMessage.Target {
     val stream: SampleStream?
     fun hasReadStreamToEnd(): Boolean
     val readingPositionUs: Long
-
     fun getDurationToProgressUs(positionUs: Long, elapsedRealtimeUs: Long): Long {
         return if (this.state == STATE_ENABLED && (this.isReady || this.isEnded))
             DEFAULT_IDLE_DURATION_TO_PROGRESS_US
@@ -60,27 +53,18 @@ interface Renderer : PlayerMessage.Target {
 
     fun setCurrentStreamFinal()
     val isCurrentStreamFinal: Boolean
-
-    
     fun maybeThrowStreamError()
-
-    
     fun resetPosition(positionUs: Long, sampleStreamIsResetToKeyFrame: Boolean)
-
     fun supportsResetPositionWithoutKeyFrameReset(positionUs: Long): Boolean {
         return false
     }
 
-    
     fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
     }
 
     fun enableMayRenderStartOfStream() {}
     fun setTimeline(timeline: Timeline)
-
-    
     fun render(positionUs: Long, elapsedRealtimeUs: Long)
-
     val isReady: Boolean
     val isEnded: Boolean
     fun stop()
