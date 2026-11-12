@@ -56,7 +56,7 @@ import kotlin.math.min
 class MediaCodecAudioRenderer(
     context: Context,
     codecAdapterFactory: MediaCodecAdapter.Factory = MediaCodecAdapter.Factory.getDefault(context),
-    mediaCodecSelector: MediaCodecSelector?,
+    mediaCodecSelector: MediaCodecSelector,
     enableDecoderFallback: Boolean = false,
     eventHandler: Handler?,
     eventListener: AudioRendererEventListener,

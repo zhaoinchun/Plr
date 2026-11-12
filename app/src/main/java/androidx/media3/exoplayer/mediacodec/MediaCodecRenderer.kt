@@ -59,78 +59,11 @@ abstract class MediaCodecRenderer(
     context: Context,
     trackType: Int,
     private val codecAdapterFactory: MediaCodecAdapter.Factory,
-    mediaCodecSelector: MediaCodecSelector?,
+    private val mediaCodecSelector: MediaCodecSelector,
     private val enableDecoderFallback: Boolean,
     private val assumedMinimumCodecOperatingRate: Float
 ) : BaseRenderer(trackType) {
-    class DecoderInitializationException private constructor(
-        message: String?,
-        cause: Throwable?,
-        val mimeType: String?,
-        val secureDecoderRequired: Boolean,
-        val codecInfo: MediaCodecInfo?,
-        val diagnosticInfo: String?,
-        val fallbackDecoderInitializationException: DecoderInitializationException?
-    ) : Exception(message, cause) {
-        constructor(
-            format: Format,
-            cause: Throwable?,
-            secureDecoderRequired: Boolean,
-            errorCode: Int
-        ) : this(
-            "Decoder init failed: [$errorCode], $format",
-            cause,
-            format.sampleMimeType,
-            secureDecoderRequired,
-            null,
-            buildCustomDiagnosticInfo(errorCode),
-            null
-        )
-
-        constructor(
-            format: Format,
-            cause: Throwable?,
-            secureDecoderRequired: Boolean,
-            mediaCodecInfo: MediaCodecInfo
-        ) : this(
-            "Decoder init failed: " + mediaCodecInfo.name + ", " + format,
-            cause,
-            format.sampleMimeType,
-            secureDecoderRequired,
-            mediaCodecInfo,
-            if (cause is CodecException) cause.diagnosticInfo else null,
-            null
-        )
-
-        fun copyWithFallbackException(
-            fallbackException: DecoderInitializationException?
-        ): DecoderInitializationException {
-            return DecoderInitializationException(
-                message,
-                cause,
-                mimeType,
-                secureDecoderRequired,
-                codecInfo,
-                diagnosticInfo,
-                fallbackException
-            )
-        }
-
-        companion object {
-            const val CUSTOM_ERROR_CODE_BASE = -50000
-            const val NO_SUITABLE_DECODER_ERROR = CUSTOM_ERROR_CODE_BASE + 1
-            const val DECODER_QUERY_ERROR = CUSTOM_ERROR_CODE_BASE + 2
-
-            private fun buildCustomDiagnosticInfo(errorCode: Int): String {
-                val sign = if (errorCode < 0) "neg_" else ""
-                val packageName = "androidx.media3.exoplayer.mediacodec"
-                return packageName + ".MediaCodecRenderer_" + sign + abs(errorCode)
-            }
-        }
-    }
-
     private val context: Context? = context.applicationContext
-    private val mediaCodecSelector = mediaCodecSelector!!
     private val noDataBuffer = DecoderInputBuffer.newNoDataInstance()
     private val buffer = DecoderInputBuffer(DecoderInputBuffer.BUFFER_REPLACEMENT_MODE_DISABLED)
     private val bypassSampleBuffer =
@@ -144,7 +77,6 @@ abstract class MediaCodecRenderer(
     private var outputFormat: Format? = null
     private var codecDrmSession: DrmSession? = null
     private var sourceDrmSession: DrmSession? = null
-
     protected var wakeupListener: WakeupListener? = null
         private set
     private var mediaCrypto: MediaCrypto? = null
@@ -2165,6 +2097,72 @@ abstract class MediaCodecRenderer(
 
         override fun onOutputBufferAvailable() {
             wakeupListener?.onWakeup()
+        }
+    }
+
+    class DecoderInitializationException private constructor(
+        message: String?,
+        cause: Throwable?,
+        val mimeType: String?,
+        val secureDecoderRequired: Boolean,
+        val codecInfo: MediaCodecInfo?,
+        val diagnosticInfo: String?,
+        val fallbackDecoderInitializationException: DecoderInitializationException?
+    ) : Exception(message, cause) {
+        constructor(
+            format: Format,
+            cause: Throwable?,
+            secureDecoderRequired: Boolean,
+            errorCode: Int
+        ) : this(
+            "Decoder init failed: [$errorCode], $format",
+            cause,
+            format.sampleMimeType,
+            secureDecoderRequired,
+            null,
+            buildCustomDiagnosticInfo(errorCode),
+            null
+        )
+
+        constructor(
+            format: Format,
+            cause: Throwable?,
+            secureDecoderRequired: Boolean,
+            mediaCodecInfo: MediaCodecInfo
+        ) : this(
+            "Decoder init failed: " + mediaCodecInfo.name + ", " + format,
+            cause,
+            format.sampleMimeType,
+            secureDecoderRequired,
+            mediaCodecInfo,
+            if (cause is CodecException) cause.diagnosticInfo else null,
+            null
+        )
+
+        fun copyWithFallbackException(
+            fallbackException: DecoderInitializationException?
+        ): DecoderInitializationException {
+            return DecoderInitializationException(
+                message,
+                cause,
+                mimeType,
+                secureDecoderRequired,
+                codecInfo,
+                diagnosticInfo,
+                fallbackException
+            )
+        }
+
+        companion object {
+            const val CUSTOM_ERROR_CODE_BASE = -50000
+            const val NO_SUITABLE_DECODER_ERROR = CUSTOM_ERROR_CODE_BASE + 1
+            const val DECODER_QUERY_ERROR = CUSTOM_ERROR_CODE_BASE + 2
+
+            private fun buildCustomDiagnosticInfo(errorCode: Int): String {
+                val sign = if (errorCode < 0) "neg_" else ""
+                val packageName = "androidx.media3.exoplayer.mediacodec"
+                return packageName + ".MediaCodecRenderer_" + sign + abs(errorCode)
+            }
         }
     }
 

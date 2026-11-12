@@ -229,7 +229,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
             MediaCodecVideoRenderer(
                 context,
                 codecAdapterFactory = getCodecAdapterFactory(),
-                mediaCodecSelector = mediaCodecSelector,
+                mediaCodecSelector = mediaCodecSelector!!,
                 eventHandler = eventHandler,
                 eventListener = eventListener,
                 lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs,
@@ -381,7 +381,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
             MediaCodecAudioRenderer(
                 context,
                 getCodecAdapterFactory(),
-                mediaCodecSelector,
+                mediaCodecSelector!!,
                 enableDecoderFallback,
                 eventHandler,
                 eventListener,

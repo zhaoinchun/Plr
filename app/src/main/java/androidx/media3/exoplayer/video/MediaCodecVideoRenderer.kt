@@ -77,7 +77,7 @@ import kotlin.math.min
 class MediaCodecVideoRenderer(
     val context: Context,
     var codecAdapterFactory: MediaCodecAdapter.Factory = Factory.getDefault(context),
-    var mediaCodecSelector: MediaCodecSelector? = MediaCodecSelector.DEFAULT,
+    var mediaCodecSelector: MediaCodecSelector = MediaCodecSelector.DEFAULT,
     var enableDecoderFallback: Boolean = false,
     var assumedMinimumCodecOperatingRate: Float = 0f,
     var eventHandler: Handler? = null,
