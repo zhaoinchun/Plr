@@ -147,7 +147,7 @@ class ExoPlayerImpl(
     private var _repeatMode: Int = 0
     private var _shuffleModeEnabled = false
     private var pendingOperationAcks = 0
-    private var pendingDiscontinuityReason:  Int = 0
+    private var pendingDiscontinuityReason: Int = 0
     private var pendingDiscontinuity = false
     private var foregroundMode = false
     private var scrubbingModeEnabled = false
@@ -169,8 +169,8 @@ class ExoPlayerImpl(
     private var sphericalGLSurfaceView: SphericalGLSurfaceView? = null
     private var surfaceHolderSurfaceIsVideoOutput = false
     private var textureView: TextureView? = null
-    private var _videoScalingMode:  Int = C.VIDEO_SCALING_MODE_DEFAULT
-    private var _videoChangeFrameRateStrategy:  Int =
+    private var _videoScalingMode: Int = C.VIDEO_SCALING_MODE_DEFAULT
+    private var _videoChangeFrameRateStrategy: Int =
         C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
     private var _surfaceSize: Size? = Size.UNKNOWN
     private var _videoDecoderCounters: DecoderCounters? = null
@@ -210,7 +210,7 @@ class ExoPlayerImpl(
     var usePlatformDiagnostics = true
     var _handleAudioBecomingNoisy = false
     var suppressPlaybackOnUnsuitableOutput = false
-    var _wakeMode:  Int = C.WAKE_MODE_NONE
+    var _wakeMode: Int = C.WAKE_MODE_NONE
     var wakeModeSet: Boolean = false
     var stuckBufferingDetectionTimeoutMs = ExoPlayer.DEFAULT_STUCK_BUFFERING_DETECTION_TIMEOUT_MS
     var _stuckPlayingDetectionTimeoutMs = if (ExoPlayer.experimentalEnableStuckPlayingDetection)
@@ -353,7 +353,7 @@ class ExoPlayerImpl(
         bandwidthMeter.addEventListener(Handler(applicationLooper), _analyticsCollector)
         addAudioOffloadListener(componentListener)
         if (foregroundModeTimeoutMs > 0) {
-            internalPlayer.experimentalSetForegroundModeTimeoutMs(foregroundModeTimeoutMs)
+            internalPlayer.setForegroundModeTimeoutMs = foregroundModeTimeoutMs
         }
         if (Build.VERSION.SDK_INT >= 31) {
             Api31.registerMediaMetricsListener(
@@ -485,7 +485,7 @@ class ExoPlayerImpl(
         constructorFinished.open()
     }
 
-    override var videoScalingMode:  Int
+    override var videoScalingMode: Int
         get() = _videoScalingMode
         set(value) {
             _videoScalingMode = value
@@ -495,7 +495,7 @@ class ExoPlayerImpl(
                 _videoScalingMode
             )
         }
-    override var videoChangeFrameRateStrategy:  Int
+    override var videoChangeFrameRateStrategy: Int
         get() = _videoChangeFrameRateStrategy
         set(value) {
             if (this._videoChangeFrameRateStrategy == value) {
@@ -749,10 +749,10 @@ class ExoPlayerImpl(
         audioOffloadListeners.remove(listener)
     }
 
-    override val playbackState:  Int
+    override val playbackState: Int
         get() = playbackInfo.playbackState
 
-    override val playbackSuppressionReason:  Int
+    override val playbackSuppressionReason: Int
         get() = playbackInfo.playbackSuppressionReason
 
     override val playerError: PlaybackException?
@@ -1653,7 +1653,7 @@ class ExoPlayerImpl(
         listeners.remove(listener)
     }
 
-    override fun setWakeMode(wakeMode:  Int) {
+    override fun setWakeMode(wakeMode: Int) {
         when (wakeMode) {
             C.WAKE_MODE_NONE -> {
                 wakeLockManager.setEnabled(false)
@@ -1877,9 +1877,9 @@ class ExoPlayerImpl(
     // Calling deprecated listeners.
     private fun updatePlaybackInfo(
         playbackInfo: PlaybackInfo,
-         timelineChangeReason:  Int,
+        timelineChangeReason: Int,
         positionDiscontinuity: Boolean,
-         positionDiscontinuityReason:  Int,
+        positionDiscontinuityReason: Int,
         discontinuityWindowStartPositionUs: Long,
         oldMaskingMediaItemIndex: Int,
         repeatCurrentMediaItem: Boolean
@@ -2044,7 +2044,7 @@ class ExoPlayerImpl(
     }
 
     private fun getPreviousPositionInfo(
-        positionDiscontinuityReason:  Int,
+        positionDiscontinuityReason: Int,
         oldPlaybackInfo: PlaybackInfo,
         oldMaskingMediaItemIndex: Int
     ): Player.PositionInfo {
@@ -2138,7 +2138,7 @@ class ExoPlayerImpl(
         playbackInfo: PlaybackInfo,
         oldPlaybackInfo: PlaybackInfo,
         positionDiscontinuity: Boolean,
-         positionDiscontinuityReason:  Int,
+        positionDiscontinuityReason: Int,
         timelineChanged: Boolean,
         repeatCurrentMediaItem: Boolean
     ): Pair<Boolean?, Int?> {
@@ -2685,7 +2685,7 @@ class ExoPlayerImpl(
     }
 
     private fun updatePlayWhenReady(
-        playWhenReady: Boolean, playWhenReadyChangeReason:  Int
+        playWhenReady: Boolean, playWhenReadyChangeReason: Int
     ) {
         val playbackSuppressionReason = computePlaybackSuppressionReason(playWhenReady)
         if (playbackInfo.playWhenReady == playWhenReady && playbackInfo.playbackSuppressionReason == playbackSuppressionReason && playbackInfo.playWhenReadyChangeReason == playWhenReadyChangeReason) {
@@ -2716,7 +2716,7 @@ class ExoPlayerImpl(
         )
     }
 
-    private fun computePlaybackSuppressionReason(playWhenReady: Boolean):  Int {
+    private fun computePlaybackSuppressionReason(playWhenReady: Boolean): Int {
         if (scrubbingModeEnabled) {
             return Player.PLAYBACK_SUPPRESSION_REASON_SCRUBBING
         }
@@ -2732,7 +2732,7 @@ class ExoPlayerImpl(
     }
 
     private fun updateWakeAndWifiLock() {
-        val playbackState:  Int = playbackState
+        val playbackState: Int = playbackState
         when (playbackState) {
             Player.STATE_READY, Player.STATE_BUFFERING -> {
                 val isSleeping = isSleepingForOffload
@@ -3178,7 +3178,7 @@ class ExoPlayerImpl(
         private var internalVideoFrameMetadataListener: VideoFrameMetadataListener? = null
         private var internalCameraMotionListener: CameraMotionListener? = null
 
-        override fun handleMessage(messageType:  Int, message: Any?) {
+        override fun handleMessage(messageType: Int, message: Any?) {
             when (messageType) {
                 MSG_SET_VIDEO_FRAME_METADATA_LISTENER ->
                     videoFrameMetadataListener = message as VideoFrameMetadataListener?
@@ -3229,11 +3229,11 @@ class ExoPlayerImpl(
         }
 
         companion object {
-            const val MSG_SET_VIDEO_FRAME_METADATA_LISTENER:  Int =
+            const val MSG_SET_VIDEO_FRAME_METADATA_LISTENER: Int =
                 Renderer.MSG_SET_VIDEO_FRAME_METADATA_LISTENER
-            const val MSG_SET_CAMERA_MOTION_LISTENER:  Int =
+            const val MSG_SET_CAMERA_MOTION_LISTENER: Int =
                 Renderer.MSG_SET_CAMERA_MOTION_LISTENER
-            const val MSG_SET_SPHERICAL_SURFACE_VIEW:  Int =
+            const val MSG_SET_SPHERICAL_SURFACE_VIEW: Int =
                 Renderer.MSG_CUSTOM_BASE
         }
     }
