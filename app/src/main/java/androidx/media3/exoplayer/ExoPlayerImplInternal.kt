@@ -11,7 +11,6 @@ import androidx.media3.common.AdPlaybackState
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Format
-import androidx.media3.common.IllegalSeekPositionException
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Metadata
 import androidx.media3.common.MimeTypes.allSamplesAreSyncSamples
@@ -93,41 +92,6 @@ class ExoPlayerImplInternal(
 ) : Handler.Callback, MediaPeriod.Callback, TrackSelector.InvalidationListener,
     MediaSourceListInfoRefreshListener, PlaybackParametersListener, Sender, PlayerControl,
     VideoFrameMetadataListener {
-    class PlaybackInfoUpdate(playbackInfo: PlaybackInfo) {
-        var hasPendingChange = false
-        var playbackInfo: PlaybackInfo = playbackInfo
-            set(value) {
-                hasPendingChange = hasPendingChange or (this.playbackInfo != value)
-                field = value
-            }
-        var operationAcks: Int = 0
-        var positionDiscontinuity: Boolean = false
-        var discontinuityReason: Int = 0
-
-        fun incrementPendingOperationAcks(operationAcks: Int) {
-            hasPendingChange = hasPendingChange or (operationAcks > 0)
-            this.operationAcks += operationAcks
-        }
-
-        fun setPositionDiscontinuity(discontinuityReason: Int) {
-            if (positionDiscontinuity
-                && this.discontinuityReason != Player.DISCONTINUITY_REASON_INTERNAL
-            ) {
-                // We always prefer non-internal discontinuity reasons. We also assume that we won't report
-                // more than one non-internal discontinuity per message iteration.
-                Preconditions.checkArgument(discontinuityReason == Player.DISCONTINUITY_REASON_INTERNAL)
-                return
-            }
-            hasPendingChange = true
-            positionDiscontinuity = true
-            this.discontinuityReason = discontinuityReason
-        }
-    }
-
-    fun interface PlaybackInfoUpdateListener {
-        fun onPlaybackInfoUpdate(playbackInfo: PlaybackInfoUpdate)
-    }
-
     private val renderers: Array<RendererHolder>
     private val rendererCapabilities: Array<RendererCapabilities>
     private val rendererReportedReady = BooleanArray(renderers.size)
@@ -3877,22 +3841,11 @@ class ExoPlayerImplInternal(
     }
 
     private fun areRenderersPrewarming(): Boolean {
-        if (!hasSecondaryRenderers) {
-            return false
-        }
-        for (renderer in renderers) {
-            if (renderer.isPrewarming) {
-                return true
-            }
-        }
-        return false
+        return hasSecondaryRenderers && renderers.find { it.isPrewarming } != null
     }
 
     private fun isRendererPrewarming(index: Int): Boolean {
-        if (!hasSecondaryRenderers) {
-            return false
-        }
-        return renderers[index].isPrewarming
+        return hasSecondaryRenderers && renderers[index].isPrewarming
     }
 
     private fun isDynamicSchedulingEnabled(): Boolean {
@@ -3907,6 +3860,41 @@ class ExoPlayerImplInternal(
         this.isRebuffering = isRebuffering
         this.lastRebufferRealtimeMs =
             if (isRebuffering && !resetLastRebufferRealtimeMs) clock.elapsedRealtime() else C.TIME_UNSET
+    }
+
+    class PlaybackInfoUpdate(playbackInfo: PlaybackInfo) {
+        var hasPendingChange = false
+        var playbackInfo: PlaybackInfo = playbackInfo
+            set(value) {
+                hasPendingChange = hasPendingChange or (this.playbackInfo != value)
+                field = value
+            }
+        var operationAcks: Int = 0
+        var positionDiscontinuity: Boolean = false
+        var discontinuityReason: Int = 0
+
+        fun incrementPendingOperationAcks(operationAcks: Int) {
+            hasPendingChange = hasPendingChange or (operationAcks > 0)
+            this.operationAcks += operationAcks
+        }
+
+        fun setPositionDiscontinuity(discontinuityReason: Int) {
+            if (positionDiscontinuity
+                && this.discontinuityReason != Player.DISCONTINUITY_REASON_INTERNAL
+            ) {
+                // We always prefer non-internal discontinuity reasons. We also assume that we won't report
+                // more than one non-internal discontinuity per message iteration.
+                Preconditions.checkArgument(discontinuityReason == Player.DISCONTINUITY_REASON_INTERNAL)
+                return
+            }
+            hasPendingChange = true
+            positionDiscontinuity = true
+            this.discontinuityReason = discontinuityReason
+        }
+    }
+
+    fun interface PlaybackInfoUpdateListener {
+        fun onPlaybackInfoUpdate(playbackInfo: PlaybackInfoUpdate)
     }
 
     private class SeekPosition(

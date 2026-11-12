@@ -1,7 +1,5 @@
-
 package androidx.media3.exoplayer
 
-import androidx.annotation.IntDef
 import androidx.media3.common.C
 import androidx.media3.common.C.TRACK_TYPE_AUDIO
 import androidx.media3.common.C.TRACK_TYPE_IMAGE
@@ -18,16 +16,14 @@ import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.trackselection.TrackSelectorResult
 import androidx.media3.exoplayer.video.VideoFrameMetadataListener
 import com.google.common.base.Preconditions
-import java.io.IOException
-import java.util.Objects
 import kotlin.math.min
 
 class RendererHolder(
     private val primaryRenderer: Renderer,
-    private val secondaryRenderer: Renderer?, // Index of renderer in renderer list held by the {@link Player}.
+    private val secondaryRenderer: Renderer?,
     private val index: Int
 ) {
-    private var prewarmingState:  Int
+    private var prewarmingState: Int = RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY
     private var primaryRequiresReset = false
     private var secondaryRequiresReset = false
 
@@ -48,7 +44,7 @@ class RendererHolder(
     }
 
     val isPrewarming: Boolean
-        get() = this.isPrimaryRendererPrewarming || this.isSecondaryRendererPrewarming
+        get() = isPrimaryRendererPrewarming || isSecondaryRendererPrewarming
 
     private val isPrimaryRendererPrewarming: Boolean
         get() = prewarmingState == RENDERER_PREWARMING_STATE_PREWARMING_PRIMARY
@@ -72,16 +68,16 @@ class RendererHolder(
         get() = primaryRenderer.trackType
 
     fun getReadingPositionUs(period: MediaPeriodHolder?): Long {
-        return Objects.requireNonNull<Renderer?>(getRendererReadingFromPeriod(period))
-            .readingPositionUs
+        return getRendererReadingFromPeriod(period)!!.readingPositionUs
     }
 
     fun hasReadPeriodToEnd(mediaPeriodHolder: MediaPeriodHolder?): Boolean {
-        val renderer =getRendererReadingFromPeriod(mediaPeriodHolder)!!
+        val renderer = getRendererReadingFromPeriod(mediaPeriodHolder)!!
         return renderer.hasReadStreamToEnd()
     }
+
     fun setCurrentStreamFinal(mediaPeriodHolder: MediaPeriodHolder?, streamEndPositionUs: Long) {
-        val renderer =getRendererReadingFromPeriod(mediaPeriodHolder)!!
+        val renderer = getRendererReadingFromPeriod(mediaPeriodHolder)!!
         setCurrentStreamFinalInternal(renderer, streamEndPositionUs)
     }
 
@@ -172,12 +168,9 @@ class RendererHolder(
         }
     }
 
-    
     fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
         primaryRenderer.setPlaybackSpeed(currentPlaybackSpeed, targetPlaybackSpeed)
-        if (secondaryRenderer != null) {
-            secondaryRenderer.setPlaybackSpeed(currentPlaybackSpeed, targetPlaybackSpeed)
-        }
+        secondaryRenderer?.setPlaybackSpeed(currentPlaybackSpeed, targetPlaybackSpeed)
     }
 
     fun setTimeline(timeline: Timeline) {
@@ -191,10 +184,7 @@ class RendererHolder(
             if (isRendererEnabled(primaryRenderer)) {
                 renderersEnded = renderersEnded and primaryRenderer.isEnded
             }
-            if (secondaryRenderer != null && isRendererEnabled(
-                    secondaryRenderer
-                )
-            ) {
+            if (secondaryRenderer != null && isRendererEnabled(secondaryRenderer)) {
                 renderersEnded = renderersEnded and secondaryRenderer.isEnded
             }
             return renderersEnded
@@ -263,7 +253,6 @@ class RendererHolder(
                 || renderer.readingPositionUs >= nextPeriod.startPositionRendererTime)
     }
 
-    
     fun render(rendererPositionUs: Long, rendererPositionElapsedRealtimeUs: Long) {
         if (isRendererEnabled(primaryRenderer)) {
             primaryRenderer.render(rendererPositionUs, rendererPositionElapsedRealtimeUs)
@@ -280,12 +269,10 @@ class RendererHolder(
                 || renderer.isEnded
     }
 
-    
     fun maybeThrowStreamError(mediaPeriodHolder: MediaPeriodHolder?) {
         getRendererReadingFromPeriod(mediaPeriodHolder)!!.maybeThrowStreamError()
     }
 
-    
     fun start() {
         if (primaryRenderer.state == Renderer.STATE_ENABLED
             && (prewarmingState != RENDERER_PREWARMING_STATE_TRANSITIONING_TO_PRIMARY)
@@ -311,7 +298,6 @@ class RendererHolder(
         }
     }
 
-    
     fun enable(
         configuration: RendererConfiguration,
         trackSelection: ExoTrackSelection,
@@ -355,21 +341,19 @@ class RendererHolder(
                     offsetUs,
                     mediaPeriodId
                 )
-            mediaClock.onRendererEnabled(secondaryRenderer!!)
+            mediaClock.onRendererEnabled(secondaryRenderer)
         }
     }
 
-    
     fun handleMessage(
-        messageType:  Int,
+        messageType: Int,
         message: Any?,
         mediaPeriod: MediaPeriodHolder?
     ) {
-        val renderer =getRendererReadingFromPeriod(mediaPeriod)!!
+        val renderer = getRendererReadingFromPeriod(mediaPeriod)!!
         renderer.handleMessage(messageType, message)
     }
 
-    
     fun setScrubbingMode(scrubbingModeParameters: ScrubbingModeParameters?) {
         primaryRenderer.handleMessage(
             Renderer.MSG_SET_SCRUBBING_MODE,
@@ -383,7 +367,6 @@ class RendererHolder(
         }
     }
 
-    
     fun disable(mediaClock: DefaultMediaClock) {
         disableRenderer(primaryRenderer, mediaClock)
         if (secondaryRenderer != null) {
@@ -391,20 +374,19 @@ class RendererHolder(
                 isRendererEnabled(secondaryRenderer)
                         && prewarmingState != RENDERER_PREWARMING_STATE_TRANSITIONING_TO_SECONDARY
             disableRenderer(secondaryRenderer, mediaClock)
-            maybeResetRenderer( false)
+            maybeResetRenderer(false)
             if (shouldTransferResources) {
-                transferResources( true)
+                transferResources(true)
             }
         }
         prewarmingState = RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY
     }
 
-    
     fun maybeHandlePrewarmingTransition() {
         if (prewarmingState == RENDERER_PREWARMING_STATE_TRANSITIONING_TO_SECONDARY
             || prewarmingState == RENDERER_PREWARMING_STATE_TRANSITIONING_TO_PRIMARY
         ) {
-            transferResources( 
+            transferResources(
                 prewarmingState
                         == RENDERER_PREWARMING_STATE_TRANSITIONING_TO_PRIMARY
             )
@@ -418,7 +400,6 @@ class RendererHolder(
         }
     }
 
-    
     private fun transferResources(transferToPrimary: Boolean) {
         if (transferToPrimary) {
             secondaryRenderer!!.handleMessage(Renderer.MSG_TRANSFER_RESOURCES, primaryRenderer)
@@ -448,7 +429,7 @@ class RendererHolder(
             e(TAG, "Disable prewarming failed.", e)
         }
         try {
-            maybeResetRenderer( isPrewarmingPrimary)
+            maybeResetRenderer(isPrewarmingPrimary)
         } catch (e: RuntimeException) {
             // There's nothing we can do.
             e(TAG, "Reset prewarming failed.", e)
@@ -460,7 +441,6 @@ class RendererHolder(
                 RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY
     }
 
-    
     fun maybeDisableOrResetPosition(
         sampleStream: SampleStream?,
         mediaClock: DefaultMediaClock,
@@ -477,7 +457,6 @@ class RendererHolder(
         }
     }
 
-    
     private fun maybeDisableOrResetPositionInternal(
         renderer: Renderer,
         sampleStream: SampleStream?,
@@ -492,7 +471,7 @@ class RendererHolder(
             } else if (streamReset) {
                 // The renderer will continue to consume from its current stream, but needs to be reset.
                 renderer.resetPosition(
-                    rendererPositionUs,  
+                    rendererPositionUs,
                     true
                 )
             }
@@ -509,14 +488,11 @@ class RendererHolder(
         renderer.disable()
     }
 
-    
     fun resetPosition(
         playingPeriod: MediaPeriodHolder?, positionUs: Long, sampleStreamIsResetToKeyFrame: Boolean
     ) {
         val renderer = getRendererReadingFromPeriod(playingPeriod)
-        if (renderer != null) {
-            renderer.resetPosition(positionUs, sampleStreamIsResetToKeyFrame)
-        }
+        renderer?.resetPosition(positionUs, sampleStreamIsResetToKeyFrame)
     }
 
     fun supportsResetPositionWithoutKeyFrameReset(
@@ -528,10 +504,10 @@ class RendererHolder(
 
     fun reset() {
         if (!isRendererEnabled(primaryRenderer)) {
-            maybeResetRenderer( true)
+            maybeResetRenderer(true)
         }
         if (secondaryRenderer != null && !isRendererEnabled(secondaryRenderer)) {
-            maybeResetRenderer( false)
+            maybeResetRenderer(false)
         }
     }
 
@@ -547,7 +523,6 @@ class RendererHolder(
         }
     }
 
-    
     fun replaceStreamsOrDisableRendererForTransition(
         readingPeriodHolder: MediaPeriodHolder,
         newTrackSelectorResult: TrackSelectorResult,
@@ -567,7 +542,6 @@ class RendererHolder(
             primaryRendererResult
     }
 
-    
     private fun replaceStreamsOrDisableRendererForTransitionInternal(
         renderer: Renderer?,
         readingPeriodHolder: MediaPeriodHolder,
@@ -603,7 +577,7 @@ class RendererHolder(
             // The renderer has finished playback, so we can disable it now.
             disableRenderer(renderer, mediaClock)
             if (!rendererShouldBeEnabled || this.isPrewarming) {
-                maybeResetRenderer( renderer === primaryRenderer)
+                maybeResetRenderer(renderer === primaryRenderer)
             }
             return REPLACE_STREAMS_DISABLE_RENDERERS_COMPLETED
         } else {
@@ -621,7 +595,6 @@ class RendererHolder(
         }
     }
 
-    
     fun setVideoOutput(videoOutput: Any?) {
         if (this.trackType != TRACK_TYPE_VIDEO) {
             return
@@ -635,23 +608,18 @@ class RendererHolder(
         }
     }
 
-    
     fun setVideoFrameMetadataListener(videoFrameMetadataListener: VideoFrameMetadataListener?) {
-        // TODO: b/507835122 - Remove image track type once metadata listener handling is refined.
         if (this.trackType != TRACK_TYPE_VIDEO && this.trackType != TRACK_TYPE_IMAGE) {
             return
         }
         primaryRenderer.handleMessage(
             Renderer.MSG_SET_VIDEO_FRAME_METADATA_LISTENER, videoFrameMetadataListener
         )
-        if (secondaryRenderer != null) {
-            secondaryRenderer.handleMessage(
-                Renderer.MSG_SET_VIDEO_FRAME_METADATA_LISTENER, videoFrameMetadataListener
-            )
-        }
+        secondaryRenderer?.handleMessage(
+            Renderer.MSG_SET_VIDEO_FRAME_METADATA_LISTENER, videoFrameMetadataListener
+        )
     }
 
-    
     fun setImageMetadataListener(imageMetadataListener: ImageMetadataListener?) {
         if (this.trackType != TRACK_TYPE_IMAGE) {
             return
@@ -660,36 +628,28 @@ class RendererHolder(
             Renderer.MSG_SET_IMAGE_METADATA_LISTENER,
             imageMetadataListener
         )
-        if (secondaryRenderer != null) {
-            secondaryRenderer.handleMessage(
-                Renderer.MSG_SET_IMAGE_METADATA_LISTENER, imageMetadataListener
-            )
-        }
+        secondaryRenderer?.handleMessage(
+            Renderer.MSG_SET_IMAGE_METADATA_LISTENER, imageMetadataListener
+        )
     }
 
-    
     fun setVolume(volume: Float) {
         if (this.trackType != TRACK_TYPE_AUDIO) {
             return
         }
         primaryRenderer.handleMessage(Renderer.MSG_SET_VOLUME, volume)
-        if (secondaryRenderer != null) {
-            secondaryRenderer.handleMessage(Renderer.MSG_SET_VOLUME, volume)
-        }
+        secondaryRenderer?.handleMessage(Renderer.MSG_SET_VOLUME, volume)
     }
 
-    
     fun setAudioSessionId(audioSessionId: Int) {
         if (this.trackType != TRACK_TYPE_AUDIO && this.trackType != TRACK_TYPE_VIDEO) {
             return
         }
         primaryRenderer.handleMessage(Renderer.MSG_SET_AUDIO_SESSION_ID, audioSessionId)
-        if (secondaryRenderer != null) {
-            secondaryRenderer.handleMessage(
-                Renderer.MSG_SET_AUDIO_SESSION_ID,
-                audioSessionId
-            )
-        }
+        secondaryRenderer?.handleMessage(
+            Renderer.MSG_SET_AUDIO_SESSION_ID,
+            audioSessionId
+        )
     }
 
     val isRendererEnabled: Boolean
@@ -716,17 +676,13 @@ class RendererHolder(
         return null
     }
 
-    init {
-        prewarmingState = RENDERER_PREWARMING_STATE_NOT_PREWARMING_USING_PRIMARY
-    }
-
     companion object {
         private const val TAG = "RendererHolder"
 
         private fun getFormats(newSelection: ExoTrackSelection?): Array<Format> {
             // Build an array of formats contained by the selection.
             val length = newSelection?.length() ?: 0
-            return Array<Format>(length){
+            return Array<Format>(length) {
                 newSelection!!.getFormat(it)
             }
         }
