@@ -5,12 +5,11 @@ import android.media.LoudnessCodecController.OnLoudnessCodecUpdateListener
 import android.media.MediaCodec
 import android.os.Bundle
 import androidx.annotation.RequiresApi
-
 import com.google.common.base.Preconditions
 import com.google.common.util.concurrent.MoreExecutors
 
 @RequiresApi(35)
-class LoudnessCodecController  constructor(private val updateListener: LoudnessParameterUpdateListener = LoudnessParameterUpdateListener.DEFAULT) {
+class LoudnessCodecController(private val updateListener: LoudnessParameterUpdateListener = LoudnessParameterUpdateListener.DEFAULT) {
     fun interface LoudnessParameterUpdateListener {
         fun onLoudnessParameterUpdate(parameters: Bundle): Bundle
 

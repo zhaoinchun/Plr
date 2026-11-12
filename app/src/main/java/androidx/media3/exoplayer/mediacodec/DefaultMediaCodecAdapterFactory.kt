@@ -1,36 +1,21 @@
-
 package androidx.media3.exoplayer.mediacodec
 
 import android.content.Context
 import android.os.Build
 import android.os.HandlerThread
-import androidx.annotation.IntDef
 import androidx.media3.common.MimeTypes.getTrackType
 import androidx.media3.common.util.Log.i
 import androidx.media3.common.util.Util.getTrackTypeString
 import com.google.common.base.Supplier
-import java.io.IOException
 
-class DefaultMediaCodecAdapterFactory : MediaCodecAdapter.Factory {
-
-    private val context: Context?
-    private val callbackThreadSupplier: Supplier<HandlerThread>?
-    private val queueingThreadSupplier: Supplier<HandlerThread>?
-    private var asynchronousMode: Int
-    private var asyncCryptoFlagEnabled = false
+class DefaultMediaCodecAdapterFactory(
+    private val context: Context?,
+    private val callbackThreadSupplier: Supplier<HandlerThread>? = null,
+    private val queueingThreadSupplier: Supplier<HandlerThread>? = null
+) : MediaCodecAdapter.Factory {
+    private var asynchronousMode: Int = MODE_DEFAULT
+    private var asyncCryptoFlagEnabled = true
     private var asyncCryptoSynchronizationEnabled = false
-
-    constructor(
-        context: Context?,
-        callbackThreadSupplier: Supplier<HandlerThread>? = null,
-        queueingThreadSupplier: Supplier<HandlerThread>? = null
-    ) {
-        this.context = context
-        asynchronousMode = MODE_DEFAULT
-        asyncCryptoFlagEnabled = true
-        this.callbackThreadSupplier = callbackThreadSupplier
-        this.queueingThreadSupplier = queueingThreadSupplier
-    }
 
     fun forceEnableAsynchronous(): DefaultMediaCodecAdapterFactory {
         asynchronousMode = MODE_ENABLED
@@ -54,7 +39,7 @@ class DefaultMediaCodecAdapterFactory : MediaCodecAdapter.Factory {
         return this
     }
 
-    
+
     override fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
         if (asynchronousMode == MODE_ENABLED
             || (asynchronousMode == MODE_DEFAULT && shouldUseAsynchronousAdapterInDefaultMode())

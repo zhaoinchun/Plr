@@ -9,12 +9,9 @@ import android.os.Handler
 import android.os.PersistableBundle
 import android.view.Surface
 import androidx.annotation.RequiresApi
-import androidx.media3.common.C
 import androidx.media3.common.util.TraceUtil.beginSection
 import androidx.media3.common.util.TraceUtil.endSection
-
 import androidx.media3.decoder.CryptoInfo
-import com.google.common.base.Preconditions
 import java.io.IOException
 import java.nio.ByteBuffer
 
@@ -24,7 +21,6 @@ class SynchronousMediaCodecAdapter private constructor(
 ) : MediaCodecAdapter {
     class Factory : MediaCodecAdapter.Factory {
         @SuppressLint("WrongConstant") // Can't verify codec flag IntDef
-        
         override fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
             var codec: MediaCodec? = null
             try {

@@ -15,24 +15,13 @@ import java.util.concurrent.atomic.AtomicReference
 class AsynchronousMediaCodecBufferEnqueuer(
     private val codec: MediaCodec,
     private val handlerThread: HandlerThread,
-    private val conditionVariable: ConditionVariable,
-    private val asyncCryptoSynchronizationEnabled: Boolean
+    private val asyncCryptoSynchronizationEnabled: Boolean,
+    private val conditionVariable: ConditionVariable = ConditionVariable(),
 ) : MediaCodecBufferEnqueuer {
     private var handler: Handler? = null
     private val pendingRuntimeException: AtomicReference<RuntimeException?> =
         AtomicReference<RuntimeException?>()
     private var started = false
-
-    constructor(
-        codec: MediaCodec,
-        queueingThread: HandlerThread,
-        enableAsyncCryptoSynchronization: Boolean
-    ) : this(
-        codec,
-        queueingThread,
-        ConditionVariable(),
-        enableAsyncCryptoSynchronization
-    )
 
     override fun start() {
         if (!started) {

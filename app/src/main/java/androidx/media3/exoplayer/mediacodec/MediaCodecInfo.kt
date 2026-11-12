@@ -26,11 +26,10 @@ import com.google.common.base.Strings
 import com.google.common.base.Supplier
 import com.google.common.base.Suppliers
 import com.google.common.primitives.Ints
-import com.google.errorprone.annotations.InlineMe
 import kotlin.math.abs
 import kotlin.math.floor
 
-class MediaCodecInfo private constructor(
+class MediaCodecInfo(
     val name: String,
     val mimeType: String,
     val codecMimeType: String?,

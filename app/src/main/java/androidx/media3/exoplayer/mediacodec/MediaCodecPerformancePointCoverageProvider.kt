@@ -3,21 +3,20 @@ package androidx.media3.exoplayer.mediacodec
 import android.media.MediaCodecInfo.VideoCapabilities
 import android.media.MediaCodecInfo.VideoCapabilities.PerformancePoint
 import android.os.Build
-import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.media3.common.Format
 import androidx.media3.common.MimeTypes
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.DecoderQueryException
 
-internal object MediaCodecPerformancePointCoverageProvider {
-    private var shouldIgnorePerformancePoints:Boolean = false
+object MediaCodecPerformancePointCoverageProvider {
+    private var shouldIgnorePerformancePoints: Boolean = false
     const val COVERAGE_RESULT_NO_PERFORMANCE_POINTS_UNSUPPORTED: Int = 0
     const val COVERAGE_RESULT_NO: Int = 1
     const val COVERAGE_RESULT_YES: Int = 2
 
     fun areResolutionAndFrameRateCovered(
         videoCapabilities: VideoCapabilities, width: Int, height: Int, frameRate: Double
-    ):  Int {
+    ): Int {
         if (Build.VERSION.SDK_INT < 29 || (shouldIgnorePerformancePoints)) {
             return COVERAGE_RESULT_NO_PERFORMANCE_POINTS_UNSUPPORTED
         }
@@ -28,7 +27,7 @@ internal object MediaCodecPerformancePointCoverageProvider {
     private object Api29 {
         fun areResolutionAndFrameRateCovered(
             videoCapabilities: VideoCapabilities, width: Int, height: Int, frameRate: Double
-        ):  Int {
+        ): Int {
             val performancePointList =
                 videoCapabilities.supportedPerformancePoints
             if (performancePointList.isNullOrEmpty()) {
@@ -41,7 +40,7 @@ internal object MediaCodecPerformancePointCoverageProvider {
             val targetPerformancePoint =
                 PerformancePoint(width, height, frameRate.toInt())
 
-            val performancePointCoverageResult:  Int =
+            val performancePointCoverageResult: Int =
                 evaluatePerformancePointCoverage(performancePointList, targetPerformancePoint)
 
             if (performancePointCoverageResult == COVERAGE_RESULT_NO
@@ -63,8 +62,8 @@ internal object MediaCodecPerformancePointCoverageProvider {
                 // The same check as below is tested in CTS and we should get reliable results from API 37.
                 return false
             }
-            val h264SecureRequiredSupportResult:  Int =
-                evaluateH264RequiredSupport( true)
+            val h264SecureRequiredSupportResult: Int =
+                evaluateH264RequiredSupport(true)
             if (Build.VERSION.SDK_INT >= 35) {
                 // From API 35, only non-secure codecs are tested in CTS and we still need to check the
                 // secure codec is correctly marked as supported (or not defined at all).
@@ -72,15 +71,15 @@ internal object MediaCodecPerformancePointCoverageProvider {
             }
             // Below API 35, we accept the performance points if the non-secure ones are correctly defined
             // and the secure ones are either undefined or correctly marked as supported.
-            val h264RequiredSupportResult:  Int =
-                evaluateH264RequiredSupport( false)
+            val h264RequiredSupportResult: Int =
+                evaluateH264RequiredSupport(false)
             return h264RequiredSupportResult != COVERAGE_RESULT_YES
                     || h264SecureRequiredSupportResult == COVERAGE_RESULT_NO
         }
 
         fun evaluateH264RequiredSupport(
             requiresSecureDecoder: Boolean
-        ):  Int {
+        ): Int {
             try {
                 val formatH264 = Format(sampleMimeType = MimeTypes.VIDEO_H264)
                 // Null check required to pass RequiresNonNull annotation on getDecoderInfosSoftMatch.
@@ -88,8 +87,8 @@ internal object MediaCodecPerformancePointCoverageProvider {
                     val decoderInfos =
                         MediaCodecUtil.getDecoderInfosSoftMatch(
                             MediaCodecSelector.DEFAULT,
-                            formatH264,  
-                            requiresSecureDecoder,  
+                            formatH264,
+                            requiresSecureDecoder,
                             false
                         )
                     for (i in decoderInfos.indices) {
@@ -97,7 +96,8 @@ internal object MediaCodecPerformancePointCoverageProvider {
                             val videoCapabilities =
                                 decoderInfos[i].capabilities!!.videoCapabilities
                             if (videoCapabilities != null) {
-                                val performancePointListH264 = videoCapabilities.supportedPerformancePoints
+                                val performancePointListH264 =
+                                    videoCapabilities.supportedPerformancePoints
                                 if (!performancePointListH264.isNullOrEmpty()) {
                                     val targetPerformancePointH264 =
                                         PerformancePoint(1280, 720, 60)
@@ -110,7 +110,7 @@ internal object MediaCodecPerformancePointCoverageProvider {
                     }
                 }
                 return COVERAGE_RESULT_NO_PERFORMANCE_POINTS_UNSUPPORTED
-            } catch (ignored: DecoderQueryException) {
+            } catch (_: DecoderQueryException) {
                 return COVERAGE_RESULT_NO_PERFORMANCE_POINTS_UNSUPPORTED
             }
         }
@@ -118,7 +118,7 @@ internal object MediaCodecPerformancePointCoverageProvider {
         fun evaluatePerformancePointCoverage(
             performancePointList: List<PerformancePoint?>,
             targetPerformancePoint: PerformancePoint
-        ):  Int {
+        ): Int {
             for (i in performancePointList.indices) {
                 if (performancePointList[i]!!.covers(targetPerformancePoint)) {
                     return COVERAGE_RESULT_YES

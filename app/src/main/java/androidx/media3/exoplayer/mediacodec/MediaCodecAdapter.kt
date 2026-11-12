@@ -9,10 +9,8 @@ import android.os.Handler
 import android.os.PersistableBundle
 import android.view.Surface
 import androidx.annotation.RequiresApi
-import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.decoder.CryptoInfo
-import java.io.IOException
 import java.nio.ByteBuffer
 
 interface MediaCodecAdapter {
@@ -62,7 +60,6 @@ interface MediaCodecAdapter {
     }
 
     interface Factory {
-        
         fun createAdapter(configuration: Configuration): MediaCodecAdapter
 
         companion object {

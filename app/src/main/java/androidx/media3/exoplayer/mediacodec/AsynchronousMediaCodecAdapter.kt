@@ -11,19 +11,15 @@ import android.os.HandlerThread
 import android.os.PersistableBundle
 import android.view.Surface
 import androidx.annotation.ChecksSdkIntAtLeast
-import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
 import androidx.media3.common.C
-
 import androidx.media3.common.util.TraceUtil.beginSection
 import androidx.media3.common.util.TraceUtil.endSection
 import androidx.media3.decoder.CryptoInfo
 import com.google.common.base.Supplier
-import java.io.IOException
 import java.nio.ByteBuffer
 
-class AsynchronousMediaCodecAdapter private constructor(
+class AsynchronousMediaCodecAdapter(
     private val codec: MediaCodec,
     callbackThread: HandlerThread,
     bufferEnqueuer: MediaCodecBufferEnqueuer,
@@ -48,7 +44,6 @@ class AsynchronousMediaCodecAdapter private constructor(
             this.enableAsyncCryptoSynchronization = enableAsyncCryptoSynchronization
         }
 
-        
         override fun createAdapter(configuration: MediaCodecAdapter.Configuration): AsynchronousMediaCodecAdapter {
             val codecName = configuration.codecInfo.name
             var codecAdapter: AsynchronousMediaCodecAdapter? = null
@@ -108,7 +103,7 @@ class AsynchronousMediaCodecAdapter private constructor(
     private val asynchronousMediaCodecCallback = AsynchronousMediaCodecCallback(callbackThread)
     private val bufferEnqueuer: MediaCodecBufferEnqueuer by lazy { bufferEnqueuer }
     private var codecReleased = false
-    private var state:  Int = STATE_CREATED
+    private var state: Int = STATE_CREATED
 
     private fun initialize(
         mediaFormat: MediaFormat?,
@@ -243,7 +238,7 @@ class AsynchronousMediaCodecAdapter private constructor(
     }
 
     override fun setOutputSurface(surface: Surface) {
-        codec.setOutputSurface(surface!!)
+        codec.setOutputSurface(surface)
     }
 
     @RequiresApi(35)
@@ -255,7 +250,7 @@ class AsynchronousMediaCodecAdapter private constructor(
         bufferEnqueuer.setParameters(params)
     }
 
-    override fun setVideoScalingMode(scalingMode:  Int) {
+    override fun setVideoScalingMode(scalingMode: Int) {
         codec.setVideoScalingMode(scalingMode)
     }
 
@@ -273,12 +268,10 @@ class AsynchronousMediaCodecAdapter private constructor(
         codec.unsubscribeFromVendorParameters(names)
     }
 
-    
     fun onError(error: CodecException?) {
         asynchronousMediaCodecCallback.onError(codec, error!!)
     }
 
-    
     fun onOutputFormatChanged(format: MediaFormat?) {
         asynchronousMediaCodecCallback.onOutputFormatChanged(codec, format!!)
     }
@@ -289,25 +282,19 @@ class AsynchronousMediaCodecAdapter private constructor(
         private const val STATE_SHUT_DOWN = 2
 
         private fun createCallbackThreadLabel(trackType: Int): String {
-            return createThreadLabel(trackType,  "ExoPlayer:MediaCodecAsyncAdapter:")
+            return createThreadLabel(trackType, "ExoPlayer:MediaCodecAsyncAdapter:")
         }
 
         private fun createQueueingThreadLabel(trackType: Int): String {
-            return createThreadLabel(trackType,  "ExoPlayer:MediaCodecQueueingThread:")
+            return createThreadLabel(trackType, "ExoPlayer:MediaCodecQueueingThread:")
         }
 
         private fun createThreadLabel(trackType: Int, prefix: String): String {
             val labelBuilder = StringBuilder(prefix)
             when (trackType) {
-                C.TRACK_TYPE_AUDIO -> {
-                    labelBuilder.append("Audio")
-                }
-                C.TRACK_TYPE_VIDEO -> {
-                    labelBuilder.append("Video")
-                }
-                else -> {
-                    labelBuilder.append("Unknown(").append(trackType).append(")")
-                }
+                C.TRACK_TYPE_AUDIO -> labelBuilder.append("Audio")
+                C.TRACK_TYPE_VIDEO -> labelBuilder.append("Video")
+                else -> labelBuilder.append("Unknown(").append(trackType).append(")")
             }
             return labelBuilder.toString()
         }

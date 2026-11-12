@@ -1,10 +1,7 @@
 
 package androidx.media3.exoplayer.mediacodec
 
-import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.DecoderQueryException
-
 fun interface MediaCodecSelector {
-    
     fun getDecoderInfos(
         mimeType: String, requiresSecureDecoder: Boolean, requiresTunnelingDecoder: Boolean
     ): List<MediaCodecInfo>

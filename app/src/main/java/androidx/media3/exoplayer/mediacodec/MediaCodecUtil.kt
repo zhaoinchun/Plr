@@ -54,14 +54,12 @@ object MediaCodecUtil {
     val decryptOnlyDecoderInfo: MediaCodecInfo?
         get() = getDecoderInfo(MimeTypes.AUDIO_RAW, false, false)
 
-    
     fun getDecoderInfo(mimeType: String, secure: Boolean, tunneling: Boolean): MediaCodecInfo? {
         val decoderInfos = getDecoderInfos(mimeType, secure, tunneling)
         return if (decoderInfos.isEmpty()) null else decoderInfos[0]
     }
 
     @Synchronized
-    
     fun getDecoderInfos(
         mimeType: String, secure: Boolean, tunneling: Boolean
     ): List<MediaCodecInfo> {
@@ -98,8 +96,8 @@ object MediaCodecUtil {
         return immutableDecoderInfos
     }
 
-        @RequiresNonNull("#2.sampleMimeType")
-    
+    @RequiresNonNull("#2.sampleMimeType")
+
     fun getDecoderInfosSoftMatch(
         mediaCodecSelector: MediaCodecSelector,
         format: Format,
@@ -120,7 +118,6 @@ object MediaCodecUtil {
         }
     }
 
-        
     fun getAlternativeDecoderInfos(
         mediaCodecSelector: MediaCodecSelector,
         format: Format,
@@ -166,7 +163,6 @@ object MediaCodecUtil {
         return decoderInfos.toList()
     }
 
-    
     fun maxH264DecodableFrameSize(): Int {
         if (maxH264DecodableFrameSize == -1) {
             var result = 0
@@ -197,7 +193,7 @@ object MediaCodecUtil {
         return getHevcProfileAndLevel(codecs, parts, format.colorInfo)
     }
 
-        fun getAlternativeCodecMimeType(format: Format): String? {
+    fun getAlternativeCodecMimeType(format: Format): String? {
         if (MimeTypes.AUDIO_E_AC3_JOC == format.sampleMimeType) {
             // E-AC3 decoders can decode JOC streams, but in 2-D rather than 3-D.
             // Some devices (e.g. Pixel) integrate an EAC3 decoder that does not support EAC3-JOC
@@ -246,7 +242,6 @@ object MediaCodecUtil {
         return Build.MANUFACTURER != "Google"
     }
 
-    
     private fun getDecoderInfosInternal(
         key: CodecKey, mediaCodecList: MediaCodecListCompat
     ): MutableList<MediaCodecInfo> {
@@ -426,13 +421,13 @@ object MediaCodecUtil {
                 // This device does not list a generic raw audio decoder, yet it can be instantiated by
                 // name. See <a href="https://github.com/google/ExoPlayer/issues/5782">Issue #5782</a>.
                 decoderInfos.add(
-                    MediaCodecInfo.newInstance( 
-                        "OMX.google.raw.decoder",  
-                        MimeTypes.AUDIO_RAW,  
-                        MimeTypes.AUDIO_RAW,  
-                        null,  
-                        false,  
-                        true,  
+                    MediaCodecInfo.newInstance(
+                        "OMX.google.raw.decoder",
+                        MimeTypes.AUDIO_RAW,
+                        MimeTypes.AUDIO_RAW,
+                        null,
+                        false,
+                        true,
                         false,
                         false,
                         false
