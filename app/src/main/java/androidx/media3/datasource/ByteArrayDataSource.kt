@@ -9,27 +9,24 @@ import kotlin.math.min
 
 class ByteArrayDataSource(uriResolver: UriResolver) : BaseDataSource(false) {
     interface UriResolver {
-        
         fun resolve(uri: Uri): ByteArray
     }
 
     private val uriResolver: UriResolver = uriResolver
-
     override var uri: Uri? = null
     private var data: ByteArray? = null
     private var readPosition = 0
     private var bytesRemaining = 0
     private var opened = false
 
-    constructor(data: ByteArray) : this(object :UriResolver {
+    constructor(data: ByteArray) : this(object : UriResolver {
         override fun resolve(uri: Uri): ByteArray {
             return data
         }
-    } ) {
+    }) {
         Preconditions.checkArgument(data.isNotEmpty())
     }
 
-    
     override fun open(dataSpec: DataSpec): Long {
         transferInitializing(dataSpec)
         uri = dataSpec.uri

@@ -85,7 +85,6 @@ class FlacStreamMetadata {
         concatenateVorbisMetadata(vorbisComments, pictureFrames)
     )
 
-
     constructor(
         minBlockSizeSamples: Int,
         maxBlockSizeSamples: Int,

@@ -7,37 +7,29 @@ import java.io.InputStream
 
 class DataSourceInputStream(private val dataSource: DataSource, private val dataSpec: DataSpec) :
     InputStream() {
-    private val singleByteArray: ByteArray
+    private val singleByteArray = ByteArray(1)
 
     private var opened = false
     private var closed = false
     private var totalBytesRead: Long = 0
 
-    init {
-        singleByteArray = ByteArray(1)
-    }
-
     fun bytesRead(): Long {
         return totalBytesRead
     }
 
-    
     fun open() {
         checkOpened()
     }
 
-    
     override fun read(): Int {
         val length = read(singleByteArray)
         return if (length == -1) -1 else (singleByteArray[0].toInt() and 0xFF)
     }
 
-    
     override fun read(buffer: ByteArray): Int {
         return read(buffer, 0, buffer.size)
     }
 
-    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         Preconditions.checkState(!closed)
         checkOpened()
@@ -50,7 +42,6 @@ class DataSourceInputStream(private val dataSource: DataSource, private val data
         }
     }
 
-    
     override fun close() {
         if (!closed) {
             dataSource.close()
@@ -58,7 +49,6 @@ class DataSourceInputStream(private val dataSource: DataSource, private val data
         }
     }
 
-    
     private fun checkOpened() {
         if (!opened) {
             dataSource.open(dataSpec)

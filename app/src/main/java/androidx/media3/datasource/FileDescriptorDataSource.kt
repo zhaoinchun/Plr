@@ -6,7 +6,6 @@ import android.system.Os
 import android.system.OsConstants
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
-import com.google.common.base.Preconditions
 import com.google.common.collect.Sets
 import java.io.FileDescriptor
 import java.io.FileInputStream
@@ -18,8 +17,7 @@ class FileDescriptorDataSource(
     private val fileDescriptor: FileDescriptor,
     private val offset: Long,
     private val length: Long
-) : BaseDataSource( false) {
-
+) : BaseDataSource(false) {
     override var uri: Uri? = null
     private var inputStream: FileInputStream? = null
     private var bytesRemaining: Long = 0
@@ -89,6 +87,7 @@ class FileDescriptorDataSource(
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
+
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -115,6 +114,7 @@ class FileDescriptorDataSource(
         bytesTransferred(bytesRead)
         return bytesRead
     }
+
     override fun close() {
         uri = null
         inUseFileDescriptors.remove(fileDescriptor)
@@ -137,9 +137,10 @@ class FileDescriptorDataSource(
         // Track file descriptors currently in use to fail fast if an attempt is made to re-use one.
         private val inUseFileDescriptors: MutableSet<FileDescriptor?> =
             Sets.newConcurrentHashSet<FileDescriptor?>()
+
         private fun seekFileDescriptor(fileDescriptor: FileDescriptor?, position: Long) {
             try {
-                Os.lseek(fileDescriptor, position,  OsConstants.SEEK_SET)
+                Os.lseek(fileDescriptor, position, OsConstants.SEEK_SET)
             } catch (e: ErrnoException) {
                 throw DataSourceException(e, PlaybackException.ERROR_CODE_IO_UNSPECIFIED)
             }

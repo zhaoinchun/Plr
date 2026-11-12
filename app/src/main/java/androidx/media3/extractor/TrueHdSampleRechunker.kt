@@ -15,8 +15,6 @@
  */
 package androidx.media3.extractor
 
-
-
 import androidx.media3.extractor.TrackOutput.CryptoData
 import com.google.common.base.Preconditions
 import java.io.IOException

@@ -8,7 +8,6 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.util.Util.getUtf8Bytes
 import androidx.media3.common.util.Util.split
 import com.google.common.base.Preconditions
-import java.io.IOException
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import kotlin.math.min
@@ -19,7 +18,6 @@ class DataSchemeDataSource : BaseDataSource( false) {
     private var readPosition = 0
     private var bytesRemaining = 0
 
-    
     override fun open(dataSpec: DataSpec): Long {
         transferInitializing(dataSpec)
         this.dataSpec = dataSpec

@@ -3,7 +3,6 @@ package androidx.media3.datasource
 import android.net.Uri
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
-import com.google.common.base.Preconditions
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -13,47 +12,38 @@ import java.net.MulticastSocket
 import java.net.SocketTimeoutException
 import kotlin.math.min
 
-class UdpDataSource  constructor(
+class UdpDataSource(
     maxPacketSize: Int = DEFAULT_MAX_PACKET_SIZE,
     private val socketTimeoutMillis: Int = DEFAULT_SOCKET_TIMEOUT_MILLIS
-) : BaseDataSource( true) {
-    class UdpDataSourceException
-        (
-        cause: Throwable?,
-         errorCode:  Int
-    ) : DataSourceException(cause, errorCode)
-
-    private val packetBuffer: ByteArray
-    private val packet: DatagramPacket
-
+) : BaseDataSource(true) {
+    private val packetBuffer = ByteArray(maxPacketSize)
+    private val packet = DatagramPacket(packetBuffer, 0, maxPacketSize)
     override var uri: Uri? = null
     private var socket: DatagramSocket? = null
     private var multicastSocket: MulticastSocket? = null
     private var address: InetAddress? = null
     private var opened = false
-
     private var packetRemaining = 0
 
-    init {
-        packetBuffer = ByteArray(maxPacketSize)
-        packet = DatagramPacket(packetBuffer, 0, maxPacketSize)
-    }
     override fun open(dataSpec: DataSpec): Long {
-        uri = dataSpec.uri
-        val host = uri!!.host!!
-        val port = uri!!.getPort()
+        val uri = dataSpec.uri
+        this.uri = uri
+        val host = uri.host!!
+        val port = uri.port
         transferInitializing(dataSpec)
         try {
-            address = InetAddress.getByName(host)
+            val address = InetAddress.getByName(host)
+            this.address = address
             val socketAddress = InetSocketAddress(address, port)
-            if (address!!.isMulticastAddress()) {
-                multicastSocket = MulticastSocket(socketAddress)
-                multicastSocket!!.joinGroup(address)
-                socket = multicastSocket
+            val socket = if (address.isMulticastAddress) {
+                MulticastSocket(socketAddress).also {
+                    it.joinGroup(address)
+                }
             } else {
-                socket = DatagramSocket(socketAddress)
+                DatagramSocket(socketAddress)
             }
-            socket!!.setSoTimeout(socketTimeoutMillis)
+            this.socket = socket
+            socket.setSoTimeout(socketTimeoutMillis)
         } catch (e: SecurityException) {
             throw UdpDataSourceException(e, PlaybackException.ERROR_CODE_IO_NO_PERMISSION)
         } catch (e: IOException) {
@@ -61,16 +51,15 @@ class UdpDataSource  constructor(
                 e, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
             )
         }
-
         opened = true
         transferStarted(dataSpec)
         return C.LENGTH_UNSET.toLong()
     }
+
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
         }
-
         if (packetRemaining == 0) {
             // We've read all of the data from the current packet. Get another.
             try {
@@ -84,11 +73,10 @@ class UdpDataSource  constructor(
                     e, PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED
                 )
             }
-            packetRemaining = packet.getLength()
+            packetRemaining = packet.length
             bytesTransferred(packetRemaining)
         }
-
-        val packetOffset = packet.getLength() - packetRemaining
+        val packetOffset = packet.length - packetRemaining
         val bytesToRead = min(packetRemaining, length)
         System.arraycopy(packetBuffer, packetOffset, buffer, offset, bytesToRead)
         packetRemaining -= bytesToRead
@@ -97,16 +85,15 @@ class UdpDataSource  constructor(
 
     override fun close() {
         uri = null
-        if (multicastSocket != null) {
+        multicastSocket?.also {
             try {
-                multicastSocket!!.leaveGroup(address!!)
-            } catch (e: IOException) {
-                // Do nothing.
+                it.leaveGroup(address!!)
+            } catch (_: IOException) {
             }
             multicastSocket = null
         }
-        if (socket != null) {
-            socket!!.close()
+        socket?.also {
+            it.close()
             socket = null
         }
         address = null
@@ -118,16 +105,14 @@ class UdpDataSource  constructor(
     }
 
     val localPort: Int
-        get() {
-            if (socket == null) {
-                return UDP_PORT_UNSET
-            }
-            return socket!!.getLocalPort()
-        }
+        get() = socket?.getLocalPort() ?: UDP_PORT_UNSET
+
+    class UdpDataSourceException(cause: Throwable?, errorCode: Int) :
+        DataSourceException(cause, errorCode)
 
     companion object {
         const val DEFAULT_MAX_PACKET_SIZE: Int = 2000
-        val DEFAULT_SOCKET_TIMEOUT_MILLIS: Int = 8 * 1000
-        val UDP_PORT_UNSET: Int = -1
+        const val DEFAULT_SOCKET_TIMEOUT_MILLIS: Int = 8 * 1000
+        const val UDP_PORT_UNSET: Int = -1
     }
 }

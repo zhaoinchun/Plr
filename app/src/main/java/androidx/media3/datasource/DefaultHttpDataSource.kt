@@ -120,7 +120,6 @@ class DefaultHttpDataSource private constructor(
     private val requestProperties: RequestProperties
     private val contentTypePredicate: Predicate<String>?
     private val keepPostFor302Redirects: Boolean
-
     private var dataSpec: DataSpec? = null
     private var connection: HttpURLConnection? = null
     private var inputStream: InputStream? = null
@@ -307,7 +306,6 @@ class DefaultHttpDataSource private constructor(
         return bytesToRead
     }
 
-   
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         try {
             return readInternal(buffer, offset, length)
@@ -318,7 +316,6 @@ class DefaultHttpDataSource private constructor(
         }
     }
 
-   
     override fun close() {
         try {
             val inputStream = this.inputStream

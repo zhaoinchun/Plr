@@ -98,7 +98,6 @@ class TrackGroup(val id: String = "", val formats: List<Format>) {
             return if (language == null || language == C.LANGUAGE_UNDETERMINED) "" else language
         }
 
-
         private fun normalizeRoleFlags(roleFlags: Int): Int {
             // Treat trick-play and non-trick-play formats as compatible.
             return roleFlags or C.ROLE_FLAG_TRICK_PLAY

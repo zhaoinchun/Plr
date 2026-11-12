@@ -309,7 +309,6 @@ abstract class BasePlayer() : Player {
                 timeline.getWindow(currentMediaItemIndex, window).durationMs
         }
 
-
     private val repeatModeForNavigation: Int
         get() {
             val repeatMode: Int =

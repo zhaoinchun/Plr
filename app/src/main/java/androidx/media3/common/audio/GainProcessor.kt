@@ -24,7 +24,6 @@ class GainProcessor(private val gainProvider: GainProvider) : BaseAudioProcessor
 
     private var readFrames: Long = 0
 
-
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         val encoding = inputAudioFormat.encoding
         if (encoding != C.ENCODING_PCM_16BIT && encoding != C.ENCODING_PCM_FLOAT) {

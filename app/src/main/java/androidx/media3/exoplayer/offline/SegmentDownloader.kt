@@ -347,7 +347,6 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         removing: Boolean
     ): MutableList<Segment>
 
-
     private fun <T> addActiveRunnable(runnable: RunnableFutureTask<T, *>) {
         synchronized(activeRunnables) {
             if (isCanceled) {

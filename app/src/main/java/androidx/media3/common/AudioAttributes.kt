@@ -72,7 +72,6 @@ data class AudioAttributes(
         return bundle
     }
 
-
     private val streamTypeInternal: Int
         get() {
             if (Build.VERSION.SDK_INT >= 26) {

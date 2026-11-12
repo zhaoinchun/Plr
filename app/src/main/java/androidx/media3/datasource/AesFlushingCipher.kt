@@ -17,7 +17,6 @@ class AesFlushingCipher(mode: Int, secretKey: ByteArray?, nonce: Long, offset: L
     private val blockSize: Int
     private val zerosBlock: ByteArray
     private val flushedBlock: ByteArray
-
     private var pendingXorBytes = 0
 
     constructor(mode: Int, secretKey: ByteArray?, nonce: String?, offset: Long) : this(
@@ -126,9 +125,8 @@ class AesFlushingCipher(mode: Int, secretKey: ByteArray?, nonce: Long, offset: L
             if (input == null) {
                 return 0
             }
-
             var hash: Long = 0
-            for (i in 0..<input.length) {
+            for (i in input.indices) {
                 hash = hash xor input[i].code.toLong()
                 // This is equivalent to hash *= 0x100000001b3 (the FNV magic prime number).
                 hash += (hash shl 1) + (hash shl 4) + (hash shl 5) + (hash shl 7) + (hash shl 8) + (hash shl 40)

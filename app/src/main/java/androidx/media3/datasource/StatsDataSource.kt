@@ -7,16 +7,10 @@ import java.io.IOException
 class StatsDataSource(private val dataSource: DataSource) : DataSource {
     var bytesRead: Long = 0
         private set
-    var lastOpenedUri: Uri
+    var lastOpenedUri: Uri = Uri.EMPTY
         private set
-
-    var lastResponseHeaders: MutableMap<String, List<String>>
+    var lastResponseHeaders: MutableMap<String, List<String>> = mutableMapOf()
         private set
-
-    init {
-        lastOpenedUri = Uri.EMPTY
-        lastResponseHeaders = mutableMapOf()
-    }
 
     fun resetBytesRead() {
         bytesRead = 0
@@ -26,7 +20,6 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
         dataSource.addTransferListener(transferListener)
     }
 
-    
     override fun open(dataSpec: DataSpec): Long {
         // Reassign defaults in case dataSource.open throws an exception.
         lastOpenedUri = dataSpec.uri
@@ -45,7 +38,7 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
         }
     }
 
-    
+
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         val bytesRead: Int = dataSource.read(buffer, offset, length)
         if (bytesRead != C.RESULT_END_OF_INPUT) {
@@ -59,7 +52,6 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
     override val responseHeaders: MutableMap<String, List<String>>
         get() = dataSource.responseHeaders
 
-    
     override fun close() {
         dataSource.close()
     }

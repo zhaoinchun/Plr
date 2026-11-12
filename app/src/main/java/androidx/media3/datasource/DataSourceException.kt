@@ -4,7 +4,6 @@ import androidx.media3.common.PlaybackException
 import java.io.IOException
 
 open class DataSourceException : IOException {
-    
     val reason:  Int
 
     constructor( reason:  Int) {
@@ -34,7 +33,6 @@ open class DataSourceException : IOException {
     }
 
     companion object {
-
         fun isCausedByPositionOutOfRange(e: IOException?): Boolean {
             var cause: Throwable? = e
             while (cause != null) {

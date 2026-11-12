@@ -36,7 +36,6 @@ class PriorityDataSource(
         return upstream.open(dataSpec)
     }
 
-    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         priorityTaskManager.proceedOrThrow(priority)
         return upstream.read(buffer, offset, length)

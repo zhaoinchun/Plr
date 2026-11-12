@@ -7,13 +7,13 @@ import androidx.media3.common.PlaybackException
 import java.io.IOException
 import kotlin.math.min
 
-class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNetwork: Boolean) : BaseDataSource(isNetwork) {
+class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNetwork: Boolean) :
+    BaseDataSource(isNetwork) {
     override var uri: Uri? = null
     private var position: Long = 0
     private var bytesRemaining: Long = 0
     private var opened = false
 
-    
     override fun open(dataSpec: DataSpec): Long {
         uri = dataSpec.uri
         position = dataSpec.position
@@ -41,6 +41,7 @@ class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNet
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
+
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -72,7 +73,6 @@ class MediaDataSourceAdapter(private val mediaDataSource: MediaDataSource, isNet
         return bytesRead
     }
 
-    
     override fun close() {
         uri = null
         if (opened) {

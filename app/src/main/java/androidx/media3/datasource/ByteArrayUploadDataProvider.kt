@@ -4,7 +4,6 @@ import android.net.http.UploadDataProvider
 import android.net.http.UploadDataSink
 import android.os.Build
 import androidx.annotation.RequiresExtension
-import java.io.IOException
 import java.nio.ByteBuffer
 import kotlin.math.min
 
@@ -17,7 +16,6 @@ class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvi
         return data.size.toLong()
     }
 
-    
     override fun read(uploadDataSink: UploadDataSink, byteBuffer: ByteBuffer) {
         val readLength = min(byteBuffer.remaining(), data.size - position)
         byteBuffer.put(data, position, readLength)
@@ -25,7 +23,6 @@ class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvi
         uploadDataSink.onReadSucceeded(false)
     }
 
-    
     override fun rewind(uploadDataSink: UploadDataSink) {
         position = 0
         uploadDataSink.onRewindSucceeded()

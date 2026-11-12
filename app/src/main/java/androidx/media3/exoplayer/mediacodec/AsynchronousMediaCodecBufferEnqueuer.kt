@@ -97,7 +97,6 @@ class AsynchronousMediaCodecBufferEnqueuer(
         started = false
     }
 
-
     override fun waitUntilQueueingComplete() {
         blockUntilHandlerThreadIsIdle()
     }
@@ -109,12 +108,10 @@ class AsynchronousMediaCodecBufferEnqueuer(
         }
     }
 
-
     private fun flushHandlerThread() {
         this.handler!!.removeCallbacksAndMessages(null)
         blockUntilHandlerThreadIsIdle()
     }
-
 
     private fun blockUntilHandlerThreadIsIdle() {
         conditionVariable.close()

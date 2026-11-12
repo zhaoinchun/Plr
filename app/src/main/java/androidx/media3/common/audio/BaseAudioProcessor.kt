@@ -13,7 +13,6 @@ abstract class BaseAudioProcessor : AudioProcessor {
     private var outputBuffer = AudioProcessor.EMPTY_BUFFER
     private var inputEnded = false
 
-
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat? {
         pendingInputAudioFormat = inputAudioFormat
         pendingOutputAudioFormat = onConfigure(inputAudioFormat)
@@ -73,7 +72,6 @@ abstract class BaseAudioProcessor : AudioProcessor {
     protected fun hasPendingOutput(): Boolean {
         return outputBuffer.hasRemaining()
     }
-
 
     protected open fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         return AudioProcessor.AudioFormat.NOT_SET

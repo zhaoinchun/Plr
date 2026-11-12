@@ -1,16 +1,9 @@
 package androidx.media3.datasource
 
-import com.google.common.base.Preconditions
-
 abstract class BaseDataSource protected constructor(private val isNetwork: Boolean) : DataSource {
-    private val listeners: ArrayList<TransferListener?>
-
+    private val listeners: ArrayList<TransferListener?> = ArrayList( 1)
     private var listenerCount = 0
     private var dataSpec: DataSpec? = null
-
-    init {
-        this.listeners = ArrayList<TransferListener?>( 1)
-    }
 
     override fun addTransferListener(transferListener: TransferListener) {
         if (!listeners.contains(transferListener)) {

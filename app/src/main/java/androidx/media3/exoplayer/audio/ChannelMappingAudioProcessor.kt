@@ -19,7 +19,6 @@ class ChannelMappingAudioProcessor : BaseAudioProcessor() {
         pendingOutputChannels = outputChannels
     }
 
-
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         val outputChannels = pendingOutputChannels ?: return AudioProcessor.AudioFormat.NOT_SET
 

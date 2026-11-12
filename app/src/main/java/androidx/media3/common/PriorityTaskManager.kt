@@ -22,7 +22,6 @@ class PriorityTaskManager {
         }
     }
 
-
     fun proceed(priority: Int) {
         synchronized(lock) {
             while (highestPriority != priority) {

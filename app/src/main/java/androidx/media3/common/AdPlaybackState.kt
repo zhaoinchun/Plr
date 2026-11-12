@@ -397,7 +397,6 @@ data class AdPlaybackState(
         return bundle
     }
 
-
     data class SkipInfo(var skipOffsetUs: Long, val skipDurationUs: Long, val labelId: String?) {
         init {
             Preconditions.checkArgument(
@@ -764,7 +763,6 @@ data class AdPlaybackState(
                 Arrays.fill(durationsUs, oldDurationsUsCount, newDurationsUsCount, C.TIME_UNSET)
                 return durationsUs
             }
-
 
             private fun copySkipInfosWithSpaceForAdCount(
                 skipInfos: Array<SkipInfo?>, count: Int

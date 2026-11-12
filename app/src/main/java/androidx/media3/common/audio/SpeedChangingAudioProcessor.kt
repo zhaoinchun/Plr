@@ -74,7 +74,6 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
         this.shouldMaintainPitch = shouldMaintainPitch
     }
 
-
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat? {
         pendingInputAudioFormat = inputAudioFormat
         pendingOutputAudioFormat = sonicAudioProcessor.configure(inputAudioFormat)

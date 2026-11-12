@@ -27,7 +27,6 @@ class AudioProcessingPipeline(
         pendingOutputAudioFormat = AudioProcessor.AudioFormat.NOT_SET
     }
 
-
     fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         if (inputAudioFormat.equals(AudioProcessor.AudioFormat.NOT_SET)) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)

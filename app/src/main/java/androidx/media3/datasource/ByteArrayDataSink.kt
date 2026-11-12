@@ -2,9 +2,7 @@ package androidx.media3.datasource
 
 import androidx.media3.common.C
 import com.google.common.base.Preconditions
-
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 
 class ByteArrayDataSink : DataSink {
     private var stream:ByteArrayOutputStream? = null
@@ -18,7 +16,6 @@ class ByteArrayDataSink : DataSink {
         }
     }
 
-    
     override fun close() {
         stream?.close()
     }

@@ -17,7 +17,6 @@ class ChannelMixingAudioProcessor : BaseAudioProcessor() {
         matrixByInputChannelCount.put(inputChannelCount, matrix)
     }
 
-
     override fun onConfigure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         if (!AudioMixingUtil.canMix(inputAudioFormat)) {
             throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)

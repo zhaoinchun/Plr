@@ -33,17 +33,12 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
         ) : super(message, cause, errorCode)
     }
 
-    private val applicationContext: Context
-
+    private val applicationContext: Context = context.applicationContext
     private var dataSpec: DataSpec? = null
     private var assetFileDescriptor: AssetFileDescriptor? = null
     private var inputStream: InputStream? = null
     private var bytesRemaining: Long = 0
     private var opened = false
-
-    init {
-        this.applicationContext = context.getApplicationContext()
-    }
     override fun open(dataSpec: DataSpec): Long {
         this.dataSpec = dataSpec
         transferInitializing(dataSpec)

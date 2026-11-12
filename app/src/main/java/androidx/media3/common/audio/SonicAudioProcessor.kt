@@ -92,7 +92,6 @@ class SonicAudioProcessor(keepActiveWithDefaultParameters: Boolean) :
         return getPlayoutDuration(durationUs)
     }
 
-
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat {
         if (inputAudioFormat.encoding != C.ENCODING_PCM_16BIT
             && inputAudioFormat.encoding != C.ENCODING_PCM_FLOAT

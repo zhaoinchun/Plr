@@ -10,7 +10,7 @@ import java.io.IOException
 
 class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
     DataSource {
-    class Factory  constructor(
+    class Factory(
         context: Context,
         private val baseDataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
     ) : DataSource.Factory {
@@ -30,9 +30,9 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
         }
     }
 
-    private val context: Context
-    private val transferListeners: MutableList<TransferListener>
-    private val baseDataSource: DataSource
+    private val context: Context = context.applicationContext
+    private val transferListeners: MutableList<TransferListener> = mutableListOf()
+    private val baseDataSource: DataSource = baseDataSource!!
 
     // Lazily initialized.
     private var fileDataSource: DataSource? = null
@@ -42,7 +42,6 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
     private var udpDataSource: DataSource? = null
     private var dataSchemeDataSource: DataSource? = null
     private var rawResourceDataSource: DataSource? = null
-
     private var dataSource: DataSource? = null
 
     constructor(context: Context, allowCrossProtocolRedirects: Boolean) : this(
@@ -76,12 +75,6 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
             .setAllowCrossProtocolRedirects(allowCrossProtocolRedirects)
             .createDataSource()
     )
-
-    init {
-        this.context = context.applicationContext
-        this.baseDataSource = baseDataSource!!
-        transferListeners = mutableListOf()
-    }
 
     override fun addTransferListener(transferListener: TransferListener) {
         baseDataSource.addTransferListener(transferListener)
@@ -232,16 +225,12 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
 
     companion object {
         private const val TAG = "DefaultDataSource"
-
         private const val SCHEME_ASSET = "asset"
         private val SCHEME_CONTENT = ContentResolver.SCHEME_CONTENT
         private const val SCHEME_RTMP = "rtmp"
         private const val SCHEME_UDP = "udp"
         private val SCHEME_DATA: String = DataSchemeDataSource.SCHEME_DATA
-
-        @Suppress("deprecation") // Detecting deprecated scheme.
         private val SCHEME_RAW: String = ContentResolver.SCHEME_ANDROID_RESOURCE
-
         private val SCHEME_ANDROID_RESOURCE = ContentResolver.SCHEME_ANDROID_RESOURCE
     }
 }

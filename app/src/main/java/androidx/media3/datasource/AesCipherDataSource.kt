@@ -2,8 +2,6 @@ package androidx.media3.datasource
 
 import android.net.Uri
 import androidx.media3.common.C
-import com.google.common.base.Preconditions
-import java.io.IOException
 import javax.crypto.Cipher
 
 class AesCipherDataSource(private val secretKey: ByteArray, private val upstream: DataSource) :
@@ -14,7 +12,6 @@ class AesCipherDataSource(private val secretKey: ByteArray, private val upstream
         upstream.addTransferListener(transferListener)
     }
 
-    
     override fun open(dataSpec: DataSpec): Long {
         val dataLength = upstream.open(dataSpec)
         cipher =
@@ -33,7 +30,6 @@ class AesCipherDataSource(private val secretKey: ByteArray, private val upstream
     override val responseHeaders: MutableMap<String, List<String>>
         get() = upstream.responseHeaders
 
-    
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -46,7 +42,6 @@ class AesCipherDataSource(private val secretKey: ByteArray, private val upstream
         return read
     }
 
-    
     override fun close() {
         cipher = null
         upstream.close()

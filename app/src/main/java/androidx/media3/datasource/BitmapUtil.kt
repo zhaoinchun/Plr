@@ -8,11 +8,9 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.media3.common.C
 import androidx.media3.common.ParserException
 import java.io.ByteArrayInputStream
-import java.io.IOException
 import kotlin.math.max
 
 object BitmapUtil {
-    
     fun decode(
         data: ByteArray?, length: Int, options: BitmapFactory.Options?, maximumOutputDimension: Int
     ): Bitmap {

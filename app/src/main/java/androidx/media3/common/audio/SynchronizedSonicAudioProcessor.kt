@@ -49,7 +49,6 @@ class SynchronizedSonicAudioProcessor(
         return getPlayoutDuration(durationUs)
     }
 
-
     override fun configure(inputAudioFormat: AudioProcessor.AudioFormat): AudioProcessor.AudioFormat? {
         synchronized(lock) {
             return sonicAudioProcessor.configure(inputAudioFormat)

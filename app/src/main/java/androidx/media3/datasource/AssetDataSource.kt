@@ -5,19 +5,14 @@ import android.content.res.AssetManager
 import android.net.Uri
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
-import com.google.common.base.Preconditions
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 import kotlin.math.min
 
-class AssetDataSource(context: Context) : BaseDataSource( false) {
-    class AssetDataSourceException : DataSourceException {
-        constructor(
-            cause: Throwable?,
-             errorCode:  Int
-        ) : super(cause, errorCode)
-    }
+class AssetDataSource(context: Context) : BaseDataSource(false) {
+    class AssetDataSourceException(cause: Throwable?, errorCode: Int) :
+        DataSourceException(cause, errorCode)
 
     private val assetManager: AssetManager = context.assets
     override var uri: Uri? = null
@@ -39,7 +34,7 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
             if (skipped < dataSpec.position) {
                 // assetManager.open() returns an AssetInputStream, whose skip() implementation only skips
                 // fewer bytes than requested if the skip is beyond the end of the asset's data.
-                throw AssetDataSourceException( 
+                throw AssetDataSourceException(
                     null, PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
                 )
             }
@@ -65,11 +60,11 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
                     PlaybackException.ERROR_CODE_IO_UNSPECIFIED
             )
         }
-
         opened = true
         transferStarted(dataSpec)
         return bytesRemaining
     }
+
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -98,6 +93,7 @@ class AssetDataSource(context: Context) : BaseDataSource( false) {
         bytesTransferred(bytesRead)
         return bytesRead
     }
+
     override fun close() {
         uri = null
         try {

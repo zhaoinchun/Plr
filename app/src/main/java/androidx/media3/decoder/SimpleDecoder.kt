@@ -190,7 +190,6 @@ abstract class SimpleDecoder<I : DecoderInputBuffer, O : DecoderOutputBuffer, E 
         }
     }
 
-
     private fun decode(): Boolean {
         val inputBuffer: I?
         val outputBuffer: O?

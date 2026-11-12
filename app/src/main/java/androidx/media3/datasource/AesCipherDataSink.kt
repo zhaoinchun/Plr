@@ -1,6 +1,5 @@
 package androidx.media3.datasource
 
-import java.io.IOException
 import javax.crypto.Cipher
 import kotlin.math.min
 
@@ -11,19 +10,16 @@ class AesCipherDataSink(
 ) : DataSink {
     private var cipher: AesFlushingCipher? = null
 
-    
     override fun open(dataSpec: DataSpec) {
         wrappedDataSink.open(dataSpec)
-        cipher =
-            AesFlushingCipher(
-                Cipher.ENCRYPT_MODE,
-                secretKey,
-                dataSpec.key,
-                dataSpec.uriPositionOffset + dataSpec.position
-            )
+        cipher = AesFlushingCipher(
+            Cipher.ENCRYPT_MODE,
+            secretKey,
+            dataSpec.key,
+            dataSpec.uriPositionOffset + dataSpec.position
+        )
     }
 
-    
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
         if (scratch == null) {
             // In-place mode. Writes over the input data.
@@ -35,19 +31,18 @@ class AesCipherDataSink(
             while (bytesProcessed < length) {
                 val bytesToProcess = min(length - bytesProcessed, scratch.size)
                 cipher!!.update(
-                        buffer,
-                        offset + bytesProcessed,
-                        bytesToProcess,
-                        scratch,  
-                        0
-                    )
-                wrappedDataSink.write(scratch,  0, bytesToProcess)
+                    buffer,
+                    offset + bytesProcessed,
+                    bytesToProcess,
+                    scratch,
+                    0
+                )
+                wrappedDataSink.write(scratch, 0, bytesToProcess)
                 bytesProcessed += bytesToProcess
             }
         }
     }
 
-    
     override fun close() {
         cipher = null
         wrappedDataSink.close()
