@@ -153,10 +153,6 @@ abstract class MediaCodecRenderer(
         bypassBatchBuffer.data!!.order(ByteOrder.nativeOrder())
     }
 
-    fun setRenderTimeLimitMs(renderTimeLimitMs: Long) {
-        this.renderTimeLimitMs = renderTimeLimitMs
-    }
-
     override fun supportsMixedMimeTypeAdaptation(): Int {
         return RendererCapabilities.ADAPTIVE_NOT_SEAMLESS
     }
@@ -166,9 +162,7 @@ abstract class MediaCodecRenderer(
             return supportsFormat(mediaCodecSelector, format)
         } catch (e: DecoderQueryException) {
             throw createRendererException(
-                e,
-                format,
-                PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED
+                e, format, PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED
             )
         }
     }
@@ -216,7 +210,6 @@ abstract class MediaCodecRenderer(
             initBypass(inputFormat)
             return
         }
-
         setCodecDrmSession(sourceDrmSession)
         if (codecDrmSession == null || initMediaCryptoIfDrmSessionReady()) {
             try {
@@ -314,7 +307,6 @@ abstract class MediaCodecRenderer(
                         + offsetUs)
             )
         }
-
         val durationUs = streamEndPositionUs
         val streamFlags: Int = stream!!.flags
         if (outputStreamInfo.streamOffsetUs == C.TIME_UNSET) {
@@ -474,11 +466,7 @@ abstract class MediaCodecRenderer(
 
             Renderer.MSG_SET_CODEC_PARAMETERS -> if (Build.VERSION.SDK_INT >= 29) {
                 activeCodecParameters = message as CodecParameters
-
-                val codec = this.codec
-                if (codec != null) {
-                    codec.setParameters(activeCodecParameters.toBundle())
-                }
+                codec?.setParameters(activeCodecParameters.toBundle())
             }
 
             Renderer.MSG_SET_SUBSCRIBED_CODEC_PARAMETER_KEYS -> if (Build.VERSION.SDK_INT >= 29) {
@@ -543,7 +531,7 @@ abstract class MediaCodecRenderer(
             if (isMediaCodecException(e)) {
                 onCodecError(e)
                 val isRecoverable =
-                    (e is CodecException) && e.isRecoverable()
+                    (e is CodecException) && e.isRecoverable
                 if (isRecoverable) {
                     releaseCodec()
                 }
