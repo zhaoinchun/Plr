@@ -110,7 +110,7 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
             dataSource = getUdpDataSource()
         } else if (SCHEME_DATA == scheme) {
             dataSource = getDataSchemeDataSource()
-        } else if (SCHEME_RAW == scheme || SCHEME_ANDROID_RESOURCE == scheme) {
+        } else if (SCHEME_ANDROID_RESOURCE == scheme) {
             dataSource = getRawResourceDataSource()
         } else {
             dataSource = baseDataSource
@@ -230,7 +230,6 @@ class DefaultDataSource(context: Context, baseDataSource: DataSource?) :
         private const val SCHEME_RTMP = "rtmp"
         private const val SCHEME_UDP = "udp"
         private val SCHEME_DATA: String = DataSchemeDataSource.SCHEME_DATA
-        private val SCHEME_RAW: String = ContentResolver.SCHEME_ANDROID_RESOURCE
         private val SCHEME_ANDROID_RESOURCE = ContentResolver.SCHEME_ANDROID_RESOURCE
     }
 }

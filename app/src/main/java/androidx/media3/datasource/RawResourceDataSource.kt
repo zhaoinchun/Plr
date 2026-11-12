@@ -17,11 +17,11 @@ import java.io.IOException
 import java.io.InputStream
 import kotlin.math.min
 
-class RawResourceDataSource(context: Context) : BaseDataSource( false) {
+class RawResourceDataSource(context: Context) : BaseDataSource(false) {
     class RawResourceDataSourceException : DataSourceException {
         @Deprecated("Use {@link #RawResourceDataSourceException(String, Throwable, int)}.")
         constructor(message: String?) : super(
-            message,  
+            message,
             null,
             PlaybackException.ERROR_CODE_IO_UNSPECIFIED
         )
@@ -29,7 +29,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
         constructor(
             message: String?,
             cause: Throwable?,
-             errorCode:  Int
+            errorCode: Int
         ) : super(message, cause, errorCode)
     }
 
@@ -58,8 +58,8 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             if (assetFileDescriptorLength != AssetFileDescriptor.UNKNOWN_LENGTH
                 && dataSpec.position > assetFileDescriptorLength
             ) {
-                throw RawResourceDataSourceException( 
-                    null,  
+                throw RawResourceDataSourceException(
+                    null,
                     null,
                     PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
                 )
@@ -71,8 +71,8 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             if (skipped != dataSpec.position) {
                 // We expect the skip to be satisfied in full. If it isn't then we're probably trying to
                 // read beyond the end of the last resource in the file.
-                throw RawResourceDataSourceException( 
-                    null,  
+                throw RawResourceDataSourceException(
+                    null,
                     null,
                     PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
                 )
@@ -87,8 +87,8 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
                     bytesRemaining = channel.size() - channel.position()
                     if (bytesRemaining < 0) {
                         // The skip above was satisfied in full, but skipped beyond the end of the file.
-                        throw RawResourceDataSourceException( 
-                            null,  
+                        throw RawResourceDataSourceException(
+                            null,
                             null,
                             PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE
                         )
@@ -103,7 +103,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
         } catch (e: RawResourceDataSourceException) {
             throw e
         } catch (e: IOException) {
-            throw RawResourceDataSourceException( 
+            throw RawResourceDataSourceException(
                 null, e, PlaybackException.ERROR_CODE_IO_UNSPECIFIED
             )
         }
@@ -119,6 +119,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
         transferStarted(dataSpec)
         return if (dataSpec.length != C.LENGTH_UNSET.toLong()) dataSpec.length else bytesRemaining
     }
+
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         if (length == 0) {
             return 0
@@ -135,7 +136,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
                 ).toInt()
             bytesRead = inputStream!!.read(buffer, offset, bytesToRead)
         } catch (e: IOException) {
-            throw RawResourceDataSourceException( 
+            throw RawResourceDataSourceException(
                 null, e, PlaybackException.ERROR_CODE_IO_UNSPECIFIED
             )
         }
@@ -160,6 +161,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
 
     override val uri: Uri?
         get() = dataSpec?.uri
+
     override fun close() {
         dataSpec = null
         try {
@@ -167,7 +169,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
                 inputStream!!.close()
             }
         } catch (e: IOException) {
-            throw RawResourceDataSourceException( 
+            throw RawResourceDataSourceException(
                 null, e, PlaybackException.ERROR_CODE_IO_UNSPECIFIED
             )
         } finally {
@@ -177,7 +179,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
                     assetFileDescriptor!!.close()
                 }
             } catch (e: IOException) {
-                throw RawResourceDataSourceException( 
+                throw RawResourceDataSourceException(
                     null, e, PlaybackException.ERROR_CODE_IO_UNSPECIFIED
                 )
             } finally {
@@ -198,20 +200,8 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             val normalizedUri = dataSpec.uri.normalizeScheme()
             val resources: Resources
             val resourceId: Int
-            if (TextUtils.equals(ContentResolver.SCHEME_ANDROID_RESOURCE, normalizedUri.getScheme())) {
-                resources = applicationContext.getResources()
-                val pathSegments = normalizedUri.getPathSegments()
-                if (pathSegments.size == 1) {
-                    resourceId = Companion.parseResourceId(pathSegments[0]!!)
-                } else {
-                    throw RawResourceDataSourceException(
-                        (ContentResolver.SCHEME_ANDROID_RESOURCE
-                                + ":// URI must have exactly one path element, found "
-                                + pathSegments.size)
-                    )
-                }
-            } else if (TextUtils.equals(
-                    ContentResolver.SCHEME_ANDROID_RESOURCE, normalizedUri.getScheme()
+            if (TextUtils.equals(
+                    ContentResolver.SCHEME_ANDROID_RESOURCE, normalizedUri.scheme
                 )
             ) {
                 var path = normalizedUri.path!!
@@ -246,13 +236,13 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
                     // The javadoc of this class already discourages the URI form that requires this API call.
                     @SuppressLint("DiscouragedApi") val resourceIdFromName =
                         resources.getIdentifier(
-                            packageName + ":" + path,  "raw",  null
+                            packageName + ":" + path, "raw", null
                         )
                     if (resourceIdFromName != 0) {
                         resourceId = resourceIdFromName
                     } else {
                         throw RawResourceDataSourceException(
-                            "Resource not found.",  
+                            "Resource not found.",
                             null,
                             PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND
                         )
@@ -264,7 +254,7 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
                             + normalizedUri.getScheme()
                             + "). Only "
                             + ContentResolver.SCHEME_ANDROID_RESOURCE
-                            + " is supported."),  
+                            + " is supported."),
                     null,
                     PlaybackException.ERROR_CODE_FAILED_RUNTIME_CHECK
                 )
@@ -274,26 +264,27 @@ class RawResourceDataSource(context: Context) : BaseDataSource( false) {
             try {
                 assetFileDescriptor = resources.openRawResourceFd(resourceId)
             } catch (e: Resources.NotFoundException) {
-                throw RawResourceDataSourceException( 
+                throw RawResourceDataSourceException(
                     null, e, PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND
                 )
             }
 
             if (assetFileDescriptor == null) {
                 throw RawResourceDataSourceException(
-                    "Resource is compressed: " + normalizedUri,  
+                    "Resource is compressed: " + normalizedUri,
                     null,
                     PlaybackException.ERROR_CODE_IO_UNSPECIFIED
                 )
             }
             return assetFileDescriptor
         }
+
         private fun parseResourceId(resourceId: String): Int {
             try {
                 return resourceId.toInt()
             } catch (e: NumberFormatException) {
                 throw RawResourceDataSourceException(
-                    "Resource identifier must be an integer.",  
+                    "Resource identifier must be an integer.",
                     null,
                     PlaybackException.ERROR_CODE_FAILED_RUNTIME_CHECK
                 )
