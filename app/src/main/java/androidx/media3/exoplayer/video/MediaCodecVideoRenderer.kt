@@ -50,14 +50,11 @@ import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.ScrubbingModeParameters
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
-import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter.Configuration
-import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter.Factory
 import androidx.media3.exoplayer.mediacodec.MediaCodecDecoderException
 import androidx.media3.exoplayer.mediacodec.MediaCodecInfo
 import androidx.media3.exoplayer.mediacodec.MediaCodecRenderer
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
-import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.DecoderQueryException
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getAlternativeDecoderInfos
 import androidx.media3.exoplayer.mediacodec.MediaCodecUtil.getDecoderInfosSoftMatch
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
@@ -76,7 +73,8 @@ import kotlin.math.min
 
 class MediaCodecVideoRenderer(
     val context: Context,
-    var codecAdapterFactory: MediaCodecAdapter.Factory = Factory.getDefault(context),
+    var codecAdapterFactory: MediaCodecAdapter.Factory =
+        MediaCodecAdapter.Factory.getDefault(context),
     var mediaCodecSelector: MediaCodecSelector = MediaCodecSelector.DEFAULT,
     var enableDecoderFallback: Boolean = false,
     var assumedMinimumCodecOperatingRate: Float = 0f,
@@ -95,13 +93,13 @@ class MediaCodecVideoRenderer(
     private val ownsVideoSink: Boolean get() = videoSink == null
     private val eventDispatcher: VideoRendererEventListener.EventDispatcher =
         VideoRendererEventListener.EventDispatcher(eventHandler, eventListener)
-
+    override val name: String = TAG
     private val deviceNeedsNoPostProcessWorkaround: Boolean = deviceNeedsNoPostProcessWorkaround()
     private val videoFrameReleaseInfo = FrameReleaseInfo()
     private val frameRateEstimator: FixedFrameRateEstimator =
-        FixedFrameRateEstimator(FixedFrameRateEstimator.Listener { frameRate: Float ->
+        FixedFrameRateEstimator { frameRate: Float ->
             this.onFrameRateEstimateChanged(frameRate)
-        })
+        }
     var parseAv1SampleDependencies = true
         set(value) {
             field = value
@@ -110,35 +108,28 @@ class MediaCodecVideoRenderer(
     private var av1SampleDependencyParser: Av1SampleDependencyParser? = null
     private val minEarlyUsToDropDecoderInput: Long
     private val videoFrameReleaseEarlyTimeForecaster: VideoFrameReleaseEarlyTimeForecaster?
-    private val discardedDecoderInputBufferTimestamps: PriorityQueue<Long?> = PriorityQueue<Long?>()
-
+    private val discardedDecoderInputBufferTimestamps: PriorityQueue<Long> = PriorityQueue<Long>()
     private var codecMaxValues: CodecMaxValues? = null
     private var codecNeedsSetOutputSurfaceWorkaround = false
     private var codecNeedsStripNonHdr10PlusT35Workaround = false
     private var codecHandlesHdr10PlusOutOfBandMetadata = false
     private var isApplyingContainerHagcMetadata = false
     private var hasSetVideoSink = false
-    private var nextVideoSinkFirstFrameReleaseInstruction:  Int = 0
-    private var videoEffects: List<Effect>? =
-        null// TODO(b/260702159) Consider renaming the method to getOutputSurface().
-
+    private var nextVideoSinkFirstFrameReleaseInstruction: Int = 0
+    private var videoEffects: List<Effect>? = null
     var buildCalled = false
     var maxDroppedFramesToNotify = 0
     var videoSink: VideoSink? = null
     private var enableMediaCodecBufferDecodeOnlyFlag = false
     var enableDurationToProgressUs = false
     var earlySchedulingThresholdUs: Long = DEFAULT_EARLY_SCHEDULING_THRESHOLD_US
-
-    protected var surface: Surface? = null
+    var surface: Surface? = null
         private set
     private var placeholderSurface: PlaceholderSurface? = null
     private var outputResolution: Size = Size.UNKNOWN
     private var haveReportedFirstFrameRenderedForCurrentSurface = false
-
-    
-    private var scalingMode:  Int = C.VIDEO_SCALING_MODE_DEFAULT
-
-    private var changeFrameRateStrategy:  Int =
+    private var scalingMode: Int = C.VIDEO_SCALING_MODE_DEFAULT
+    private var changeFrameRateStrategy: Int =
         C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
     private var droppedFrameAccumulationStartTimeMs: Long = 0
     private var droppedFrames = 0
@@ -153,14 +144,12 @@ class MediaCodecVideoRenderer(
     private var decodedVideoSize: VideoSize = VideoSize.UNKNOWN
     private var reportedVideoSize: VideoSize? = null
     private var rendererPriority: Int = C.PRIORITY_PLAYBACK
-
     private var tunneling = false
     private var tunnelingAudioSessionId: Int = C.AUDIO_SESSION_ID_UNSET
     private var tunnelingOnFrameRenderedListener: OnFrameRenderedListener? = null
     private var frameMetadataListener: VideoFrameMetadataListener? = null
     private var startPositionUs: Long = C.TIME_UNSET
     private var pendingVideoSinkInputStreamChange = false
-
     private var consecutiveDroppedInputBufferCount = 0
     private var nextOutputBufferToProcessPresentationTimeUs: Long = C.TIME_UNSET
     private val videoFrameReleaseControl =
@@ -193,7 +182,6 @@ class MediaCodecVideoRenderer(
         return shouldDropOutputBuffer(earlyUs, elapsedRealtimeUs, isLastFrame)
     }
 
-    
     override fun shouldIgnoreFrame(
         earlyUs: Long,
         positionUs: Long,
@@ -211,17 +199,13 @@ class MediaCodecVideoRenderer(
                 && maybeDropBuffersToKeyframe(positionUs, treatDroppedBuffersAsSkipped)
     }
 
-    override val name: String = TAG
-
-    
     override fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector,
         format: Format
-    ):  Int {
+    ): Int {
         return supportsFormatInternal(context, mediaCodecSelector, format)
     }
 
-    
     override fun getDecoderInfos(
         mediaCodecSelector: MediaCodecSelector, format: Format, requiresSecureDecoder: Boolean
     ): List<MediaCodecInfo> {
@@ -237,16 +221,12 @@ class MediaCodecVideoRenderer(
         fun doesDisplaySupportDolbyVision(context: Context): Boolean {
             val displayManager =
                 context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager?
-            val display =
-                if (displayManager != null) displayManager.getDisplay(Display.DEFAULT_DISPLAY) else null
-            if (display == null || !display.isHdr()) {
+            val display = displayManager?.getDisplay(Display.DEFAULT_DISPLAY)
+            if (display == null || !display.isHdr) {
                 return false
             }
-            val hdrCapabilities = display.getHdrCapabilities()
-            if (hdrCapabilities == null) {
-                return false
-            }
-            for (hdrType in hdrCapabilities.getSupportedHdrTypes()) {
+            val hdrCapabilities = display.hdrCapabilities ?: return false
+            for (hdrType in hdrCapabilities.supportedHdrTypes) {
                 if (hdrType == HdrCapabilities.HDR_TYPE_DOLBY_VISION) {
                     return true
                 }
@@ -259,7 +239,6 @@ class MediaCodecVideoRenderer(
         super.onInit()
     }
 
-    
     protected override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         super.onEnabled(joining, mayRenderStartOfStream)
         val tunneling = getConfiguration().tunneling
@@ -308,9 +287,7 @@ class MediaCodecVideoRenderer(
             object : VideoSink.Listener {
                 override fun onFrameAvailableForRendering() {
                     val wakeupListener = wakeupListener
-                    if (wakeupListener != null) {
-                        wakeupListener.onWakeup()
-                    }
+                    wakeupListener?.onWakeup()
                 }
 
                 override fun onFirstFrameRendered() {
@@ -328,9 +305,6 @@ class MediaCodecVideoRenderer(
                 }
 
                 override fun onVideoSizeChanged(videoSize: VideoSize) {
-                    // TODO: b/292111083 - Report video size change to app. Video size reporting is
-                    //  removed at the moment to ensure the first frame is rendered, and the video is
-                    //  rendered after switching on/off the screen.
                 }
 
                 override fun onError(videoSinkException: VideoSinkException) {
@@ -349,7 +323,7 @@ class MediaCodecVideoRenderer(
         if (frameMetadataListener != null) {
             videoSink!!.setVideoFrameMetadataListener(frameMetadataListener)
         }
-        if (this.surface != null && !outputResolution.equals(Size.UNKNOWN)) {
+        if (this.surface != null && outputResolution != Size.UNKNOWN) {
             videoSink!!.setOutputSurfaceInfo(this.surface!!, outputResolution)
         }
         videoSink!!.setChangeFrameRateStrategy(changeFrameRateStrategy)
@@ -362,7 +336,6 @@ class MediaCodecVideoRenderer(
     protected fun createPlaybackVideoGraphWrapper(
         context: Context, videoFrameReleaseControl: VideoFrameReleaseControl
     ): PlaybackVideoGraphWrapper {
-        // TODO: b/391109644 - Add a more explicit API to enable replaying.
         return PlaybackVideoGraphWrapper(context, videoFrameReleaseControl).apply {
             enablePlaylistMode = true
             lateThresholdToDropInputUs = if (minEarlyUsToDropDecoderInput != C.TIME_UNSET)
@@ -389,7 +362,6 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    
     protected override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -397,12 +369,9 @@ class MediaCodecVideoRenderer(
         mediaPeriodId: MediaPeriodId
     ) {
         super.onStreamChanged(formats, startPositionUs, offsetUs, mediaPeriodId)
-        if (videoFrameReleaseEarlyTimeForecaster != null) {
-            videoFrameReleaseEarlyTimeForecaster.reset()
-        }
+        videoFrameReleaseEarlyTimeForecaster?.reset()
     }
 
-    
     protected override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -420,9 +389,7 @@ class MediaCodecVideoRenderer(
         if (videoSink == null) {
             videoFrameReleaseControl.reset()
         }
-        if (videoFrameReleaseEarlyTimeForecaster != null) {
-            videoFrameReleaseEarlyTimeForecaster.reset()
-        }
+        videoFrameReleaseEarlyTimeForecaster?.reset()
         if (joining) {
             // Don't render next frame immediately to let the codec catch up with the playback position
             // first. This prevents a stuttering effect caused by showing the first frame and then
@@ -495,9 +462,7 @@ class MediaCodecVideoRenderer(
         } else {
             videoFrameReleaseControl.onStopped()
         }
-        if (videoFrameReleaseEarlyTimeForecaster != null) {
-            videoFrameReleaseEarlyTimeForecaster.reset()
-        }
+        videoFrameReleaseEarlyTimeForecaster?.reset()
         super.onStopped()
     }
 
@@ -535,16 +500,13 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    
-    override fun handleMessage(messageType:  Int, message: Any?) {
+    override fun handleMessage(messageType: Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VIDEO_OUTPUT -> setOutput(message)
             Renderer.MSG_SET_SCALING_MODE -> {
                 scalingMode = message as Int
                 val codec = codec
-                if (codec != null) {
-                    codec.setVideoScalingMode(scalingMode)
-                }
+                codec?.setVideoScalingMode(scalingMode)
             }
 
             Renderer.MSG_SET_CHANGE_FRAME_RATE_STRATEGY -> {
@@ -620,10 +582,9 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    
     private fun setOutput(output: Any?) {
         // Handle unsupported (i.e., non-Surface) outputs by clearing the display surface.
-        val displaySurface = if (output is Surface) output else null
+        val displaySurface = output as? Surface
 
         if (this.surface !== displaySurface) {
             this.surface = displaySurface
@@ -632,7 +593,7 @@ class MediaCodecVideoRenderer(
             }
             haveReportedFirstFrameRenderedForCurrentSurface = false
 
-            val state:  Int = state
+            val state: Int = state
             val codec = codec
             var surfaceReplacedSeamlessly = false
             if (codec != null) {
@@ -704,7 +665,7 @@ class MediaCodecVideoRenderer(
             )
         val codecSurface = getSurfaceForCodec(codecInfo)
         maybeSetKeyAllowFrameDrop(mediaFormat)
-        return Configuration.createForVideoDecoding(
+        return MediaCodecAdapter.Configuration.createForVideoDecoding(
             codecInfo, mediaFormat, format, codecSurface, crypto
         )
     }
@@ -724,7 +685,7 @@ class MediaCodecVideoRenderer(
     ): DecoderReuseEvaluation {
         val evaluation = codecInfo.canReuseCodec(oldFormat, newFormat)
 
-        var discardReasons:  Int = evaluation.discardReasons
+        var discardReasons: Int = evaluation.discardReasons
         val codecMaxValues: CodecMaxValues = this.codecMaxValues!!
         if (newFormat.width > codecMaxValues.width || newFormat.height > codecMaxValues.height) {
             discardReasons =
@@ -752,7 +713,7 @@ class MediaCodecVideoRenderer(
     }
 
     @CallSuper
-    
+
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (videoSink != null) {
             try {
@@ -778,7 +739,6 @@ class MediaCodecVideoRenderer(
         av1SampleDependencyParser?.reset()
     }
 
-    
     override fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
         super.setPlaybackSpeed(currentPlaybackSpeed, targetPlaybackSpeed)
         if (videoSink != null) {
@@ -786,9 +746,7 @@ class MediaCodecVideoRenderer(
         } else {
             videoFrameReleaseControl.setPlaybackSpeed(currentPlaybackSpeed)
         }
-        if (videoFrameReleaseEarlyTimeForecaster != null) {
-            videoFrameReleaseEarlyTimeForecaster.setPlaybackSpeed(currentPlaybackSpeed)
-        }
+        videoFrameReleaseEarlyTimeForecaster?.setPlaybackSpeed(currentPlaybackSpeed)
     }
 
     override fun getDurationToProgressUs(
@@ -821,7 +779,7 @@ class MediaCodecVideoRenderer(
         }
 
         try {
-            val frameReleaseAction:  Int =
+            val frameReleaseAction: Int =
                 videoFrameReleaseControl.getFrameReleaseAction(
                     nextOutputBufferToProcessPresentationTimeUs,
                     positionUs,
@@ -889,7 +847,7 @@ class MediaCodecVideoRenderer(
     }
 
     @CallSuper
-    
+
     override fun maybeInitializeProcessingPipeline(format: Format): Boolean {
         if (videoSink != null && !videoSink!!.isInitialized) {
             try {
@@ -975,7 +933,6 @@ class MediaCodecVideoRenderer(
                 || lastBufferInStreamPresentationTimeUs != C.TIME_UNSET
     }
 
-    
     override fun onInputFormatChanged(formatHolder: FormatHolder): DecoderReuseEvaluation? {
         val evaluation = super.onInputFormatChanged(formatHolder)
         isApplyingContainerHagcMetadata = false
@@ -983,17 +940,12 @@ class MediaCodecVideoRenderer(
             formatHolder.format!!,
             evaluation
         )
-        if (videoFrameReleaseEarlyTimeForecaster != null) {
-            // A change in input format is likely to affect decoding speed, making predictions from
-            // the forecaster invalid.
-            // TODO: b/412588892 - Handle the transition when input and output format are different.
-            videoFrameReleaseEarlyTimeForecaster.reset()
-        }
+        videoFrameReleaseEarlyTimeForecaster?.reset()
         return evaluation
     }
 
     @CallSuper
-    
+
     override fun onQueueInputBuffer(buffer: DecoderInputBuffer) {
         val mimeType = codecInfo!!.mimeType
         val av1SampleDependencyParser = av1SampleDependencyParser
@@ -1111,8 +1063,6 @@ class MediaCodecVideoRenderer(
         if (hasReadStreamToEnd() || buffer.isLastSample) {
             return true
         }
-        // TODO: b/352276461 - improve buffer.isLastSample() logic.
-        // This is a temporary workaround: do not skip buffers close to the period end.
         if (streamEndPositionUs == C.TIME_UNSET) {
             // Duration unknown: probably last sample.
             return true
@@ -1128,10 +1078,7 @@ class MediaCodecVideoRenderer(
 
     override fun onOutputFormatChanged(format: Format, mediaFormat: MediaFormat?) {
         val codec = codec
-        if (codec != null) {
-            // Must be applied each time the output format changes.
-            codec.setVideoScalingMode(scalingMode)
-        }
+        codec?.setVideoScalingMode(scalingMode)
         var width: Int
         var height: Int
         var pixelWidthHeightRatio: Float
@@ -1197,9 +1144,9 @@ class MediaCodecVideoRenderer(
 
     protected fun changeVideoSinkInputStream(
         videoSink: VideoSink,
-        inputType:  Int,
+        inputType: Int,
         format: Format,
-        firstFrameReleaseInstruction:  Int
+        firstFrameReleaseInstruction: Int
     ) {
         val videoEffectsToApply =
             (if (videoEffects != null) videoEffects else listOf())!!
@@ -1214,7 +1161,6 @@ class MediaCodecVideoRenderer(
 
     // codecHandlesHdr10PlusOutOfBandMetadata is false if SDK_INT < 29
     @TargetApi(29)
-    
     override fun handleInputBufferSupplementalData(buffer: DecoderInputBuffer) {
         if (buffer.supplementalData == null) {
             return
@@ -1260,7 +1206,6 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    
     override fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -1283,7 +1228,7 @@ class MediaCodecVideoRenderer(
         if (videoSink != null) {
             // Skip decode-only buffers, e.g. after seeking, immediately.
             if (isDecodeOnlyBuffer && !isLastBuffer) {
-                skipOutputBuffer(codec!!, bufferIndex, presentationTimeUs)
+                skipOutputBuffer(codec, bufferIndex, presentationTimeUs)
                 return true
             }
             return videoSink!!.handleInputFrame(
@@ -1291,7 +1236,7 @@ class MediaCodecVideoRenderer(
                 object : VideoFrameHandler {
                     override fun render(renderTimestampNs: Long) {
                         renderOutputBuffer(
-                            codec!!,
+                            codec,
                             bufferIndex,
                             presentationTimeUs,
                             renderTimestampNs
@@ -1299,12 +1244,12 @@ class MediaCodecVideoRenderer(
                     }
 
                     override fun skip() {
-                        dropOutputBuffer(codec!!, bufferIndex, presentationTimeUs)
+                        dropOutputBuffer(codec, bufferIndex, presentationTimeUs)
                     }
                 })
         }
 
-        val frameReleaseAction:  Int =
+        val frameReleaseAction: Int =
             videoFrameReleaseControl.getFrameReleaseAction(
                 bufferPresentationTimeUs,
                 positionUs,
@@ -1341,19 +1286,19 @@ class MediaCodecVideoRenderer(
             VideoFrameReleaseControl.FRAME_RELEASE_IMMEDIATELY -> {
                 val releaseTimeNs = getClock().nanoTime()
                 notifyFrameMetadataListener(presentationTimeUs, releaseTimeNs, format)
-                renderOutputBuffer(codec!!, bufferIndex, presentationTimeUs, releaseTimeNs)
+                renderOutputBuffer(codec, bufferIndex, presentationTimeUs, releaseTimeNs)
                 updateVideoFrameProcessingOffsetCounters(videoFrameReleaseInfo.earlyUs)
                 return true
             }
 
             VideoFrameReleaseControl.FRAME_RELEASE_SKIP -> {
-                skipOutputBuffer(codec!!, bufferIndex, presentationTimeUs)
+                skipOutputBuffer(codec, bufferIndex, presentationTimeUs)
                 updateVideoFrameProcessingOffsetCounters(videoFrameReleaseInfo.earlyUs)
                 return true
             }
 
             VideoFrameReleaseControl.FRAME_RELEASE_DROP -> {
-                dropOutputBuffer(codec!!, bufferIndex, presentationTimeUs)
+                dropOutputBuffer(codec, bufferIndex, presentationTimeUs)
                 updateVideoFrameProcessingOffsetCounters(videoFrameReleaseInfo.earlyUs)
                 return true
             }
@@ -1361,7 +1306,7 @@ class MediaCodecVideoRenderer(
             VideoFrameReleaseControl.FRAME_RELEASE_TRY_AGAIN_LATER, VideoFrameReleaseControl.FRAME_RELEASE_IGNORE -> return false
             VideoFrameReleaseControl.FRAME_RELEASE_SCHEDULED -> {
                 releaseFrame(
-                    codec!!,
+                    codec,
                     bufferIndex,
                     presentationTimeUs,
                     format
@@ -1385,7 +1330,6 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    // TODO: b/417646815 - Remove this workaround method once it's no longer needed.
     protected fun experimentalDisableAdvancingTimestampChecksInVideoFrameReleaseControl() {
         videoFrameReleaseControl.experimentalDisableAdvancingTimestampChecks()
     }
@@ -1422,7 +1366,6 @@ class MediaCodecVideoRenderer(
         }
     }
 
-    
     protected fun onProcessedTunneledBuffer(presentationTimeUs: Long) {
         updateOutputFormatForTime(presentationTimeUs)
         maybeNotifyVideoSizeChanged(decodedVideoSize)
@@ -1498,7 +1441,6 @@ class MediaCodecVideoRenderer(
         )
     }
 
-    
     protected fun maybeDropBuffersToKeyframe(
         positionUs: Long, treatDroppedBuffersAsSkipped: Boolean
     ): Boolean {
@@ -1510,7 +1452,7 @@ class MediaCodecVideoRenderer(
         // We dropped some buffers to catch up, so update the decoder counters and flush the codec,
         // which releases all pending buffers buffers including the current output buffer.
         if (DEBUG_LOG_ENABLED) {
-            d(DEBUG_LOG_TAG, "video, discard input to keyframe, count=" + droppedSourceBufferCount)
+            d(DEBUG_LOG_TAG, "video, discard input to keyframe, count=$droppedSourceBufferCount")
         }
         var droppedInQueue = 0
         var skippedInQueue = 0
@@ -1606,7 +1548,7 @@ class MediaCodecVideoRenderer(
     }
 
     private fun hasSurfaceForCodec(codecInfo: MediaCodecInfo): Boolean {
-        return videoSink != null || (this.surface != null && surface!!.isValid())
+        return videoSink != null || (this.surface != null && surface!!.isValid)
                 || shouldUseDetachedSurface(codecInfo)
                 || shouldUsePlaceholderSurface(codecInfo)
     }
@@ -1670,11 +1612,7 @@ class MediaCodecVideoRenderer(
     }
 
     private fun updateCodecImportance() {
-        val codec = codec
-        if (codec == null) {
-            // If codec is null, then the importance will be set when initializing the codec.
-            return
-        }
+        val codec = codec ?: return
         if (Build.VERSION.SDK_INT >= 35) {
             val codecParameters = Bundle()
             codecParameters.putInt(MediaFormat.KEY_IMPORTANCE, max(0, -rendererPriority))
@@ -1742,7 +1680,7 @@ class MediaCodecVideoRenderer(
             throw IllegalStateException()
         }
         if (DEBUG_LOG_ENABLED) {
-            d(DEBUG_LOG_TAG, "video, codec surface=" + surface)
+            d(DEBUG_LOG_TAG, "video, codec surface=$surface")
         }
     }
 
@@ -1884,19 +1822,6 @@ class MediaCodecVideoRenderer(
         return MediaCodecVideoDecoderException(cause, codecInfo, this.surface)
     }
 
-    /*
-   * TODO:
-   *
-   * 1. Validate that Android device certification now ensures correct behavior, and add a
-   *    corresponding SDK_INT upper bound for applying the workaround (probably SDK_INT < 26).
-   * 2. Determine a complete list of affected devices.
-   * 3. Some of the devices in this list only fail to support setOutputSurface when switching from
-   *    a SurfaceView provided Surface to a Surface of another type (e.g. TextureView/DummySurface),
-   *    and vice versa. One hypothesis is that setOutputSurface fails when the surfaces have
-   *    different pixel formats. If we can find a way to query the Surface instances to determine
-   *    whether this case applies, then we'll be able to provide a more targeted workaround.
-   */
-
     protected fun codecNeedsSetOutputSurfaceWorkaround(name: String): Boolean {
         if (name.startsWith("OMX.google")) {
             // Google OMX decoders are not known to have this issue on any API level.
@@ -2018,52 +1943,37 @@ class MediaCodecVideoRenderer(
     companion object {
         const val DEFAULT_LATE_THRESHOLD_TO_DROP_DECODER_INPUT_US: Long = 15000
         private const val HANDLE_FRAME_RENDERED = 0
-
         private const val TAG = "MediaCodecVideoRenderer"
         private const val KEY_CROP_LEFT = "crop-left"
         private const val KEY_CROP_RIGHT = "crop-right"
         private const val KEY_CROP_BOTTOM = "crop-bottom"
         private const val KEY_CROP_TOP = "crop-top"
-
-        // TODO: b/388762778 - Replace with MediaFormat.KEY_HDR_ST2094_50_INFO once compile SDK is 37.
         private const val KEY_HDR_ST2094_50_INFO = "hdr-st2094-50-info"
 
         // Long edge length in pixels for standard video formats, in decreasing in order.
         private val STANDARD_LONG_EDGE_VIDEO_PX =
             intArrayOf(1920, 1600, 1440, 1280, 960, 854, 640, 540, 480)
-
         private const val INITIAL_FORMAT_MAX_INPUT_SIZE_SCALE_FACTOR = 1.5f
-
         private val TUNNELING_EOS_PRESENTATION_TIME_US = Long.MAX_VALUE
-
         private val HEVC_MAX_INPUT_SIZE_THRESHOLD = 2 * 1024 * 1024
-
         private val MIN_EARLY_US_LATE_THRESHOLD = -30000L
-
         private val MIN_EARLY_US_VERY_LATE_THRESHOLD = -500000L
-
         private const val OFFSET_FROM_PERIOD_END_TO_TREAT_AS_LAST_US = 100000L
-
         private const val MAX_CONSECUTIVE_DROPPED_INPUT_BUFFERS_COUNT_TO_DISCARD_HEADER = 0
-
         private const val MAX_FRAME_RATE_RATIO_DIFF_TO_KEEP_CODEC = 0.01f
-
         const val DEFAULT_EARLY_SCHEDULING_THRESHOLD_US: Long = 50000
-
         private var evaluatedDeviceNeedsSetOutputSurfaceWorkaround = false
         private var deviceNeedsSetOutputSurfaceWorkaround = false
 
-        
         fun supportsFormat(
             context: Context, mediaCodecSelector: MediaCodecSelector, format: Format
-        ):  Int {
+        ): Int {
             return supportsFormatInternal(context, mediaCodecSelector, format)
         }
 
-        
         private fun supportsFormatInternal(
             context: Context, mediaCodecSelector: MediaCodecSelector, format: Format
-        ):  Int {
+        ): Int {
             val mimeType = format.sampleMimeType
             if (!isVideo(mimeType)) {
                 return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
@@ -2113,7 +2023,7 @@ class MediaCodecVideoRenderer(
                     }
                 }
             }
-             val formatSupport:  Int =
+            val formatSupport: Int =
                 if (isFormatSupported) C.FORMAT_HANDLED else C.FORMAT_EXCEEDS_CAPABILITIES
             val adaptiveSupport: Int =
                 if (decoderInfo.isSeamlessAdaptationSupported(format))
@@ -2125,7 +2035,7 @@ class MediaCodecVideoRenderer(
                     RendererCapabilities.HARDWARE_ACCELERATION_SUPPORTED
                 else
                     RendererCapabilities.HARDWARE_ACCELERATION_NOT_SUPPORTED
-            var decoderSupport:  Int =
+            var decoderSupport: Int =
                 if (isPreferredDecoder) RendererCapabilities.DECODER_SUPPORT_PRIMARY else RendererCapabilities.DECODER_SUPPORT_FALLBACK
 
             if (Build.VERSION.SDK_INT >= 26 && MimeTypes.VIDEO_DOLBY_VISION == format.sampleMimeType
@@ -2134,7 +2044,7 @@ class MediaCodecVideoRenderer(
                 decoderSupport = RendererCapabilities.DECODER_SUPPORT_FALLBACK_MIMETYPE
             }
 
-            var tunnelingSupport:  Int =
+            var tunnelingSupport: Int =
                 RendererCapabilities.TUNNELING_NOT_SUPPORTED
             if (isFormatSupported) {
                 val tunnelingDecoderInfos: List<MediaCodecInfo> =
@@ -2169,7 +2079,6 @@ class MediaCodecVideoRenderer(
 
         // Other methods
 
-        
         private fun getDecoderInfos(
             context: Context,
             mediaCodecSelector: MediaCodecSelector,
@@ -2336,7 +2245,7 @@ class MediaCodecVideoRenderer(
         }
 
         private fun debugLogForBufferRelease(
-            frameReleaseAction:  Int,
+            frameReleaseAction: Int,
             bufferPresentationTimeUs: Long,
             positionUs: Long,
             isDecodeOnlyBuffer: Boolean,
@@ -2388,12 +2297,6 @@ class MediaCodecVideoRenderer(
                 return false
             }
             if (Build.VERSION.SDK_INT <= 28) {
-                // Workaround for MiTV and MiBox devices which have been observed broken up to API 28.
-                // https://github.com/google/ExoPlayer/issues/5169,
-                // https://github.com/google/ExoPlayer/issues/6899.
-                // https://github.com/google/ExoPlayer/issues/8014.
-                // https://github.com/google/ExoPlayer/issues/8329.
-                // https://github.com/google/ExoPlayer/issues/9710.
                 when (Build.DEVICE) {
                     "aquaman", "dangal", "dangalUHD", "dangalFHD", "magnolia", "machuca", "once", "oneday" -> return true
                     else -> {}
@@ -2409,28 +2312,8 @@ class MediaCodecVideoRenderer(
                 else -> {}
             }
             if (Build.VERSION.SDK_INT <= 26) {
-                // In general, devices running API level 27 or later should be unaffected unless observed
-                // otherwise. Enable the workaround on a per-device basis. Works around:
-                // https://github.com/google/ExoPlayer/issues/3236,
-                // https://github.com/google/ExoPlayer/issues/3355,
-                // https://github.com/google/ExoPlayer/issues/3439,
-                // https://github.com/google/ExoPlayer/issues/3724,
-                // https://github.com/google/ExoPlayer/issues/3835,
-                // https://github.com/google/ExoPlayer/issues/4006,
-                // https://github.com/google/ExoPlayer/issues/4084,
-                // https://github.com/google/ExoPlayer/issues/4104,
-                // https://github.com/google/ExoPlayer/issues/4134,
-                // https://github.com/google/ExoPlayer/issues/4315,
-                // https://github.com/google/ExoPlayer/issues/4419,
-                // https://github.com/google/ExoPlayer/issues/4460,
-                // https://github.com/google/ExoPlayer/issues/4468,
-                // https://github.com/google/ExoPlayer/issues/5312,
-                // https://github.com/google/ExoPlayer/issues/6503.
-                // https://github.com/google/ExoPlayer/issues/8014,
-                // https://github.com/google/ExoPlayer/pull/8030.
                 when (Build.DEVICE) {
                     "1601", "1713", "1714", "601LV", "602LV", "A10-70F", "A10-70L", "A1601", "A2016a40", "A7000-a", "A7000plus", "A7010a48", "A7020a48", "AquaPowerM", "ASUS_X00AD_2", "Aura_Note_2", "b5", "BLACK-1X", "BRAVIA_ATV2", "BRAVIA_ATV3_4K", "C1", "ComioS1", "CP8676_I02", "CPH1609", "CPH1715", "CPY83_I00", "cv1", "cv3", "deb", "DM-01K", "E5643", "ELUGA_A3_Pro", "ELUGA_Note", "ELUGA_Prim", "ELUGA_Ray_X", "EverStar_S", "F01H", "F01J", "F02H", "F03H", "F04H", "F04J", "F3111", "F3113", "F3116", "F3211", "F3213", "F3215", "F3311", "flo", "fugu", "GiONEE_CBL7513", "GiONEE_GBL7319", "GIONEE_GBL7360", "GIONEE_SWW1609", "GIONEE_SWW1627", "GIONEE_SWW1631", "GIONEE_WBL5708", "GIONEE_WBL7365", "GIONEE_WBL7519", "griffin", "htc_e56ml_dtul", "hwALE-H", "HWBLN-H", "HWCAM-H", "HWVNS-H", "HWWAS-H", "i9031", "iball8735_9806", "Infinix-X572", "iris60", "itel_S41", "j2xlteins", "JGZ", "K50a40", "kate", "l5460", "le_x6", "LS-5017", "M04", "M5c", "manning", "marino_f", "MEIZU_M5", "mh", "mido", "MX6", "namath", "nicklaus_f", "NX541J", "NX573J", "OnePlus5T", "p212", "P681", "P85", "pacificrim", "panell_d", "panell_dl", "panell_ds", "panell_dt", "PB2-670M", "PGN528", "PGN610", "PGN611", "Phantom6", "Pixi4-7_3G", "Pixi5-10_4G", "PLE", "PRO7S", "Q350", "Q4260", "Q427", "Q4310", "Q5", "QM16XE_U", "QX1", "RAIJIN", "santoni", "Slate_Pro", "SVP-DTV15", "s905x018", "taido_row", "TB3-730F", "TB3-730X", "TB3-850F", "TB3-850M", "tcl_eu", "V1", "V23GB", "V5", "vernee_M5", "watson", "whyred", "woods_f", "woods_fn", "X3_HK", "XE2X", "XT1663", "Z12_PRO", "Z80" -> return true
-
                     else -> {}
                 }
                 when (Build.MODEL) {
