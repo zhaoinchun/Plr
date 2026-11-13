@@ -14,6 +14,46 @@ import androidx.media3.decoder.CryptoInfo
 import java.nio.ByteBuffer
 
 interface MediaCodecAdapter {
+    fun dequeueInputBufferIndex(): Int
+    fun dequeueOutputBufferIndex(bufferInfo: MediaCodec.BufferInfo): Int
+    val outputFormat: MediaFormat
+    fun getInputBuffer(index: Int): ByteBuffer?
+    fun useInputBuffer(runnable: Runnable) {
+        runnable.run()
+    }
+
+    fun getOutputBuffer(index: Int): ByteBuffer?
+    fun queueInputBuffer(index: Int, offset: Int, size: Int, presentationTimeUs: Long, flags: Int)
+    fun queueSecureInputBuffer(
+        index: Int, offset: Int, info: CryptoInfo, presentationTimeUs: Long, flags: Int
+    )
+
+    fun releaseOutputBuffer(index: Int, render: Boolean)
+    fun releaseOutputBuffer(index: Int, renderTimeStampNs: Long)
+    fun flush()
+    fun release()
+    fun setOnFrameRenderedListener(listener: OnFrameRenderedListener, handler: Handler)
+    fun registerOnBufferAvailableListener(listener: OnBufferAvailableListener): Boolean {
+        return false
+    }
+
+    fun setOutputSurface(surface: Surface)
+
+    @RequiresApi(35)
+    fun detachOutputSurface()
+    fun setParameters(params: Bundle)
+    fun setVideoScalingMode(scalingMode: Int)
+    fun needsReconfiguration(): Boolean
+
+    @get:RequiresApi(26)
+    val metrics: PersistableBundle
+
+    @RequiresApi(31)
+    fun subscribeToVendorParameters(names: List<String>)
+
+    @RequiresApi(31)
+    fun unsubscribeFromVendorParameters(names: List<String>)
+
     class Configuration private constructor(
         val codecInfo: MediaCodecInfo,
         val mediaFormat: MediaFormat,
@@ -78,44 +118,4 @@ interface MediaCodecAdapter {
         fun onOutputBufferAvailable() {}
     }
 
-    fun dequeueInputBufferIndex(): Int
-    fun dequeueOutputBufferIndex(bufferInfo: MediaCodec.BufferInfo): Int
-    val outputFormat: MediaFormat
-    fun getInputBuffer(index: Int): ByteBuffer?
-    fun useInputBuffer(runnable: Runnable) {
-        runnable.run()
-    }
-
-    fun getOutputBuffer(index: Int): ByteBuffer?
-    fun queueInputBuffer(index: Int, offset: Int, size: Int, presentationTimeUs: Long, flags: Int)
-
-    fun queueSecureInputBuffer(
-        index: Int, offset: Int, info: CryptoInfo, presentationTimeUs: Long, flags: Int
-    )
-
-    fun releaseOutputBuffer(index: Int, render: Boolean)
-    fun releaseOutputBuffer(index: Int, renderTimeStampNs: Long)
-    fun flush()
-    fun release()
-    fun setOnFrameRenderedListener(listener: OnFrameRenderedListener, handler: Handler)
-    fun registerOnBufferAvailableListener(listener: OnBufferAvailableListener): Boolean {
-        return false
-    }
-
-    fun setOutputSurface(surface: Surface)
-
-    @RequiresApi(35)
-    fun detachOutputSurface()
-    fun setParameters(params: Bundle)
-    fun setVideoScalingMode( scalingMode:  Int)
-    fun needsReconfiguration(): Boolean
-
-    @get:RequiresApi(26)
-    val metrics: PersistableBundle
-
-    @RequiresApi(31)
-    fun subscribeToVendorParameters(names: List<String>)
-
-    @RequiresApi(31)
-    fun unsubscribeFromVendorParameters(names: List<String>)
 }
