@@ -101,6 +101,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             null
         )
     }
+
     override fun openSession(): ByteArray {
         return mediaDrm.openSession()
     }
@@ -118,6 +119,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             }
         }
     }
+
     override fun getKeyRequest(
         scope: ByteArray,
         schemeDatas: List<DrmInitData.SchemeData>?,
@@ -136,7 +138,8 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             mimeType = adjustRequestMimeType(uuid, schemeData.mimeType)
         }
         val request =
-            mediaDrm.getKeyRequest(scope, initData, mimeType, keyType,
+            mediaDrm.getKeyRequest(
+                scope, initData, mimeType, keyType,
                 optionalParameters as HashMap<String?, String?>?
             )
 
@@ -165,6 +168,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         }
         return licenseServerUrl
     }
+
     override fun provideKeyResponse(scope: ByteArray, response: ByteArray): ByteArray? {
         var response = response
         if (C.CLEARKEY_UUID == uuid) {
@@ -179,6 +183,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
             val request = mediaDrm.provisionRequest
             return ExoMediaDrm.ProvisionRequest(request.data, request.getDefaultUrl())
         }
+
     override fun provideProvisionResponse(response: ByteArray) {
         mediaDrm.provideProvisionResponse(response)
     }
@@ -272,12 +277,12 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         mediaDrm.setPropertyByteArray(propertyName, value)
     }
 
-    
+
     override fun createCryptoConfig(sessionId: ByteArray): FrameworkCryptoConfig {
         return FrameworkCryptoConfig(adjustUuid(uuid), sessionId)
     }
 
-    override val cryptoType:  Int = C.CRYPTO_TYPE_FRAMEWORK
+    override val cryptoType: Int = C.CRYPTO_TYPE_FRAMEWORK
 
     @get:RequiresApi(31)
     private val isMediaDrmRequiresSecureDecoderImplemented: Boolean
@@ -323,12 +328,12 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
     companion object {
         private const val TAG = "FrameworkMediaDrm"
 
-        val DEFAULT_PROVIDER: ExoMediaDrm.Provider = ExoMediaDrm.Provider { uuid: UUID? ->
+        val DEFAULT_PROVIDER: (uuid: UUID) -> ExoMediaDrm = { uuid: UUID ->
             try {
-                return@Provider Companion.newInstance(uuid!!)
-            } catch (e: UnsupportedDrmException) {
+                newInstance(uuid)
+            } catch (_: UnsupportedDrmException) {
                 e(TAG, "Failed to instantiate a FrameworkMediaDrm for uuid: $uuid.")
-                return@Provider DummyExoMediaDrm()
+                DummyExoMediaDrm()
             }
         }
 
@@ -340,6 +345,7 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         fun isCryptoSchemeSupported(uuid: UUID?): Boolean {
             return MediaDrm.isCryptoSchemeSupported(adjustUuid(uuid)!!)
         }
+
         fun newInstance(uuid: UUID): FrameworkMediaDrm {
             try {
                 return FrameworkMediaDrm(uuid)

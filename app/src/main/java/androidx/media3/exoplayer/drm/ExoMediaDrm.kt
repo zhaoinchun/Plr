@@ -1,31 +1,12 @@
 package androidx.media3.exoplayer.drm
 
-import android.media.DeniedByServerException
-import android.media.MediaCryptoException
 import android.media.MediaDrm
-import android.media.MediaDrmException
-import android.media.NotProvisionedException
 import android.os.PersistableBundle
-import androidx.annotation.IntDef
-import androidx.media3.common.C
 import androidx.media3.common.DrmInitData
 import androidx.media3.decoder.CryptoConfig
 import androidx.media3.exoplayer.analytics.PlayerId
-import java.util.UUID
 
 interface ExoMediaDrm {
-    fun interface Provider {
-        fun acquireExoMediaDrm(uuid: UUID): ExoMediaDrm
-    }
-
-    class AppManagedProvider(private val exoMediaDrm: ExoMediaDrm) :
-        Provider {
-        override fun acquireExoMediaDrm(uuid: UUID): ExoMediaDrm {
-            exoMediaDrm.acquire()
-            return exoMediaDrm
-        }
-    }
-
     interface OnEventListener {
         fun onEvent(
             mediaDrm: ExoMediaDrm,
@@ -109,15 +90,11 @@ interface ExoMediaDrm {
         }
 
     val metrics: PersistableBundle?
-
     fun getPropertyString(propertyName: String): String
     fun getPropertyByteArray(propertyName: String): ByteArray
     fun setPropertyString(propertyName: String, value: String)
     fun setPropertyByteArray(propertyName: String, value: ByteArray)
-
-    
     fun createCryptoConfig(sessionId: ByteArray): CryptoConfig
-
     val cryptoType:  Int
 
     companion object {

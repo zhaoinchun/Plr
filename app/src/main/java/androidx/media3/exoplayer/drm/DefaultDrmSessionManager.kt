@@ -33,7 +33,7 @@ import kotlin.concurrent.Volatile
 
 class DefaultDrmSessionManager(
     private val uuid: UUID = C.WIDEVINE_UUID,
-    private val exoMediaDrmProvider: ExoMediaDrm.Provider = FrameworkMediaDrm.DEFAULT_PROVIDER,
+    private val acquireExoMediaDrm: (uuid: UUID)-> ExoMediaDrm = FrameworkMediaDrm.DEFAULT_PROVIDER,
     private val callback: MediaDrmCallback,
     private val keyRequestParameters: MutableMap<String, String> = HashMap(),
     private val multiSession: Boolean = false,
@@ -85,7 +85,7 @@ class DefaultDrmSessionManager(
             return
         }
         if (exoMediaDrm == null) {
-            exoMediaDrm = exoMediaDrmProvider.acquireExoMediaDrm(uuid)
+            exoMediaDrm = acquireExoMediaDrm(uuid)
             exoMediaDrm!!.setOnEventListener(MediaDrmEventListener())
         } else if (sessionKeepaliveMs != C.TIME_UNSET) {
             // Re-acquire the keepalive references for any sessions that are still active.

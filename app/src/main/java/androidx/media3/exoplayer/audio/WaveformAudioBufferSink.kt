@@ -18,9 +18,9 @@ import androidx.core.util.size
 class WaveformAudioBufferSink(
     private val barsPerSecond: Int,
     outputChannelCount: Int,
-    private val listener: Listener
+    private val onNewWaveformBar: (channelIndex: Int, waveformBar: WaveformBar?) -> Unit
 ) : AudioBufferSink {
-    
+
     class WaveformBar {
         private var minSampleValue = 1f
         private var maxSampleValue = -1f
@@ -48,10 +48,6 @@ class WaveformAudioBufferSink(
         }
     }
 
-    interface Listener {
-        fun onNewWaveformBar(channelIndex: Int, waveformBar: WaveformBar?)
-    }
-
     private val outputChannels = SparseArray<WaveformBar>(outputChannelCount).apply {
         for (i in 0..<outputChannelCount) {
             append(i, WaveformBar())
@@ -59,9 +55,9 @@ class WaveformAudioBufferSink(
     }
     private val mixingBuffer =
         ByteBuffer.allocate(getPcmFrameSize(C.ENCODING_PCM_FLOAT, outputChannelCount))
-    private var inputAudioFormat:AudioProcessor.AudioFormat? = null
-    private var mixingAudioFormat:AudioProcessor.AudioFormat? = null
-    private var channelMixingMatrix:ChannelMixingMatrix? = null
+    private var inputAudioFormat: AudioProcessor.AudioFormat? = null
+    private var mixingAudioFormat: AudioProcessor.AudioFormat? = null
+    private var channelMixingMatrix: ChannelMixingMatrix? = null
     private var samplesPerBar = 0
 
     override fun flush(sampleRateHz: Int, channelCount: Int, encoding: Int) {
@@ -81,9 +77,9 @@ class WaveformAudioBufferSink(
                 inputAudioFormat!!,
                 mixingBuffer,
                 mixingAudioFormat!!,
-                channelMixingMatrix!!,  
-                1,  
-                false,  
+                channelMixingMatrix!!,
+                1,
+                false,
                 true
             )
             mixingBuffer.rewind()
@@ -91,7 +87,7 @@ class WaveformAudioBufferSink(
                 val bar = outputChannels[i]
                 bar.addSample(mixingBuffer.getFloat())
                 if (bar.sampleCount >= samplesPerBar) {
-                    listener.onNewWaveformBar(i, bar)
+                    onNewWaveformBar(i, bar)
                     outputChannels.set(i, WaveformBar())
                 }
             }

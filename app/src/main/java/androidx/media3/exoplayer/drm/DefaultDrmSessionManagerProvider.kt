@@ -60,7 +60,7 @@ class DefaultDrmSessionManagerProvider : DrmSessionManagerProvider {
         val drmSessionManager =
             DefaultDrmSessionManager(
                 uuid = drmConfiguration.scheme!!,
-                exoMediaDrmProvider = FrameworkMediaDrm.DEFAULT_PROVIDER,
+                acquireExoMediaDrm = FrameworkMediaDrm.DEFAULT_PROVIDER,
                 callback = httpDrmCallback,
                 multiSession = drmConfiguration.multiSession,
                 loadErrorHandlingPolicy = drmLoadErrorHandlingPolicy
