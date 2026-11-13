@@ -122,7 +122,7 @@ class MediaCodecVideoRenderer(
     var buildCalled = false
     var maxDroppedFramesToNotify = 0
     var videoSink: VideoSink? = null
-    private var enableMediaCodecBufferDecodeOnlyFlag = false
+     var enableMediaCodecBufferDecodeOnlyFlag = false
     var enableDurationToProgressUs = false
     var earlySchedulingThresholdUs: Long = DEFAULT_EARLY_SCHEDULING_THRESHOLD_US
     var surface: Surface? = null

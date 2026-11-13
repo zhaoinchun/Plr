@@ -3,13 +3,9 @@ package androidx.media3.exoplayer
 import android.content.Context
 import android.os.Build
 import android.os.Handler
-import android.os.Looper
-import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
-
 import androidx.media3.common.util.Log.i
-
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.audio.DefaultAudioSink
@@ -27,142 +23,43 @@ import androidx.media3.exoplayer.text.TextRenderer
 import androidx.media3.exoplayer.video.MediaCodecVideoRenderer
 import androidx.media3.exoplayer.video.VideoRendererEventListener
 import androidx.media3.exoplayer.video.spherical.CameraMotionRenderer
-import com.google.common.base.Preconditions
-import com.google.errorprone.annotations.CanIgnoreReturnValue
-import com.google.errorprone.annotations.ForOverride
 import java.lang.reflect.Constructor
-import kotlin.collections.toTypedArray
 
 class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
-    private val codecAdapterFactory = DefaultMediaCodecAdapterFactory(context)
+    val codecAdapterFactory = DefaultMediaCodecAdapterFactory(context)
     private val codecAdapterProvider: (MediaCodecAdapter.Configuration) -> MediaCodecAdapter =
         { codecAdapterFactory.createAdapter(it) }
-    private var extensionRendererMode: Int
-    private var allowedVideoJoiningTimeMs: Long
-    private var enableDecoderFallback = false
-    private var mediaCodecSelector: MediaCodecSelector?
-    private var enableFloatOutput = false
-    private var enableAudioOutputPlaybackParameters = false
-    private var enableMediaCodecVideoRendererPrewarming = false
-    private var parseAv1SampleDependencies: Boolean
-    private var lateThresholdToDropDecoderInputUs: Long
-    private var videoRendererEarlySchedulingThresholdUs: Long
-    private var enableMediaCodecBufferDecodeOnlyFlag = false
-    private var enableMediaCodecVideoRendererDurationToProgressUs = false
+    var extensionRendererMode: Int = EXTENSION_RENDERER_MODE_OFF
+    var allowedVideoJoiningTimeMs: Long = DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS
+    var enableDecoderFallback = false
+    var mediaCodecSelector: MediaCodecSelector? = MediaCodecSelector.DEFAULT
+    var enableFloatOutput = false
+    var enableMediaCodecVideoRendererPrewarming = false
+    var parseAv1SampleDependencies: Boolean = true
+    var lateThresholdToDropDecoderInputUs: Long =
+        MediaCodecVideoRenderer.DEFAULT_LATE_THRESHOLD_TO_DROP_DECODER_INPUT_US
+    var videoRendererEarlySchedulingThresholdUs: Long =
+        MediaCodecVideoRenderer.DEFAULT_EARLY_SCHEDULING_THRESHOLD_US
+    var enableMediaCodecBufferDecodeOnlyFlag = false
+    var enableMediaCodecVideoRendererDurationToProgressUs = false
 
-    init {
-        extensionRendererMode = EXTENSION_RENDERER_MODE_OFF
-        allowedVideoJoiningTimeMs = DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS
-        mediaCodecSelector = MediaCodecSelector.DEFAULT
-        parseAv1SampleDependencies = true
-        lateThresholdToDropDecoderInputUs =
-            MediaCodecVideoRenderer.DEFAULT_LATE_THRESHOLD_TO_DROP_DECODER_INPUT_US
-        videoRendererEarlySchedulingThresholdUs =
-            MediaCodecVideoRenderer.DEFAULT_EARLY_SCHEDULING_THRESHOLD_US
-    }
-
-    fun setExtensionRendererMode(
-        extensionRendererMode: Int
-    ): DefaultRenderersFactory {
-        this.extensionRendererMode = extensionRendererMode
-        return this
-    }
-
-    fun forceEnableMediaCodecAsynchronousQueueing(): DefaultRenderersFactory {
+    fun forceEnableMediaCodecAsynchronousQueueing() {
         codecAdapterFactory.forceEnableAsynchronous()
-        return this
     }
 
-    fun forceDisableMediaCodecAsynchronousQueueing(): DefaultRenderersFactory {
+    fun forceDisableMediaCodecAsynchronousQueueing() {
         codecAdapterFactory.forceDisableAsynchronous()
-        return this
     }
 
-    // TODO: b/470368123 - Remove method once flag usage once safe.
-    fun experimentalSetMediaCodecAsyncCryptoFlagEnabled(
-        enableAsyncCryptoFlag: Boolean
-    ): DefaultRenderersFactory {
+    fun experimentalSetMediaCodecAsyncCryptoFlagEnabled(enableAsyncCryptoFlag: Boolean) {
         codecAdapterFactory.asyncCryptoFlagEnabled = enableAsyncCryptoFlag
-        return this
-    }
-
-    fun setEnableDecoderFallback(enableDecoderFallback: Boolean): DefaultRenderersFactory {
-        this.enableDecoderFallback = enableDecoderFallback
-        return this
-    }
-
-    fun setMediaCodecSelector(
-        mediaCodecSelector: MediaCodecSelector?
-    ): DefaultRenderersFactory {
-        this.mediaCodecSelector = mediaCodecSelector
-        return this
-    }
-
-    fun setEnableAudioFloatOutput(enableFloatOutput: Boolean): DefaultRenderersFactory {
-        this.enableFloatOutput = enableFloatOutput
-        return this
-    }
-
-    fun setEnableAudioOutputPlaybackParameters(
-        enableAudioOutputPlaybackParameters: Boolean
-    ): DefaultRenderersFactory {
-        this.enableAudioOutputPlaybackParameters = enableAudioOutputPlaybackParameters
-        return this
-    }
-
-    // TODO: b/470365582 - Enable as a permanent, non-experimental option.
-    fun experimentalSetEnableMediaCodecVideoRendererPrewarming(
-        enableMediaCodecVideoRendererPrewarming: Boolean
-    ): DefaultRenderersFactory {
-        this.enableMediaCodecVideoRendererPrewarming = enableMediaCodecVideoRendererPrewarming
-        return this
-    }
-
-    // TODO: b/470365670 - Remove method once config is enabled by default.
-    fun experimentalSetParseAv1SampleDependencies(
-        parseAv1SampleDependencies: Boolean
-    ): DefaultRenderersFactory {
-        this.parseAv1SampleDependencies = parseAv1SampleDependencies
-        return this
     }
 
     @RequiresApi(34)
-    // TODO: b/470367414 - Run experiments and enable by default.
     fun experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
         enableMediaCodecBufferDecodeOnlyFlag: Boolean
     ): DefaultRenderersFactory {
         this.enableMediaCodecBufferDecodeOnlyFlag = enableMediaCodecBufferDecodeOnlyFlag
-        return this
-    }
-
-    // TODO: b/369523131 - Remove once experiment is complete.
-    fun setEnableMediaCodecVideoRendererDurationToProgressUs(
-        enableMediaCodecVideoRendererDurationToProgressUs: Boolean
-    ): DefaultRenderersFactory {
-        this.enableMediaCodecVideoRendererDurationToProgressUs =
-            enableMediaCodecVideoRendererDurationToProgressUs
-        return this
-    }
-
-    fun setAllowedVideoJoiningTimeMs(
-        allowedVideoJoiningTimeMs: Long
-    ): DefaultRenderersFactory {
-        this.allowedVideoJoiningTimeMs = allowedVideoJoiningTimeMs
-        return this
-    }
-
-    // TODO: b/470367421 - Remove or make non-experimental.
-    fun experimentalSetLateThresholdToDropDecoderInputUs(
-        lateThresholdToDropDecoderInputUs: Long
-    ): DefaultRenderersFactory {
-        this.lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs
-        return this
-    }
-
-    fun setVideoRendererEarlySchedulingThresholdUs(
-        videoRendererEarlySchedulingThresholdUs: Long
-    ): DefaultRenderersFactory {
-        this.videoRendererEarlySchedulingThresholdUs = videoRendererEarlySchedulingThresholdUs
         return this
     }
 
@@ -184,37 +81,26 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
             allowedVideoJoiningTimeMs,
             renderersList
         )
-        val audioSink =
-            buildAudioSink(context, enableFloatOutput, enableAudioOutputPlaybackParameters)
-        if (audioSink != null) {
-            buildAudioRenderers(
-                context,
-                extensionRendererMode,
-                mediaCodecSelector,
-                enableDecoderFallback,
-                audioSink,
-                eventHandler,
-                audioRendererEventListener,
-                renderersList
-            )
+        val audioSink = DefaultAudioSink(context).apply {
+            this.enableFloatOutput = this@DefaultRenderersFactory.enableFloatOutput
+            preferAudioOutputPlaybackParameters = enableFloatOutput
         }
-        buildTextRenderers(
+        buildAudioRenderers(
             context,
-            textRendererOutput,
-            eventHandler.looper,
             extensionRendererMode,
+            mediaCodecSelector,
+            enableDecoderFallback,
+            audioSink,
+            eventHandler,
+            audioRendererEventListener,
             renderersList
         )
-        buildMetadataRenderers(
-            context,
-            metadataRendererOutput,
-            eventHandler.looper,
-            extensionRendererMode,
-            renderersList
-        )
-        buildCameraMotionRenderers(context, extensionRendererMode, renderersList)
-        buildImageRenderers(context, renderersList)
-        buildMiscellaneousRenderers(context, eventHandler, extensionRendererMode, renderersList)
+        renderersList.add(TextRenderer(textRendererOutput, eventHandler.looper))
+        repeat(METADATA_RENDERER_COUNT) {
+            renderersList.add(MetadataRenderer(metadataRendererOutput, eventHandler.looper))
+        }
+        renderersList.add(CameraMotionRenderer())
+        renderersList.add(ImageRenderer(getImageDecoderFactory(context), null))
         return renderersList.toTypedArray<Renderer>()
     }
 
@@ -226,31 +112,28 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         eventListener: VideoRendererEventListener?,
         allowedVideoJoiningTimeMs: Long
     ): MediaCodecVideoRenderer {
-        var builder =
-            MediaCodecVideoRenderer(
-                context,
-                codecAdapterProvider = codecAdapterProvider,
-                mediaCodecSelector = mediaCodecSelector!!,
-                eventHandler = eventHandler,
-                eventListener = eventListener,
-                lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs,
-                enableDecoderFallback = enableDecoderFallback
-            ).apply {
-                maxDroppedFramesToNotify = MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY
-                parseAv1SampleDependencies = parseAv1SampleDependencies
-                enableDurationToProgressUs = enableMediaCodecVideoRendererDurationToProgressUs
-                earlySchedulingThresholdUs = videoRendererEarlySchedulingThresholdUs
-                allowedJoiningTimeMs = allowedVideoJoiningTimeMs
-                if (Build.VERSION.SDK_INT >= 34) {
-                    experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
-                        enableMediaCodecBufferDecodeOnlyFlag
-                    )
-                }
+        return MediaCodecVideoRenderer(
+            context,
+            codecAdapterProvider = codecAdapterProvider,
+            mediaCodecSelector = mediaCodecSelector!!,
+            eventHandler = eventHandler,
+            eventListener = eventListener,
+            lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs,
+            enableDecoderFallback = enableDecoderFallback
+        ).apply {
+            maxDroppedFramesToNotify = MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY
+            parseAv1SampleDependencies = this@DefaultRenderersFactory.parseAv1SampleDependencies
+            enableDurationToProgressUs = enableMediaCodecVideoRendererDurationToProgressUs
+            earlySchedulingThresholdUs = videoRendererEarlySchedulingThresholdUs
+            allowedJoiningTimeMs = allowedVideoJoiningTimeMs
+            if (Build.VERSION.SDK_INT >= 34) {
+                this.enableMediaCodecBufferDecodeOnlyFlag =
+                    this@DefaultRenderersFactory.enableMediaCodecBufferDecodeOnlyFlag
             }
-        return builder
+        }
     }
 
-    protected fun buildVideoRenderers(
+    private fun buildVideoRenderers(
         context: Context,
         extensionRendererMode: Int,
         mediaCodecSelector: MediaCodecSelector?,
@@ -270,7 +153,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                 allowedVideoJoiningTimeMs
             )
         )
-
         if (extensionRendererMode == EXTENSION_RENDERER_MODE_OFF) {
             return
         }
@@ -278,12 +160,8 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         if (extensionRendererMode == EXTENSION_RENDERER_MODE_PREFER) {
             extensionRendererIndex--
         }
-
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.vp9.LibvpxVideoRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Long::class.javaPrimitiveType,
@@ -291,7 +169,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                     VideoRendererEventListener::class.java,
                     Int::class.javaPrimitiveType
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(
                     allowedVideoJoiningTimeMs,
@@ -301,18 +178,12 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                 ) as Renderer
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded LibvpxVideoRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating VP9 extension", e)
         }
-
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.av1.Libdav1dVideoRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Long::class.javaPrimitiveType,
@@ -320,7 +191,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                     VideoRendererEventListener::class.java,
                     Int::class.javaPrimitiveType
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(
                     allowedVideoJoiningTimeMs,
@@ -330,19 +200,13 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                 ) as Renderer
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded Libdav1dVideoRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating AV1 extension", e)
         }
-
         try {
-            // LINT.IfChange
             val clazz =
                 Class.forName("androidx.media3.decoder.ffmpeg.ExperimentalFfmpegVideoRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Long::class.javaPrimitiveType,
@@ -350,7 +214,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                     VideoRendererEventListener::class.java,
                     Int::class.javaPrimitiveType
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(
                     allowedVideoJoiningTimeMs,
@@ -358,17 +221,15 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                     eventListener,
                     MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY
                 ) as Renderer
-            out.add(extensionRendererIndex++, renderer)
+            out.add(extensionRendererIndex, renderer)
             i(TAG, "Loaded FfmpegVideoRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating FFmpeg extension", e)
         }
     }
 
-    protected fun buildAudioRenderers(
+    private fun buildAudioRenderers(
         context: Context,
         extensionRendererMode: Int,
         mediaCodecSelector: MediaCodecSelector?,
@@ -389,7 +250,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                 audioSink
             )
         out.add(audioRenderer)
-
         if (extensionRendererMode == EXTENSION_RENDERER_MODE_OFF) {
             return
         }
@@ -397,12 +257,8 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         if (extensionRendererMode == EXTENSION_RENDERER_MODE_PREFER) {
             extensionRendererIndex--
         }
-
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.midi.MidiRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Context::class.java,
@@ -410,96 +266,71 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                     AudioRendererEventListener::class.java,
                     AudioSink::class.java
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(context, eventHandler, eventListener, audioSink) as Renderer
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded MidiRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating MIDI extension", e)
         }
 
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.opus.LibopusAudioRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Handler::class.java,
                     AudioRendererEventListener::class.java,
                     AudioSink::class.java
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(eventHandler, eventListener, audioSink) as Renderer
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded LibopusAudioRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating Opus extension", e)
         }
-
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.flac.LibflacAudioRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Handler::class.java,
                     AudioRendererEventListener::class.java,
                     AudioSink::class.java
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(eventHandler, eventListener, audioSink) as Renderer
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded LibflacAudioRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating FLAC extension", e)
         }
 
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Handler::class.java,
                     AudioRendererEventListener::class.java,
                     AudioSink::class.java
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(eventHandler, eventListener, audioSink) as Renderer
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded FfmpegAudioRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating FFmpeg extension", e)
         }
 
         try {
-            // LINT.IfChange
             val builderClass =
                 Class.forName("androidx.media3.decoder.iamf.IamfAudioRenderer\$Builder")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any move.
             val builderConstructor: Constructor<*> =
                 builderClass.getConstructor(AudioSink::class.java)
             val builder: Any = builderConstructor.newInstance(audioSink)
-            // Full class names used for media3 constructor args so the LINT rule triggers if any move.
             val audioRenderEventListenerClass: Class<*> =
                 AudioRendererEventListener::class.java
             builderClass
@@ -510,89 +341,27 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
                 )
                 .invoke(builder, eventHandler, eventListener)
             val renderer = builderClass.getMethod("build").invoke(builder) as Renderer
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             out.add(extensionRendererIndex++, renderer)
             i(TAG, "Loaded IamfAudioRenderer.")
-        } catch (e: ReflectiveOperationException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ReflectiveOperationException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating IAMF extension", e)
         }
-
         try {
-            // LINT.IfChange
             val clazz = Class.forName("androidx.media3.decoder.mpegh.MpeghAudioRenderer")
-            // Full class names used for media3 constructor args so the LINT rule triggers if any of them
-            // move.
             val constructor: Constructor<*> =
                 clazz.getConstructor(
                     Handler::class.java,
                     AudioRendererEventListener::class.java,
                     AudioSink::class.java
                 )
-            // LINT.ThenChange(../../../../../../proguard-rules.txt)
             val renderer =
                 constructor.newInstance(eventHandler, eventListener, audioSink) as Renderer
-            out.add(extensionRendererIndex++, renderer)
+            out.add(extensionRendererIndex, renderer)
             i(TAG, "Loaded MpeghAudioRenderer.")
-        } catch (e: ClassNotFoundException) {
-            // Expected if the app was built without the extension.
+        } catch (_: ClassNotFoundException) {
         } catch (e: Exception) {
-            // The extension is present, but instantiation failed.
             throw IllegalStateException("Error instantiating MPEG-H extension", e)
-        }
-    }
-
-    protected fun buildTextRenderers(
-        context: Context?,
-        output: TextOutput?,
-        outputLooper: Looper?,
-        extensionRendererMode: Int,
-        out: ArrayList<Renderer>
-    ) {
-        out.add(TextRenderer(output, outputLooper))
-    }
-
-    protected fun buildMetadataRenderers(
-        context: Context?,
-        output: MetadataOutput,
-        outputLooper: Looper?,
-        extensionRendererMode: Int,
-        out: ArrayList<Renderer>
-    ) {
-        for (i in 0..<METADATA_RENDERER_COUNT) {
-            out.add(MetadataRenderer(output, outputLooper))
-        }
-    }
-
-    protected fun buildCameraMotionRenderers(
-        context: Context?,
-        extensionRendererMode: Int,
-        out: ArrayList<Renderer>
-    ) {
-        out.add(CameraMotionRenderer())
-    }
-
-    protected fun buildImageRenderers(context: Context, out: ArrayList<Renderer>) {
-        out.add(ImageRenderer(getImageDecoderFactory(context), null))
-    }
-
-    protected fun buildMiscellaneousRenderers(
-        context: Context?,
-        eventHandler: Handler?,
-        extensionRendererMode: Int,
-        out: ArrayList<Renderer>?
-    ) {
-        // Do nothing.
-    }
-
-    protected fun buildAudioSink(
-        context: Context?, enableFloatOutput: Boolean, enableAudioOutputPlaybackParams: Boolean
-    ): AudioSink {
-        return DefaultAudioSink(context).apply {
-            this.enableFloatOutput = enableFloatOutput
-            preferAudioOutputPlaybackParameters = enableFloatOutput
         }
     }
 
@@ -604,11 +373,12 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         textRendererOutput: TextOutput?,
         metadataRendererOutput: MetadataOutput?
     ): Renderer? {
-        if (renderer.trackType == C.TRACK_TYPE_VIDEO) {
-            return buildSecondaryVideoRenderer(
-                renderer,
+        if (renderer.trackType == C.TRACK_TYPE_VIDEO
+            && enableMediaCodecVideoRendererPrewarming
+            && renderer.javaClass == MediaCodecVideoRenderer::class.java
+        ) {
+            return createMediaCodecVideoRenderer(
                 context,
-                extensionRendererMode,
                 mediaCodecSelector,
                 enableDecoderFallback,
                 eventHandler,
@@ -619,33 +389,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         return null
     }
 
-    protected fun buildSecondaryVideoRenderer(
-        renderer: Renderer,
-        context: Context,
-        extensionRendererMode: Int,
-        mediaCodecSelector: MediaCodecSelector?,
-        enableDecoderFallback: Boolean,
-        eventHandler: Handler?,
-        eventListener: VideoRendererEventListener?,
-        allowedVideoJoiningTimeMs: Long
-    ): Renderer? {
-        if (enableMediaCodecVideoRendererPrewarming
-            && renderer.javaClass == MediaCodecVideoRenderer::class.java
-        ) {
-            return createMediaCodecVideoRenderer(
-                context,
-                mediaCodecSelector,
-                enableDecoderFallback,
-                eventHandler,
-                eventListener,
-                allowedVideoJoiningTimeMs
-            )
-        }
-        return null
-    }
-
-    @ForOverride
-    protected fun getImageDecoderFactory(context: Context): ImageDecoder.Factory {
+    private fun getImageDecoderFactory(context: Context): ImageDecoder.Factory {
         return BitmapFactoryImageDecoder.Factory(context)
     }
 
