@@ -294,13 +294,7 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
             audioCapabilitiesReceiver =
                 AudioCapabilitiesReceiver(
                     context,
-                    object : AudioCapabilitiesReceiver.Listener {
-                        override fun onAudioCapabilitiesChanged(audioCapabilities: AudioCapabilities?) {
-                            this.onAudioCapabilitiesChanged(
-                                audioCapabilities!!
-                            )
-                        }
-                    },
+                    { this.onAudioCapabilitiesChanged(it)},
                     formatConfig.audioAttributes,
                     formatConfig.preferredDevice
                 ).also {

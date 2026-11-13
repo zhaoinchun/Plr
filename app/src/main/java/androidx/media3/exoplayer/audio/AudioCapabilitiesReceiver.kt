@@ -19,14 +19,10 @@ import androidx.media3.exoplayer.util.SpatializerWrapper
 
 class AudioCapabilitiesReceiver(
     context: Context,
-    private val listener: Listener,
+    private val onAudioCapabilitiesChanged: (audioCapabilities: AudioCapabilities) -> Unit,
     private var audioAttributes: AudioAttributes,
     private var routedDevice: AudioDeviceInfo?
 ) {
-    interface Listener {
-        fun onAudioCapabilitiesChanged(audioCapabilities: AudioCapabilities?)
-    }
-
     private val context: Context = context.applicationContext
     private val handler = createHandlerForCurrentOrMainLooper()
     private val audioDeviceCallback = AudioDeviceCallback()
@@ -89,7 +85,7 @@ class AudioCapabilitiesReceiver(
         val stickyIntent =
             context.registerReceiver(
                 hdmiAudioPlugBroadcastReceiver,
-                IntentFilter(AudioManager.ACTION_HDMI_AUDIO_PLUG),  
+                IntentFilter(AudioManager.ACTION_HDMI_AUDIO_PLUG),
                 null,
                 handler
             )
@@ -126,7 +122,7 @@ class AudioCapabilitiesReceiver(
     private fun onNewAudioCapabilities(newAudioCapabilities: AudioCapabilities) {
         if (registered && newAudioCapabilities != audioCapabilities) {
             audioCapabilities = newAudioCapabilities
-            listener.onAudioCapabilitiesChanged(newAudioCapabilities)
+            onAudioCapabilitiesChanged(newAudioCapabilities)
         }
     }
 
