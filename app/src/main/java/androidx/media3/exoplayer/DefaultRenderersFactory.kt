@@ -34,8 +34,10 @@ import java.lang.reflect.Constructor
 import kotlin.collections.toTypedArray
 
 class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
-    private val codecAdapterFactory: DefaultMediaCodecAdapterFactory
-    private var extensionRendererMode:  Int
+    private val codecAdapterFactory = DefaultMediaCodecAdapterFactory(context)
+    private val codecAdapterProvider: (MediaCodecAdapter.Configuration) -> MediaCodecAdapter =
+        { codecAdapterFactory.createAdapter(it) }
+    private var extensionRendererMode: Int
     private var allowedVideoJoiningTimeMs: Long
     private var enableDecoderFallback = false
     private var mediaCodecSelector: MediaCodecSelector?
@@ -49,7 +51,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     private var enableMediaCodecVideoRendererDurationToProgressUs = false
 
     init {
-        codecAdapterFactory = DefaultMediaCodecAdapterFactory(context)
         extensionRendererMode = EXTENSION_RENDERER_MODE_OFF
         allowedVideoJoiningTimeMs = DEFAULT_ALLOWED_VIDEO_JOINING_TIME_MS
         mediaCodecSelector = MediaCodecSelector.DEFAULT
@@ -61,7 +62,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     }
 
     fun setExtensionRendererMode(
-        extensionRendererMode:  Int
+        extensionRendererMode: Int
     ): DefaultRenderersFactory {
         this.extensionRendererMode = extensionRendererMode
         return this
@@ -81,7 +82,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     fun experimentalSetMediaCodecAsyncCryptoFlagEnabled(
         enableAsyncCryptoFlag: Boolean
     ): DefaultRenderersFactory {
-        codecAdapterFactory.setAsyncCryptoFlagEnabled(enableAsyncCryptoFlag)
+        codecAdapterFactory.asyncCryptoFlagEnabled = enableAsyncCryptoFlag
         return this
     }
 
@@ -228,22 +229,22 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         var builder =
             MediaCodecVideoRenderer(
                 context,
-                codecAdapterFactory = getCodecAdapterFactory(),
+                codecAdapterProvider = codecAdapterProvider,
                 mediaCodecSelector = mediaCodecSelector!!,
                 eventHandler = eventHandler,
                 eventListener = eventListener,
                 lateThresholdToDropDecoderInputUs = lateThresholdToDropDecoderInputUs,
                 enableDecoderFallback = enableDecoderFallback
             ).apply {
-                maxDroppedFramesToNotify=MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY
+                maxDroppedFramesToNotify = MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY
                 parseAv1SampleDependencies = parseAv1SampleDependencies
-                enableDurationToProgressUs=enableMediaCodecVideoRendererDurationToProgressUs
+                enableDurationToProgressUs = enableMediaCodecVideoRendererDurationToProgressUs
                 earlySchedulingThresholdUs = videoRendererEarlySchedulingThresholdUs
                 allowedJoiningTimeMs = allowedVideoJoiningTimeMs
                 if (Build.VERSION.SDK_INT >= 34) {
-                        experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
-                            enableMediaCodecBufferDecodeOnlyFlag
-                        )
+                    experimentalSetEnableMediaCodecBufferDecodeOnlyFlag(
+                        enableMediaCodecBufferDecodeOnlyFlag
+                    )
                 }
             }
         return builder
@@ -251,7 +252,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildVideoRenderers(
         context: Context,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         mediaCodecSelector: MediaCodecSelector?,
         enableDecoderFallback: Boolean,
         eventHandler: Handler?,
@@ -369,7 +370,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildAudioRenderers(
         context: Context,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         mediaCodecSelector: MediaCodecSelector?,
         enableDecoderFallback: Boolean,
         audioSink: AudioSink,
@@ -380,7 +381,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         val audioRenderer =
             MediaCodecAudioRenderer(
                 context,
-                getCodecAdapterFactory(),
+                codecAdapterProvider,
                 mediaCodecSelector!!,
                 enableDecoderFallback,
                 eventHandler,
@@ -547,7 +548,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         context: Context?,
         output: TextOutput?,
         outputLooper: Looper?,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         out: ArrayList<Renderer>
     ) {
         out.add(TextRenderer(output, outputLooper))
@@ -557,7 +558,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         context: Context?,
         output: MetadataOutput,
         outputLooper: Looper?,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         out: ArrayList<Renderer>
     ) {
         for (i in 0..<METADATA_RENDERER_COUNT) {
@@ -567,7 +568,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
 
     protected fun buildCameraMotionRenderers(
         context: Context?,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         out: ArrayList<Renderer>
     ) {
         out.add(CameraMotionRenderer())
@@ -580,7 +581,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     protected fun buildMiscellaneousRenderers(
         context: Context?,
         eventHandler: Handler?,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         out: ArrayList<Renderer>?
     ) {
         // Do nothing.
@@ -621,7 +622,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
     protected fun buildSecondaryVideoRenderer(
         renderer: Renderer,
         context: Context,
-        extensionRendererMode:  Int,
+        extensionRendererMode: Int,
         mediaCodecSelector: MediaCodecSelector?,
         enableDecoderFallback: Boolean,
         eventHandler: Handler?,
@@ -641,10 +642,6 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
             )
         }
         return null
-    }
-
-    protected fun getCodecAdapterFactory(): MediaCodecAdapter.Factory {
-        return codecAdapterFactory
     }
 
     @ForOverride

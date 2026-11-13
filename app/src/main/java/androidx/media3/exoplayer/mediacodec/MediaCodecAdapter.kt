@@ -1,6 +1,5 @@
 package androidx.media3.exoplayer.mediacodec
 
-import android.content.Context
 import android.media.MediaCodec
 import android.media.MediaCrypto
 import android.media.MediaFormat
@@ -95,16 +94,6 @@ interface MediaCodecAdapter {
                     crypto,
                     null
                 )
-            }
-        }
-    }
-
-    interface Factory {
-        fun createAdapter(configuration: Configuration): MediaCodecAdapter
-
-        companion object {
-            fun getDefault(context: Context): Factory {
-                return DefaultMediaCodecAdapterFactory(context)
             }
         }
     }

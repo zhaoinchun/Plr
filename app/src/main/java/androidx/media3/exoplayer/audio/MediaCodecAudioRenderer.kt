@@ -38,6 +38,7 @@ import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.audio.AudioSink.AudioSinkConfig
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
+import androidx.media3.exoplayer.mediacodec.DefaultMediaCodecAdapterFactory
 import androidx.media3.exoplayer.mediacodec.LoudnessCodecController
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
 import androidx.media3.exoplayer.mediacodec.MediaCodecInfo
@@ -55,7 +56,9 @@ import kotlin.math.min
 
 class MediaCodecAudioRenderer(
     context: Context,
-    codecAdapterFactory: MediaCodecAdapter.Factory = MediaCodecAdapter.Factory.getDefault(context),
+    codecAdapterProvider: (MediaCodecAdapter.Configuration) -> MediaCodecAdapter = {
+        DefaultMediaCodecAdapterFactory(context).createAdapter(it)
+    },
     mediaCodecSelector: MediaCodecSelector,
     enableDecoderFallback: Boolean = false,
     eventHandler: Handler?,
@@ -65,7 +68,7 @@ class MediaCodecAudioRenderer(
 ) : MediaCodecRenderer(
     context.applicationContext,
     C.TRACK_TYPE_AUDIO,
-    codecAdapterFactory,
+    codecAdapterProvider,
     mediaCodecSelector,
     enableDecoderFallback,
     0f
@@ -92,18 +95,18 @@ class MediaCodecAudioRenderer(
     override val name: String
         get() = TAG
 
-    
+
     override fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector,
         format: Format
-    ):  Int {
+    ): Int {
         if (!isAudio(format.sampleMimeType)) {
             return RendererCapabilities.create(C.FORMAT_UNSUPPORTED_TYPE)
         }
         val formatHasDrm = format.cryptoType != C.CRYPTO_TYPE_NONE
         val supportsFormatDrm = supportsFormatDrm(format)
 
-        var audioOffloadSupport:  Int =
+        var audioOffloadSupport: Int =
             RendererCapabilities.AUDIO_OFFLOAD_NOT_SUPPORTED
         // In direct mode, if the format has DRM then we need to use a decoder that only decrypts.
         // Else we don't need a decoder at all.
@@ -162,7 +165,7 @@ class MediaCodecAudioRenderer(
                 }
             }
         }
-        val formatSupport:  Int =
+        val formatSupport: Int =
             if (isFormatSupported) C.FORMAT_HANDLED else C.FORMAT_EXCEEDS_CAPABILITIES
         val adaptiveSupport: Int =
             if (isFormatSupported && decoderInfo.isSeamlessAdaptationSupported(format))
@@ -174,7 +177,7 @@ class MediaCodecAudioRenderer(
                 RendererCapabilities.HARDWARE_ACCELERATION_SUPPORTED
             else
                 RendererCapabilities.HARDWARE_ACCELERATION_NOT_SUPPORTED
-        val decoderSupport:  Int =
+        val decoderSupport: Int =
             if (isPreferredDecoder) RendererCapabilities.DECODER_SUPPORT_PRIMARY else RendererCapabilities.DECODER_SUPPORT_FALLBACK
         return RendererCapabilities.create(
             formatSupport,
@@ -186,12 +189,12 @@ class MediaCodecAudioRenderer(
         )
     }
 
-    private fun getAudioOffloadSupport(format: Format):  Int {
+    private fun getAudioOffloadSupport(format: Format): Int {
         val audioSinkOffloadSupport = audioSink.getFormatOffloadSupport(format)
         if (!audioSinkOffloadSupport.isFormatSupported) {
             return RendererCapabilities.AUDIO_OFFLOAD_NOT_SUPPORTED
         }
-        var audioOffloadSupport:  Int =
+        var audioOffloadSupport: Int =
             RendererCapabilities.AUDIO_OFFLOAD_SUPPORTED
         if (audioSinkOffloadSupport.isGaplessSupported) {
             audioOffloadSupport =
@@ -204,7 +207,7 @@ class MediaCodecAudioRenderer(
         return audioOffloadSupport
     }
 
-    
+
     override fun getDecoderInfos(
         mediaCodecSelector: MediaCodecSelector, format: Format, requiresSecureDecoder: Boolean
     ): List<MediaCodecInfo> {
@@ -217,7 +220,7 @@ class MediaCodecAudioRenderer(
 
     override fun shouldUseBypass(format: Format): Boolean {
         if (getConfiguration().offloadModePreferred != AudioSink.OFFLOAD_MODE_DISABLED) {
-            val audioOffloadSupport:  Int =
+            val audioOffloadSupport: Int =
                 getAudioOffloadSupport(format)
             if ((audioOffloadSupport and RendererCapabilities.AUDIO_OFFLOAD_SUPPORTED) != 0
                 && ((getConfiguration().offloadModePreferred
@@ -259,7 +262,7 @@ class MediaCodecAudioRenderer(
     ): DecoderReuseEvaluation {
         val evaluation = codecInfo.canReuseCodec(oldFormat, newFormat)
 
-        var discardReasons:  Int = evaluation.discardReasons
+        var discardReasons: Int = evaluation.discardReasons
         if (isBypassPossible(newFormat)) {
             // We prefer direct audio playback so that for multi-channel tracks the audio is not downmixed
             // to stereo.
@@ -353,7 +356,7 @@ class MediaCodecAudioRenderer(
         eventDispatcher.audioCodecError(codecError)
     }
 
-    
+
     override fun onInputFormatChanged(formatHolder: FormatHolder): DecoderReuseEvaluation? {
         val inputFormat = formatHolder.format!!
         this.inputFormat = inputFormat
@@ -362,7 +365,7 @@ class MediaCodecAudioRenderer(
         return evaluation
     }
 
-    
+
     override fun onOutputFormatChanged(format: Format, mediaFormat: MediaFormat?) {
         val audioSinkInputFormat: Format
         var channelMap: ImmutableIntArray? = null
@@ -463,7 +466,7 @@ class MediaCodecAudioRenderer(
         allowPositionDiscontinuity = true
     }
 
-    
+
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         super.onEnabled(joining, mayRenderStartOfStream)
         eventDispatcher.enabled(decoderCounters)
@@ -477,7 +480,7 @@ class MediaCodecAudioRenderer(
         audioSink.setListener(AudioSinkListener())
     }
 
-    
+
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -596,7 +599,7 @@ class MediaCodecAudioRenderer(
         audioSink.handleDiscontinuity()
     }
 
-    
+
     override fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -700,7 +703,7 @@ class MediaCodecAudioRenderer(
         eventDispatcher.audioCodecParametersChanged(codecParameters!!)
     }
 
-    
+
     override fun renderToEndOfStream() {
         try {
             audioSink.playToEndOfStream()
@@ -724,8 +727,8 @@ class MediaCodecAudioRenderer(
         audioSink.setOutputStreamOffsetUs(outputStreamOffsetUs)
     }
 
-    
-    override fun handleMessage(messageType:  Int, message: Any?) {
+
+    override fun handleMessage(messageType: Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_VOLUME -> audioSink.setVolume(message as Float)
             Renderer.MSG_SET_AUDIO_ATTRIBUTES -> {
@@ -980,7 +983,7 @@ class MediaCodecAudioRenderer(
         private const val VIVO_BITS_PER_SAMPLE_KEY = "v-bits-per-sample"
         private const val READY_GRACE_PERIOD_MS: Long = 100
 
-        
+
         private fun getDecoderInfos(
             mediaCodecSelector: MediaCodecSelector,
             format: Format,

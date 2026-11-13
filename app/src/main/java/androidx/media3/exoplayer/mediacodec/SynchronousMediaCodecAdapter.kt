@@ -150,7 +150,7 @@ class SynchronousMediaCodecAdapter private constructor(
                 beginSection("createCodec:$codecName")
                 val codec = MediaCodec.createByCodecName(codecName)
                 endSection()
-                
+
                 beginSection("configureCodec")
                 var flags = 0
                 if (configuration.surface == null && configuration.codecInfo.detachedSurfaceSupported

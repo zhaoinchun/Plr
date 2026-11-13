@@ -11,35 +11,20 @@ class DefaultMediaCodecAdapterFactory(
     private val context: Context?,
     private val callbackThread: HandlerThread? = null,
     private val queueingThread: HandlerThread? = null
-) : MediaCodecAdapter.Factory {
+) {
     private var asynchronousMode: Int = MODE_DEFAULT
-    private var asyncCryptoFlagEnabled = true
-    private var asyncCryptoSynchronizationEnabled = false
+    var asyncCryptoFlagEnabled = true
+    var asyncCryptoSynchronizationEnabled = false
 
-    fun forceEnableAsynchronous(): DefaultMediaCodecAdapterFactory {
+    fun forceEnableAsynchronous() {
         asynchronousMode = MODE_ENABLED
-        return this
     }
 
-    fun forceDisableAsynchronous(): DefaultMediaCodecAdapterFactory {
+    fun forceDisableAsynchronous() {
         asynchronousMode = MODE_DISABLED
-        return this
     }
 
-    fun setAsyncCryptoFlagEnabled(enableAsyncCryptoFlag: Boolean): DefaultMediaCodecAdapterFactory {
-        asyncCryptoFlagEnabled = enableAsyncCryptoFlag
-        return this
-    }
-
-    fun setAsyncCryptoSynchronizationEnabled(
-        enableAsyncCryptoSynchronization: Boolean
-    ): DefaultMediaCodecAdapterFactory {
-        asyncCryptoSynchronizationEnabled = enableAsyncCryptoSynchronization
-        return this
-    }
-
-
-    override fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
+    fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
         if (asynchronousMode == MODE_ENABLED
             || (asynchronousMode == MODE_DEFAULT && shouldUseAsynchronousAdapterInDefaultMode())
         ) {

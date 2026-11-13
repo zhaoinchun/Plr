@@ -58,7 +58,7 @@ import kotlin.math.max
 abstract class MediaCodecRenderer(
     context: Context,
     trackType: Int,
-    private val codecAdapterFactory: MediaCodecAdapter.Factory,
+    private val codecAdapterProvider: (MediaCodecAdapter.Configuration)-> MediaCodecAdapter,
     private val mediaCodecSelector: MediaCodecSelector,
     private val enableDecoderFallback: Boolean,
     private val assumedMinimumCodecOperatingRate: Float
@@ -899,7 +899,7 @@ abstract class MediaCodecRenderer(
         }
         try {
             beginSection("createCodec:$codecName")
-            codec = codecAdapterFactory.createAdapter(configuration)
+            codec = codecAdapterProvider(configuration)
             codecRegisteredOnBufferAvailableListener =
                 codec!!.registerOnBufferAvailableListener(MediaCodecRendererCodecAdapterListener())
         } finally {

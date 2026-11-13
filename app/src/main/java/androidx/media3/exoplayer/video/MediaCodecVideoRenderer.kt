@@ -49,6 +49,7 @@ import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.Renderer
 import androidx.media3.exoplayer.RendererCapabilities
 import androidx.media3.exoplayer.ScrubbingModeParameters
+import androidx.media3.exoplayer.mediacodec.DefaultMediaCodecAdapterFactory
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
 import androidx.media3.exoplayer.mediacodec.MediaCodecDecoderException
 import androidx.media3.exoplayer.mediacodec.MediaCodecInfo
@@ -73,8 +74,9 @@ import kotlin.math.min
 
 class MediaCodecVideoRenderer(
     val context: Context,
-    var codecAdapterFactory: MediaCodecAdapter.Factory =
-        MediaCodecAdapter.Factory.getDefault(context),
+    codecAdapterProvider: (MediaCodecAdapter.Configuration) -> MediaCodecAdapter = {
+        DefaultMediaCodecAdapterFactory(context).createAdapter(it)
+    },
     var mediaCodecSelector: MediaCodecSelector = MediaCodecSelector.DEFAULT,
     var enableDecoderFallback: Boolean = false,
     var assumedMinimumCodecOperatingRate: Float = 0f,
@@ -85,7 +87,7 @@ class MediaCodecVideoRenderer(
 ) : MediaCodecRenderer(
     context.applicationContext,
     C.TRACK_TYPE_VIDEO,
-    codecAdapterFactory,
+    codecAdapterProvider,
     mediaCodecSelector,
     enableDecoderFallback,
     assumedMinimumCodecOperatingRate
