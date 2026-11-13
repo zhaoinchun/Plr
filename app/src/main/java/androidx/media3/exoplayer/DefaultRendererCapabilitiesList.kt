@@ -1,6 +1,5 @@
 package androidx.media3.exoplayer
 
-import android.content.Context
 import androidx.media3.common.Metadata
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.Clock
@@ -11,29 +10,6 @@ import androidx.media3.exoplayer.video.VideoRendererEventListener
 
 class DefaultRendererCapabilitiesList private constructor(renderers: Array<Renderer>) :
     RendererCapabilitiesList {
-    class Factory : RendererCapabilitiesList.Factory {
-        private val renderersFactory: RenderersFactory
-
-        constructor(context: Context) {
-            this.renderersFactory = DefaultRenderersFactory(context)
-        }
-
-        constructor(renderersFactory: RenderersFactory) {
-            this.renderersFactory = renderersFactory
-        }
-
-        override fun createRendererCapabilitiesList(): DefaultRendererCapabilitiesList {
-            val renderers =
-                renderersFactory.createRenderers(
-                    createHandlerForCurrentOrMainLooper(),
-                    object : VideoRendererEventListener {},
-                    object : AudioRendererEventListener {},
-                    { cueGroup: CueGroup? -> },
-                    { metadata: Metadata? -> })
-            return DefaultRendererCapabilitiesList(renderers)
-        }
-    }
-
     private val renderers: Array<Renderer> = renderers.copyOf()
 
     init {
@@ -56,6 +32,19 @@ class DefaultRendererCapabilitiesList private constructor(renderers: Array<Rende
     override fun release() {
         for (renderer in renderers) {
             renderer.release()
+        }
+    }
+
+    companion object {
+        fun create(renderersFactory: RenderersFactory): DefaultRendererCapabilitiesList {
+            val renderers =
+                renderersFactory.createRenderers(
+                    createHandlerForCurrentOrMainLooper(),
+                    object : VideoRendererEventListener {},
+                    object : AudioRendererEventListener {},
+                    { cueGroup: CueGroup? -> },
+                    { metadata: Metadata? -> })
+            return DefaultRendererCapabilitiesList(renderers)
         }
     }
 }

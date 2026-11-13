@@ -172,8 +172,7 @@ class DefaultPreloadManager(
     }
 
     private val rendererCapabilitiesList =
-        DefaultRendererCapabilitiesList.Factory(renderersFactorySupplier.get())
-            .createRendererCapabilitiesList()
+        DefaultRendererCapabilitiesList.create(renderersFactorySupplier.get())
     private val trackSelector: TrackSelector =
         trackSelectorFactory.createTrackSelector(context)
     private val preloadMediaSourceFactory: PreloadMediaSource.Factory

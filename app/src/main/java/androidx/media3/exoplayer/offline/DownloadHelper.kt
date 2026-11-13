@@ -122,8 +122,7 @@ class DownloadHelper(
                     ),
                 trackSelectionParameters!!,
                 if (renderersFactory != null)
-                    DefaultRendererCapabilitiesList.Factory(renderersFactory!!)
-                        .createRendererCapabilitiesList()
+                    DefaultRendererCapabilitiesList.create(renderersFactory!!)
                 else
                     UnreleaseableRendererCapabilitiesList(arrayOf()),
                 debugLoggingEnabled
@@ -136,8 +135,7 @@ class DownloadHelper(
                 mediaSource,
                 trackSelectionParameters!!,
                 if (renderersFactory != null)
-                    DefaultRendererCapabilitiesList.Factory(renderersFactory!!)
-                        .createRendererCapabilitiesList()
+                    DefaultRendererCapabilitiesList.create(renderersFactory!!)
                 else
                     UnreleaseableRendererCapabilitiesList(arrayOf()),
                 debugLoggingEnabled
