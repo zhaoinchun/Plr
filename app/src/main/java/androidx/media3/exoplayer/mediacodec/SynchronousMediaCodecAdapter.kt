@@ -19,47 +19,6 @@ class SynchronousMediaCodecAdapter private constructor(
     private val codec: MediaCodec,
     private val loudnessCodecController: LoudnessCodecController?
 ) : MediaCodecAdapter {
-    class Factory : MediaCodecAdapter.Factory {
-        @SuppressLint("WrongConstant") // Can't verify codec flag IntDef
-        override fun createAdapter(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
-            var codec: MediaCodec? = null
-            try {
-                codec = createCodec(configuration)
-                beginSection("configureCodec")
-                var flags = 0
-                if (configuration.surface == null && configuration.codecInfo.detachedSurfaceSupported
-                    && Build.VERSION.SDK_INT >= 35
-                ) {
-                    flags = flags or MediaCodec.CONFIGURE_FLAG_DETACHED_SURFACE
-                }
-                codec.configure(
-                    configuration.mediaFormat, configuration.surface, configuration.crypto, flags
-                )
-                endSection()
-                beginSection("startCodec")
-                codec.start()
-                endSection()
-                return SynchronousMediaCodecAdapter(codec, configuration.loudnessCodecController)
-            } catch (e: IOException) {
-                codec?.release()
-                throw e
-            } catch (e: RuntimeException) {
-                codec?.release()
-                throw e
-            }
-        }
-
-        
-        private fun createCodec(configuration: MediaCodecAdapter.Configuration): MediaCodec {
-            configuration.codecInfo
-            val codecName = configuration.codecInfo.name
-            beginSection("createCodec:$codecName")
-            val mediaCodec = MediaCodec.createByCodecName(codecName)
-            endSection()
-            return mediaCodec
-        }
-    }
-
     init {
         if (Build.VERSION.SDK_INT >= 35 && loudnessCodecController != null) {
             loudnessCodecController.addMediaCodec(codec)
@@ -180,5 +139,41 @@ class SynchronousMediaCodecAdapter private constructor(
     @RequiresApi(31)
     override fun unsubscribeFromVendorParameters(names: List<String>) {
         codec.unsubscribeFromVendorParameters(names)
+    }
+
+    companion object{
+        @SuppressLint("WrongConstant") // Can't verify codec flag IntDef
+        fun create(configuration: MediaCodecAdapter.Configuration): MediaCodecAdapter {
+            var codec: MediaCodec? = null
+            try {
+                val codecName = configuration.codecInfo.name
+                beginSection("createCodec:$codecName")
+                val codec = MediaCodec.createByCodecName(codecName)
+                endSection()
+                
+                beginSection("configureCodec")
+                var flags = 0
+                if (configuration.surface == null && configuration.codecInfo.detachedSurfaceSupported
+                    && Build.VERSION.SDK_INT >= 35
+                ) {
+                    flags = flags or MediaCodec.CONFIGURE_FLAG_DETACHED_SURFACE
+                }
+                codec.configure(
+                    configuration.mediaFormat, configuration.surface, configuration.crypto, flags
+                )
+                endSection()
+                beginSection("startCodec")
+                codec.start()
+                endSection()
+                return SynchronousMediaCodecAdapter(codec, configuration.loudnessCodecController)
+            } catch (e: IOException) {
+                codec?.release()
+                throw e
+            } catch (e: RuntimeException) {
+                codec?.release()
+                throw e
+            }
+        }
+
     }
 }

@@ -57,7 +57,7 @@ class DefaultMediaCodecAdapterFactory(
                 asyncCryptoFlagEnabled
             )
         }
-        return SynchronousMediaCodecAdapter.Factory().createAdapter(configuration)
+        return SynchronousMediaCodecAdapter.create(configuration)
     }
 
     private fun shouldUseAsynchronousAdapterInDefaultMode(): Boolean {
