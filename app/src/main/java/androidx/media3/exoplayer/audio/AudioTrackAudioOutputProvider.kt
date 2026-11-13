@@ -42,7 +42,7 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
     private val capabilityChangeListener: CapabilityChangeListener? =
         if (context == null) null else CapabilityChangeListener()
     private val maxPlaybackSpeed = DefaultAudioSink.MAX_PLAYBACK_SPEED
-    private var listeners: ListenerSet<AudioOutputProvider.Listener>? = null
+    private var listeners: ListenerSet<() -> Unit>? = null
     private var clock = Clock.DEFAULT
 
     var audioCapabilities: AudioCapabilities? = null
@@ -226,16 +226,16 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
         )
     }
 
-    override fun addListener(listener: AudioOutputProvider.Listener) {
+    override fun addOnFormatSupportChanged(onFormatSupportChanged: ()-> Unit){
         verifySinglePlaybackLooper()
         if (listeners == null) {
             listeners = ListenerSet(Thread.currentThread())
         }
-        listeners!!.add(listener)
+        listeners!!.add(onFormatSupportChanged)
     }
 
-    override fun removeListener(listener: AudioOutputProvider.Listener) {
-        listeners?.remove(listener)
+    override fun removeOnFormatSupportChanged(onFormatSupportChanged: ()-> Unit){
+        listeners?.remove(onFormatSupportChanged)
     }
 
     override fun setClock(clock: Clock) {
@@ -268,7 +268,7 @@ class AudioTrackAudioOutputProvider(context: Context?) : AudioOutputProvider {
         verifySinglePlaybackLooper()
         if (this.audioCapabilities != null && audioCapabilities != this.audioCapabilities) {
             this.audioCapabilities = audioCapabilities
-            listeners?.sendEvent { obj: AudioOutputProvider.Listener? -> obj!!.onFormatSupportChanged() }
+            listeners?.sendEvent { onFormatSupportChanged: () -> Unit -> onFormatSupportChanged() }
         }
     }
 

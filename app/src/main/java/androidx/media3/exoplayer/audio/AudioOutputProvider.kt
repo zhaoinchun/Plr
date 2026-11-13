@@ -1,17 +1,12 @@
 package androidx.media3.exoplayer.audio
 
 import android.media.AudioDeviceInfo
-import androidx.annotation.IntDef
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.util.Clock
 
 interface AudioOutputProvider {
-    fun interface Listener {
-        fun onFormatSupportChanged()
-    }
-
     class FormatConfig(
         val format: Format,
         val audioAttributes: AudioAttributes = AudioAttributes.DEFAULT,
@@ -44,11 +39,7 @@ interface AudioOutputProvider {
         var isGaplessSupportedForOffload: Boolean = false,
         var isSpeedChangeSupportedForOffload: Boolean = false,
         var supportLevel:  Int = FORMAT_UNSUPPORTED,
-    ) {
-        companion object {
-            val UNSUPPORTED: FormatSupport = FormatSupport()
-        }
-    }
+    )
 
     class ConfigurationException(message: String?) : Exception(message!!)
 
@@ -58,13 +49,10 @@ interface AudioOutputProvider {
     }
 
     fun getFormatSupport(formatConfig: FormatConfig): FormatSupport
-
-    
     fun getOutputConfig(formatConfig: FormatConfig): OutputConfig
     fun getAudioOutput(config: OutputConfig): AudioOutput?
-
-    fun addListener(listener: Listener)
-    fun removeListener(listener: Listener)
+    fun addOnFormatSupportChanged(onFormatSupportChanged: ()-> Unit)
+    fun removeOnFormatSupportChanged(onFormatSupportChanged: ()-> Unit)
     fun setClock(clock: Clock) {}
     fun release()
 

@@ -121,7 +121,7 @@ class DefaultAudioSink(
         fun getBufferSizeInBytes(
             minBufferSizeInBytes: Int,
             encoding: Int,
-            outputMode:  Int,
+            outputMode: Int,
             pcmFrameSize: Int,
             sampleRate: Int,
             bitrate: Int,
@@ -154,7 +154,7 @@ class DefaultAudioSink(
         listOf(trimmingAudioProcessor, channelMappingAudioProcessor)
     private val mediaPositionParametersCheckpoints = ArrayDeque<MediaPositionParameters>()
     var preferAudioOutputPlaybackParameters: Boolean = false
-    private var offloadMode:  Int = AudioSink.OFFLOAD_MODE_DISABLED
+    private var offloadMode: Int = AudioSink.OFFLOAD_MODE_DISABLED
     private var audioOutputListener: AudioOutputListener? = null
     private val initializationExceptionPendingExceptionHolder: PendingExceptionHolder<AudioSink.InitializationException> =
         PendingExceptionHolder()
@@ -185,7 +185,7 @@ class DefaultAudioSink(
             audioOutputProvider
         }
     }
-    private var audioOutputProviderListener: AudioOutputProvider.Listener? = null
+    private var audioOutputProviderListener: (() -> Unit)? = null
     private var audioOutput: AudioOutput? = null
     override var audioAttributes: AudioAttributes? = AudioAttributes.DEFAULT
         set(value) {
@@ -340,6 +340,7 @@ class DefaultAudioSink(
         positionUs = min(positionUs, configuration!!.framesToDurationUs(this.writtenFrames))
         return applySkipping(applyMediaPositionParameters(positionUs))
     }
+
     override fun configure(audioSinkConfig: AudioSinkConfig) {
         var audioProcessingPipeline: AudioProcessingPipeline?
         val inputPcmFrameSize: Int
@@ -468,7 +469,7 @@ class DefaultAudioSink(
             )
         )
     }
-    
+
     private fun initializeAudioOutput(): Boolean {
         if (initializationExceptionPendingExceptionHolder.shouldWaitBeforeRetry()) {
             return false
@@ -537,6 +538,7 @@ class DefaultAudioSink(
     override fun handleDiscontinuity() {
         startMediaTimeUsNeedsSync = true
     }
+
     override fun handleBuffer(
         buffer: ByteBuffer, presentationTimeUs: Long, encodedAccessUnitCount: Int
     ): Boolean {
@@ -689,7 +691,7 @@ class DefaultAudioSink(
         }
         return false
     }
-    
+
     private fun buildAudioOutputWithRetry(): AudioOutput? {
         val configuration = configuration!!
         try {
@@ -750,7 +752,7 @@ class DefaultAudioSink(
 
             return max(oneSecondBufferSize, minBufferSize)
         }
-    
+
     private fun buildAudioOutput(outputConfig: OutputConfig): AudioOutput? {
         try {
             return audioOutputProvider.getAudioOutput(outputConfig)
@@ -773,7 +775,7 @@ class DefaultAudioSink(
         }
     }
 
-    
+
     private fun processBuffers(avSyncPresentationTimeUs: Long) {
         // Drain existing buffer first.
         drainOutputBuffer(avSyncPresentationTimeUs)
@@ -810,7 +812,7 @@ class DefaultAudioSink(
         }
     }
 
-    
+
     private fun drainToEndOfStream(): Boolean {
         if (!audioProcessingPipeline!!.isOperational) {
             drainOutputBuffer(C.TIME_END_OF_SOURCE)
@@ -831,7 +833,7 @@ class DefaultAudioSink(
         outputBuffer = maybeRampUpVolume(buffer)
     }
 
-    
+
     private fun drainOutputBuffer(avSyncPresentationTimeUs: Long) {
         if (outputBuffer == null) {
             return
@@ -908,7 +910,7 @@ class DefaultAudioSink(
         }
     }
 
-    
+
     override fun playToEndOfStream() {
         if (!handledEndOfStream && this.isAudioOutputInitialized && drainToEndOfStream()) {
             playPendingData()
@@ -1028,7 +1030,7 @@ class DefaultAudioSink(
     }
 
     @RequiresApi(29)
-    override fun setOffloadMode(offloadMode:  Int) {
+    override fun setOffloadMode(offloadMode: Int) {
         Preconditions.checkState(Build.VERSION.SDK_INT >= 29)
         this.offloadMode = offloadMode
     }
@@ -1049,7 +1051,7 @@ class DefaultAudioSink(
         this.audioOutputProvider.release()
         this.audioOutputProvider = audioOutputProvider
         if (audioOutputProviderListener != null) {
-            audioOutputProvider.addListener(audioOutputProviderListener!!)
+            audioOutputProvider.addOnFormatSupportChanged(audioOutputProviderListener!!)
         }
         reconfigureAndFlush()
     }
@@ -1324,11 +1326,10 @@ class DefaultAudioSink(
         if (audioOutputProviderListener == null && context != null) {
             // Must be lazily initialized to receive listener events on the current (playback) thread as
             // the constructor is not called in the playback thread.
-            audioOutputProviderListener =
-                AudioOutputProvider.Listener {
-                    listener?.onAudioCapabilitiesChanged()
-                }
-            audioOutputProvider.addListener(audioOutputProviderListener!!)
+            audioOutputProviderListener = {
+                listener?.onAudioCapabilitiesChanged()
+            }
+            audioOutputProvider.removeOnFormatSupportChanged(audioOutputProviderListener!!)
         }
     }
 
@@ -1537,6 +1538,7 @@ class DefaultAudioSink(
             this.throwDeadlineMs = C.TIME_UNSET
             this.earliestNextRetryTimeMs = C.TIME_UNSET
         }
+
         fun throwExceptionIfDeadlineIsReached(exception: T?) {
             val nowMs = SystemClock.elapsedRealtime()
             if (pendingException == null) {
