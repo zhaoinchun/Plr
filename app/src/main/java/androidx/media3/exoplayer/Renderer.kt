@@ -59,9 +59,7 @@ interface Renderer : PlayerMessage.Target {
         return false
     }
 
-    fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {
-    }
-
+    fun setPlaybackSpeed(currentPlaybackSpeed: Float, targetPlaybackSpeed: Float) {}
     fun enableMayRenderStartOfStream() {}
     fun setTimeline(timeline: Timeline)
     fun render(positionUs: Long, elapsedRealtimeUs: Long)

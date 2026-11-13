@@ -9,29 +9,20 @@ interface RendererCapabilities {
     interface Listener {
         fun onRendererCapabilitiesChanged(renderer: Renderer)
     }
+
     val name: String
     val trackType: Int
-
-    
-    fun supportsFormat(format: Format):  Int
-
-    
+    fun supportsFormat(format: Format): Int
     fun supportsMixedMimeTypeAdaptation(): Int
-
-    fun setListener(listener: Listener?) {
-        // Do nothing.
-    }
-
-    fun clearListener() {
-        // Do nothing.
-    }
+    fun setListener(listener: Listener?) {}
+    fun clearListener() {}
 
     companion object {
         fun create(
-             formatSupport:  Int,
+            formatSupport: Int,
             adaptiveSupport: Int,
-            tunnelingSupport:  Int
-        ):  Int {
+            tunnelingSupport: Int
+        ): Int {
             return create(
                 formatSupport,
                 adaptiveSupport,
@@ -43,11 +34,11 @@ interface RendererCapabilities {
         }
 
         fun create(
-             formatSupport:  Int,
+            formatSupport: Int,
             adaptiveSupport: Int = ADAPTIVE_NOT_SUPPORTED,
-            tunnelingSupport:  Int = TUNNELING_NOT_SUPPORTED,
-            audioOffloadSupport:  Int = AUDIO_OFFLOAD_NOT_SUPPORTED
-        ):  Int {
+            tunnelingSupport: Int = TUNNELING_NOT_SUPPORTED,
+            audioOffloadSupport: Int = AUDIO_OFFLOAD_NOT_SUPPORTED
+        ): Int {
             return create(
                 formatSupport,
                 adaptiveSupport,
@@ -59,12 +50,12 @@ interface RendererCapabilities {
         }
 
         fun create(
-             formatSupport:  Int,
+            formatSupport: Int,
             adaptiveSupport: Int,
-            tunnelingSupport:  Int,
+            tunnelingSupport: Int,
             hardwareAccelerationSupport: Int,
-            decoderSupport:  Int
-        ):  Int {
+            decoderSupport: Int
+        ): Int {
             return create(
                 formatSupport,
                 adaptiveSupport,
@@ -78,13 +69,13 @@ interface RendererCapabilities {
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
         fun create(
-             formatSupport:  Int,
+            formatSupport: Int,
             adaptiveSupport: Int,
-            tunnelingSupport:  Int,
+            tunnelingSupport: Int,
             hardwareAccelerationSupport: Int,
-            decoderSupport:  Int,
-            audioOffloadSupport:  Int
-        ):  Int {
+            decoderSupport: Int,
+            audioOffloadSupport: Int
+        ): Int {
             return (formatSupport
                     or adaptiveSupport
                     or tunnelingSupport
@@ -95,15 +86,15 @@ interface RendererCapabilities {
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        
-        fun getFormatSupport(supportFlags:  Int):  Int {
+
+        fun getFormatSupport(supportFlags: Int): Int {
             return supportFlags and FORMAT_SUPPORT_MASK
         }
 
         fun isFormatSupported(
-            supportFlags:  Int, allowExceedsCapabilities: Boolean
+            supportFlags: Int, allowExceedsCapabilities: Boolean
         ): Boolean {
-             val formatSupport:  Int =
+            val formatSupport: Int =
                 getFormatSupport(supportFlags)
             return formatSupport == C.FORMAT_HANDLED
                     || (allowExceedsCapabilities && formatSupport == C.FORMAT_EXCEEDS_CAPABILITIES)
@@ -111,33 +102,33 @@ interface RendererCapabilities {
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getAdaptiveSupport(supportFlags:  Int): Int {
+        fun getAdaptiveSupport(supportFlags: Int): Int {
             return supportFlags and ADAPTIVE_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getTunnelingSupport(supportFlags:  Int):  Int {
+        fun getTunnelingSupport(supportFlags: Int): Int {
             return supportFlags and TUNNELING_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
         fun getHardwareAccelerationSupport(
-            supportFlags:  Int
+            supportFlags: Int
         ): Int {
             return supportFlags and HARDWARE_ACCELERATION_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getDecoderSupport(supportFlags:  Int):  Int {
+        fun getDecoderSupport(supportFlags: Int): Int {
             return supportFlags and DECODER_SUPPORT_MASK
         }
 
         // Suppression needed for IntDef casting.
         @SuppressLint("WrongConstant")
-        fun getAudioOffloadSupport(supportFlags:  Int):  Int {
+        fun getAudioOffloadSupport(supportFlags: Int): Int {
             return supportFlags and AUDIO_OFFLOAD_SUPPORT_MASK
         }
 

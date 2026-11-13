@@ -1221,7 +1221,7 @@ class PlayerControlView  constructor(
         if (player == null || !player!!.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) {
             return
         }
-        player!!.playbackParameters = player!!.playbackParameters!!.withSpeed(speed)
+        player!!.playbackParameters = player!!.playbackParameters!!.copy(speed=speed)
     }
 
     fun requestPlayPauseFocus() {

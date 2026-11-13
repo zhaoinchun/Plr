@@ -1190,9 +1190,7 @@ class ExoPlayerImplInternal(
                 )
             if (mediaClock.playbackParameters.speed != adjustedSpeed) {
                 setMediaClockPlaybackParameters(
-                    playbackInfo.playbackParameters.withSpeed(
-                        adjustedSpeed
-                    )
+                    playbackInfo.playbackParameters.copy(speed = adjustedSpeed)
                 )
                 handlePlaybackParameters(
                     playbackInfo.playbackParameters,

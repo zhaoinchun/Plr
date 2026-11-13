@@ -168,7 +168,7 @@ abstract class BasePlayer() : Player {
     )
 
     override fun setPlaybackSpeed(speed: Float) {
-        playbackParameters = playbackParameters!!.withSpeed(speed)
+        playbackParameters = playbackParameters!!.copy(speed=speed)
     }
 
     @get:Deprecated("Use {@link #getCurrentMediaItemIndex()} instead.")
