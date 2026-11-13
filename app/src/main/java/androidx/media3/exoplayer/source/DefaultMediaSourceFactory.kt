@@ -32,7 +32,6 @@ import androidx.media3.extractor.text.SubtitleExtractor
 import androidx.media3.extractor.text.SubtitleParser
 import com.google.common.base.Supplier
 import com.google.common.primitives.Ints
-import java.io.IOException
 
 class DefaultMediaSourceFactory(
     private var dataSourceFactory: DataSource.Factory,
@@ -43,7 +42,7 @@ class DefaultMediaSourceFactory(
         DelegateFactoryLoader(extractorsFactory, subtitleParserFactory)
     private var serverSideAdInsertionMediaSourceFactory: MediaSource.Factory? = null
     private var externalImageLoader: ExternalLoader? = null
-    private var adsLoaderProvider: AdsLoader.Provider? = null
+    private var provideAdsLoader: ((adsConfiguration: MediaItem.AdsConfiguration) -> AdsLoader?)? = null
     private var adViewProvider: AdViewProvider? = null
     private var loadErrorHandlingPolicy: LoadErrorHandlingPolicy? = null
     private var liveTargetOffsetMs: Long = C.TIME_UNSET
@@ -82,7 +81,7 @@ class DefaultMediaSourceFactory(
     }
 
     override fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-        codecsToParseWithinGopSampleDependencies:  Int
+        codecsToParseWithinGopSampleDependencies: Int
     ): DefaultMediaSourceFactory {
         delegateFactoryLoader.setCodecsToParseWithinGopSampleDependencies(
             codecsToParseWithinGopSampleDependencies
@@ -91,15 +90,16 @@ class DefaultMediaSourceFactory(
     }
 
     fun setLocalAdInsertionComponents(
-        adsLoaderProvider: AdsLoader.Provider, adViewProvider: AdViewProvider
+        adsLoaderProvide: (adsConfiguration: MediaItem.AdsConfiguration) -> AdsLoader?,
+        adViewProvider: AdViewProvider
     ): DefaultMediaSourceFactory {
-        this.adsLoaderProvider = adsLoaderProvider
+        this.provideAdsLoader = adsLoaderProvide
         this.adViewProvider = adViewProvider
         return this
     }
 
     fun clearLocalAdInsertionComponents(): DefaultMediaSourceFactory {
-        this.adsLoaderProvider = null
+        this.provideAdsLoader = null
         this.adViewProvider = null
         return this
     }
@@ -205,7 +205,7 @@ class DefaultMediaSourceFactory(
             )
                 .createMediaSource(mediaItem)
         }
-        val type:  Int =
+        val type: Int =
             inferContentTypeForUriAndMimeType(
                 config.uri, mediaItem.localConfiguration.mimeType
             )
@@ -322,9 +322,9 @@ class DefaultMediaSourceFactory(
         mediaSource: MediaSource
     ): MediaSource {
         val adsConfiguration = mediaItem.localConfiguration!!.adsConfiguration ?: return mediaSource
-        val adsLoaderProvider = this.adsLoaderProvider
+        val adsLoaderProvide = this.provideAdsLoader
         val adViewProvider = this.adViewProvider
-        if (adsLoaderProvider == null || adViewProvider == null) {
+        if (adsLoaderProvide == null || adViewProvider == null) {
             w(
                 TAG,
                 "Playing media without ads. Configure ad support by calling setAdsLoaderProvider and"
@@ -332,7 +332,7 @@ class DefaultMediaSourceFactory(
             )
             return mediaSource
         }
-        val adsLoader = adsLoaderProvider.getAdsLoader(adsConfiguration)
+        val adsLoader = adsLoaderProvide(adsConfiguration)
         if (adsLoader == null) {
             w(TAG, "Playing media without ads, as no AdsLoader was provided.")
             return mediaSource
@@ -363,7 +363,7 @@ class DefaultMediaSourceFactory(
         private val mediaSourceFactories: MutableMap<Int, MediaSource.Factory> = mutableMapOf()
 
         private var dataSourceFactory: DataSource.Factory? = null
-        private var codecsToParseWithinGopSampleDependencies:  Int =
+        private var codecsToParseWithinGopSampleDependencies: Int =
             C.VIDEO_CODEC_FLAG_H264 or C.VIDEO_CODEC_FLAG_H265
         private var loadOnlySelectedTracks = false
         private var experimentalEnableHagcPlayback = true
@@ -377,7 +377,8 @@ class DefaultMediaSourceFactory(
                 ensureAllSuppliersAreLoaded()
                 return Ints.toArray(mediaSourceFactorySuppliers.keys)
             }
-        fun getMediaSourceFactory(contentType:  Int): MediaSource.Factory {
+
+        fun getMediaSourceFactory(contentType: Int): MediaSource.Factory {
             var mediaSourceFactory = mediaSourceFactories[contentType]
             if (mediaSourceFactory != null) {
                 return mediaSourceFactory
@@ -416,7 +417,7 @@ class DefaultMediaSourceFactory(
         }
 
         fun setCodecsToParseWithinGopSampleDependencies(
-            codecsToParseWithinGopSampleDependencies:  Int
+            codecsToParseWithinGopSampleDependencies: Int
         ) {
             this.codecsToParseWithinGopSampleDependencies = codecsToParseWithinGopSampleDependencies
             extractorsFactory.experimentalSetCodecsToParseWithinGopSampleDependencies(
@@ -445,7 +446,7 @@ class DefaultMediaSourceFactory(
             }
         }
 
-        fun setJpegExtractorFlags(flags:  Int) {
+        fun setJpegExtractorFlags(flags: Int) {
             if (this.extractorsFactory is DefaultExtractorsFactory) {
                 this.extractorsFactory.setJpegExtractorFlags(flags)
             }
@@ -459,7 +460,7 @@ class DefaultMediaSourceFactory(
             this.experimentalEnableHagcPlayback = experimentalEnableHagcPlayback
         }
 
-        fun setHeifExtractorFlags(flags:  Int) {
+        fun setHeifExtractorFlags(flags: Int) {
             if (this.extractorsFactory is DefaultExtractorsFactory) {
                 this.extractorsFactory.setHeifExtractorFlags(flags)
             }
@@ -480,7 +481,7 @@ class DefaultMediaSourceFactory(
             maybeLoadSupplier(C.CONTENT_TYPE_OTHER)
         }
 
-        fun maybeLoadSupplier(contentType:  Int): Supplier<MediaSource.Factory>? {
+        fun maybeLoadSupplier(contentType: Int): Supplier<MediaSource.Factory>? {
             try {
                 return loadSupplier(contentType)
             } catch (e: ClassNotFoundException) {
@@ -488,7 +489,8 @@ class DefaultMediaSourceFactory(
                 return null
             }
         }
-        fun loadSupplier(contentType:  Int): Supplier<MediaSource.Factory> {
+
+        fun loadSupplier(contentType: Int): Supplier<MediaSource.Factory> {
             var mediaSourceFactorySupplier = mediaSourceFactorySuppliers[contentType]
             if (mediaSourceFactorySupplier != null) {
                 return mediaSourceFactorySupplier
@@ -558,7 +560,7 @@ class DefaultMediaSourceFactory(
             )
         }
 
-        
+
         override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
             val skipResult = input.skip(Int.MAX_VALUE)
             if (skipResult == C.RESULT_END_OF_INPUT) {
