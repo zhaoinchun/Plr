@@ -9,17 +9,16 @@ import android.view.Display
 import android.view.Surface
 import androidx.annotation.BinderThread
 
-class OrientationListener(private val display: Display, listeners: Array<Listener>) :
-    SensorEventListener {
-    interface Listener {
-        fun onOrientationChange(deviceOrientationMatrix: FloatArray, deviceRoll: Float)
-    }
+class OrientationListener(
+    private val display: Display,
+    private val onOrientationChanges: Array<(deviceOrientationMatrix: FloatArray, deviceRoll: Float) -> Unit>
+) : SensorEventListener {
+
 
     private val deviceOrientationMatrix4x4 = FloatArray(16)
     private val tempMatrix4x4 = FloatArray(16)
     private val recenterMatrix4x4 = FloatArray(16)
     private val angles = FloatArray(3)
-    private val listeners = listeners
     private var recenterMatrixComputed = false
 
     @BinderThread
@@ -38,8 +37,8 @@ class OrientationListener(private val display: Display, listeners: Array<Listene
     }
 
     private fun notifyListeners(deviceOrientationMatrix: FloatArray, roll: Float) {
-        for (listener in listeners) {
-            listener.onOrientationChange(deviceOrientationMatrix, roll)
+        for (onOrientationChange in onOrientationChanges) {
+            onOrientationChange(deviceOrientationMatrix, roll)
         }
     }
 

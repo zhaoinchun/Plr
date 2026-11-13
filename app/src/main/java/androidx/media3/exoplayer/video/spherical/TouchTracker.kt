@@ -18,7 +18,7 @@ class TouchTracker(
     context: Context?,
     private val listener: Listener,
     private val pxPerDegrees: Float
-) : SimpleOnGestureListener(), OnTouchListener, OrientationListener.Listener {
+) : SimpleOnGestureListener(), OnTouchListener {
     interface Listener {
         fun onScrollChange(scrollOffsetDegrees: PointF)
         fun onSingleTapUp(event: MotionEvent): Boolean {
@@ -34,7 +34,7 @@ class TouchTracker(
     // The conversion from touch to yaw & pitch requires compensating for device roll. This is set
     // on the sensor thread and read on the UI thread.
     @Volatile
-    private var roll: Float=SphericalGLSurfaceView.UPRIGHT_ROLL
+    private var roll: Float = SphericalGLSurfaceView.UPRIGHT_ROLL
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         return gestureDetector.onTouchEvent(event)
@@ -80,7 +80,7 @@ class TouchTracker(
     }
 
     @BinderThread
-    override fun onOrientationChange(deviceOrientationMatrix: FloatArray, roll: Float) {
+    fun onOrientationChange(deviceOrientationMatrix: FloatArray, roll: Float) {
         // We compensate for roll by rotating in the opposite direction.
         this.roll = -roll
     }
@@ -88,7 +88,7 @@ class TouchTracker(
     companion object {
         // Touch input won't change the pitch beyond +/- 45 degrees. This reduces awkward situations
         // where the touch-based pitch and gyro-based pitch interact badly near the poles.
-        
+
         const val MAX_PITCH_DEGREES: Float = 45f
     }
 }

@@ -70,7 +70,16 @@ class SphericalGLSurfaceView(
         touchTracker = TouchTracker(context, renderer, PX_PER_DEGREES)
         val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager?
         val display = windowManager!!.defaultDisplay
-        orientationListener = OrientationListener(display, arrayOf(touchTracker, renderer))
+        orientationListener = OrientationListener(
+            display,
+            arrayOf(
+                { deviceOrientationMatrix: FloatArray, deviceRoll: Float ->
+                    touchTracker.onOrientationChange(deviceOrientationMatrix, deviceRoll)
+                },
+                { deviceOrientationMatrix: FloatArray, deviceRoll: Float ->
+                    renderer.onOrientationChange(deviceOrientationMatrix, deviceRoll)
+                })
+        )
 
         setEGLContextClientVersion(2)
         setRenderer(renderer)
@@ -91,7 +100,7 @@ class SphericalGLSurfaceView(
     val cameraMotionListener: CameraMotionListener
         get() = scene
 
-    fun setDefaultStereoMode(stereoMode:  Int) {
+    fun setDefaultStereoMode(stereoMode: Int) {
         scene.setDefaultStereoMode(stereoMode)
     }
 
@@ -163,8 +172,7 @@ class SphericalGLSurfaceView(
     }
 
     internal inner class Renderer
-        (private val scene: SceneRenderer) : GLSurfaceView.Renderer, TouchTracker.Listener,
-        OrientationListener.Listener {
+        (private val scene: SceneRenderer) : GLSurfaceView.Renderer, TouchTracker.Listener {
         private val projectionMatrix = FloatArray(16)
 
         // There is no model matrix for this scene so viewProjectionMatrix is used for the mvpMatrix.
@@ -213,12 +221,12 @@ class SphericalGLSurfaceView(
             }
 
             Matrix.multiplyMM(viewProjectionMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
-            scene.drawFrame(viewProjectionMatrix,  false)
+            scene.drawFrame(viewProjectionMatrix, false)
         }
 
         @BinderThread
         @Synchronized
-        override fun onOrientationChange(matrix: FloatArray, deviceRoll: Float) {
+        fun onOrientationChange(matrix: FloatArray, deviceRoll: Float) {
             System.arraycopy(matrix, 0, deviceOrientationMatrix, 0, deviceOrientationMatrix.size)
             this.deviceRoll = -deviceRoll
             updatePitchMatrix()
