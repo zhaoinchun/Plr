@@ -46,7 +46,7 @@ class ChunkSampleStream<T : ChunkSource>(
     handleInitialDiscontinuity: Boolean,
     firstChunkStartTimeUs: Long,
     downloadExecutor: ReleasableExecutor?
-) : SampleStream, SequenceableLoader, Loader.Callback<Chunk>, Loader.ReleaseCallback {
+) : SampleStream, SequenceableLoader, Loader.Callback<Chunk> {
     interface ReleaseCallback<T : ChunkSource> {
         fun onSampleStreamReleased(chunkSampleStream: ChunkSampleStream<T>)
     }
@@ -268,10 +268,10 @@ class ChunkSampleStream<T : ChunkSource>(
         for (embeddedSampleQueue in embeddedSampleQueues) {
             embeddedSampleQueue.preRelease()
         }
-        loader.release(this)
+        loader.release{onLoaderReleased()}
     }
 
-    override fun onLoaderReleased() {
+    fun onLoaderReleased() {
         primarySampleQueue.release()
         for (embeddedSampleQueue in embeddedSampleQueues) {
             embeddedSampleQueue.release()

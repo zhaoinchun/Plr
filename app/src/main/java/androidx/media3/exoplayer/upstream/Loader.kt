@@ -57,10 +57,6 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
         ): LoadErrorAction
     }
 
-    interface ReleaseCallback {
-        fun onLoaderReleased()
-    }
-
     class LoadErrorAction constructor(
         val type:  Int,
         val retryDelayMillis: Long
@@ -103,12 +99,12 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
         currentTask!!.cancel(false)
     }
 
-    fun release(callback: ReleaseCallback? = null) {
+    fun release(onLoaderReleased: (()-> Unit)? = null) {
         if (currentTask != null) {
             currentTask!!.cancel(true)
         }
-        if (callback != null) {
-            downloadExecutor.execute(ReleaseTask(callback))
+        if (onLoaderReleased != null) {
+            downloadExecutor.execute(ReleaseTask(onLoaderReleased))
         }
         downloadExecutor.release()
     }
@@ -326,9 +322,9 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
 
     }
 
-    private class ReleaseTask(private val callback: ReleaseCallback) : Runnable {
+    private class ReleaseTask(private val callback: ()-> Unit) : Runnable {
         override fun run() {
-            callback.onLoaderReleased()
+            callback()
         }
     }
 

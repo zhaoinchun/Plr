@@ -61,8 +61,7 @@ import kotlin.concurrent.Volatile
 import kotlin.math.max
 import kotlin.math.min
 
-class ProgressiveMediaPeriod
-    (
+class ProgressiveMediaPeriod(
     private val uri: Uri,
     private val dataSource: DataSource,
     private val progressiveMediaExtractor: ProgressiveMediaExtractor,
@@ -80,7 +79,7 @@ class ProgressiveMediaPeriod
     private val singleTrackFormat: Format?,
     private val singleSampleDurationUs: Long,
     downloadExecutor: ReleasableExecutor?
-) : MediaPeriod, ExtractorOutput, Loader.Callback<ExtractingLoadable>, Loader.ReleaseCallback,
+) : MediaPeriod, ExtractorOutput, Loader.Callback<ExtractingLoadable>,
     UpstreamFormatChangedListener {
     interface Listener {
         fun onSourceInfoRefreshed(durationUs: Long, seekMap: SeekMap, isLive: Boolean)
@@ -149,13 +148,13 @@ class ProgressiveMediaPeriod
                 sampleQueue.preRelease()
             }
         }
-        loader.release(this)
+        loader.release { onLoaderReleased() }
         handler.removeCallbacksAndMessages(null)
         callback = null
         released = true
     }
 
-    override fun onLoaderReleased() {
+    fun onLoaderReleased() {
         for (sampleQueue in sampleQueues) {
             sampleQueue.release()
         }
