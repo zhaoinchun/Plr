@@ -43,7 +43,6 @@ import androidx.media3.exoplayer.analytics.AnalyticsCollector
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.audio.AudioSink
 import androidx.media3.exoplayer.drm.DrmSession.DrmSessionException
-import androidx.media3.exoplayer.image.ImageMetadataListener
 import androidx.media3.exoplayer.source.BehindLiveWindowException
 import androidx.media3.exoplayer.source.MediaPeriod
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
@@ -200,8 +199,8 @@ class ExoPlayerImplInternal(
             MSG_SET_VIDEO_FRAME_METADATA_LISTENER, internalVideoFrameMetadataListener
         ).sendToTarget()
 
-        val internalOnImageAvailableListener =
-            ImageMetadataListener { presentationTimeUs: Long, format: Format? ->
+        val internalOnImageAvailableListener: (presentationTimeUs: Long, format: Format) -> Unit =
+            { presentationTimeUs: Long, format: Format? ->
                 if (seekIsPendingWhileScrubbing) {
                     handler.obtainMessage(MSG_SEEK_COMPLETED_IN_SCRUBBING_MODE).sendToTarget()
                 }
@@ -415,9 +414,9 @@ class ExoPlayerImplInternal(
         }
     }
 
-    private fun setImageMetadataListenerInternal(imageMetadataListener: ImageMetadataListener?) {
+    private fun setImageMetadataListenerInternal(onImageAboutToBeAvailable: ((presentationTimeUs: Long, format: Format) -> Unit)?) {
         for (renderer in renderers) {
-            renderer.setImageMetadataListener(imageMetadataListener)
+            renderer.setImageMetadataListener(onImageAboutToBeAvailable)
         }
     }
 
@@ -635,7 +634,7 @@ class ExoPlayerImplInternal(
 
                 MSG_AUDIO_FOCUS_VOLUME_MULTIPLIER -> handleAudioFocusVolumeMultiplierChange()
                 MSG_SET_VIDEO_FRAME_METADATA_LISTENER -> setVideoFrameMetadataListenerInternal(msg.obj as VideoFrameMetadataListener?)
-                MSG_SET_IMAGE_METADATA_LISTENER -> setImageMetadataListenerInternal(msg.obj as ImageMetadataListener?)
+                MSG_SET_IMAGE_METADATA_LISTENER -> setImageMetadataListenerInternal(msg.obj as ((presentationTimeUs: Long, format: Format) -> Unit)??)
                 MSG_RELEASE -> {
                     releaseInternal((msg.obj as androidx.media3.common.util.ConditionVariable?)!!)
                     // Return immediately to not send playback info updates after release.

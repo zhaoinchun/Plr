@@ -7,7 +7,6 @@ import androidx.media3.common.C.TRACK_TYPE_VIDEO
 import androidx.media3.common.Format
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Log.e
-import androidx.media3.exoplayer.image.ImageMetadataListener
 import androidx.media3.exoplayer.metadata.MetadataRenderer
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import androidx.media3.exoplayer.source.SampleStream
@@ -620,16 +619,16 @@ class RendererHolder(
         )
     }
 
-    fun setImageMetadataListener(imageMetadataListener: ImageMetadataListener?) {
+    fun setImageMetadataListener(onImageAboutToBeAvailable:((presentationTimeUs: Long, format: Format) -> Unit)?) {
         if (this.trackType != TRACK_TYPE_IMAGE) {
             return
         }
         primaryRenderer.handleMessage(
             Renderer.MSG_SET_IMAGE_METADATA_LISTENER,
-            imageMetadataListener
+            onImageAboutToBeAvailable
         )
         secondaryRenderer?.handleMessage(
-            Renderer.MSG_SET_IMAGE_METADATA_LISTENER, imageMetadataListener
+            Renderer.MSG_SET_IMAGE_METADATA_LISTENER, onImageAboutToBeAvailable
         )
     }
 

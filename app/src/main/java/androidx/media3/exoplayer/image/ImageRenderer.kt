@@ -29,14 +29,15 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     private var outputStreamInfo = OutputStreamInfo.UNSET
     private var lastProcessedOutputBufferTimeUs = C.TIME_UNSET
     private var largestQueuedPresentationTimeUs = C.TIME_UNSET
-    private var decoderReinitializationState:  Int =
+    private var decoderReinitializationState: Int =
         REINITIALIZATION_STATE_NONE
-    private var firstFrameState:  Int = C.FIRST_FRAME_NOT_RENDERED
+    private var firstFrameState: Int = C.FIRST_FRAME_NOT_RENDERED
     private var inputFormat: Format? = null
     private var decoder: ImageDecoder? = null
     private var inputBuffer: DecoderInputBuffer? = null
     private var imageOutput: ImageOutput = getImageOutput(imageOutput)
-    private var imageMetadataListener: ImageMetadataListener? = null
+    private var onImageAboutToBeAvailable: ((presentationTimeUs: Long, format: Format) -> Unit)? =
+        null
     private var outputBitmap: Bitmap? = null
     private var readyToOutputTiles = false
     private var tileInfo: TileInfo? = null
@@ -45,11 +46,11 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     private var codecNeedsInitialization = false
     override val name: String = TAG
 
-    override fun supportsFormat(format: Format):  Int {
+    override fun supportsFormat(format: Format): Int {
         return decoderFactory.supportsFormat(format)
     }
 
-    
+
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (outputStreamEnded) {
             return
@@ -58,7 +59,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             // We don't have a format yet, so try and read one.
             val formatHolder = getFormatHolder()
             flagsOnlyBuffer.clear()
-            val result:  Int =
+            val result: Int =
                 readSource(formatHolder, flagsOnlyBuffer, SampleStream.FLAG_REQUIRE_FORMAT)
             when (result) {
                 C.RESULT_FORMAT_READ -> {
@@ -105,7 +106,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     override val isEnded: Boolean
         get() = outputStreamEnded
 
-    
+
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         firstFrameState =
             if (mayRenderStartOfStream)
@@ -114,7 +115,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
                 C.FIRST_FRAME_NOT_RENDERED_ONLY_ALLOWED_IF_STARTED
     }
 
-    
+
     override fun onStreamChanged(
         formats: Array<Format>,
         startPositionUs: Long,
@@ -139,7 +140,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-    
+
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
     ) {
@@ -172,20 +173,21 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         releaseDecoderResources()
     }
 
-    
-    override fun handleMessage(messageType:  Int, message: Any?) {
+
+    override fun handleMessage(messageType: Int, message: Any?) {
         when (messageType) {
             Renderer.MSG_SET_IMAGE_OUTPUT -> {
                 val imageOutput = message as? ImageOutput
                 setImageOutput(imageOutput)
             }
 
-            Renderer.MSG_SET_IMAGE_METADATA_LISTENER -> imageMetadataListener =
-                message as ImageMetadataListener?
+            Renderer.MSG_SET_IMAGE_METADATA_LISTENER -> onImageAboutToBeAvailable =
+                message as ((presentationTimeUs: Long, format: Format) -> Unit)?
 
             else -> super.handleMessage(messageType, message)
         }
     }
+
     private fun drainOutput(positionUs: Long, elapsedRealtimeUs: Long): Boolean {
         // If tileInfo and outputBitmap are both null, we must not return early. The EOS may have been
         // queued to the decoder, and we must stay in this method to deque it further down.
@@ -262,7 +264,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-    
+
     private fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -271,12 +273,11 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     ): Boolean {
         val earlyUs = bufferPresentationTimeUs - positionUs
         if (shouldForceRender() || earlyUs < IMAGE_PRESENTATION_WINDOW_THRESHOLD_US) {
-            if (imageMetadataListener != null) {
-                imageMetadataListener!!.onImageAboutToBeAvailable(
-                    bufferPresentationTimeUs - outputStreamInfo.streamOffsetUs,
-                    inputFormat!!
-                )
-            }
+            onImageAboutToBeAvailable?.invoke(
+                bufferPresentationTimeUs - outputStreamInfo.streamOffsetUs,
+                inputFormat!!
+            )
+
             imageOutput.onImageAvailable(
                 bufferPresentationTimeUs - outputStreamInfo.streamOffsetUs, outputBitmap
             )
@@ -285,7 +286,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         return false
     }
 
-    
+
     private fun maybeInitializeProcessingPipeline(): Boolean {
         // Do nothing.
         return true
@@ -299,6 +300,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             outputStreamInfo = pendingOutputStreamChanges.removeFirst()
         }
     }
+
     private fun feedInputBuffer(positionUs: Long): Boolean {
         if (readyToOutputTiles && tileInfo != null) {
             return false
@@ -368,7 +370,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-    
+
     private fun maybeInitCodec(): Boolean {
         if (!maybeInitializeProcessingPipeline()) {
             return false
@@ -391,13 +393,13 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     }
 
     private fun canCreateDecoderForFormat(format: Format): Boolean {
-        val supportsFormat:  Int =
+        val supportsFormat: Int =
             decoderFactory.supportsFormat(format)
         return supportsFormat == RendererCapabilities.create(C.FORMAT_HANDLED)
                 || supportsFormat == RendererCapabilities.create(C.FORMAT_EXCEEDS_CAPABILITIES)
     }
 
-    private fun lowerFirstFrameState(firstFrameState:  Int) {
+    private fun lowerFirstFrameState(firstFrameState: Int) {
         this.firstFrameState = min(this.firstFrameState, firstFrameState)
     }
 
@@ -460,7 +462,7 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     }
 
     private class TileInfo(val tileIndex: Int, val presentationTimeUs: Long) {
-        var tileBitmap:Bitmap? = null
+        var tileBitmap: Bitmap? = null
 
         fun hasTileBitmap(): Boolean {
             return tileBitmap != null
