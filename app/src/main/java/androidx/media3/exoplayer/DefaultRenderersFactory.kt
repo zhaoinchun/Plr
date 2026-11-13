@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Handler
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
+import androidx.media3.common.Metadata
 import androidx.media3.common.util.Log.i
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
@@ -16,7 +17,6 @@ import androidx.media3.exoplayer.image.ImageRenderer
 import androidx.media3.exoplayer.mediacodec.DefaultMediaCodecAdapterFactory
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
-import androidx.media3.exoplayer.metadata.MetadataOutput
 import androidx.media3.exoplayer.metadata.MetadataRenderer
 import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.text.TextRenderer
@@ -68,7 +68,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         videoRendererEventListener: VideoRendererEventListener,
         audioRendererEventListener: AudioRendererEventListener,
         textRendererOutput: TextOutput?,
-        metadataRendererOutput: MetadataOutput
+        onMetadata: (metadata: Metadata)-> Unit
     ): Array<Renderer> {
         val renderersList = ArrayList<Renderer>()
         buildVideoRenderers(
@@ -97,7 +97,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         )
         renderersList.add(TextRenderer(textRendererOutput, eventHandler.looper))
         repeat(METADATA_RENDERER_COUNT) {
-            renderersList.add(MetadataRenderer(metadataRendererOutput, eventHandler.looper))
+            renderersList.add(MetadataRenderer(onMetadata, eventHandler.looper))
         }
         renderersList.add(CameraMotionRenderer())
         renderersList.add(ImageRenderer(getImageDecoderFactory(context), null))
@@ -371,7 +371,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         videoRendererEventListener: VideoRendererEventListener?,
         audioRendererEventListener: AudioRendererEventListener?,
         textRendererOutput: TextOutput?,
-        metadataRendererOutput: MetadataOutput?
+        onMetadata: ((metadata: Metadata) -> Unit)?
     ): Renderer? {
         if (renderer.trackType == C.TRACK_TYPE_VIDEO
             && enableMediaCodecVideoRendererPrewarming

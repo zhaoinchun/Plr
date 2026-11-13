@@ -16,8 +16,8 @@ import androidx.media3.extractor.metadata.MetadataInputBuffer
 import com.google.common.base.Preconditions
 import org.checkerframework.dataflow.qual.SideEffectFree
 
-class MetadataRenderer constructor(
-    private val output: MetadataOutput,
+class MetadataRenderer(
+    private val onMetadata: (metadata: Metadata)-> Unit,
     outputLooper: Looper?,
     private val decoderFactory: MetadataDecoderFactory = MetadataDecoderFactory.DEFAULT,
     private val outputMetadataEarly: Boolean = false
@@ -204,7 +204,7 @@ class MetadataRenderer constructor(
     }
 
     private fun invokeRendererInternal(metadata: Metadata) {
-        output.onMetadata(metadata)
+        onMetadata(metadata)
     }
 
     @SideEffectFree

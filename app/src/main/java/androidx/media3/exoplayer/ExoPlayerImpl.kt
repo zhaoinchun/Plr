@@ -67,7 +67,6 @@ import androidx.media3.exoplayer.audio.AudioOutputProvider
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink.AudioTrackConfig
 import androidx.media3.exoplayer.image.ImageOutput
-import androidx.media3.exoplayer.metadata.MetadataOutput
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MaskingMediaSource
 import androidx.media3.exoplayer.source.MediaSource
@@ -230,7 +229,7 @@ class ExoPlayerImpl(
                 componentListener,
                 componentListener,
                 componentListener,
-                componentListener
+                { componentListener.onMetadata(it) }
             )
         emptyTrackSelectorResult = TrackSelectorResult(
             arrayOfNulls(renderers.size),
@@ -247,7 +246,7 @@ class ExoPlayerImpl(
                 componentListener,
                 componentListener,
                 componentListener,
-                componentListener
+                {componentListener.onMetadata(it)}
             )
         }
         listeners =
@@ -2913,7 +2912,7 @@ class ExoPlayerImpl(
     }
 
     private inner class ComponentListener
-        : VideoRendererEventListener, AudioRendererEventListener, TextOutput, MetadataOutput,
+        : VideoRendererEventListener, AudioRendererEventListener, TextOutput,
         SurfaceHolder.Callback, SurfaceTextureListener, VideoSurfaceListener,
         AudioBecomingNoisyManager.Listener, StreamVolumeManager.Listener, AudioOffloadListener,
         StuckPlayerDetector.Callback {
@@ -3064,8 +3063,7 @@ class ExoPlayerImpl(
             }
         }
 
-        // MetadataOutput implementation
-        override fun onMetadata(metadata: Metadata) {
+        fun onMetadata(metadata: Metadata) {
             staticAndDynamicMediaMetadata =
                 staticAndDynamicMediaMetadata!!.copy().apply {
                     populateFromMetadata(metadata)
