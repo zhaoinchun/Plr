@@ -6,12 +6,11 @@ import android.os.HandlerThread
 import androidx.media3.common.MimeTypes.getTrackType
 import androidx.media3.common.util.Log.i
 import androidx.media3.common.util.Util.getTrackTypeString
-import com.google.common.base.Supplier
 
 class DefaultMediaCodecAdapterFactory(
     private val context: Context?,
-    private val callbackThreadSupplier: Supplier<HandlerThread>? = null,
-    private val queueingThreadSupplier: Supplier<HandlerThread>? = null
+    private val callbackThread: HandlerThread? = null,
+    private val queueingThread: HandlerThread? = null
 ) : MediaCodecAdapter.Factory {
     private var asynchronousMode: Int = MODE_DEFAULT
     private var asyncCryptoFlagEnabled = true
@@ -51,9 +50,9 @@ class DefaultMediaCodecAdapterFactory(
                         + getTrackTypeString(trackType)
             )
             val factory =
-                if (callbackThreadSupplier != null && queueingThreadSupplier != null)
+                if (callbackThread != null && queueingThread != null)
                     AsynchronousMediaCodecAdapter.Factory(
-                        callbackThreadSupplier, queueingThreadSupplier
+                        callbackThread, queueingThread
                     )
                 else
                     AsynchronousMediaCodecAdapter.Factory(trackType)

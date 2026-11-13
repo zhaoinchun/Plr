@@ -26,15 +26,16 @@ class AsynchronousMediaCodecAdapter(
     private val loudnessCodecController: LoudnessCodecController?
 ) : MediaCodecAdapter {
     class Factory(
-        private val callbackThreadSupplier: Supplier<HandlerThread>,
-        private val queueingThreadSupplier: Supplier<HandlerThread>
+        private val callbackThread: HandlerThread,
+        private val queueingThread: HandlerThread
     ) : MediaCodecAdapter.Factory {
         private var enableSynchronousBufferQueueingWithAsyncCryptoFlag = true
         private var enableAsyncCryptoSynchronization = false
 
         constructor(trackType: Int) : this(
-            Supplier { HandlerThread(createCallbackThreadLabel(trackType)) },
-            Supplier { HandlerThread(createQueueingThreadLabel(trackType)) })
+            HandlerThread(createCallbackThreadLabel(trackType)),
+            HandlerThread(createQueueingThreadLabel(trackType))
+        )
 
         fun setAsyncCryptoFlagEnabled(enableAsyncCryptoFlag: Boolean) {
             enableSynchronousBufferQueueingWithAsyncCryptoFlag = enableAsyncCryptoFlag
@@ -61,13 +62,13 @@ class AsynchronousMediaCodecAdapter(
                 } else {
                     bufferEnqueuer =
                         AsynchronousMediaCodecBufferEnqueuer(
-                            codec, queueingThreadSupplier.get(), enableAsyncCryptoSynchronization
+                            codec, queueingThread, enableAsyncCryptoSynchronization
                         )
                 }
                 codecAdapter =
                     AsynchronousMediaCodecAdapter(
                         codec,
-                        callbackThreadSupplier.get(),
+                        callbackThread,
                         bufferEnqueuer,
                         configuration.loudnessCodecController
                     )
