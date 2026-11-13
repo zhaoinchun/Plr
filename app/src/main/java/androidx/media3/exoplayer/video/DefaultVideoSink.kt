@@ -40,9 +40,7 @@ class DefaultVideoSink(
         videoFrameReleaseControl.setClock(clock)
         frameRateEstimator =
             FixedFrameRateEstimator { frameRate: Float ->
-                videoFrameReleaseControl.setSurfaceMediaFrameRate(
-                    frameRate
-                )
+                videoFrameReleaseControl.setSurfaceMediaFrameRate(frameRate)
             }
         videoFrameRenderControl =
             VideoFrameRenderControl(

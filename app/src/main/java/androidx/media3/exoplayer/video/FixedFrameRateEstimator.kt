@@ -5,11 +5,7 @@ import androidx.media3.common.Format
 import java.util.Arrays
 import kotlin.math.abs
 
-class FixedFrameRateEstimator(private val listener: Listener) {
-    fun interface Listener {
-        fun onFrameRateEstimateChanged(frameRate: Float)
-    }
-
+class FixedFrameRateEstimator(private val onFrameRateEstimateChanged: (frameRate: Float)-> Unit) {
     private var currentMatcher: Matcher = Matcher()
     private var candidateMatcher: Matcher = Matcher()
     private var candidateMatcherActive = false
@@ -60,7 +56,7 @@ class FixedFrameRateEstimator(private val listener: Listener) {
 
         if (shouldUpdate) {
             frameRateEstimate = candidateFrameRate
-            listener.onFrameRateEstimateChanged(frameRateEstimate)
+            onFrameRateEstimateChanged(frameRateEstimate)
         }
     }
 
