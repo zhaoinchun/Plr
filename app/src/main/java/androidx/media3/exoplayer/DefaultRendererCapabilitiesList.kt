@@ -4,13 +4,9 @@ import android.content.Context
 import androidx.media3.common.Metadata
 import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.Clock
-import androidx.media3.common.util.SystemClock
-
 import androidx.media3.common.util.Util.createHandlerForCurrentOrMainLooper
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
-import androidx.media3.exoplayer.metadata.MetadataOutput
-import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.video.VideoRendererEventListener
 
 class DefaultRendererCapabilitiesList private constructor(renderers: Array<Renderer>) :
@@ -38,10 +34,9 @@ class DefaultRendererCapabilitiesList private constructor(renderers: Array<Rende
         }
     }
 
-    private val renderers: Array<Renderer>
+    private val renderers: Array<Renderer> = renderers.copyOf()
 
     init {
-        this.renderers = renderers.copyOf()
         for (i in renderers.indices) {
             this.renderers[i].init(i, PlayerId.UNSET, Clock.DEFAULT)
         }

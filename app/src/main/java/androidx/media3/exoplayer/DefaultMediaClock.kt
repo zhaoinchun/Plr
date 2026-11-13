@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer
 
 import androidx.media3.common.PlaybackException
@@ -12,17 +11,11 @@ class DefaultMediaClock(private val listener: PlaybackParametersListener, clock:
         fun onPlaybackParametersChanged(newPlaybackParameters: PlaybackParameters?)
     }
 
-    private val standaloneClock: StandaloneMediaClock
-
+    private val standaloneClock = StandaloneMediaClock(clock)
     private var rendererClockSource: Renderer? = null
     private var rendererClock: MediaClock? = null
-    private var isUsingStandaloneClock: Boolean
+    private var isUsingStandaloneClock = true
     private var standaloneClockIsStarted = false
-
-    init {
-        this.standaloneClock = StandaloneMediaClock(clock)
-        isUsingStandaloneClock = true
-    }
 
     fun start() {
         standaloneClockIsStarted = true
@@ -38,7 +31,7 @@ class DefaultMediaClock(private val listener: PlaybackParametersListener, clock:
         standaloneClock.resetPosition(positionUs)
     }
 
-    
+
     fun onRendererEnabled(renderer: Renderer) {
         val rendererMediaClock = renderer.mediaClock
         if (rendererMediaClock != null && rendererMediaClock !== rendererClock) {
@@ -95,7 +88,7 @@ class DefaultMediaClock(private val listener: PlaybackParametersListener, clock:
                 rendererClock!!.playbackParameters = v
                 v = rendererClock!!.playbackParameters!!
             }
-            standaloneClock.playbackParameters=(v)
+            standaloneClock.playbackParameters = (v)
         }
 
     private fun syncClocks(isReadingAhead: Boolean) {
@@ -125,7 +118,7 @@ class DefaultMediaClock(private val listener: PlaybackParametersListener, clock:
         standaloneClock.resetPosition(rendererClockPositionUs)
         val playbackParameters = rendererClock.playbackParameters!!
         if (!playbackParameters.equals(standaloneClock.playbackParameters)) {
-            standaloneClock.playbackParameters=(playbackParameters)
+            standaloneClock.playbackParameters = (playbackParameters)
             listener.onPlaybackParametersChanged(playbackParameters)
         }
     }
