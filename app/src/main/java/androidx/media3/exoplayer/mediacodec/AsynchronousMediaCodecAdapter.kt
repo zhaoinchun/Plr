@@ -10,13 +10,11 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.PersistableBundle
 import android.view.Surface
-import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
 import androidx.media3.common.util.TraceUtil.beginSection
 import androidx.media3.common.util.TraceUtil.endSection
 import androidx.media3.decoder.CryptoInfo
-import com.google.common.base.Supplier
 import java.nio.ByteBuffer
 
 class AsynchronousMediaCodecAdapter(
@@ -25,82 +23,6 @@ class AsynchronousMediaCodecAdapter(
     bufferEnqueuer: MediaCodecBufferEnqueuer,
     private val loudnessCodecController: LoudnessCodecController?
 ) : MediaCodecAdapter {
-    class Factory(
-        private val callbackThread: HandlerThread,
-        private val queueingThread: HandlerThread
-    ) : MediaCodecAdapter.Factory {
-        private var enableSynchronousBufferQueueingWithAsyncCryptoFlag = true
-        private var enableAsyncCryptoSynchronization = false
-
-        constructor(trackType: Int) : this(
-            HandlerThread(createCallbackThreadLabel(trackType)),
-            HandlerThread(createQueueingThreadLabel(trackType))
-        )
-
-        fun setAsyncCryptoFlagEnabled(enableAsyncCryptoFlag: Boolean) {
-            enableSynchronousBufferQueueingWithAsyncCryptoFlag = enableAsyncCryptoFlag
-        }
-
-        fun setAsyncCryptoSynchronizationEnabled(enableAsyncCryptoSynchronization: Boolean) {
-            this.enableAsyncCryptoSynchronization = enableAsyncCryptoSynchronization
-        }
-
-        override fun createAdapter(configuration: MediaCodecAdapter.Configuration): AsynchronousMediaCodecAdapter {
-            val codecName = configuration.codecInfo.name
-            var codecAdapter: AsynchronousMediaCodecAdapter? = null
-            var codec: MediaCodec? = null
-            try {
-                beginSection("createCodec:$codecName")
-                codec = MediaCodec.createByCodecName(codecName)
-                var flags = 0
-                val bufferEnqueuer: MediaCodecBufferEnqueuer?
-                if (enableSynchronousBufferQueueingWithAsyncCryptoFlag
-                    && useSynchronousBufferQueueingWithAsyncCryptoFlag()
-                ) {
-                    bufferEnqueuer = SynchronousMediaCodecBufferEnqueuer(codec)
-                    flags = flags or MediaCodec.CONFIGURE_FLAG_USE_CRYPTO_ASYNC
-                } else {
-                    bufferEnqueuer =
-                        AsynchronousMediaCodecBufferEnqueuer(
-                            codec, queueingThread, enableAsyncCryptoSynchronization
-                        )
-                }
-                codecAdapter =
-                    AsynchronousMediaCodecAdapter(
-                        codec,
-                        callbackThread,
-                        bufferEnqueuer,
-                        configuration.loudnessCodecController
-                    )
-                endSection()
-                if (configuration.surface == null && configuration.codecInfo.detachedSurfaceSupported
-                    && Build.VERSION.SDK_INT >= 35
-                ) {
-                    flags = flags or MediaCodec.CONFIGURE_FLAG_DETACHED_SURFACE
-                }
-                codecAdapter.initialize(
-                    configuration.mediaFormat, configuration.surface, configuration.crypto, flags
-                )
-                return codecAdapter
-            } catch (e: Exception) {
-                if (codecAdapter != null) {
-                    codecAdapter.release()
-                } else {
-                    codec?.release()
-                }
-                throw e
-            }
-        }
-
-        companion object {
-            @ChecksSdkIntAtLeast(api = 36)
-            private fun useSynchronousBufferQueueingWithAsyncCryptoFlag(): Boolean {
-                // CONFIGURE_FLAG_USE_CRYPTO_ASYNC causes timeout errors on API < 36, see b/362450802.
-                return Build.VERSION.SDK_INT >= 36
-            }
-        }
-    }
-
     private val asynchronousMediaCodecCallback = AsynchronousMediaCodecCallback(callbackThread)
     private val bufferEnqueuer: MediaCodecBufferEnqueuer by lazy { bufferEnqueuer }
     private var codecReleased = false
@@ -281,6 +203,67 @@ class AsynchronousMediaCodecAdapter(
         private const val STATE_CREATED = 0
         private const val STATE_INITIALIZED = 1
         private const val STATE_SHUT_DOWN = 2
+
+        fun create(
+            configuration: MediaCodecAdapter.Configuration,
+            trackType: Int,
+            callbackThread: HandlerThread?,
+            queueingThread: HandlerThread?,
+            enableSynchronousBufferQueueingWithAsyncCryptoFlag: Boolean,
+            enableAsyncCryptoSynchronization: Boolean
+        ): AsynchronousMediaCodecAdapter {
+            val callbackThread = callbackThread ?: HandlerThread(
+                createThreadLabel(trackType, "ExoPlayer:MediaCodecAsyncAdapter:")
+            )
+            val queueingThread = queueingThread ?: HandlerThread(
+                createThreadLabel(trackType, "ExoPlayer:MediaCodecQueueingThread:")
+            )
+            val codecName = configuration.codecInfo.name
+            var codecAdapter: AsynchronousMediaCodecAdapter? = null
+            var codec: MediaCodec? = null
+            val useSynchronousBufferQueueingWithAsyncCryptoFlag = Build.VERSION.SDK_INT >= 36
+            try {
+                beginSection("createCodec:$codecName")
+                codec = MediaCodec.createByCodecName(codecName)
+                var flags = 0
+                val bufferEnqueuer: MediaCodecBufferEnqueuer?
+                if (enableSynchronousBufferQueueingWithAsyncCryptoFlag
+                    && useSynchronousBufferQueueingWithAsyncCryptoFlag
+                ) {
+                    bufferEnqueuer = SynchronousMediaCodecBufferEnqueuer(codec)
+                    flags = flags or MediaCodec.CONFIGURE_FLAG_USE_CRYPTO_ASYNC
+                } else {
+                    bufferEnqueuer =
+                        AsynchronousMediaCodecBufferEnqueuer(
+                            codec, queueingThread, enableAsyncCryptoSynchronization
+                        )
+                }
+                codecAdapter =
+                    AsynchronousMediaCodecAdapter(
+                        codec,
+                        callbackThread,
+                        bufferEnqueuer,
+                        configuration.loudnessCodecController
+                    )
+                endSection()
+                if (configuration.surface == null && configuration.codecInfo.detachedSurfaceSupported
+                    && Build.VERSION.SDK_INT >= 35
+                ) {
+                    flags = flags or MediaCodec.CONFIGURE_FLAG_DETACHED_SURFACE
+                }
+                codecAdapter.initialize(
+                    configuration.mediaFormat, configuration.surface, configuration.crypto, flags
+                )
+                return codecAdapter
+            } catch (e: Exception) {
+                if (codecAdapter != null) {
+                    codecAdapter.release()
+                } else {
+                    codec?.release()
+                }
+                throw e
+            }
+        }
 
         private fun createCallbackThreadLabel(trackType: Int): String {
             return createThreadLabel(trackType, "ExoPlayer:MediaCodecAsyncAdapter:")

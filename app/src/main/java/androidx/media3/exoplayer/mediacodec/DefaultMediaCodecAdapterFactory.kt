@@ -49,16 +49,13 @@ class DefaultMediaCodecAdapterFactory(
                 "Creating an asynchronous MediaCodec adapter for track type "
                         + getTrackTypeString(trackType)
             )
-            val factory =
-                if (callbackThread != null && queueingThread != null)
-                    AsynchronousMediaCodecAdapter.Factory(
-                        callbackThread, queueingThread
-                    )
-                else
-                    AsynchronousMediaCodecAdapter.Factory(trackType)
-            factory.setAsyncCryptoFlagEnabled(asyncCryptoFlagEnabled)
-            factory.setAsyncCryptoSynchronizationEnabled(asyncCryptoSynchronizationEnabled)
-            return factory.createAdapter(configuration)
+            return AsynchronousMediaCodecAdapter.create(
+                configuration, trackType,
+                callbackThread,
+                queueingThread,
+                asyncCryptoSynchronizationEnabled,
+                asyncCryptoFlagEnabled
+            )
         }
         return SynchronousMediaCodecAdapter.Factory().createAdapter(configuration)
     }
