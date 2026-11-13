@@ -1,13 +1,7 @@
-
 package androidx.media3.exoplayer.offline
 
-import java.io.IOException
-
 interface Downloader {
-    interface ProgressListener {
-        fun onProgress(contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float)
-    }
-    fun download(progressListener: ProgressListener?)
+    fun download(onProgress: ((contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float)-> Unit)?)
     fun cancel()
     fun remove()
 }

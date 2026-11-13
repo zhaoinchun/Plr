@@ -33,7 +33,7 @@ class ProgressiveDownloader(
     private val dataSource = cacheDataSourceFactory.createDataSourceForDownloading()
     private val cacheWriter: CacheWriter
     private val priorityTaskManager: PriorityTaskManager?
-    private var progressListener: Downloader.ProgressListener? = null
+    private var  onProgress: ((contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float)-> Unit)? = null
 
     @Volatile
     private var downloadRunnable: RunnableFutureTask<Void?, IOException?>? = null
@@ -64,8 +64,9 @@ class ProgressiveDownloader(
             CacheWriter(dataSource, dataSpec, null, progressListener)
         priorityTaskManager = cacheDataSourceFactory.getUpstreamPriorityTaskManager()
     }
-    override fun download(progressListener: Downloader.ProgressListener?) {
-        this.progressListener = progressListener
+
+    override fun download(onProgress: ((contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float) -> Unit)?) {
+        this.onProgress = onProgress
         priorityTaskManager?.add(C.PRIORITY_DOWNLOAD)
         try {
             var finished = false
@@ -73,7 +74,7 @@ class ProgressiveDownloader(
                 // Recreate downloadRunnable on each loop iteration to avoid rethrowing a previous error.
                 downloadRunnable =
                     object : RunnableFutureTask<Void?, IOException?>() {
-                        
+
                         override fun doWork(): Void? {
                             cacheWriter.cache()
                             return null
@@ -119,7 +120,7 @@ class ProgressiveDownloader(
     }
 
     private fun onProgress(contentLength: Long, bytesCached: Long, newBytesCached: Long) {
-        if (progressListener == null) {
+        if (onProgress == null) {
             return
         }
         val percentDownloaded: Float =
@@ -127,6 +128,6 @@ class ProgressiveDownloader(
                 C.PERCENTAGE_UNSET.toFloat()
             else
                 percentFloat(bytesCached, contentLength)
-        progressListener!!.onProgress(contentLength, bytesCached, percentDownloaded)
+        onProgress!!(contentLength, bytesCached, percentDownloaded)
     }
 }

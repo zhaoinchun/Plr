@@ -55,7 +55,7 @@ class DownloadManager(
         fun onRequirementsStateChanged(
             downloadManager: DownloadManager?,
             requirements: Requirements?,
-             notMetRequirements:  Int
+            notMetRequirements: Int
         ) {
         }
 
@@ -292,7 +292,7 @@ class DownloadManager(
 
     private fun onRequirementsStateChanged(
         requirementsWatcher: RequirementsWatcher,
-         notMetRequirements:  Int
+        notMetRequirements: Int
     ) {
         val requirements = requirementsWatcher.requirements
         if (this.notMetRequirements != notMetRequirements) {
@@ -409,7 +409,7 @@ class DownloadManager(
 
         private val downloads = ArrayList<Download>()
         private val activeTasks = HashMap<String?, Task>()
-        private var notMetRequirements:  Int = 0
+        private var notMetRequirements: Int = 0
         private var activeDownloadTaskCount = 0
         private var hasActiveRemoveTask = false
 
@@ -526,7 +526,7 @@ class DownloadManager(
             syncTasks()
         }
 
-        fun setNotMetRequirements( notMetRequirements:  Int) {
+        fun setNotMetRequirements(notMetRequirements: Int) {
             this.notMetRequirements = notMetRequirements
             syncTasks()
         }
@@ -568,7 +568,7 @@ class DownloadManager(
                     )
                 }
             } else if (stopReason != download.stopReason) {
-                 var state:  Int = download.state
+                var state: Int = download.state
                 if (state == Download.STATE_QUEUED || state == Download.STATE_DOWNLOADING) {
                     state = Download.STATE_STOPPED
                 }
@@ -925,7 +925,7 @@ class DownloadManager(
 
         fun onRemoveTaskStopped(download: Download) {
             if (download.state == Download.STATE_RESTARTING) {
-                 val state:  Int =
+                val state: Int =
                     if (download.stopReason == Download.STOP_REASON_NONE) Download.STATE_QUEUED else Download.STATE_STOPPED
                 putDownloadWithState(download, state, download.stopReason)
                 syncTasks()
@@ -969,7 +969,7 @@ class DownloadManager(
         }
 
         fun putDownloadWithState(
-            download: Download,  state:  Int, stopReason: Int
+            download: Download, state: Int, stopReason: Int
         ): Download {
             // Downloads in terminal states shouldn't be in the downloads list.
             Preconditions.checkState(state != Download.STATE_COMPLETED && state != Download.STATE_FAILED)
@@ -1049,7 +1049,7 @@ class DownloadManager(
             private const val UPDATE_PROGRESS_INTERVAL_MS = 5000
 
             private fun copyDownloadWithState(
-                download: Download,  state:  Int, stopReason: Int
+                download: Download, state: Int, stopReason: Int
             ): Download {
                 return Download(
                     download.request,
@@ -1076,11 +1076,11 @@ class DownloadManager(
         val isRemove: Boolean,
         val minRetryCount: Int,
         @field:Volatile var internalHandler: InternalHandler?
-    ) : Thread(), Downloader.ProgressListener {
+    ) : Thread() {
         @Volatile
         var isCanceled = false
         var finalException: Exception? = null
-        var contentLength= C.LENGTH_UNSET.toLong()
+        var contentLength = C.LENGTH_UNSET.toLong()
 
         fun cancel(released: Boolean) {
             if (released) {
@@ -1107,7 +1107,9 @@ class DownloadManager(
                     var errorPosition = C.LENGTH_UNSET.toLong()
                     while (!isCanceled) {
                         try {
-                            downloader.download(this)
+                            downloader.download { contentLength, bytesDownloaded, percentDownloaded ->
+                                onProgress(contentLength, bytesDownloaded, percentDownloaded)
+                            }
                             break
                         } catch (e: IOException) {
                             if (!isCanceled) {
@@ -1133,7 +1135,7 @@ class DownloadManager(
             internalHandler?.obtainMessage(MSG_TASK_STOPPED, this)?.sendToTarget()
         }
 
-        override fun onProgress(
+        fun onProgress(
             contentLength: Long,
             bytesDownloaded: Long,
             percentDownloaded: Float
@@ -1195,7 +1197,7 @@ class DownloadManager(
         fun mergeRequest(
             download: Download, request: DownloadRequest, stopReason: Int, nowMs: kotlin.Long
         ): Download {
-             var state:  Int = download.state
+            var state: Int = download.state
             // Treat the merge as creating a new download if we're currently removing the existing one, or
             // if the existing download is in a terminal state. Else treat the merge as updating the
             // existing download.

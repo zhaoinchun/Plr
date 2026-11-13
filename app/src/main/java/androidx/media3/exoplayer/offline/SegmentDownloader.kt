@@ -105,7 +105,8 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         0,
         C.TIME_UNSET
     )
-    override fun download(progressListener: Downloader.ProgressListener?) {
+
+    override fun download(onProgress: ((contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float) -> Unit)?) {
         val pendingSegments = ArrayDeque<Segment>()
         val recycledRunnables: ArrayDeque<SegmentDownloadRunnable> =
             ArrayDeque<SegmentDownloadRunnable>()
@@ -159,9 +160,9 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
 
             // Download the segments.
             val progressNotifier =
-                if (progressListener != null)
+                if (onProgress != null)
                     ProgressNotifier(
-                        progressListener,
+                        onProgress,
                         contentLength,
                         totalSegments,
                         bytesDownloaded,
@@ -274,6 +275,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
     protected fun getManifest(dataSource: DataSource, dataSpec: DataSpec, removing: Boolean): M {
         return getManifest(dataSource, manifestParser, dataSpec, removing)
     }
+
     protected fun getManifest(
         dataSource: DataSource,
         manifestParser: ParsingLoadable.Parser<M>,
@@ -283,7 +285,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         return execute<M>(
             {
                 object : RunnableFutureTask<M, IOException>() {
-                    
+
                     override fun doWork(): M {
                         return ParsingLoadable.load<M>(
                             dataSource, manifestParser, dataSpec, C.DATA_TYPE_MANIFEST
@@ -294,6 +296,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
             removing
         )
     }
+
     protected fun <T> execute(
         runnable: Supplier<RunnableFutureTask<T, *>>,
         removing: Boolean
@@ -341,6 +344,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
             }
         }
     }
+
     protected abstract fun getSegments(
         dataSource: DataSource?,
         manifest: M,
@@ -377,7 +381,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         private val cacheWriter: CacheWriter =
             CacheWriter(dataSource, segment.dataSpec, temporaryBuffer, progressNotifier)
 
-        
+
         override fun doWork(): Void? {
             cacheWriter.cache()
             progressNotifier?.onSegmentDownloaded()
@@ -390,7 +394,7 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
     }
 
     private class ProgressNotifier(
-        private val progressListener: Downloader.ProgressListener,
+        private val onProgress: (contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float) -> Unit,
         private val contentLength: Long,
         private val totalSegments: Int,
         private var bytesDownloaded: Long,
@@ -402,12 +406,12 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
             newBytesCached: Long
         ) {
             bytesDownloaded += newBytesCached
-            progressListener.onProgress(contentLength, bytesDownloaded, this.percentDownloaded)
+            onProgress(contentLength, bytesDownloaded, this.percentDownloaded)
         }
 
         fun onSegmentDownloaded() {
             segmentsDownloaded++
-            progressListener.onProgress(contentLength, bytesDownloaded, this.percentDownloaded)
+            onProgress(contentLength, bytesDownloaded, this.percentDownloaded)
         }
 
         val percentDownloaded: Float

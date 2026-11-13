@@ -208,7 +208,7 @@ class PreCacheHelper(
 
     private class ReleasableExecutorSupplier(private val preCacheHandler: Handler) :
         Supplier<ReleasableExecutor> {
-        private var downloadCallback:DownloadCallback? = null
+        private var downloadCallback: DownloadCallback? = null
 
         @GuardedBy("this")
         private var executorCount = 0
@@ -410,7 +410,7 @@ class PreCacheHelper(
         val isRemove: Boolean,
         val minRetryCount: Int,
         var downloadCallback: DownloadCallback?
-    ) : Thread(), Downloader.ProgressListener {
+    ) : Thread() {
         @Volatile
         var isCanceled = false
 
@@ -449,7 +449,9 @@ class PreCacheHelper(
                     var errorPosition = C.LENGTH_UNSET.toLong()
                     while (!isCanceled) {
                         try {
-                            downloader.download(this)
+                            downloader.download { contentLength, bytesDownloaded, percentDownloaded ->
+                                onProgress(contentLength, bytesDownloaded, percentDownloaded)
+                            }
                             break
                         } catch (e: IOException) {
                             if (!isCanceled) {
@@ -477,7 +479,7 @@ class PreCacheHelper(
             }
         }
 
-        override fun onProgress(
+        fun onProgress(
             contentLength: Long,
             bytesDownloaded: Long,
             percentDownloaded: Float
