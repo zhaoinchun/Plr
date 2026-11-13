@@ -1,4 +1,3 @@
-
 package androidx.media3.exoplayer.video
 
 import android.content.Context
@@ -13,14 +12,11 @@ import android.view.Display
 import android.view.Surface
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.util.Log.e
 import androidx.media3.common.util.Log.w
-
 import androidx.media3.common.util.Util.createHandlerForCurrentLooper
-import com.google.common.base.Preconditions
 import kotlin.concurrent.Volatile
 import kotlin.math.abs
 
@@ -32,37 +28,25 @@ class VideoFrameReleaseHelper(private val context: Context) {
     private var surfaceMediaFrameRate = 0f
     private var surfacePlaybackFrameRate = 0f
     private var playbackSpeed = 1f
-
-    
-    private var changeFrameRateStrategy:  Int
-
+    private var changeFrameRateStrategy: Int= C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
     private var lastVsyncHysteresisOffsetNs: Long = 0
     private var pendingVsyncHysteresisOffsetNs: Long = 0
-
     private var pendingLastAdjustedFrameIndex: Long = 0
     private var pendingLastAdjustedReleaseTimeNs: Long = 0
     private var pendingLastPresentationTimeUs: Long = 0
     private var lastAdjustedFrameIndex: Long = 0
     private var lastAdjustedReleaseTimeNs: Long = 0
     private var lastAdjustedPresentationTimeUs: Long = 0
-    private var vsyncSamplerListener: VSyncSamplerListener? = null
-
-     interface VSyncSamplerListener {
-        fun onVsyncSampled(sampler: Any?)
-    }
-
-    init {
-        changeFrameRateStrategy = C.VIDEO_CHANGE_FRAME_RATE_STRATEGY_ONLY_IF_SEAMLESS
-    }
+    private var onVsyncSampled: ((sampler: Any?) -> Unit)? = null
 
     fun setChangeFrameRateStrategy(
-         changeFrameRateStrategy:  Int
+        changeFrameRateStrategy: Int
     ) {
         if (this.changeFrameRateStrategy == changeFrameRateStrategy) {
             return
         }
         this.changeFrameRateStrategy = changeFrameRateStrategy
-        updateSurfacePlaybackFrameRate( true)
+        updateSurfacePlaybackFrameRate(true)
     }
 
     fun onStarted() {
@@ -70,15 +54,11 @@ class VideoFrameReleaseHelper(private val context: Context) {
         resetAdjustment()
         if (!vsyncSamplerBuilt) {
             vsyncSampler = VSyncSampler.maybeBuildInstance(context)
-            if (vsyncSampler != null) {
-                vsyncSampler!!.listener = vsyncSamplerListener
-            }
+            vsyncSampler?.onVsyncSampled = onVsyncSampled
             vsyncSamplerBuilt = true
         }
-        if (vsyncSampler != null) {
-            vsyncSampler!!.register()
-        }
-        updateSurfacePlaybackFrameRate( false)
+        vsyncSampler?.register()
+        updateSurfacePlaybackFrameRate(false)
     }
 
     fun onSurfaceChanged(surface: Surface?) {
@@ -87,7 +67,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
         }
         clearSurfaceFrameRate()
         this.surface = surface
-        updateSurfacePlaybackFrameRate( true)
+        updateSurfacePlaybackFrameRate(true)
     }
 
     fun onPositionReset() {
@@ -96,7 +76,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
 
     fun onPlaybackSpeed(playbackSpeed: Float) {
         this.playbackSpeed = playbackSpeed
-        updateSurfacePlaybackFrameRate( false)
+        updateSurfacePlaybackFrameRate(false)
     }
 
     fun setSurfaceMediaFrameRate(surfaceMediaFrameRate: Float) {
@@ -104,7 +84,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
             return
         }
         this.surfaceMediaFrameRate = surfaceMediaFrameRate
-        updateSurfacePlaybackFrameRate( false)
+        updateSurfacePlaybackFrameRate(false)
     }
 
     fun onStopped() {
@@ -166,19 +146,15 @@ class VideoFrameReleaseHelper(private val context: Context) {
         return snappedTimeNs - (vsyncDurationNs * VSYNC_OFFSET_PERCENTAGE) / 100
     }
 
-    
     fun setVsyncData(vsyncSampleTimeNs: Long, vsyncDurationNs: Long) {
         vsyncSampler!!.sampledVsyncTimeNs =
             vsyncSampleTimeNs
         vsyncSampler!!.vsyncDurationNs = vsyncDurationNs
     }
 
-    
-    fun setVSyncSamplerListener(listener: VSyncSamplerListener?) {
-        this.vsyncSamplerListener = listener
-        if (vsyncSampler != null) {
-            vsyncSampler!!.listener = listener
-        }
+    fun setVSyncSamplerListener(onVsyncSampled: ((sampler: Any?) -> Unit)?) {
+        this.onVsyncSampled = onVsyncSampled
+        vsyncSampler?.onVsyncSampled = onVsyncSampled
     }
 
     private fun resetAdjustment() {
@@ -212,7 +188,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
             return
         }
         surfacePlaybackFrameRate = 0f
-        Api30.setSurfaceFrameRate(surface!!,  0f)
+        Api30.setSurfaceFrameRate(surface!!, 0f)
     }
 
     private fun findClosestVsyncAndUpdateHysteresis(
@@ -276,22 +252,17 @@ class VideoFrameReleaseHelper(private val context: Context) {
         }
     }
 
-    private abstract class VSyncSampler(val choreographer: Choreographer, 
-                                        val displayManager: DisplayManager
+    private abstract class VSyncSampler(
+        val choreographer: Choreographer,
+        val displayManager: DisplayManager
     ) : DisplayListener {
-        
-        @Volatile
-        var sampledVsyncTimeNs: Long
 
         @Volatile
-        var vsyncDurationNs: Long
+        var sampledVsyncTimeNs: Long = C.TIME_UNSET
 
-        var listener:  VSyncSamplerListener? = null
-
-        init {
-            sampledVsyncTimeNs = C.TIME_UNSET
-            vsyncDurationNs = C.TIME_UNSET
-        }
+        @Volatile
+        var vsyncDurationNs: Long = C.TIME_UNSET
+        var onVsyncSampled: ((sampler: Any?) -> Unit)? = null
 
         @CallSuper
         open fun register() {
@@ -312,7 +283,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
         }
 
         companion object {
-             fun maybeBuildInstance(context: Context): VSyncSampler? {
+            fun maybeBuildInstance(context: Context): VSyncSampler? {
                 val displayManager =
                     context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager?
                 if (displayManager == null) {
@@ -354,9 +325,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
             sampledVsyncTimeNs = vsyncTimeNs
             choreographer.removeFrameCallback(this)
             choreographer.postFrameCallbackDelayed(this, VSYNC_SAMPLE_UPDATE_PERIOD_MS)
-            if (listener != null) {
-                listener!!.onVsyncSampled(this)
-            }
+            onVsyncSampled?.invoke(this)
         }
 
         override fun onDisplayChanged(displayId: Int) {
@@ -398,7 +367,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
 
         override fun unregister() {
             super.unregister()
-            handler.removeCallbacksAndMessages( null)
+            handler.removeCallbacksAndMessages(null)
             choreographer.removeVsyncCallback(this)
             sampledVsyncTimeNs = C.TIME_UNSET
             vsyncDurationNs = C.TIME_UNSET
@@ -415,18 +384,16 @@ class VideoFrameReleaseHelper(private val context: Context) {
             } else {
                 vsyncDurationNs = C.TIME_UNSET
             }
-            handler.removeCallbacksAndMessages( null)
+            handler.removeCallbacksAndMessages(null)
             handler.postDelayed(
                 Runnable { choreographer.postVsyncCallback(this) }, VSYNC_SAMPLE_UPDATE_PERIOD_MS
             )
-            if (listener != null) {
-                listener!!.onVsyncSampled(this)
-            }
+            onVsyncSampled?.invoke(this)
         }
 
         override fun onDisplayChanged(displayId: Int) {
             if (displayId == Display.DEFAULT_DISPLAY) {
-                handler.removeCallbacksAndMessages( null)
+                handler.removeCallbacksAndMessages(null)
                 choreographer.removeVsyncCallback(this)
                 choreographer.postVsyncCallback(this)
             }
@@ -436,7 +403,7 @@ class VideoFrameReleaseHelper(private val context: Context) {
     companion object {
         private const val TAG = "VideoFrameReleaseHelper"
 
-        
+
         const val VSYNC_SAMPLE_UPDATE_PERIOD_MS: Long = 500
         private const val MAX_ALLOWED_ADJUSTMENT_NS: Long = 20000000
         private const val VSYNC_OFFSET_PERCENTAGE: Long = 80
