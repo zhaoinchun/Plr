@@ -33,7 +33,6 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.AdOverlayInfo
 import androidx.media3.common.AdViewProvider
 import androidx.media3.common.C
-import androidx.media3.common.ErrorMessageProvider
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
@@ -105,7 +104,7 @@ class PlayerView(
     private var defaultArtwork: Drawable? = null
     private var showBuffering:  Int = 0
     private var keepContentOnPlayerReset = false
-    private var errorMessageProvider: ErrorMessageProvider<in PlaybackException>? = null
+    private var getErrorMessage:((throwable: PlaybackException)-> Pair<Int, String>)? = null
     private var customErrorMessage: CharSequence? = null
     private var controllerShowTimeoutMs: Int = 0
 
@@ -575,10 +574,10 @@ class PlayerView(
     }
 
     fun setErrorMessageProvider(
-        errorMessageProvider: ErrorMessageProvider<in PlaybackException>?
+        getErrorMessage:((throwable: PlaybackException)-> Pair<Int, String>)?
     ) {
-        if (this.errorMessageProvider !== errorMessageProvider) {
-            this.errorMessageProvider = errorMessageProvider
+        if (this.getErrorMessage !== getErrorMessage) {
+            this.getErrorMessage = getErrorMessage
             updateErrorMessage()
         }
     }
@@ -1099,9 +1098,8 @@ class PlayerView(
                 return
             }
             val error = if (player != null) player!!.playerError else null
-            if (error != null && errorMessageProvider != null) {
-                val errorMessage: CharSequence? =
-                    errorMessageProvider!!.getErrorMessage(error).second
+            if (error != null && getErrorMessage != null) {
+                val errorMessage: CharSequence? = getErrorMessage!!(error).second
                 errorMessageView.setText(errorMessage)
                 errorMessageView.setVisibility(VISIBLE)
             } else {
