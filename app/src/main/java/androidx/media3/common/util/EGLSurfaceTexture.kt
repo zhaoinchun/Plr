@@ -16,26 +16,17 @@ import androidx.media3.common.util.GlUtil.checkGlException
 import androidx.media3.common.util.Util.formatInvariant
 import com.google.common.base.Preconditions
 
-class EGLSurfaceTexture  constructor(
+class EGLSurfaceTexture(
     private val handler: Handler,
-    private val callback: TextureImageListener? = null
+    private val onFrameAvailable: (()-> Unit)? = null
 ) : OnFrameAvailableListener, Runnable {
-    interface TextureImageListener {
-        fun onFrameAvailable()
-    }
-
-    private val textureIdHolder: IntArray
+    private val textureIdHolder = IntArray(1)
 
     private var display: EGLDisplay? = null
     private var context: EGLContext? = null
     private var surface: EGLSurface? = null
     private var texture: SurfaceTexture? = null
 
-    init {
-        textureIdHolder = IntArray(1)
-    }
-
-    
     fun init(secureMode:  Int) {
         display = defaultDisplay
         val config: EGLConfig? = chooseEGLConfig(display)
@@ -99,9 +90,7 @@ class EGLSurfaceTexture  constructor(
     }
 
     private fun dispatchOnFrameAvailable() {
-        if (callback != null) {
-            callback.onFrameAvailable()
-        }
+        onFrameAvailable?.invoke()
     }
 
     companion object {

@@ -3,14 +3,12 @@ package androidx.media3.common.audio
 import android.util.Pair
 import androidx.annotation.IntRange
 import androidx.media3.common.C
-
 import androidx.media3.common.util.Util.durationUsToSampleCount
 import androidx.media3.common.util.Util.sampleCountToDurationUs
 import com.google.common.base.Function
 import com.google.common.base.Preconditions
 import com.google.common.collect.Range
 import com.google.common.collect.TreeRangeMap
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -18,9 +16,10 @@ class DefaultGainProvider private constructor(
     gainMap: TreeRangeMap<Long, Function<Pair<Long, Int>, Float>>,
     defaultGain: Float
 ) : GainProcessor.GainProvider {
-    
+
     class Builder(private val defaultGain: Float) {
-        private val gainMap: TreeRangeMap<Long, Function<Pair<Long, Int>, Float>> = TreeRangeMap.create<Long, Function<Pair<Long, Int>, Float>>()
+        private val gainMap: TreeRangeMap<Long, Function<Pair<Long, Int>, Float>> =
+            TreeRangeMap.create<Long, Function<Pair<Long, Int>, Float>>()
 
         init {
             // Add default value for all possible positions.
@@ -30,7 +29,7 @@ class DefaultGainProvider private constructor(
         fun addFadeAt(
             @IntRange(from = 0) positionUs: Long,
             @IntRange(from = 1) durationUs: Long,
-            shape: FadeProvider
+            getGainFactorAt: (index: Long, duration: Long) -> Float
         ): Builder {
             Preconditions.checkArgument(positionUs >= 0)
             Preconditions.checkArgument(durationUs > 1)
@@ -43,7 +42,7 @@ class DefaultGainProvider private constructor(
                             positionUs,
                             sampleRate
                         )
-                    shape.getGainFactorAt(
+                    getGainFactorAt(
                         relativeSamplePosition, durationUsToSampleCount(durationUs, sampleRate)
                     )
                 })
@@ -55,15 +54,9 @@ class DefaultGainProvider private constructor(
         }
     }
 
-    fun interface FadeProvider {
-        fun getGainFactorAt(
-            @IntRange(from = 0) index: Long,
-            @IntRange(from = 1) duration: Long
-        ): Float
-    }
-
     // Use TreeRangeMap instead of ImmutableRangeMap to allow overlapping ranges.
-    private val gainMap: TreeRangeMap<Long, Function<Pair<Long, Int>, Float>> = TreeRangeMap.create<Long, Function<Pair<Long, Int>, Float>>()
+    private val gainMap: TreeRangeMap<Long, Function<Pair<Long, Int>, Float>> =
+        TreeRangeMap.create<Long, Function<Pair<Long, Int>, Float>>()
 
     private val defaultGain: Float
 
@@ -81,8 +74,8 @@ class DefaultGainProvider private constructor(
         // gainMap has a default value set for all possible values, so it should never return null.
         val gain: Float =
             gainMap.get(sampleCountToDurationUs(samplePosition, sampleRate))!!.apply(
-                    Pair.create(samplePosition, sampleRate)
-                )!!
+                Pair.create(samplePosition, sampleRate)
+            )!!
         if (gain == GAIN_UNSET) {
             return defaultGain
         }
@@ -96,7 +89,7 @@ class DefaultGainProvider private constructor(
         Preconditions.checkArgument(samplePosition >= 0)
 
         val positionUs: Long = sampleCountToDurationUs(samplePosition, sampleRate)
-        val entry =gainMap.getEntry(positionUs)!!
+        val entry = gainMap.getEntry(positionUs)!!
         val gainFactor: Float = entry.value!!.apply(
             Pair.create(samplePosition, sampleRate)
         )!!
@@ -118,18 +111,13 @@ class DefaultGainProvider private constructor(
     }
 
     companion object {
-        val FADE_IN_LINEAR: FadeProvider =
-            DefaultGainProvider.FadeProvider { index: Long, duration: Long -> index.toFloat() / duration }
-
-        val FADE_OUT_LINEAR: FadeProvider =
-            DefaultGainProvider.FadeProvider { index: Long, duration: Long -> (duration - index).toFloat() / duration }
-
-        val FADE_IN_EQUAL_POWER: FadeProvider =
-            DefaultGainProvider.FadeProvider { index: Long, duration: Long -> sin((Math.PI / 2.0) * index / duration).toFloat() }
-
-        val FADE_OUT_EQUAL_POWER: FadeProvider =
-            DefaultGainProvider.FadeProvider { index: Long, duration: Long -> cos((Math.PI / 2.0) * index / duration).toFloat() }
-
+        val FADE_IN_LINEAR = { index: Long, duration: Long -> index.toFloat() / duration }
+        val FADE_OUT_LINEAR =
+            { index: Long, duration: Long -> (duration - index).toFloat() / duration }
+        val FADE_IN_EQUAL_POWER =
+            { index: Long, duration: Long -> sin((Math.PI / 2.0) * index / duration).toFloat() }
+        val FADE_OUT_EQUAL_POWER =
+            { index: Long, duration: Long -> cos((Math.PI / 2.0) * index / duration).toFloat() }
         private const val GAIN_UNSET = C.RATE_UNSET
     }
 }
