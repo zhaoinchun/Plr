@@ -30,7 +30,6 @@ import androidx.media3.exoplayer.SeekParameters
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.DrmSessionManager
 import androidx.media3.exoplayer.source.ProgressiveMediaPeriod.ExtractingLoadable
-import androidx.media3.exoplayer.source.SampleQueue.UpstreamFormatChangedListener
 
 import androidx.media3.exoplayer.trackselection.ExoTrackSelection
 import androidx.media3.exoplayer.upstream.Allocator
@@ -79,8 +78,7 @@ class ProgressiveMediaPeriod(
     private val singleTrackFormat: Format?,
     private val singleSampleDurationUs: Long,
     downloadExecutor: ReleasableExecutor?
-) : MediaPeriod, ExtractorOutput, Loader.Callback<ExtractingLoadable>,
-    UpstreamFormatChangedListener {
+) : MediaPeriod, ExtractorOutput, Loader.Callback<ExtractingLoadable> {
     interface Listener {
         fun onSourceInfoRefreshed(durationUs: Long, seekMap: SeekMap, isLive: Boolean)
     }
@@ -180,7 +178,7 @@ class ProgressiveMediaPeriod(
         }
     }
 
-    
+
     override fun maybeThrowPrepareError() {
         maybeThrowError()
         if (loadingFinished && !prepared) {
@@ -552,13 +550,13 @@ class ProgressiveMediaPeriod(
         return !suppressRead() && sampleQueues[track].isReady(loadingFinished)
     }
 
-    
+
     fun maybeThrowError(sampleQueueIndex: Int) {
         sampleQueues[sampleQueueIndex].maybeThrowError()
         maybeThrowError()
     }
 
-    
+
     fun maybeThrowError() {
         loader.maybeThrowError(loadErrorHandlingPolicy.getMinimumLoadableRetryCount(dataType))
     }
@@ -567,7 +565,7 @@ class ProgressiveMediaPeriod(
         sampleQueueIndex: Int,
         formatHolder: FormatHolder,
         buffer: DecoderInputBuffer,
-        readFlags:  Int
+        readFlags: Int
     ): Int {
         if (suppressRead()) {
             return C.RESULT_NOTHING_READ
@@ -818,8 +816,7 @@ class ProgressiveMediaPeriod(
         return prepareTrackOutput(TrackId(0, true))
     }
 
-    // UpstreamFormatChangedListener implementation. Called by the loading thread.
-    override fun onUpstreamFormatChanged(format: Format) {
+    fun onUpstreamFormatChanged(format: Format) {
         handler.post(maybeFinishPrepareRunnable)
     }
 
@@ -842,7 +839,7 @@ class ProgressiveMediaPeriod(
         val sampleQueue: SampleQueue =
             SampleQueue.createWithDrm(allocator, drmSessionManager, drmEventDispatcher)
         val trackOutput = ControlledTrackOutput(sampleQueue)
-        sampleQueue.setUpstreamFormatChangeListener(this)
+        sampleQueue.setUpstreamFormatChangeListener { onUpstreamFormatChanged(it) }
         val sampleQueueTrackIds: Array<TrackId?> = sampleQueueTrackIds.copyOf(trackCount + 1)
         sampleQueueTrackIds[trackCount] = id
         this.sampleQueueTrackIds = sampleQueueTrackIds as Array<TrackId>
@@ -1081,13 +1078,13 @@ class ProgressiveMediaPeriod(
         override val isReady: Boolean
             get() = this@ProgressiveMediaPeriod.isReady(track)
 
-        
+
         override fun maybeThrowError() {
             this@ProgressiveMediaPeriod.maybeThrowError(track)
         }
 
         override fun readData(
-            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags:  Int
+            formatHolder: FormatHolder, buffer: DecoderInputBuffer, readFlags: Int
         ): Int {
             return this@ProgressiveMediaPeriod.readData(track, formatHolder, buffer, readFlags)
         }
@@ -1096,7 +1093,7 @@ class ProgressiveMediaPeriod(
             return this@ProgressiveMediaPeriod.skipData(track, positionUs)
         }
 
-        override val flags:  Int
+        override val flags: Int
             get() = if (hasPreroll) SampleStream.FLAG_HAS_PREROLL else 0
 
     }
@@ -1107,7 +1104,7 @@ class ProgressiveMediaPeriod(
         val progressiveMediaExtractor: ProgressiveMediaExtractor,
         val extractorOutput: ExtractorOutput,
         val loadCondition: ConditionVariable
-    ) : Loadable, IcyDataSource.Listener {
+    ) : Loadable {
         val loadTaskId: Long = LoadEventInfo.newId
         val dataSource: StatsDataSource = StatsDataSource(dataSource)
         val positionHolder: PositionHolder = PositionHolder()
@@ -1130,7 +1127,7 @@ class ProgressiveMediaPeriod(
             loadCanceled = true
         }
 
-        
+
         override fun load() {
             var result = Extractor.RESULT_CONTINUE
             var etag: String? = null
@@ -1152,7 +1149,10 @@ class ProgressiveMediaPeriod(
                     var extractorDataSource: DataSource = dataSource
                     if (icyHeaders != null && icyHeaders!!.metadataInterval != C.LENGTH_UNSET) {
                         extractorDataSource =
-                            IcyDataSource(dataSource, icyHeaders!!.metadataInterval, this)
+                            IcyDataSource(
+                                dataSource,
+                                icyHeaders!!.metadataInterval,
+                                onIcyMetadata = { onIcyMetadata(it) })
                         icyTrackOutput = icyTrack()
                         icyTrackOutput!!.format(ICY_FORMAT)
                     }
@@ -1200,8 +1200,7 @@ class ProgressiveMediaPeriod(
             }
         }
 
-        // IcyDataSource.Listener
-        override fun onIcyMetadata(metadata: ParsableByteArray) {
+        fun onIcyMetadata(metadata: ParsableByteArray) {
             // Always output the first ICY metadata at the start time. This helps minimize any delay
             // between the start of playback and the first ICY metadata event.
             val timeUs =
@@ -1281,7 +1280,7 @@ class ProgressiveMediaPeriod(
             DISCARDING,
         }
 
-        
+
         override fun sampleData(
             input: DataReader,
             length: Int,
@@ -1290,12 +1289,12 @@ class ProgressiveMediaPeriod(
             return this.currentOutput.sampleData(input, length, allowEndOfInput)
         }
 
-        
+
         override fun sampleData(
             input: DataReader,
             length: Int,
             allowEndOfInput: Boolean,
-            sampleDataPart:  Int
+            sampleDataPart: Int
         ): Int {
             return this.currentOutput.sampleData(input, length, allowEndOfInput, sampleDataPart)
         }
@@ -1307,14 +1306,14 @@ class ProgressiveMediaPeriod(
         override fun sampleData(
             data: ParsableByteArray,
             length: Int,
-            sampleDataPart:  Int
+            sampleDataPart: Int
         ) {
             this.currentOutput.sampleData(data, length, sampleDataPart)
         }
 
         override fun sampleMetadata(
             timeUs: Long,
-            flags:  Int,
+            flags: Int,
             size: Int,
             offset: Int,
             cryptoData: TrackOutput.CryptoData?

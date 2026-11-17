@@ -26,19 +26,12 @@ import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.Executor
 
 class NetworkTypeObserver private constructor(context: Context) {
-
-    fun interface Listener {
-
-        fun onNetworkTypeChanged( networkType:  Int)
-    }
-
     private val backgroundExecutor: Executor?
     private val listeners: CopyOnWriteArrayList<ListenerHolder>
     private val lock: Any
 
     @GuardedBy("lock")
-    
-    private var networkType:  Int
+    private var networkType: Int
 
     @GuardedBy("lock")
     private var isInitialized = false
@@ -56,10 +49,10 @@ class NetworkTypeObserver private constructor(context: Context) {
         imports = ["android.os.Handler", "android.os.Looper"]
     )
 
-    fun register(listener: Listener, executor: Executor) {
+    fun register(onNetworkTypeChanged: (networkType: Int) -> Unit, executor: Executor) {
         removeClearedReferences()
         val isInitialized: Boolean
-        val listenerHolder: ListenerHolder = ListenerHolder(listener, executor)
+        val listenerHolder: ListenerHolder = ListenerHolder(onNetworkTypeChanged, executor)
         synchronized(lock) {
             listeners.add(listenerHolder)
             isInitialized = this.isInitialized
@@ -71,8 +64,8 @@ class NetworkTypeObserver private constructor(context: Context) {
         }
     }
 
-    
-    fun getNetworkType():  Int {
+
+    fun getNetworkType(): Int {
         synchronized(lock) {
             return networkType
         }
@@ -94,17 +87,17 @@ class NetworkTypeObserver private constructor(context: Context) {
     }
 
     private fun handleConnectivityActionBroadcast(context: Context) {
-         val networkType:  Int =
+        val networkType: Int =
             getNetworkTypeFromConnectivityManager(context)
         if (Build.VERSION.SDK_INT >= 31 && networkType == C.NETWORK_TYPE_4G) {
             // Delay update of the network type to check whether this is actually 5G-NSA.
-            Api31.disambiguate4gAnd5gNsa(context,  this@NetworkTypeObserver)
+            Api31.disambiguate4gAnd5gNsa(context, this@NetworkTypeObserver)
         } else {
             updateNetworkType(networkType)
         }
     }
 
-    private fun updateNetworkType( networkType:  Int) {
+    private fun updateNetworkType(networkType: Int) {
         removeClearedReferences()
         val currentListeners: MutableIterator<ListenerHolder?>?
         synchronized(lock) {
@@ -154,26 +147,22 @@ class NetworkTypeObserver private constructor(context: Context) {
         }
     }
 
-    private inner class ListenerHolder(listener: Listener, private val executor: Executor) {
+    private inner class ListenerHolder(
+        onNetworkTypeChanged: (networkType: Int) -> Unit,
+        private val executor: Executor
+    ) {
         // This class needs to hold weak references as it doesn't require listeners to unregister.
-        private val listener: WeakReference<Listener?>
-
-        init {
-            this.listener = WeakReference<Listener?>(listener)
-        }
+        private val onNetworkTypeChanged: WeakReference<(networkType: Int) -> Unit> =
+            WeakReference<(networkType: Int) -> Unit>(onNetworkTypeChanged)
 
         fun canBeRemoved(): Boolean {
-            return listener.get() == null
+            return onNetworkTypeChanged.get() == null
         }
 
         fun callOnNetworkTypeChanged() {
-            executor.execute(
-                Runnable {
-                    val listener = this.listener.get()
-                    if (listener != null) {
-                        listener.onNetworkTypeChanged(getNetworkType())
-                    }
-                })
+            executor.execute {
+                onNetworkTypeChanged.get()?.invoke(getNetworkType())
+            }
         }
     }
 
@@ -188,15 +177,15 @@ class NetworkTypeObserver private constructor(context: Context) {
             return staticInstance!!
         }
 
-        
+
         @Synchronized
         fun resetForTests() {
             staticInstance = null
         }
 
         @Suppress("deprecation") // Using deprecated NetworkInfo for compatibility to older APIs
-        
-        private fun getNetworkTypeFromConnectivityManager(context: Context):  Int {
+
+        private fun getNetworkTypeFromConnectivityManager(context: Context): Int {
             val networkInfo: NetworkInfo?
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
@@ -224,8 +213,8 @@ class NetworkTypeObserver private constructor(context: Context) {
             }
         }
 
-        
-        private fun getMobileNetworkType(networkInfo: NetworkInfo):  Int {
+
+        private fun getMobileNetworkType(networkInfo: NetworkInfo): Int {
             when (networkInfo.getSubtype()) {
                 TelephonyManager.NETWORK_TYPE_EDGE, TelephonyManager.NETWORK_TYPE_GPRS -> return C.NETWORK_TYPE_2G
                 TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_EVDO_0, TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyManager.NETWORK_TYPE_EVDO_B, TelephonyManager.NETWORK_TYPE_HSDPA, TelephonyManager.NETWORK_TYPE_HSPA, TelephonyManager.NETWORK_TYPE_HSUPA, TelephonyManager.NETWORK_TYPE_IDEN, TelephonyManager.NETWORK_TYPE_UMTS, TelephonyManager.NETWORK_TYPE_EHRPD, TelephonyManager.NETWORK_TYPE_HSPAP, TelephonyManager.NETWORK_TYPE_TD_SCDMA -> return C.NETWORK_TYPE_3G

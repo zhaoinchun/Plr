@@ -7,19 +7,13 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DataSpec
 import androidx.media3.datasource.TransferListener
 import com.google.common.base.Preconditions
-import java.io.IOException
 import kotlin.math.min
 
 class IcyDataSource(
     private val upstream: DataSource,
     private val metadataIntervalBytes: Int,
-    private val listener: Listener
-) :
-    DataSource {
-    interface Listener {
-        fun onIcyMetadata(metadata: ParsableByteArray)
-    }
-
+    private val onIcyMetadata: (metadata: ParsableByteArray)-> Unit
+) : DataSource {
     private val metadataLengthByteHolder: ByteArray = ByteArray(1)
     private var bytesUntilMetadata: Int = metadataIntervalBytes
 
@@ -90,7 +84,7 @@ class IcyDataSource(
         }
 
         if (metadataLength > 0) {
-            listener.onIcyMetadata(ParsableByteArray(metadata, metadataLength))
+            onIcyMetadata(ParsableByteArray(metadata, metadataLength))
         }
         return true
     }

@@ -31,15 +31,11 @@ class SampleQueue(
     private val drmSessionManager: DrmSessionManager?,
     private val drmEventDispatcher: DrmSessionEventListener.EventDispatcher?
 ) : TrackOutput {
-    interface UpstreamFormatChangedListener {
-        fun onUpstreamFormatChanged(format: Format)
-    }
-
     private val sampleDataQueue: SampleDataQueue = SampleDataQueue(allocator)
     private val extrasHolder: SampleExtrasHolder = SampleExtrasHolder()
     private val sharedSampleMetadata: SpannedData<SharedSampleMetadata> =
         SpannedData({ metadata: SharedSampleMetadata -> metadata.drmSessionReference.release() })
-    private var upstreamFormatChangeListener: UpstreamFormatChangedListener? = null
+    private var onUpstreamFormatChanged: ((format: Format)-> Unit)? = null
     private var downstreamFormat: Format? = null
     private var currentDrmSession: DrmSession? = null
     private var capacity: Int = SAMPLE_CAPACITY_INCREMENT
@@ -338,10 +334,8 @@ class SampleQueue(
         }
     }
 
-    fun setUpstreamFormatChangeListener(
-        listener: UpstreamFormatChangedListener?
-    ) {
-        upstreamFormatChangeListener = listener
+    fun setUpstreamFormatChangeListener(onUpstreamFormatChanged:((format: Format)-> Unit) ) {
+        this.onUpstreamFormatChanged = onUpstreamFormatChanged
     }
 
     // TrackOutput implementation. Called by the loading thread.
@@ -350,8 +344,8 @@ class SampleQueue(
         upstreamFormatAdjustmentRequired = false
         unadjustedUpstreamFormat = format
         val upstreamFormatChanged = setUpstreamFormat(adjustedUpstreamFormat)
-        if (upstreamFormatChangeListener != null && upstreamFormatChanged) {
-            upstreamFormatChangeListener!!.onUpstreamFormatChanged(adjustedUpstreamFormat)
+        if (onUpstreamFormatChanged != null && upstreamFormatChanged) {
+            onUpstreamFormatChanged!!(adjustedUpstreamFormat)
         }
     }
 
