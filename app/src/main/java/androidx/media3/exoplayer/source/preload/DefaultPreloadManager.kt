@@ -40,9 +40,10 @@ class DefaultPreloadManager(
     targetPreloadStatusControl: TargetPreloadStatusControl<Int, PreloadStatus>,
     mediaSourceFactory: MediaSource.Factory,
     var dataSourceFactory: DataSource.Factory? = null,
-    var preloadLooperProvider: PlaybackLooperProvider= PlaybackLooperProvider(),
-    var trackSelectorFactory: TrackSelector.Factory
-      =TrackSelector.Factory { context: Context? -> DefaultTrackSelector(context) },
+    var preloadLooperProvider: PlaybackLooperProvider = PlaybackLooperProvider(),
+    var createTrackSelector: (context: Context) -> TrackSelector = { context: Context ->
+        DefaultTrackSelector(context)
+    },
     var bandwidthMeterSupplier: BandwidthMeter = DefaultBandwidthMeter.getSingletonInstance(
         context
     ),
@@ -173,8 +174,7 @@ class DefaultPreloadManager(
 
     private val rendererCapabilitiesList =
         DefaultRendererCapabilitiesList.create(renderersFactorySupplier.get())
-    private val trackSelector: TrackSelector =
-        trackSelectorFactory.createTrackSelector(context)
+    private val trackSelector: TrackSelector = createTrackSelector(context)
     private val preloadMediaSourceFactory: PreloadMediaSource.Factory
     private val preCacheThread: HandlerThread?
     private val preCacheHelperFactory: PreCacheHelper.Factory?
@@ -210,7 +210,7 @@ class DefaultPreloadManager(
                     androidx.media3.datasource.DefaultDataSource.Factory(context))!!
             preCacheHelperFactory =
                 PreCacheHelper.Factory(
-                   context, cache, upstreamDataSourceFactory, preCacheThread.getLooper()
+                    context, cache, upstreamDataSourceFactory, preCacheThread.getLooper()
                 )
                     .setDownloadExecutor(cachingExecutor)
                     .setListener(PreCacheHelperListener())

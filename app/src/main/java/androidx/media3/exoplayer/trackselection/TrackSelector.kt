@@ -14,10 +14,6 @@ import androidx.media3.exoplayer.upstream.BandwidthMeter
 import com.google.common.base.Preconditions
 
 abstract class TrackSelector {
-    fun interface Factory {
-        fun createTrackSelector(context: Context): TrackSelector
-    }
-
     fun interface InvalidationListener {
         fun onTrackSelectionsInvalidated(parameters: TrackSelectionParameters?)
         fun onRendererCapabilitiesChanged(renderer: Renderer) {}
