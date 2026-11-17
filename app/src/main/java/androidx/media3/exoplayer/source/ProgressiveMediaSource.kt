@@ -29,7 +29,7 @@ import java.util.concurrent.Executor
 class ProgressiveMediaSource private constructor(
     @field:GuardedBy("this") override var mediaItem: MediaItem,
     private val dataSourceFactory: DataSource.Factory,
-    private val progressiveMediaExtractorFactory: ProgressiveMediaExtractor.Factory,
+    private val createProgressiveMediaExtractor: (playerId: PlayerId)-> ProgressiveMediaExtractor,
     private val drmSessionManager: DrmSessionManager,
     private val loadableLoadErrorHandlingPolicy: LoadErrorHandlingPolicy,
     private val continueLoadingCheckIntervalBytes: Int,
@@ -46,7 +46,7 @@ class ProgressiveMediaSource private constructor(
     @Suppress("deprecation") // Implement deprecated type for backwards compatibility.
     class Factory(
         private val dataSourceFactory: DataSource.Factory,
-        private var progressiveMediaExtractorFactory: ProgressiveMediaExtractor.Factory,
+        private var createProgressiveMediaExtractor: (playerId: PlayerId)-> ProgressiveMediaExtractor,
         private var drmSessionManagerProvider: DrmSessionManagerProvider = DefaultDrmSessionManagerProvider(),
         private var loadErrorHandlingPolicy: LoadErrorHandlingPolicy = DefaultLoadErrorHandlingPolicy(),
         private var continueLoadingCheckIntervalBytes: Int = DEFAULT_LOADING_CHECK_INTERVAL_BYTES
@@ -62,7 +62,7 @@ class ProgressiveMediaSource private constructor(
             extractorsFactory: ExtractorsFactory = DefaultExtractorsFactory()
         ) : this(
             dataSourceFactory,
-            ProgressiveMediaExtractor.Factory { playerId: PlayerId ->
+             { playerId: PlayerId ->
                 BundledExtractorsAdapter(extractorsFactory)
             })
 
@@ -121,7 +121,7 @@ class ProgressiveMediaSource private constructor(
             return ProgressiveMediaSource(
                 mediaItem,
                 dataSourceFactory,
-                progressiveMediaExtractorFactory,
+                createProgressiveMediaExtractor,
                 drmSessionManagerProvider.get(mediaItem)!!,
                 loadErrorHandlingPolicy,
                 continueLoadingCheckIntervalBytes,
@@ -183,7 +183,7 @@ class ProgressiveMediaSource private constructor(
         return ProgressiveMediaPeriod(
             localConfiguration.uri,
             dataSource,
-            progressiveMediaExtractorFactory.createProgressiveMediaExtractor(getPlayerId()),
+            createProgressiveMediaExtractor(getPlayerId()),
             drmSessionManager,
             createDrmEventDispatcher(id),
             loadableLoadErrorHandlingPolicy,

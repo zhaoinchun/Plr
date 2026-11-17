@@ -21,29 +21,6 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
     playerId: PlayerId,
     parameters: Map<String, Any>
 ) : ProgressiveMediaExtractor {
-
-    class Factory : ProgressiveMediaExtractor.Factory {
-        fun setConstantBitrateSeekingEnabled(enabled: Boolean) {
-            if (enabled) {
-                parameters[MediaParser.PARAMETER_ADTS_ENABLE_CBR_SEEKING] = true
-                parameters[MediaParser.PARAMETER_AMR_ENABLE_CBR_SEEKING] = true
-                parameters[MediaParser.PARAMETER_MP3_ENABLE_CBR_SEEKING] = true
-            } else {
-                parameters.remove(MediaParser.PARAMETER_ADTS_ENABLE_CBR_SEEKING)
-                parameters.remove(MediaParser.PARAMETER_AMR_ENABLE_CBR_SEEKING)
-                parameters.remove(MediaParser.PARAMETER_MP3_ENABLE_CBR_SEEKING)
-            }
-        }
-
-        override fun createProgressiveMediaExtractor(playerId: PlayerId): MediaParserExtractorAdapter {
-            return MediaParserExtractorAdapter(playerId, parameters)
-        }
-
-        companion object {
-            private val parameters: MutableMap<String, Any> = HashMap()
-        }
-    }
-
     private val outputConsumerAdapter: OutputConsumerAdapterV30 = OutputConsumerAdapterV30()
     private val inputReaderAdapter: InputReaderAdapterV30 = InputReaderAdapterV30()
     private val mediaParser: MediaParser = MediaParser.create(outputConsumerAdapter)
@@ -61,7 +38,7 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
         }
     }
 
-    
+
     override fun init(
         dataReader: DataReader,
         uri: Uri,
@@ -107,7 +84,7 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
         mediaParser.seek((if (seekPoints.second!!.position == position) seekPoints.second else seekPoints.first)!!)
     }
 
-    
+
     override fun read(positionHolder: PositionHolder): Int {
         val shouldContinue = mediaParser.advance(inputReaderAdapter)
         positionHolder.position = inputReaderAdapter.getAndResetSeekPosition()
@@ -126,4 +103,24 @@ class MediaParserExtractorAdapter @SuppressLint("WrongConstant") private constru
         else
             mediaParser.parserName
 
+    companion object {
+        private val parameters: MutableMap<String, Any> = HashMap()
+        var setConstantBitrateSeekingEnabled: Boolean = false
+            set(value) {
+                field = value
+                if (value) {
+                    parameters[MediaParser.PARAMETER_ADTS_ENABLE_CBR_SEEKING] = true
+                    parameters[MediaParser.PARAMETER_AMR_ENABLE_CBR_SEEKING] = true
+                    parameters[MediaParser.PARAMETER_MP3_ENABLE_CBR_SEEKING] = true
+                } else {
+                    parameters.remove(MediaParser.PARAMETER_ADTS_ENABLE_CBR_SEEKING)
+                    parameters.remove(MediaParser.PARAMETER_AMR_ENABLE_CBR_SEEKING)
+                    parameters.remove(MediaParser.PARAMETER_MP3_ENABLE_CBR_SEEKING)
+                }
+            }
+
+        fun createProgressiveMediaExtractor(playerId: PlayerId): MediaParserExtractorAdapter {
+            return MediaParserExtractorAdapter(playerId, parameters)
+        }
+    }
 }

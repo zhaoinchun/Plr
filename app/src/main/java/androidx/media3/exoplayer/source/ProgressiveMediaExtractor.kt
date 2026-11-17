@@ -8,13 +8,8 @@ import androidx.media3.extractor.PositionHolder
 import java.io.IOException
 
 interface ProgressiveMediaExtractor {
-    fun interface Factory {
-        fun createProgressiveMediaExtractor(playerId: PlayerId): ProgressiveMediaExtractor
-    }
-
     val currentInputPosition: Long
 
-    
     fun init(
         dataReader: DataReader,
         uri: Uri,
