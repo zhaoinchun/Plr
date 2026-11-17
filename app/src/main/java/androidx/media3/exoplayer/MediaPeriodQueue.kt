@@ -1,11 +1,8 @@
 package androidx.media3.exoplayer
 
-import android.util.Log
 import android.util.Pair
-import androidx.annotation.IntDef
 import androidx.media3.common.AdPlaybackState
 import androidx.media3.common.C
-import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.HandlerWrapper
 import androidx.media3.exoplayer.ExoPlayer.PreloadConfiguration
@@ -19,16 +16,13 @@ import kotlin.math.max
 class MediaPeriodQueue(
     private val analyticsCollector: AnalyticsCollector,
     private val analyticsCollectorHandler: HandlerWrapper,
-    private val mediaPeriodHolderFactory: MediaPeriodHolder.Factory,
+    private val createMediaPeriodHolder: (info: MediaPeriodInfo?, rendererPositionOffsetUs: Long)-> MediaPeriodHolder,
     private var preloadConfiguration: PreloadConfiguration,
     rendererCount: Int
 ) {
     private val period: Timeline.Period
     private val window: Timeline.Window
-
     private var nextWindowSequenceNumber: Long = 0
-
-    
     private var repeatMode: Int = 0
     private var shuffleModeEnabled = false
     var playingPeriod: MediaPeriodHolder? = null
@@ -44,10 +38,7 @@ class MediaPeriodQueue(
     private var oldFrontPeriodWindowSequenceNumber: Long = 0
     private var preloadPriorityList: MutableList<MediaPeriodHolder>
 
-    fun updateRepeatMode(
-        timeline: Timeline,
-        repeatMode: Int
-    ): Int {
+    fun updateRepeatMode(timeline: Timeline, repeatMode: Int): Int {
         this.repeatMode = repeatMode
         return updateForPlaybackModeChange(timeline)
     }
@@ -107,7 +98,7 @@ class MediaPeriodQueue(
                 (loadingPeriod!!.rendererOffset + loadingPeriod!!.info.durationUs - info.startPositionUs)
         var newPeriodHolder = removePreloadedMediaPeriodHolder(info)
         if (newPeriodHolder == null) {
-            newPeriodHolder = mediaPeriodHolderFactory.create(info, rendererPositionOffsetUs)
+            newPeriodHolder = createMediaPeriodHolder(info, rendererPositionOffsetUs)
         } else {
             newPeriodHolder.info = info
             newPeriodHolder.rendererOffset = (rendererPositionOffsetUs)
@@ -161,7 +152,7 @@ class MediaPeriodQueue(
                 val rendererPositionOffsetUs =
                     loading.rendererOffset + loading.info.durationUs - nextInfo.startPositionUs
                 nextMediaPeriodHolder =
-                    mediaPeriodHolderFactory.create(nextInfo, rendererPositionOffsetUs)
+                    createMediaPeriodHolder(nextInfo, rendererPositionOffsetUs)
             }
             newPreloadPriorityList.add(nextMediaPeriodHolder!!)
         }
@@ -257,7 +248,7 @@ class MediaPeriodQueue(
 
     val latestReadingPeriod: MediaPeriodHolder?
         get() {
-            if (readingPeriods.size == 0) {
+            if (readingPeriods.isEmpty()) {
                 return null
             }
             var periodHolder = this.playingPeriod

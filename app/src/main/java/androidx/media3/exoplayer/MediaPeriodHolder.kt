@@ -306,10 +306,6 @@ class MediaPeriodHolder(
         return renderersInCorrectState[index]
     }
 
-    fun interface Factory {
-        fun create(info: MediaPeriodInfo?, rendererPositionOffsetUs: Long): MediaPeriodHolder?
-    }
-
     companion object {
         private const val TAG = "MediaPeriodHolder"
 

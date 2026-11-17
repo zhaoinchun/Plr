@@ -4,8 +4,6 @@ import android.os.Handler
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Timeline
-
-import androidx.media3.datasource.TransferListener
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.DrmSessionManagerProvider
@@ -16,7 +14,6 @@ import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.exoplayer.util.ReleasableExecutor
 import androidx.media3.extractor.text.SubtitleParser
 import com.google.common.base.Supplier
-import java.io.IOException
 
 interface MediaSource {
     interface Factory {

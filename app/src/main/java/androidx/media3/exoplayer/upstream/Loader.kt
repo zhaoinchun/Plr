@@ -28,8 +28,6 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
 
     interface Loadable {
         fun cancelLoad()
-
-        
         fun load()
     }
 

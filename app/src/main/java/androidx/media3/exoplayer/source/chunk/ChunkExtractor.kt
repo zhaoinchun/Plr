@@ -1,14 +1,11 @@
 package androidx.media3.exoplayer.source.chunk
 
-import androidx.media3.common.C
 import androidx.media3.common.Format
-
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.extractor.ChunkIndex
 import androidx.media3.extractor.ExtractorInput
 import androidx.media3.extractor.TrackOutput
 import androidx.media3.extractor.text.SubtitleParser
-import java.io.IOException
 
 interface ChunkExtractor {
     interface Factory {
