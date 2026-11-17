@@ -10,20 +10,15 @@ import kotlin.math.max
 
 class StuckPlayerDetector(
     private val player: Player,
-    private val callback: Callback,
-    clock: Clock,
+    private val onStuckPlayerDetected:(exception: StuckPlayerException)-> Unit,
+    private val clock: Clock,
     stuckBufferingTimeoutMs: Int,
     stuckPlayingTimeoutMs: Int,
     stuckPlayingNotEndingTimeoutMs: Int,
     stuckSuppressedTimeoutMs: Int
 ) {
-    interface Callback {
-        fun onStuckPlayerDetected(exception: StuckPlayerException)
-    }
-
     private val playerListener: Player.Listener
-    private val clock: Clock?
-    private val period: Timeline.Period
+    private val period = Timeline.Period()
     private val handler: HandlerWrapper
     private val stuckBufferingDetector: StuckBufferingDetector
     private val stuckPlayingDetector: StuckPlayingDetector
@@ -32,8 +27,6 @@ class StuckPlayerDetector(
 
     // Using instance methods as listeners in the constructor
     init {
-        this.clock = clock
-        this.period = Timeline.Period()
         this.handler =
             clock.createHandler(
                 player.applicationLooper!!,  
@@ -131,7 +124,7 @@ class StuckPlayerDetector(
             ) {
                 // Still the same state, keep current timeout.
                 if (nowRealtimeMs - startRealtimeMs >= stuckBufferingTimeoutMs) {
-                    callback.onStuckPlayerDetected(
+                    onStuckPlayerDetected(
                         StuckPlayerException(
                             StuckPlayerException.STUCK_BUFFERING_NO_PROGRESS,
                             stuckBufferingTimeoutMs
@@ -190,7 +183,7 @@ class StuckPlayerDetector(
             ) {
                 // Still the same state, keep current timeout.
                 if (nowRealtimeMs - startRealtimeMs >= stuckPlayingTimeoutMs) {
-                    callback.onStuckPlayerDetected(
+                    onStuckPlayerDetected(
                         StuckPlayerException(
                             StuckPlayerException.STUCK_PLAYING_NO_PROGRESS, stuckPlayingTimeoutMs
                         )
@@ -257,7 +250,7 @@ class StuckPlayerDetector(
             ) {
                 // Still the same state, keep current timeout.
                 if (nowRealtimeMs - startRealtimeMs >= stuckPlayingNotEndingTimeoutMs) {
-                    callback.onStuckPlayerDetected(
+                    onStuckPlayerDetected(
                         StuckPlayerException(
                             StuckPlayerException.STUCK_PLAYING_NOT_ENDING,
                             stuckPlayingNotEndingTimeoutMs
@@ -300,7 +293,7 @@ class StuckPlayerDetector(
             if (isSuppressed && this.suppressionReason == suppressionReason) {
                 // Still the same state, keep current timeout.
                 if (nowRealtimeMs - startRealtimeMs >= stuckSuppressedTimeoutMs) {
-                    callback.onStuckPlayerDetected(
+                    onStuckPlayerDetected(
                         StuckPlayerException(
                             StuckPlayerException.STUCK_SUPPRESSED, stuckSuppressedTimeoutMs
                         )

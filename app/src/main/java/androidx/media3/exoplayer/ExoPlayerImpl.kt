@@ -436,7 +436,7 @@ class ExoPlayerImpl(
         stuckPlayerDetector =
             StuckPlayerDetector(
                 this,
-                componentListener,
+                { componentListener.onStuckPlayerDetected(it) },
                 clock,
                 stuckBufferingDetectionTimeoutMs,
                 _stuckPlayingDetectionTimeoutMs,
@@ -2918,8 +2918,7 @@ class ExoPlayerImpl(
     private inner class ComponentListener
         : VideoRendererEventListener, AudioRendererEventListener, TextOutput,
         SurfaceHolder.Callback, SurfaceTextureListener, VideoSurfaceListener,
-        StreamVolumeManager.Listener, AudioOffloadListener,
-        StuckPlayerDetector.Callback {
+        StreamVolumeManager.Listener, AudioOffloadListener {
         // VideoRendererEventListener implementation
         override fun onVideoEnabled(counters: DecoderCounters) {
             _videoDecoderCounters = counters
@@ -3162,8 +3161,7 @@ class ExoPlayerImpl(
             updateWakeAndWifiLock()
         }
 
-        // StuckPlayerDetector.Callback implementation.
-        override fun onStuckPlayerDetected(exception: StuckPlayerException) {
+        fun onStuckPlayerDetected(exception: StuckPlayerException) {
             stopInternal(
                 ExoPlaybackException.createForUnexpected(
                     exception, PlaybackException.ERROR_CODE_TIMEOUT
