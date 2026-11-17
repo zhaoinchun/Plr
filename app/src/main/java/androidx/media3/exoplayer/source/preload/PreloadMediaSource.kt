@@ -80,8 +80,8 @@ class PreloadMediaSource private constructor(
             this.clock = Clock.DEFAULT
         }
 
-        override fun setCmcdConfigurationFactory(cmcdConfigurationFactory: CmcdConfiguration.Factory): Factory {
-            this.mediaSourceFactory.setCmcdConfigurationFactory(cmcdConfigurationFactory)
+        override fun setCmcdConfigurationFactory(createCmcdConfiguration:((mediaItem: MediaItem?)-> CmcdConfiguration?)): Factory {
+            this.mediaSourceFactory.setCmcdConfigurationFactory(createCmcdConfiguration)
             return this
         }
 

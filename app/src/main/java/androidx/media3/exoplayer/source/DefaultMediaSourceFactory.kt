@@ -147,8 +147,8 @@ class DefaultMediaSourceFactory(
         return this
     }
 
-    override fun setCmcdConfigurationFactory(cmcdConfigurationFactory: CmcdConfiguration.Factory): DefaultMediaSourceFactory {
-        delegateFactoryLoader.setCmcdConfigurationFactory(cmcdConfigurationFactory)
+    override fun setCmcdConfigurationFactory(createCmcdConfiguration:((mediaItem: MediaItem?)-> CmcdConfiguration?)): DefaultMediaSourceFactory {
+        delegateFactoryLoader.setCmcdConfigurationFactory(createCmcdConfiguration)
         return this
     }
 
@@ -367,7 +367,7 @@ class DefaultMediaSourceFactory(
             C.VIDEO_CODEC_FLAG_H264 or C.VIDEO_CODEC_FLAG_H265
         private var loadOnlySelectedTracks = false
         private var experimentalEnableHagcPlayback = true
-        private var cmcdConfigurationFactory: CmcdConfiguration.Factory? = null
+        private var createCmcdConfiguration:((mediaItem: MediaItem?)-> CmcdConfiguration?)? = null
         private var drmSessionManagerProvider: DrmSessionManagerProvider? = null
         private var loadErrorHandlingPolicy: LoadErrorHandlingPolicy? = null
         private var downloadExecutorSupplier: Supplier<ReleasableExecutor>? = null
@@ -386,7 +386,7 @@ class DefaultMediaSourceFactory(
             val mediaSourceFactorySupplier = loadSupplier(contentType)
 
             mediaSourceFactory = mediaSourceFactorySupplier.get()!!
-            cmcdConfigurationFactory?.also { mediaSourceFactory.setCmcdConfigurationFactory(it) }
+            createCmcdConfiguration?.also { mediaSourceFactory.setCmcdConfigurationFactory(it) }
             drmSessionManagerProvider?.also { mediaSourceFactory.setDrmSessionManagerProvider(it) }
             loadErrorHandlingPolicy?.also { mediaSourceFactory.setLoadErrorHandlingPolicy(it) }
             downloadExecutorSupplier?.also { mediaSourceFactory.setDownloadExecutor(it) }
@@ -425,10 +425,10 @@ class DefaultMediaSourceFactory(
             )
         }
 
-        fun setCmcdConfigurationFactory(cmcdConfigurationFactory: CmcdConfiguration.Factory) {
-            this.cmcdConfigurationFactory = cmcdConfigurationFactory
+        fun setCmcdConfigurationFactory(createCmcdConfiguration:((mediaItem: MediaItem?)-> CmcdConfiguration?)) {
+            this.createCmcdConfiguration = createCmcdConfiguration
             for (mediaSourceFactory in mediaSourceFactories.values) {
-                mediaSourceFactory.setCmcdConfigurationFactory(cmcdConfigurationFactory)
+                mediaSourceFactory.setCmcdConfigurationFactory(createCmcdConfiguration)
             }
         }
 

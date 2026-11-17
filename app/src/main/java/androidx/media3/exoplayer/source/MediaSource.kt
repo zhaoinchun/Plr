@@ -20,7 +20,7 @@ import java.io.IOException
 
 interface MediaSource {
     interface Factory {
-        fun setCmcdConfigurationFactory(cmcdConfigurationFactory: CmcdConfiguration.Factory): Factory {
+        fun setCmcdConfigurationFactory(createCmcdConfiguration:((mediaItem: MediaItem?)-> CmcdConfiguration?)): Factory {
             // do nothing
             return this
         }

@@ -1,10 +1,7 @@
 package androidx.media3.exoplayer.upstream
 
-import androidx.annotation.IntDef
-import androidx.annotation.StringDef
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
-
 import com.google.common.base.Preconditions
 import java.util.UUID
 
@@ -12,30 +9,15 @@ class CmcdConfiguration(
     sessionId: String?,
     contentId: String?,
     requestConfig: RequestConfig,
-    dataTransmissionMode:  Int = MODE_REQUEST_HEADER
+    dataTransmissionMode: Int = MODE_REQUEST_HEADER
 ) {
-
-    fun interface Factory {
-        fun createCmcdConfiguration(mediaItem: MediaItem?): CmcdConfiguration?
-
-        companion object {
-            val DEFAULT: Factory = CmcdConfiguration.Factory { mediaItem: MediaItem? ->
-                CmcdConfiguration(
-                    UUID.randomUUID().toString(),
-                    mediaItem?.mediaId ?: MediaItem.DEFAULT_MEDIA_ID,
-                    object : RequestConfig {})
-            }
-        }
-    }
-
     interface RequestConfig {
-
         fun isKeyAllowed(key: String?): Boolean {
             return true
         }
 
         val customData: Map<String, List<String>>
-            get() = mapOf< String, List<String>>()
+            get() = mapOf<String, List<String>>()
 
         fun getRequestedMaximumThroughputKbps(throughputKbps: Int): Int {
             return C.RATE_UNSET_INT
@@ -45,7 +27,7 @@ class CmcdConfiguration(
     val sessionId: String?
     val contentId: String?
     val requestConfig: RequestConfig
-    val dataTransmissionMode:  Int
+    val dataTransmissionMode: Int
 
     init {
         Preconditions.checkArgument(sessionId == null || sessionId.length <= MAX_ID_LENGTH)
@@ -134,5 +116,12 @@ class CmcdConfiguration(
         const val KEY_NEXT_RANGE_REQUEST: String = "nrr"
         const val MODE_REQUEST_HEADER: Int = 0
         const val MODE_QUERY_PARAMETER: Int = 1
+
+        fun createDefaultCmcdConfiguration(mediaItem: MediaItem?): CmcdConfiguration {
+            return CmcdConfiguration(
+                UUID.randomUUID().toString(),
+                mediaItem?.mediaId ?: MediaItem.DEFAULT_MEDIA_ID,
+                object : RequestConfig {})
+        }
     }
 }
