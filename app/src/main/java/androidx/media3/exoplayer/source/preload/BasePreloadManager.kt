@@ -255,7 +255,7 @@ abstract class BasePreloadManager<T, PreloadStatusT> protected constructor(
                 val targetPreloadStatus =
                     getTargetPreloadStatusIfCurrentlyPreloading(mediaItem) ?: return@Runnable
                 if (shouldNotifyListenerAndAdvancePredicate.apply(targetPreloadStatus)) {
-                    listeners.sendEvent(ListenerSet.Event { listener: PreloadManagerListener ->
+                    listeners.sendEvent( { listener: PreloadManagerListener ->
                         listener.onError(error)
                     } as (PreloadManagerListener) -> Unit)
                     maybeAdvanceToNextMediaSourceHolder()

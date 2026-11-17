@@ -18,11 +18,6 @@ class ListenerSet<T : Any> private constructor(
     private val iterationFinishedEvent: IterationFinishedEvent<T>?,
     throwsWhenUsingWrongThread: Boolean
 ) {
-    
-    fun interface Event<T> {
-        fun invoke(listener: T)
-    }
-
     fun interface IterationFinishedEvent<T> {
         fun invoke(listener: T, eventFlags: FlagSet)
     }

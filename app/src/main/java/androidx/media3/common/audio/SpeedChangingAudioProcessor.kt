@@ -3,14 +3,11 @@ package androidx.media3.common.audio
 import androidx.annotation.GuardedBy
 import androidx.annotation.IntRange
 import androidx.annotation.RestrictTo
-import androidx.annotation.VisibleForTesting
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.util.LongArrayQueue
 import androidx.media3.common.util.SpeedProviderUtil
 import androidx.media3.common.util.SpeedProviderUtil.SpeedProviderMapper
-import androidx.media3.common.util.TimestampConsumer
-
 import androidx.media3.common.util.Util.durationUsToSampleCount
 import androidx.media3.common.util.Util.sampleCountToDurationUs
 import androidx.media3.common.util.Util.scaleLargeValue
@@ -35,7 +32,7 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
     private val pendingCallbackInputTimesUs: LongArrayQueue
 
     @GuardedBy("lock")
-    private val pendingCallbacks: Queue<TimestampConsumer>
+    private val pendingCallbacks: Queue<(timestampUs: Long)-> Unit>
 
     private val areInputTimestampsAdjusted: Boolean
     private val speedProviderMapper: SpeedProviderMapper
@@ -68,7 +65,7 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
         sonicAudioProcessor =
             SynchronizedSonicAudioProcessor(lock,  true)
         pendingCallbackInputTimesUs = LongArrayQueue()
-        pendingCallbacks = ArrayDeque<TimestampConsumer>()
+        pendingCallbacks = ArrayDeque<(timestampUs: Long)-> Unit>()
         currentSpeed = 1f
         this.areInputTimestampsAdjusted = areInputTimestampsAdjusted
         this.shouldMaintainPitch = shouldMaintainPitch
@@ -185,17 +182,17 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
         sonicAudioProcessor.reset()
     }
 
-    fun getSpeedAdjustedTimeAsync(inputTimeUs: Long, callback: TimestampConsumer) {
+    fun getSpeedAdjustedTimeAsync(inputTimeUs: Long, onTimestamp:(timestampUs: Long)-> Unit) {
         val sampleRate: Int
         synchronized(lock) {
             sampleRate = inputAudioFormat.sampleRate
             if (sampleRate == Format.NO_VALUE) {
                 pendingCallbackInputTimesUs.add(inputTimeUs)
-                pendingCallbacks.add(callback)
+                pendingCallbacks.add(onTimestamp)
                 return
             }
         }
-        callback.onTimestamp(
+        onTimestamp(
             getDurationUsAfterProcessorApplied(speedProvider, sampleRate, inputTimeUs)
         )
     }
@@ -227,8 +224,8 @@ class SpeedChangingAudioProcessor @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) co
             }
             while (!pendingCallbacks.isEmpty()) {
                 val inputTimeUs = pendingCallbackInputTimesUs.remove()
-                val consumer = pendingCallbacks.remove()
-                consumer.onTimestamp(
+                val onTimestamp = pendingCallbacks.remove()
+                onTimestamp(
                     getDurationUsAfterProcessorApplied(
                         speedProvider, inputAudioFormat.sampleRate, inputTimeUs
                     )
