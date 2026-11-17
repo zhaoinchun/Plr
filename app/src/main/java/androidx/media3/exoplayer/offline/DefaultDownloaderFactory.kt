@@ -10,10 +10,10 @@ import java.util.concurrent.Executor
 class DefaultDownloaderFactory(
     private val cacheDataSourceFactory: CacheDataSource.Factory,
     private val executor: Executor
-) : DownloaderFactory {
+) {
     private val segmentDownloaderFactories = SparseArray<SegmentDownloaderFactory>()
 
-    override fun createDownloader(request: DownloadRequest): Downloader {
+    fun createDownloader(request: DownloadRequest): Downloader {
          val contentType:  Int =
             inferContentTypeForUriAndMimeType(request.uri, request.mimeType)
         when (contentType) {

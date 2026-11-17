@@ -20,7 +20,6 @@ import androidx.media3.exoplayer.offline.DefaultDownloaderFactory
 import androidx.media3.exoplayer.offline.DownloadHelper
 import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.Downloader
-import androidx.media3.exoplayer.offline.DownloaderFactory
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.util.ReleasableExecutor
 import com.google.common.base.Preconditions
@@ -37,7 +36,7 @@ class PreCacheHelper(
     private val mediaItem: MediaItem,
     private val testMediaSourceFactory: MediaSource.Factory?,
     private val downloadHelperFactory: DownloadHelper.Factory,
-    private val downloaderFactory: DownloaderFactory,
+    private val createDownloader: (request: DownloadRequest) -> Downloader,
     preCacheLooper: Looper,
     private val listener: Listener?
 ) {
@@ -144,13 +143,13 @@ class PreCacheHelper(
                     .setDataSourceFactory(cacheDataSourceFactory)
                     .setRenderersFactory(renderersFactory)
                     .setTrackSelectionParameters(trackSelectionParameters)
-            val downloaderFactory: DownloaderFactory =
+            val downloaderFactory =
                 DefaultDownloaderFactory(cacheDataSourceFactory, downloadExecutor!!)
             return PreCacheHelper(
                 mediaItem,
                 null,
                 downloadHelperFactory,
-                downloaderFactory,
+                { downloaderFactory.createDownloader(it) },
                 preCacheLooper,
                 listener
             )
@@ -310,7 +309,7 @@ class PreCacheHelper(
         fun maybeSubmitPendingDownloadRequest() {
             Preconditions.checkState(Looper.myLooper() == preCacheHandler.looper)
             if (pendingDownloadRequest != null) {
-                downloader = downloaderFactory.createDownloader(pendingDownloadRequest!!)
+                downloader = createDownloader(pendingDownloadRequest!!)
                 downloaderTask = Task(
                     downloader!!,
                     false,
@@ -389,7 +388,7 @@ class PreCacheHelper(
             }
         }
 
-        fun notifyListeners(callable: (Listener?)-> Unit) {
+        fun notifyListeners(callable: (Listener?) -> Unit) {
             applicationHandler.post(
                 Runnable {
                     synchronized(lock) {

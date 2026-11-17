@@ -1,6 +1,5 @@
 package androidx.media3.exoplayer.offline
 
-import androidx.annotation.IntDef
 import com.google.common.base.Preconditions
 
 class Download(

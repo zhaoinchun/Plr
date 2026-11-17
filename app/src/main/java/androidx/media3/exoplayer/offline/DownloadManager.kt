@@ -36,7 +36,7 @@ import kotlin.synchronized
 class DownloadManager(
     context: Context,
     private val downloadIndex: WritableDownloadIndex,
-    downloaderFactory: DownloaderFactory
+    createDownloader: (request: DownloadRequest) -> Downloader
 ) {
     interface Listener {
         fun onInitialized(downloadManager: DownloadManager) {}
@@ -107,7 +107,9 @@ class DownloadManager(
                 .setCache(cache)
                 .setUpstreamDataSourceFactory(upstreamFactory),
             executor
-        )
+        ).let { factory ->
+            { factory.createDownloader(it) }
+        }
     )
 
     init {
@@ -117,7 +119,7 @@ class DownloadManager(
             InternalHandler(
                 internalThread,
                 downloadIndex,
-                downloaderFactory,
+                createDownloader,
                 applicationHandler,
                 maxParallelDownloads,
                 minRetryCount,
@@ -399,7 +401,7 @@ class DownloadManager(
     private class InternalHandler(
         private val thread: HandlerThread,
         private val downloadIndex: WritableDownloadIndex,
-        private val downloaderFactory: DownloaderFactory,
+        private val createDownloader: (request: DownloadRequest) -> Downloader,
         private val mainHandler: Handler,
         private var maxParallelDownloads: Int,
         private var minRetryCount: Int,
@@ -764,7 +766,7 @@ class DownloadManager(
                 Download.STATE_DOWNLOADING,
                 Download.STOP_REASON_NONE
             )
-            val downloader = downloaderFactory.createDownloader(download.request)
+            val downloader = createDownloader(download.request)
             activeTask =
                 Task(
                     download.request,
@@ -813,7 +815,7 @@ class DownloadManager(
             }
 
             // We can start a remove task.
-            val downloader = downloaderFactory.createDownloader(download.request)
+            val downloader = createDownloader(download.request)
             activeTask =
                 Task(
                     download.request,
