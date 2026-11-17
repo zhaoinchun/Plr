@@ -14,20 +14,16 @@ class AudioBecomingNoisyManager(
     context: Context,
     backgroundLooper: Looper,
     eventLooper: Looper,
-    listener: Listener,
+    onAudioBecomingNoisy: ()-> Unit,
     clock: Clock
 ) {
     private val context: Context = context.applicationContext
     private val receiver = AudioBecomingNoisyReceiver(
-        clock.createHandler(eventLooper, null), listener
+        clock.createHandler(eventLooper, null), onAudioBecomingNoisy
     )
     private val backgroundHandler: HandlerWrapper =
         clock.createHandler(backgroundLooper, null)
     private var isEnabled = false
-
-    interface Listener {
-        fun onAudioBecomingNoisy()
-    }
 
     @SuppressLint("UnprotectedReceiver") // Protected system broadcasts must not specify protection.
     fun setEnabled(enabled: Boolean) {
@@ -48,7 +44,7 @@ class AudioBecomingNoisyManager(
 
     private inner class AudioBecomingNoisyReceiver(
         private val eventHandler: HandlerWrapper,
-        private val listener: Listener
+        private val onAudioBecomingNoisy: ()-> Unit
     ) : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY == intent.action) {
@@ -58,7 +54,7 @@ class AudioBecomingNoisyManager(
 
         fun callListenerIfEnabled() {
             if (isEnabled) {
-                listener.onAudioBecomingNoisy()
+               onAudioBecomingNoisy()
             }
         }
     }

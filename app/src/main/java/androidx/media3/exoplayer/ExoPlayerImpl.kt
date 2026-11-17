@@ -246,7 +246,7 @@ class ExoPlayerImpl(
                 componentListener,
                 componentListener,
                 componentListener,
-                {componentListener.onMetadata(it)}
+                { componentListener.onMetadata(it) }
             )
         }
         listeners =
@@ -382,7 +382,11 @@ class ExoPlayerImpl(
         }
         audioBecomingNoisyManager =
             AudioBecomingNoisyManager(
-                context, playbackLooper, applicationLooper, componentListener, clock
+                context,
+                playbackLooper,
+                applicationLooper,
+                { componentListener.onAudioBecomingNoisy() },
+                clock
             )
         audioBecomingNoisyManager.setEnabled(_handleAudioBecomingNoisy)
 
@@ -2914,7 +2918,7 @@ class ExoPlayerImpl(
     private inner class ComponentListener
         : VideoRendererEventListener, AudioRendererEventListener, TextOutput,
         SurfaceHolder.Callback, SurfaceTextureListener, VideoSurfaceListener,
-        AudioBecomingNoisyManager.Listener, StreamVolumeManager.Listener, AudioOffloadListener,
+        StreamVolumeManager.Listener, AudioOffloadListener,
         StuckPlayerDetector.Callback {
         // VideoRendererEventListener implementation
         override fun onVideoEnabled(counters: DecoderCounters) {
@@ -3130,8 +3134,7 @@ class ExoPlayerImpl(
             setVideoOutputInternal(null)
         }
 
-        // AudioBecomingNoisyManager.EventListener implementation.
-        override fun onAudioBecomingNoisy() {
+        fun onAudioBecomingNoisy() {
             updatePlayWhenReady(
                 false, Player.PLAY_WHEN_READY_CHANGE_REASON_AUDIO_BECOMING_NOISY
             )

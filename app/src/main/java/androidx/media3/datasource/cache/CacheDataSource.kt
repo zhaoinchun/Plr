@@ -27,7 +27,7 @@ class CacheDataSource private constructor(
     cacheReadDataSource: DataSource,
     cacheWriteDataSink: DataSink?,
     cacheKeyFactory: CacheKeyFactory?,
-    flags:  Int,
+    flags: Int,
     upstreamPriorityTaskManager: PriorityTaskManager?,
     upstreamPriority: Int,
     eventListener: EventListener?
@@ -36,14 +36,14 @@ class CacheDataSource private constructor(
         var cache: Cache? = null
             private set
         private var cacheReadDataSourceFactory: DataSource.Factory = FileDataSource.Factory()
-        private var cacheWriteDataSinkFactory: DataSink.Factory? = null
+        private var createCacheWriteDataSink: (() -> DataSink)? = null
         var cacheKeyFactory: CacheKeyFactory = CacheKeyFactory.DEFAULT
             private set
         private var cacheIsReadOnly = false
         private var upstreamDataSourceFactory: DataSource.Factory? = null
         private var upstreamPriorityTaskManager: PriorityTaskManager? = null
         private var upstreamPriority: Int = 0
-        private var flags:  Int = 0
+        private var flags: Int = 0
         private var eventListener: EventListener? = null
 
         fun setCache(cache: Cache): Factory {
@@ -57,10 +57,10 @@ class CacheDataSource private constructor(
         }
 
         fun setCacheWriteDataSinkFactory(
-            cacheWriteDataSinkFactory: DataSink.Factory?
+            createCacheWriteDataSink: (() -> DataSink)?
         ): Factory {
-            this.cacheWriteDataSinkFactory = cacheWriteDataSinkFactory
-            this.cacheIsReadOnly = cacheWriteDataSinkFactory == null
+            this.createCacheWriteDataSink = createCacheWriteDataSink
+            this.cacheIsReadOnly = createCacheWriteDataSink == null
             return this
         }
 
@@ -92,7 +92,7 @@ class CacheDataSource private constructor(
             return this
         }
 
-        fun setFlags(flags:  Int): Factory {
+        fun setFlags(flags: Int): Factory {
             this.flags = flags
             return this
         }
@@ -126,17 +126,17 @@ class CacheDataSource private constructor(
 
         private fun createDataSourceInternal(
             upstreamDataSource: DataSource?,
-            flags:  Int,
+            flags: Int,
             upstreamPriority: Int
         ): CacheDataSource {
             val cache = this.cache!!
             val cacheWriteDataSink: DataSink?
             if (cacheIsReadOnly || upstreamDataSource == null) {
                 cacheWriteDataSink = null
-            } else if (cacheWriteDataSinkFactory != null) {
-                cacheWriteDataSink = cacheWriteDataSinkFactory!!.createDataSink()
+            } else if (createCacheWriteDataSink != null) {
+                cacheWriteDataSink = createCacheWriteDataSink!!.invoke()
             } else {
-                cacheWriteDataSink = CacheDataSink.Factory(cache=cache).createDataSink()
+                cacheWriteDataSink = CacheDataSink.createDataSink(cache = cache)
             }
             return CacheDataSource(
                 cache,
@@ -154,7 +154,7 @@ class CacheDataSource private constructor(
 
     interface EventListener {
         fun onCachedBytesRead(cacheSizeBytes: Long, cachedBytesRead: Long)
-        fun onCacheIgnored( reason:  Int)
+        fun onCacheIgnored(reason: Int)
     }
 
     val cache: Cache
@@ -182,7 +182,7 @@ class CacheDataSource private constructor(
     private var totalCachedBytesRead: Long = 0
     private var checkCachePosition: Long = 0
 
-    constructor(cache: Cache, upstreamDataSource: DataSource?, flags:  Int = 0) : this(
+    constructor(cache: Cache, upstreamDataSource: DataSource?, flags: Int = 0) : this(
         cache,
         upstreamDataSource,
         FileDataSource(),
@@ -196,7 +196,7 @@ class CacheDataSource private constructor(
         upstreamDataSource: DataSource?,
         cacheReadDataSource: DataSource,
         cacheWriteDataSink: DataSink?,
-        flags:  Int,
+        flags: Int,
         eventListener: EventListener?,
         cacheKeyFactory: CacheKeyFactory? = null
     ) : this(
@@ -409,7 +409,7 @@ class CacheDataSource private constructor(
                     length = min(length, bytesRemaining)
                 }
             }
-            nextDataSpec =requestDataSpec.copy(position = readPosition, length = length)
+            nextDataSpec = requestDataSpec.copy(position = readPosition, length = length)
             if (cacheWriteDataSource != null) {
                 nextDataSource = cacheWriteDataSource
             } else {
@@ -471,7 +471,7 @@ class CacheDataSource private constructor(
         }
     }
 
-    
+
     private fun setNoBytesRemainingAndMaybeStoreLength(key: String) {
         bytesRemaining = 0
         if (this.isWritingToCache) {
@@ -493,7 +493,7 @@ class CacheDataSource private constructor(
     private val isWritingToCache: Boolean
         get() = currentDataSource === cacheWriteDataSource
 
-    
+
     private fun closeCurrentSource() {
         if (currentDataSource == null) {
             return
@@ -526,7 +526,7 @@ class CacheDataSource private constructor(
         }
     }
 
-    private fun notifyCacheIgnored( reason:  Int) {
+    private fun notifyCacheIgnored(reason: Int) {
         if (eventListener != null) {
             eventListener.onCacheIgnored(reason)
         }

@@ -43,20 +43,6 @@ class CacheDataSink(
             if (fragmentSize == C.LENGTH_UNSET.toLong()) Long.MAX_VALUE else fragmentSize
     }
 
-    class Factory(
-        var cache: Cache,
-        var fragmentSize: Long = DEFAULT_FRAGMENT_SIZE,
-        var bufferSize: Int = DEFAULT_BUFFER_SIZE
-    ) : DataSink.Factory {
-        override fun createDataSink(): DataSink {
-            return CacheDataSink(
-                cache,
-                fragmentSize,
-                bufferSize
-            )
-        }
-    }
-
     class CacheDataSinkException(cause: IOException?) : CacheException(cause)
 
     override fun open(dataSpec: DataSpec) {
@@ -77,6 +63,7 @@ class CacheDataSink(
             throw CacheDataSinkException(e)
         }
     }
+
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
         val dataSpec = this.dataSpec ?: return
         try {
@@ -161,5 +148,17 @@ class CacheDataSink(
         const val DEFAULT_BUFFER_SIZE: Int = 20 * 1024
         private const val MIN_RECOMMENDED_FRAGMENT_SIZE = (2 * 1024 * 1024).toLong()
         private const val TAG = "CacheDataSink"
+
+        fun createDataSink(
+            cache: Cache,
+            fragmentSize: Long = DEFAULT_FRAGMENT_SIZE,
+            bufferSize: Int = DEFAULT_BUFFER_SIZE
+        ): DataSink {
+            return CacheDataSink(
+                cache,
+                fragmentSize,
+                bufferSize
+            )
+        }
     }
 }
