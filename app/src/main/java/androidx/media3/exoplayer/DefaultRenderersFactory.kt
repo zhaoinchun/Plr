@@ -6,6 +6,7 @@ import android.os.Handler
 import androidx.annotation.RequiresApi
 import androidx.media3.common.C
 import androidx.media3.common.Metadata
+import androidx.media3.common.text.CueGroup
 import androidx.media3.common.util.Log.i
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
 import androidx.media3.exoplayer.audio.AudioSink
@@ -18,7 +19,6 @@ import androidx.media3.exoplayer.mediacodec.DefaultMediaCodecAdapterFactory
 import androidx.media3.exoplayer.mediacodec.MediaCodecAdapter
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.metadata.MetadataRenderer
-import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.text.TextRenderer
 import androidx.media3.exoplayer.video.MediaCodecVideoRenderer
 import androidx.media3.exoplayer.video.VideoRendererEventListener
@@ -67,7 +67,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         eventHandler: Handler,
         videoRendererEventListener: VideoRendererEventListener,
         audioRendererEventListener: AudioRendererEventListener,
-        textRendererOutput: TextOutput?,
+        onCues:(cueGroup: CueGroup)-> Unit,
         onMetadata: (metadata: Metadata)-> Unit
     ): Array<Renderer> {
         val renderersList = ArrayList<Renderer>()
@@ -95,7 +95,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
             audioRendererEventListener,
             renderersList
         )
-        renderersList.add(TextRenderer(textRendererOutput, eventHandler.looper))
+        renderersList.add(TextRenderer(onCues, eventHandler.looper))
         repeat(METADATA_RENDERER_COUNT) {
             renderersList.add(MetadataRenderer(onMetadata, eventHandler.looper))
         }
@@ -370,7 +370,7 @@ class DefaultRenderersFactory(private val context: Context) : RenderersFactory {
         eventHandler: Handler,
         videoRendererEventListener: VideoRendererEventListener?,
         audioRendererEventListener: AudioRendererEventListener?,
-        textRendererOutput: TextOutput?,
+        onCues:(cueGroup: CueGroup)-> Unit,
         onMetadata: ((metadata: Metadata) -> Unit)?
     ): Renderer? {
         if (renderer.trackType == C.TRACK_TYPE_VIDEO

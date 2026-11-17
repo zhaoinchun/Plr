@@ -1,11 +1,9 @@
-
 package androidx.media3.exoplayer
 
 import android.os.Handler
 import androidx.media3.common.Metadata
-
+import androidx.media3.common.text.CueGroup
 import androidx.media3.exoplayer.audio.AudioRendererEventListener
-import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.video.VideoRendererEventListener
 
 interface RenderersFactory {
@@ -13,8 +11,8 @@ interface RenderersFactory {
         eventHandler: Handler,
         videoRendererEventListener: VideoRendererEventListener,
         audioRendererEventListener: AudioRendererEventListener,
-        textRendererOutput: TextOutput?,
-        onMetadata: (metadata: Metadata)-> Unit
+        onCues: (cueGroup: CueGroup) -> Unit,
+        onMetadata: (metadata: Metadata) -> Unit
     ): Array<Renderer>
 
     fun createSecondaryRenderer(
@@ -22,8 +20,8 @@ interface RenderersFactory {
         eventHandler: Handler,
         videoRendererEventListener: VideoRendererEventListener?,
         audioRendererEventListener: AudioRendererEventListener?,
-        textRendererOutput: TextOutput?,
-        onMetadata: ((metadata: Metadata)-> Unit)?
+        onCues: (cueGroup: CueGroup) -> Unit,
+        onMetadata: ((metadata: Metadata) -> Unit)?
     ): Renderer? {
         return null
     }

@@ -32,7 +32,7 @@ import org.checkerframework.dataflow.qual.SideEffectFree
 import java.io.IOException
 
 class TextRenderer(
-    output: TextOutput?,
+    onCues:(cueGroup: CueGroup)-> Unit,
     outputLooper: Looper?,
 // Fields used when handling Subtitle objects from legacy samples.
     private val subtitleDecoderFactory: SubtitleDecoderFactory = SubtitleDecoderFactory.DEFAULT
@@ -56,7 +56,7 @@ class TextRenderer(
     // Fields used with both CuesWithTiming and Subtitle objects
     private val outputHandler: Handler? =
         if (outputLooper == null) null else createHandler(outputLooper, this)
-    private val output = output!!
+    private val output = onCues
     private val formatHolder = FormatHolder()
     private var inputStreamEnded = false
     private var outputStreamEnded = false
@@ -472,7 +472,7 @@ class TextRenderer(
     }
 
     private fun invokeUpdateOutputInternal(cueGroup: CueGroup) {
-        output.onCues(cueGroup)
+        output(cueGroup)
     }
 
     private fun handleDecoderError(e: SubtitleDecoderException?) {

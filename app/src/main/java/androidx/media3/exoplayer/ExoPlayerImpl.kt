@@ -75,7 +75,6 @@ import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
 import androidx.media3.exoplayer.source.TimelineWithUpdatedMediaItem
 import androidx.media3.exoplayer.source.TrackGroupArray
-import androidx.media3.exoplayer.text.TextOutput
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.exoplayer.trackselection.TrackSelectionArray
 import androidx.media3.exoplayer.trackselection.TrackSelector
@@ -228,7 +227,7 @@ class ExoPlayerImpl(
                 eventHandler,
                 componentListener,
                 componentListener,
-                componentListener,
+                { componentListener.onCues(it) },
                 { componentListener.onMetadata(it) }
             )
         emptyTrackSelectorResult = TrackSelectorResult(
@@ -245,7 +244,7 @@ class ExoPlayerImpl(
                 eventHandler,
                 componentListener,
                 componentListener,
-                componentListener,
+                { componentListener.onCues(it) },
                 { componentListener.onMetadata(it) }
             )
         }
@@ -2916,7 +2915,7 @@ class ExoPlayerImpl(
     }
 
     private inner class ComponentListener
-        : VideoRendererEventListener, AudioRendererEventListener, TextOutput,
+        : VideoRendererEventListener, AudioRendererEventListener,
         SurfaceHolder.Callback, SurfaceTextureListener, VideoSurfaceListener,
         StreamVolumeManager.Listener, AudioOffloadListener {
         // VideoRendererEventListener implementation
@@ -3059,7 +3058,7 @@ class ExoPlayerImpl(
             videoListenerManager.onParametersChanged(codecParameters)
         }
 
-        override fun onCues(cueGroup: CueGroup) {
+        fun onCues(cueGroup: CueGroup) {
             currentCueGroup = cueGroup
             listeners.sendEvent(Player.EVENT_CUES) { listener: Player.Listener ->
                 listener.onCues(cueGroup)
