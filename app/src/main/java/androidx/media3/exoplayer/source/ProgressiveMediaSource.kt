@@ -6,7 +6,6 @@ import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Timeline
-import androidx.media3.common.util.Consumer
 import androidx.media3.common.util.Util.msToUs
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.TransferListener
@@ -95,7 +94,7 @@ class ProgressiveMediaSource private constructor(
         }
 
         fun <T : Executor?> setDownloadExecutor(
-            downloadExecutor: Supplier<T>, downloadExecutorReleaser: Consumer<T>
+            downloadExecutor: Supplier<T>, downloadExecutorReleaser: (T)-> Unit
         ): Factory {
             setDownloadExecutor {
                 ReleasableExecutor.from<T>(

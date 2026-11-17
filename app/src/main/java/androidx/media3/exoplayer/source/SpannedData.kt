@@ -2,13 +2,12 @@ package androidx.media3.exoplayer.source
 
 import android.util.SparseArray
 import androidx.media3.common.C
-import androidx.media3.common.util.Consumer
 import com.google.common.base.Preconditions
 import kotlin.math.min
 import androidx.core.util.size
 
-class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Consumer { value: V -> }) {
-    private var memoizedReadIndex: Int= C.INDEX_UNSET
+class SpannedData<V>(private val remove: (V) -> Unit = { value: V -> }) {
+    private var memoizedReadIndex: Int = C.INDEX_UNSET
     private val spans: SparseArray<V> = SparseArray<V>()
 
     fun get(key: Int): V? {
@@ -34,7 +33,7 @@ class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Cons
             val lastStartKey = spans.keyAt(spans.size - 1)
             Preconditions.checkArgument(startKey >= lastStartKey)
             if (lastStartKey == startKey) {
-                removeCallback.accept(spans.valueAt(spans.size - 1))
+                remove(spans.valueAt(spans.size - 1))
             }
         }
         spans.append(startKey, value)
@@ -46,7 +45,7 @@ class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Cons
     fun discardTo(discardToKey: Int) {
         var i = 0
         while (i < spans.size - 1 && discardToKey >= spans.keyAt(i + 1)) {
-            removeCallback.accept(spans.valueAt(i))
+            remove(spans.valueAt(i))
             spans.removeAt(i)
             if (memoizedReadIndex > 0) {
                 memoizedReadIndex--
@@ -58,7 +57,7 @@ class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Cons
     fun discardFrom(discardFromKey: Int) {
         var i = spans.size - 1
         while (i >= 0 && discardFromKey < spans.keyAt(i)) {
-            removeCallback.accept(spans.valueAt(i))
+            remove(spans.valueAt(i))
             spans.removeAt(i)
             i--
         }
@@ -68,7 +67,7 @@ class SpannedData<V>  constructor(private val removeCallback: Consumer<V> = Cons
 
     fun clear() {
         for (i in 0..<spans.size) {
-            removeCallback.accept(spans.valueAt(i))
+            remove(spans.valueAt(i))
         }
         memoizedReadIndex = C.INDEX_UNSET
         spans.clear()

@@ -57,7 +57,7 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
         ): LoadErrorAction
     }
 
-    class LoadErrorAction constructor(
+    class LoadErrorAction(
         val type:  Int,
         val retryDelayMillis: Long
     ) {
@@ -71,7 +71,7 @@ class Loader(private val downloadExecutor: ReleasableExecutor) : LoaderErrorThro
     constructor(threadNameSuffix: String?) : this(
         ReleasableExecutor.from<ExecutorService?>(
             newSingleThreadExecutor(THREAD_NAME_PREFIX + threadNameSuffix),
-            androidx.media3.common.util.Consumer { obj: ExecutorService? -> obj!!.shutdown() })
+             { obj: ExecutorService? -> obj!!.shutdown() })
     )
 
     fun hasFatalError(): Boolean {

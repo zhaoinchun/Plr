@@ -10,7 +10,6 @@ import android.util.SparseArray
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
-import androidx.media3.common.util.Consumer
 import androidx.media3.common.util.Log.w
 import androidx.media3.common.util.ParsableBitArray
 import androidx.media3.common.util.ParsableByteArray

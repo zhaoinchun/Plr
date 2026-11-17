@@ -1,12 +1,9 @@
-
 package androidx.media3.extractor.text.webvtt
 
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
-import androidx.media3.common.util.Consumer
 import androidx.media3.common.util.ParsableByteArray
-
 import androidx.media3.common.util.Util.fromUtf8Bytes
 import androidx.media3.extractor.text.CuesWithTiming
 import androidx.media3.extractor.text.SubtitleParser
@@ -16,20 +13,16 @@ import androidx.media3.extractor.text.webvtt.WebvttCueParser.parseCueText
 import com.google.common.base.Preconditions
 
 class Mp4WebvttParser : SubtitleParser {
-    private val parsableByteArray: ParsableByteArray
-
-    init {
-        parsableByteArray = ParsableByteArray()
-    }
+    private val parsableByteArray = ParsableByteArray()
 
     override fun parse(
         data: ByteArray,
         offset: Int,
         length: Int,
         outputOptions: SubtitleParser.OutputOptions,
-        output: ((CuesWithTiming)-> Unit)
+        output: ((CuesWithTiming) -> Unit)
     ) {
-        parsableByteArray.reset(data!!,  offset + length)
+        parsableByteArray.reset(data!!, offset + length)
         parsableByteArray.setPosition(offset)
         val cues: MutableList<Cue> = ArrayList<Cue>()
         while (parsableByteArray.bytesLeft() > 0) {
@@ -49,7 +42,7 @@ class Mp4WebvttParser : SubtitleParser {
             }
         }
         output(
-            CuesWithTiming(cues,  C.TIME_UNSET,  C.TIME_UNSET)
+            CuesWithTiming(cues, C.TIME_UNSET, C.TIME_UNSET)
         )
     }
 
@@ -57,7 +50,7 @@ class Mp4WebvttParser : SubtitleParser {
         get() = Mp4WebvttParser.cueReplacementBehavior
 
     companion object {
-        val cueReplacementBehavior:  Int =
+        val cueReplacementBehavior: Int =
             Format.CUE_REPLACEMENT_BEHAVIOR_REPLACE
 
         private const val BOX_HEADER_SIZE = 8
@@ -88,8 +81,8 @@ class Mp4WebvttParser : SubtitleParser {
                     cueBuilder = parseCueSettingsList(boxPayload)
                 } else if (boxType == TYPE_payl) {
                     cueText =
-                        parseCueText( 
-                            null, boxPayload.trim { it <= ' ' },  
+                        parseCueText(
+                            null, boxPayload.trim { it <= ' ' },
                             mutableListOf<WebvttCssStyle>()
                         )
                 } else {

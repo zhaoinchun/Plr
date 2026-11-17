@@ -4,9 +4,7 @@ import android.graphics.Bitmap
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.text.Cue
-import androidx.media3.common.util.Consumer
 import androidx.media3.common.util.ParsableByteArray
-
 import androidx.media3.common.util.Util.constrainValue
 import androidx.media3.common.util.Util.maybeInflate
 import androidx.media3.extractor.text.CuesWithTiming

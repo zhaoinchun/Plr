@@ -7,7 +7,6 @@ import androidx.annotation.GuardedBy
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.TrackSelectionParameters
-import androidx.media3.common.util.Consumer
 import androidx.media3.common.util.Util.createHandler
 import androidx.media3.common.util.Util.createHandlerForCurrentOrMainLooper
 import androidx.media3.common.util.Util.newSingleThreadExecutor
@@ -390,7 +389,7 @@ class PreCacheHelper(
             }
         }
 
-        fun notifyListeners(callable: Consumer<Listener?>) {
+        fun notifyListeners(callable: (Listener?)-> Unit) {
             applicationHandler.post(
                 Runnable {
                     synchronized(lock) {
@@ -398,7 +397,7 @@ class PreCacheHelper(
                             return@Runnable
                         }
                         if (listener != null) {
-                            callable.accept(listener)
+                            callable(listener)
                         }
                     }
                 })

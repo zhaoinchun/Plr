@@ -11,12 +11,10 @@ import android.util.Pair
 import androidx.annotation.GuardedBy
 import androidx.media3.common.C
 import androidx.media3.common.DrmInitData
-import androidx.media3.common.util.Consumer
 import androidx.media3.common.util.CopyOnWriteMultiset
 import androidx.media3.common.util.Log.d
 import androidx.media3.common.util.Log.e
 import androidx.media3.common.util.Log.w
-import androidx.media3.common.util.Util
 import androidx.media3.decoder.CryptoConfig
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.drm.DrmSession.DrmSessionException
@@ -475,9 +473,9 @@ class DefaultDrmSession(
     private val isOpen: Boolean
         get() = state == DrmSession.STATE_OPENED || state == DrmSession.STATE_OPENED_WITH_KEYS
 
-    private fun dispatchEvent(event: Consumer<DrmSessionEventListener.EventDispatcher?>) {
+    private fun dispatchEvent(event: (DrmSessionEventListener.EventDispatcher?)-> Unit) {
         for (eventDispatcher in eventDispatchers.elementSet()) {
-            event.accept(eventDispatcher)
+            event(eventDispatcher)
         }
     }
 
