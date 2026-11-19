@@ -5,9 +5,11 @@ import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.media3.common.util.Log.e
+import androidx.media3.database.DatabaseProvider
 
 class StandaloneDatabaseProvider(context: Context) :
-    SQLiteOpenHelper(context.applicationContext, DATABASE_NAME,  null, VERSION){
+    SQLiteOpenHelper(context.applicationContext, DATABASE_NAME,  null, VERSION),
+    DatabaseProvider {
     override fun onCreate(db: SQLiteDatabase?) {
         // Features create their own tables.
     }

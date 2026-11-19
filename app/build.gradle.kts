@@ -9,6 +9,7 @@ android {
             minorApiLevel = 1
         }
     }
+    buildFeatures { buildConfig = true }
 
     defaultConfig {
         applicationId = "com.example.plr"
@@ -18,7 +19,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("boolean", "USE_DECODER_EXTENSIONS", "true")
     }
+
     sourceSets {
         getByName("main") {
             res.srcDirs(
@@ -52,6 +55,7 @@ dependencies {
 //    implementation(libs.androidx.media3.extractor)
     implementation(libs.material)
     implementation(libs.androidx.exifinterface)
+    api(libs.cronet.api)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
@@ -65,5 +69,8 @@ dependencies {
 //      exclude(group = "com.google.errorprone", module = "error_prone_annotations")
 //      exclude(group = "com.google.j2objc", module = "j2objc-annotations")
 //      exclude(group = "org.codehaus.mojo", module = "animal-sniffer-annotations")
+    }
+    api("com.google.ads.interactivemedia.v3:interactivemedia:3.39.0") {
+        exclude(group = "androidx.media3", module = "media3-common")
     }
 }

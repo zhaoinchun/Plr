@@ -48,7 +48,7 @@ class ServerSideAdInsertionMediaSource(
     private val adPlaybackStateUpdater: AdPlaybackStateUpdater?
 ) : BaseMediaSource(), MediaSourceCaller, MediaSourceEventListener, DrmSessionEventListener {
     interface AdPlaybackStateUpdater {
-        fun onAdPlaybackStateUpdateRequested(contentTimeline: Timeline?): Boolean
+        fun onAdPlaybackStateUpdateRequested(contentTimeline: Timeline): Boolean
     }
 
     private val mediaPeriods: ListMultimap<Pair<Long, Any>, SharedMediaPeriod> =

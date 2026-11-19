@@ -11,7 +11,7 @@ import com.google.common.base.Preconditions
 import java.util.Collections
 import java.util.UUID
 
-class MediaItem private constructor(
+class MediaItem(
     val mediaId: String,
     clippingConfiguration: ClippingConfiguration,
     val localConfiguration: LocalConfiguration?,

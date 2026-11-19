@@ -11,7 +11,7 @@ import kotlin.math.max
 
 data class AdPlaybackState(
     val adsId: Any?,
-    private val adGroups: List<AdGroup?>,
+    private val adGroups: List<AdGroup?> = emptyList(),
     val adResumePositionUs: Long = 0L,
     val contentDurationUs: Long = C.TIME_UNSET,
     val removedAdGroupCount: Int = 0

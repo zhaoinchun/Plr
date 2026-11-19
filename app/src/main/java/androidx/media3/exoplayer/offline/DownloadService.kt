@@ -191,7 +191,7 @@ abstract class DownloadService protected constructor(
     protected abstract val scheduler: Scheduler?
 
     protected abstract fun getForegroundNotification(
-        downloads: List<Download?>?,
+        downloads: List<Download>,
         notMetRequirements:  Int
     ): Notification
 

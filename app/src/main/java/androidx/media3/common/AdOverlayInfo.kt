@@ -3,7 +3,7 @@ package androidx.media3.common
 import android.view.View
 
 class AdOverlayInfo(
-    val view: View?,
+    val view: View,
     val purpose: Int,
     val reasonDetail: String? = null
 ) {

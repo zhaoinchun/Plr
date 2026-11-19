@@ -50,10 +50,10 @@ class DownloadManager(
         ) {
         }
 
-        fun onDownloadRemoved(downloadManager: DownloadManager?, download: Download?) {}
-        fun onIdle(downloadManager: DownloadManager?) {}
+        fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {}
+        fun onIdle(downloadManager: DownloadManager) {}
         fun onRequirementsStateChanged(
-            downloadManager: DownloadManager?,
+            downloadManager: DownloadManager,
             requirements: Requirements?,
             notMetRequirements: Int
         ) {
@@ -89,7 +89,7 @@ class DownloadManager(
     var isWaitingForRequirements: Boolean = false
         private set
 
-    var currentDownloads = mutableListOf<Download?>()
+    var currentDownloads = mutableListOf<Download>()
         private set
     private var requirementsWatcher: RequirementsWatcher
 
