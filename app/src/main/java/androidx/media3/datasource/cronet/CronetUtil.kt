@@ -20,8 +20,6 @@ object CronetUtil {
         )
     }
 
-    
-    
     fun buildCronetEngine(
         context: Context, userAgent: String?, preferGooglePlayServices: Boolean
     ): CronetEngine? {
@@ -78,7 +76,6 @@ object CronetUtil {
             return -compareVersionStrings(providerLeft.getVersion(), providerRight.getVersion())
         }
 
-        
         fun getPriority(provider: CronetProvider): Int {
             val providerName: String? = provider.getName()
             if (CronetProvider.PROVIDER_NAME_APP_PACKAGED == providerName) {
@@ -99,7 +96,6 @@ object CronetUtil {
             private const val GOOGLE_PLAY_SERVICES_PROVIDER_NAME =
                 "Google-Play-Services-Cronet-Provider"
 
-            
             private fun compareVersionStrings(
                 versionLeft: String?, versionRight: String?
             ): Int {

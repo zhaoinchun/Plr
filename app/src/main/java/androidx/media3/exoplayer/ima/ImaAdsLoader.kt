@@ -62,7 +62,6 @@ class ImaAdsLoader(
         private var enableCustomTabs = false
         private var imaFactory: ImaUtil.ImaFactory
 
-        
         init {
             this.context = Preconditions.checkNotNull<Context?>(context).getApplicationContext()
             adPreloadTimeoutMs = DEFAULT_AD_PRELOAD_TIMEOUT_MS
@@ -72,33 +71,23 @@ class ImaAdsLoader(
             imaFactory = DefaultImaFactory()
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setImaSdkSettings(imaSdkSettings: ImaSdkSettings?): Builder {
             this.imaSdkSettings = Preconditions.checkNotNull<ImaSdkSettings?>(imaSdkSettings)
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setAdErrorListener(adErrorListener: AdErrorEvent.AdErrorListener?): Builder {
-            this.adErrorListener = Preconditions.checkNotNull<AdErrorEvent.AdErrorListener?>(adErrorListener)
+            this.adErrorListener =
+                Preconditions.checkNotNull<AdErrorEvent.AdErrorListener?>(adErrorListener)
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setAdEventListener(adEventListener: AdEvent.AdEventListener?): Builder {
-            this.adEventListener = Preconditions.checkNotNull<AdEvent.AdEventListener?>(adEventListener)
+            this.adEventListener =
+                Preconditions.checkNotNull<AdEvent.AdEventListener?>(adEventListener)
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setVideoAdPlayerCallback(
             videoAdPlayerCallback: VideoAdPlayer.VideoAdPlayerCallback?
         ): Builder {
@@ -109,9 +98,6 @@ class ImaAdsLoader(
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setAdUiElements(adUiElements: MutableSet<UiElement?>?): Builder {
             this.adUiElements = ImmutableSet.copyOf<UiElement?>(
                 Preconditions.checkNotNull<MutableSet<UiElement?>?>(adUiElements)
@@ -119,9 +105,6 @@ class ImaAdsLoader(
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setCompanionAdSlots(companionAdSlots: MutableCollection<CompanionAdSlot?>?): Builder {
             this.companionAdSlots = ImmutableList.copyOf<CompanionAdSlot?>(
                 Preconditions.checkNotNull<MutableCollection<CompanionAdSlot?>?>(companionAdSlots)
@@ -129,9 +112,6 @@ class ImaAdsLoader(
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setAdMediaMimeTypes(adMediaMimeTypes: MutableList<String?>?): Builder {
             this.adMediaMimeTypes = ImmutableList.copyOf<String?>(
                 Preconditions.checkNotNull<MutableList<String?>?>(adMediaMimeTypes)
@@ -139,90 +119,61 @@ class ImaAdsLoader(
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setEnableContinuousPlayback(enableContinuousPlayback: Boolean): Builder {
             this.enableContinuousPlayback = enableContinuousPlayback
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setAdPreloadTimeoutMs(adPreloadTimeoutMs: Long): Builder {
             Preconditions.checkArgument(adPreloadTimeoutMs == C.TIME_UNSET || adPreloadTimeoutMs > 0)
             this.adPreloadTimeoutMs = adPreloadTimeoutMs
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setVastLoadTimeoutMs(@IntRange(from = 1) vastLoadTimeoutMs: Int): Builder {
             Preconditions.checkArgument(vastLoadTimeoutMs > 0)
             this.vastLoadTimeoutMs = vastLoadTimeoutMs
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setMediaLoadTimeoutMs(@IntRange(from = 1) mediaLoadTimeoutMs: Int): Builder {
             Preconditions.checkArgument(mediaLoadTimeoutMs > 0)
             this.mediaLoadTimeoutMs = mediaLoadTimeoutMs
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setEnableCustomTabs(enableCustomTabs: Boolean): Builder {
             this.enableCustomTabs = enableCustomTabs
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setMaxMediaBitrate(@IntRange(from = 1) bitrate: Int): Builder {
             Preconditions.checkArgument(bitrate > 0)
             this.mediaBitrate = bitrate
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setFocusSkipButtonWhenAvailable(focusSkipButtonWhenAvailable: Boolean): Builder {
             this.focusSkipButtonWhenAvailable = focusSkipButtonWhenAvailable
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setPlayAdBeforeStartPosition(playAdBeforeStartPosition: Boolean): Builder {
             this.playAdBeforeStartPosition = playAdBeforeStartPosition
             return this
         }
 
-        
-        @CanIgnoreReturnValue
-        
         fun setDebugModeEnabled(debugModeEnabled: Boolean): Builder {
             this.debugModeEnabled = debugModeEnabled
             return this
         }
 
-        @CanIgnoreReturnValue
         @VisibleForTesting
         fun setImaFactory(imaFactory: ImaUtil.ImaFactory?): Builder {
             this.imaFactory = Preconditions.checkNotNull<ImaUtil.ImaFactory?>(imaFactory)
             return this
         }
 
-        
         fun build(): ImaAdsLoader {
             if (vastLoadTimeoutMs != ImaUtil.TIMEOUT_UNSET && adPreloadTimeoutMs < vastLoadTimeoutMs) {
                 adPreloadTimeoutMs = vastLoadTimeoutMs.toLong()
@@ -252,8 +203,7 @@ class ImaAdsLoader(
         }
 
         companion object {
-            
-            
+
             val DEFAULT_AD_PRELOAD_TIMEOUT_MS: Long = 10 * C.MILLIS_PER_SECOND
         }
     }
@@ -284,15 +234,11 @@ class ImaAdsLoader(
     }
 
     val adsLoader: com.google.ads.interactivemedia.v3.api.AdsLoader?
-        
         get() = if (currentAdTagLoader != null) currentAdTagLoader!!.getAdsLoader() else null
 
     val adDisplayContainer: AdDisplayContainer?
-        
         get() = if (currentAdTagLoader != null) currentAdTagLoader!!.getAdDisplayContainer() else null
 
-    
-    
     fun requestAds(adTagDataSpec: DataSpec, adsId: Any?, adViewGroup: ViewGroup?) {
         if (!adTagLoaderByAdsId.containsKey(adsId)) {
             val adTagLoader =
@@ -309,16 +255,12 @@ class ImaAdsLoader(
         }
     }
 
-    
-    
     fun skipAd() {
         if (currentAdTagLoader != null) {
             currentAdTagLoader!!.skipAd()
         }
     }
 
-    
-    
     fun focusSkipButton() {
         if (currentAdTagLoader != null) {
             currentAdTagLoader!!.focusSkipButton()
@@ -333,9 +275,9 @@ class ImaAdsLoader(
         wasSetPlayerCalled = true
     }
 
-    override fun setSupportedContentTypes( vararg contentTypes: Int) {
+    override fun setSupportedContentTypes(vararg contentTypes: Int) {
         val supportedMimeTypes: MutableList<String?> = ArrayList<String?>()
-        for ( contentType in contentTypes) {
+        for (contentType in contentTypes) {
             // IMA does not support Smooth Streaming ad media.
             if (contentType == C.CONTENT_TYPE_DASH) {
                 supportedMimeTypes.add(MimeTypes.APPLICATION_MPD)
@@ -356,7 +298,6 @@ class ImaAdsLoader(
         this.supportedMimeTypes = Collections.unmodifiableList<String?>(supportedMimeTypes)
     }
 
-    
     override fun start(
         adsMediaSource: AdsMediaSource,
         adTagDataSpec: DataSpec,
@@ -386,7 +327,6 @@ class ImaAdsLoader(
         maybeUpdateCurrentAdTagLoader()
     }
 
-    
     override fun stop(adsMediaSource: AdsMediaSource, eventListener: AdsLoader.EventListener) {
         val removedAdTagLoader = adTagLoaderByAdsMediaSource.remove(adsMediaSource)
         maybeUpdateCurrentAdTagLoader()
@@ -421,14 +361,14 @@ class ImaAdsLoader(
         adTagLoaderByAdsId.clear()
     }
 
-    
     override fun handlePrepareComplete(
         adsMediaSource: AdsMediaSource, adGroupIndex: Int, adIndexInAdGroup: Int
     ) {
         if (player == null) {
             return
         }
-        adTagLoaderByAdsMediaSource.get(adsMediaSource)!!.handlePrepareComplete(adGroupIndex, adIndexInAdGroup)
+        adTagLoaderByAdsMediaSource.get(adsMediaSource)!!
+            .handlePrepareComplete(adGroupIndex, adIndexInAdGroup)
     }
 
     override fun handlePrepareError(
@@ -440,7 +380,8 @@ class ImaAdsLoader(
         if (player == null) {
             return
         }
-        adTagLoaderByAdsMediaSource.get(adsMediaSource)!! .handlePrepareError(adGroupIndex, adIndexInAdGroup, exception)
+        adTagLoaderByAdsMediaSource.get(adsMediaSource)!!
+            .handlePrepareError(adGroupIndex, adIndexInAdGroup, exception)
     }
 
     // Internal methods.
@@ -520,7 +461,7 @@ class ImaAdsLoader(
     }
 
     private inner class PlayerListenerImpl : Player.Listener {
-        override fun onTimelineChanged(timeline: Timeline,reason: Int) {
+        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             if (timeline.isEmpty) {
                 // The player is being reset or contains no media.
                 return
@@ -542,12 +483,11 @@ class ImaAdsLoader(
             maybePreloadNextPeriodAds()
         }
 
-        override fun onRepeatModeChanged( repeatMode: Int) {
+        override fun onRepeatModeChanged(repeatMode: Int) {
             maybePreloadNextPeriodAds()
         }
     }
 
-    
     private class DefaultImaFactory : ImaUtil.ImaFactory {
         override fun createImaSdkSettings(): ImaSdkSettings {
             val settings: ImaSdkSettings = ImaSdkFactory.getInstance().createImaSdkSettings()

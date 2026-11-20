@@ -64,67 +64,37 @@ internal class AdTagLoader(
     private val adDisplayContainer: AdDisplayContainer
     private val adsLoader: AdsLoader
     private val adLoadTimeoutRunnable: Runnable
-
     private var pendingAdRequestContext: Any? = null
     private var player: Player? = null
     private var lastContentProgress: VideoProgressUpdate
     private var lastAdProgress: VideoProgressUpdate
     private var lastVolumePercent = 0
-
     private var adsManager: AdsManager? = null
     private var isAdsManagerInitialized = false
     private var pendingAdLoadError: AdLoadException? = null
     private var timeline: Timeline
     private var contentDurationMs: Long
     private var adPlaybackState: AdPlaybackState
-
     private var released = false
 
     // Fields tracking IMA's state.
-    
     private var imaPausedContent = false
-
-    
     private var imaAdState: Int = 0
-
-    
     private var imaAdMediaInfo: AdMediaInfo? = null
-
-    
     private var imaAdInfo: AdInfo? = null
-
-    
     private var sentContentComplete = false
 
     // Fields tracking the player/loader state.
-    
     private var playingAd = false
-
-    
     private var bufferingAd = false
-
-    
     private var playingAdIndexInAdGroup = 0
-
-    
     private var pendingAdPrepareErrorAdInfo: AdInfo? = null
-
-    
     private var fakeContentProgressElapsedRealtimeMs: Long
-
-    
     private var fakeContentProgressOffsetMs: Long
-
-    
     private var pendingContentPositionMs: Long
-
-    
     private var sentPendingContentPositionMs = false
-
-    
     private var waitingForPreloadElapsedRealtimeMs: Long
 
-    
     init {
         this.imaFactory = imaFactory
         var imaSdkSettings: ImaSdkSettings? = configuration.imaSdkSettings
@@ -174,27 +144,22 @@ internal class AdTagLoader(
         adsLoader = requestAds(context, imaSdkSettings, adDisplayContainer)
     }
 
-    
     fun getAdsLoader(): AdsLoader {
         return adsLoader
     }
 
-    
     fun getAdDisplayContainer(): AdDisplayContainer {
         return adDisplayContainer
     }
 
-    
     fun skipAd() {
         adsManager?.skip()
     }
 
-    
     fun focusSkipButton() {
         adsManager?.focus()
     }
 
-    
     fun addListenerWithAdView(
         eventListener: EventListener,
         adViewProvider: AdViewProvider
@@ -236,12 +201,10 @@ internal class AdTagLoader(
         }
     }
 
-    
     fun maybePreloadAds(contentPositionMs: Long, contentDurationMs: Long) {
         maybeInitializeAdsManager(contentPositionMs, contentDurationMs)
     }
 
-    
     fun activate(player: Player) {
         this.player = player
         player.addListener(this)
@@ -269,7 +232,6 @@ internal class AdTagLoader(
         }
     }
 
-    
     fun deactivate() {
         val player: Player = player!!
         // Post deactivation behind any already queued Player.Listener events to ensure that
@@ -277,7 +239,6 @@ internal class AdTagLoader(
         handler.post(Runnable { deactivateInternal(player) })
     }
 
-    
     private fun deactivateInternal(player: Player) {
         if ((adPlaybackState != AdPlaybackState.NONE) && imaPausedContent
             && player.playerError == null
@@ -296,7 +257,6 @@ internal class AdTagLoader(
         this.player = null
     }
 
-    
     fun removeListener(eventListener: EventListener?) {
         eventListeners.remove(eventListener)
         if (eventListeners.isEmpty()) {
@@ -304,7 +264,6 @@ internal class AdTagLoader(
         }
     }
 
-    
     fun release() {
         if (released) {
             return
@@ -331,7 +290,6 @@ internal class AdTagLoader(
         updateAdPlaybackState()
     }
 
-    
     fun handlePrepareComplete(adGroupIndex: Int, adIndexInAdGroup: Int) {
         val adInfo = AdInfo(adGroupIndex, adIndexInAdGroup)
         if (configuration.debugModeEnabled) {
@@ -347,7 +305,6 @@ internal class AdTagLoader(
         }
     }
 
-    
     fun handlePrepareError(adGroupIndex: Int, adIndexInAdGroup: Int, exception: IOException?) {
         if (player == null) {
             return
@@ -492,7 +449,6 @@ internal class AdTagLoader(
         }
     }
 
-    
     private fun setupAdsRendering(
         contentPositionMs: Long,
         contentDurationMs: Long
@@ -630,7 +586,7 @@ internal class AdTagLoader(
         }
 
     private fun updateAdProgress() {
-        val videoProgressUpdate =adVideoProgressUpdate
+        val videoProgressUpdate = adVideoProgressUpdate
         if (configuration.debugModeEnabled) {
             Log.d(
                 TAG,
@@ -672,7 +628,7 @@ internal class AdTagLoader(
         }
         when (adEvent.getType()) {
             AdEventType.AD_BREAK_FETCH_ERROR -> {
-                val adGroupTimeSecondsString: String =adEvent.getAdData().get("adBreakTime")!!
+                val adGroupTimeSecondsString: String = adEvent.getAdData().get("adBreakTime")!!
                 if (configuration.debugModeEnabled) {
                     Log.d(TAG, "Fetch error for ad at " + adGroupTimeSecondsString + " seconds")
                 }
@@ -708,12 +664,12 @@ internal class AdTagLoader(
                 }
             }
 
-            AdEventType. CONTENT_RESUME_REQUESTED -> {
+            AdEventType.CONTENT_RESUME_REQUESTED -> {
                 imaPausedContent = false
                 resumeContentInternal()
             }
 
-            AdEventType. LOG -> {
+            AdEventType.LOG -> {
                 val adData: MutableMap<String?, String?>? = adEvent.getAdData()
                 val message = "AdEvent: " + adData
                 Log.i(TAG, message)
@@ -743,7 +699,6 @@ internal class AdTagLoader(
     }
 
     private val isWaitingForFirstAdToPreload: Boolean
-        
         get() {
             val player: Player? = this.player
             if (player == null) {
@@ -791,7 +746,7 @@ internal class AdTagLoader(
         if (playingAd && imaAdState == IMA_AD_STATE_PLAYING) {
             if (!bufferingAd && playbackState == Player.STATE_BUFFERING) {
                 bufferingAd = true
-                val adMediaInfo: AdMediaInfo =imaAdMediaInfo!!
+                val adMediaInfo: AdMediaInfo = imaAdMediaInfo!!
                 for (i in adCallbacks.indices) {
                     adCallbacks.get(i).onBuffering(adMediaInfo)
                 }
@@ -988,7 +943,7 @@ internal class AdTagLoader(
                 adCallbacks.get(i).onResume(adMediaInfo)
             }
         }
-        if (player?.playWhenReady==false) {
+        if (player?.playWhenReady == false) {
             // Either this loader hasn't been activated yet, or the player is paused now.
             adsManager!!.pause()
         }
@@ -1239,7 +1194,6 @@ internal class AdTagLoader(
     }
 
     private val loadingAdGroupIndex: Int
-        
         get() {
             if (player == null) {
                 return C.INDEX_UNSET
@@ -1498,24 +1452,18 @@ internal class AdTagLoader(
         private const val IMA_SDK_SETTINGS_PLAYER_TYPE = "google/exo.ext.ima"
         private val IMA_SDK_SETTINGS_PLAYER_VERSION: String = MediaLibraryInfo.VERSION
 
-        
         private const val AD_PROGRESS_UPDATE_INTERVAL_MS = 200
 
-        
         private val IMA_DURATION_UNSET = -1L
 
-        
         private const val THRESHOLD_END_OF_CONTENT_MS: Long = 5000
 
-        
         private const val THRESHOLD_AD_MATCH_US: Long = 1000
 
-        
         private const val IMA_AD_STATE_NONE = 0
 
         private const val IMA_AD_STATE_PLAYING = 1
 
-        
         private const val IMA_AD_STATE_PAUSED = 2
 
         private fun getContentPeriodPositionMs(

@@ -32,7 +32,6 @@ class ImaServerSideAdInsertionUriBuilder {
     var format: Int
     private var loadVideoTimeoutMs: Int
 
-    
     init {
         adTagParameters = ImmutableMap.of<String?, String?>()
         loadVideoTimeoutMs = DEFAULT_LOAD_VIDEO_TIMEOUT_MS
@@ -44,57 +43,49 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setAssetKey(assetKey: String?): ImaServerSideAdInsertionUriBuilder {
         this.assetKey = assetKey
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setAuthToken(authToken: String?): ImaServerSideAdInsertionUriBuilder {
         this.authToken = authToken
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setContentSourceId(contentSourceId: String?): ImaServerSideAdInsertionUriBuilder {
         this.contentSourceId = contentSourceId
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setVideoId(videoId: String?): ImaServerSideAdInsertionUriBuilder {
         this.videoId = videoId
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setNetworkCode(networkCode: String?): ImaServerSideAdInsertionUriBuilder {
         this.networkCode = networkCode
         return this
     }
 
-    
     @CanIgnoreReturnValue
-    fun setFormat( format: Int): ImaServerSideAdInsertionUriBuilder {
+    fun setFormat(format: Int): ImaServerSideAdInsertionUriBuilder {
         Preconditions.checkArgument(format == C.CONTENT_TYPE_DASH || format == C.CONTENT_TYPE_HLS)
         this.format = format
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setApiKey(apiKey: String?): ImaServerSideAdInsertionUriBuilder {
         this.apiKey = apiKey
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setStreamActivityMonitorId(
         streamActivityMonitorId: String?
@@ -103,7 +94,6 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setAdTagParameters(
         adTagParameters: MutableMap<String?, String?>
@@ -112,7 +102,6 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setCustomUiOptions(
         customUiOptions: CustomUiOptions?
@@ -121,28 +110,24 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setManifestSuffix(manifestSuffix: String?): ImaServerSideAdInsertionUriBuilder {
         this.manifestSuffix = manifestSuffix
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setContentUrl(contentUrl: String?): ImaServerSideAdInsertionUriBuilder {
         this.contentUrl = contentUrl
         return this
     }
 
-    
     @CanIgnoreReturnValue
     fun setLoadVideoTimeoutMs(loadVideoTimeoutMs: Int): ImaServerSideAdInsertionUriBuilder {
         this.loadVideoTimeoutMs = loadVideoTimeoutMs
         return this
     }
 
-    
     fun build(): Uri? {
         Preconditions.checkState(
             (TextUtils.isEmpty(assetKey)
@@ -216,7 +201,7 @@ class ImaServerSideAdInsertionUriBuilder {
     }
 
     companion object {
-        
+
         const val DEFAULT_LOAD_VIDEO_TIMEOUT_MS: Int = 10000
 
         /* package */
@@ -238,17 +223,17 @@ class ImaServerSideAdInsertionUriBuilder {
         private const val CUSTOM_UI_OPTIONS_ABOUT_THIS_AD_SUPPORT =
             "customUiOptionsAboutThisAdSupport"
 
-         /* package */
+        /* package */
         fun isLiveStream(uri: Uri): Boolean {
             return !TextUtils.isEmpty(uri.getQueryParameter(ASSET_KEY))
         }
 
-         /* package */
+        /* package */
         fun getAdsId(uri: Uri): kotlin.String {
             return Preconditions.checkNotNull<kotlin.String>(uri.getQueryParameter(ADS_ID))
         }
 
-         /* package */
+        /* package */
         fun getLoadVideoTimeoutMs(uri: Uri): Int {
             val adsLoaderTimeoutUs = uri.getQueryParameter(LOAD_VIDEO_TIMEOUT_MS)
             return if (TextUtils.isEmpty(adsLoaderTimeoutUs))
@@ -256,7 +241,6 @@ class ImaServerSideAdInsertionUriBuilder {
             else adsLoaderTimeoutUs!!.toInt()
         }
 
-        
         fun createStreamRequest(uri: Uri): StreamRequest {
             require(!(C.SSAI_SCHEME != uri.getScheme() || IMA_AUTHORITY != uri.getAuthority())) { "Invalid URI scheme or authority." }
             val streamRequest: StreamRequest

@@ -5,8 +5,7 @@ import androidx.media3.common.C
 import com.google.ads.interactivemedia.v3.api.AdsRequest
 import com.google.ads.interactivemedia.v3.api.VideoOrientation
 
-class ImaAdTagUriBuilder
-(private val uri: Uri) {
+class ImaAdTagUriBuilder(private val uri: Uri) {
     private var preferredLinearOrientation: Int = IMA_ORIENTATION_UNSET
 
     fun setPreferredLinearOrientation(

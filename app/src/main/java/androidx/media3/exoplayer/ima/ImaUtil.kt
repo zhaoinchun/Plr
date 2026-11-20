@@ -57,7 +57,6 @@ object ImaUtil {
         }
     }
 
-    
     fun getAdGroupTimesUsForCuePoints(cuePoints: MutableList<Float?>): LongArray {
         if (cuePoints.isEmpty()) {
             return longArrayOf(0L)
@@ -79,7 +78,6 @@ object ImaUtil {
         return adGroupTimesUs
     }
 
-    
     @Throws(IOException::class)
     fun getAdsRequestForAdTagDataSpec(
         imaFactory: ImaFactory, adTagDataSpec: DataSpec
@@ -105,7 +103,6 @@ object ImaUtil {
         return request
     }
 
-    
     fun isAdGroupLoadError(adError: AdError): Boolean {
         // TODO: Find out what other errors need to be handled (if any), and whether each one relates to
         // a single ad, ad group or the whole timeline.
@@ -114,12 +111,10 @@ object ImaUtil {
     }
 
     val imaLooper: Looper
-        
         get() =// IMA SDK callbacks occur on the main thread. This method can be used to check that the player
             // is using the same looper, to ensure all interaction with this class is on the main thread.
             Looper.getMainLooper()
 
-    
     // VideoProgressUpdate.equals() is annotated as hidden.
     fun getStringForVideoProgressUpdate(videoProgressUpdate: VideoProgressUpdate): String {
         if (VideoProgressUpdate.VIDEO_TIME_NOT_READY.equals(videoProgressUpdate)) {
@@ -132,7 +127,6 @@ object ImaUtil {
         }
     }
 
-    
     @CheckResult
     fun expandAdGroupPlaceholder(
         adGroupIndex: Int,
@@ -152,7 +146,6 @@ object ImaUtil {
             .withAdDurationsUs(adGroupIndex, *adDurationsUs)
     }
 
-    
     @CheckResult
     fun updateAdDurationInAdGroup(
         adGroupIndex: Int,
@@ -172,7 +165,6 @@ object ImaUtil {
         return adPlaybackState.withAdDurationsUs(adGroupIndex, *adDurationsUs)
     }
 
-    
     private fun updateAdDurationAndPropagate(
         adDurationsUs: LongArray, adIndex: Int, adDurationUs: Long, remainingDurationUs: Long
     ): LongArray {
@@ -185,13 +177,11 @@ object ImaUtil {
         return adDurationsUs
     }
 
-    
     fun getWindowStartTimeUs(windowStartTimeMs: Long, positionInFirstPeriodUs: Long): Long {
         // Revert us/ms truncation introduced in `DashMediaSource.DashTimeline`.
         return Util.msToUs(windowStartTimeMs) + (positionInFirstPeriodUs % 1000)
     }
 
-    
     fun splitAdPlaybackStateForPeriods(
         adPlaybackState: AdPlaybackState, contentTimeline: Timeline
     ): ImmutableMap<Any?, AdPlaybackState?> {
@@ -346,7 +336,6 @@ object ImaUtil {
         return adPlaybackState
     }
 
-    
     fun maybeCorrectPreviouslyUnknownAdDurations(
         contentTimeline: Timeline, adPlaybackState: AdPlaybackState
     ): AdPlaybackState {
@@ -424,7 +413,6 @@ object ImaUtil {
         return adPlaybackState.withContentResumeOffsetUs(adGroupIndex, adGroupDurationUs)
     }
 
-    
     fun getAdGroupDurationUsForLiveAdPeriodIndex(
         timeline: Timeline,
         adPodInfo: AdPodInfo,
@@ -460,7 +448,6 @@ object ImaUtil {
             secToUsRounded(adPodInfo.getMaxDuration())
     }
 
-    
     @CheckResult
     fun handleAdPeriodRemovedFromTimeline(
         currentPeriodIndex: Int, timeline: Timeline, adPlaybackState: AdPlaybackState
@@ -574,7 +561,6 @@ object ImaUtil {
             .withContentResumeOffsetUs(adGroupIndex, newDurationsUs.sum())
     }
 
-    
     fun getAdGroupAndIndexInLiveMultiPeriodTimeline(
         adPeriodIndex: Int, adPlaybackState: AdPlaybackState, timeline: Timeline
     ): Pair<Int?, Int?> {
@@ -606,7 +592,6 @@ object ImaUtil {
         )
     }
 
-    
     fun getAdGroupAndIndexInVodMultiPeriodTimeline(
         adPeriodIndex: Int, adPlaybackState: AdPlaybackState, timeline: Timeline
     ): Pair<Int?, Int?> {
@@ -653,7 +638,6 @@ object ImaUtil {
         throw IllegalStateException()
     }
 
-    
     @CheckResult
     fun addLiveAdBreak(
         currentContentPeriodPositionUs: Long,
@@ -734,7 +718,6 @@ object ImaUtil {
         return adPlaybackState
     }
 
-    
     @CheckResult
     fun splitAdGroup(
         adGroup: AdPlaybackState.AdGroup,
@@ -783,51 +766,42 @@ object ImaUtil {
         return adGroup.states.size
     }
 
-    
     fun secToUsRounded(timeSec: Double): Long {
         return DoubleMath.roundToLong(
             BigDecimal.valueOf(timeSec).scaleByPowerOfTen(6).toDouble(), RoundingMode.HALF_UP
         )
     }
 
-    
     fun secToMsRounded(timeSec: Double): Long {
         return DoubleMath.roundToLong(
             BigDecimal.valueOf(timeSec).scaleByPowerOfTen(3).toDouble(), RoundingMode.HALF_UP
         )
     }
 
-    
     interface ImaFactory {
-        
+
         fun createImaSdkSettings(): ImaSdkSettings
 
-        
         fun createAdsRenderingSettings(): AdsRenderingSettings
 
-        
         fun createAdDisplayContainer(
             container: ViewGroup,
             player: VideoAdPlayer
         ): AdDisplayContainer
 
-        
         fun createAudioAdDisplayContainer(
             context: Context,
             player: VideoAdPlayer
         ): AdDisplayContainer
 
-        
         fun createFriendlyObstruction(
             view: View,
             friendlyObstructionPurpose: FriendlyObstructionPurpose,
             reasonDetail: String?
         ): FriendlyObstruction
 
-        
         fun createAdsRequest(): AdsRequest
 
-        
         fun createAdsLoader(
             context: Context,
             imaSdkSettings: ImaSdkSettings,
@@ -835,7 +809,6 @@ object ImaUtil {
         ): AdsLoader
     }
 
-    
     class Configuration(
         val adPreloadTimeoutMs: Long,
         val vastLoadTimeoutMs: Int,
@@ -875,7 +848,6 @@ object ImaUtil {
         }
     }
 
-    
     class ServerSideAdInsertionConfiguration(
         adViewProvider: AdViewProvider,
         imaSdkSettings: ImaSdkSettings,

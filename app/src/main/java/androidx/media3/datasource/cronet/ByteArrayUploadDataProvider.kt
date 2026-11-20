@@ -6,7 +6,6 @@ import java.io.IOException
 import java.nio.ByteBuffer
 import kotlin.math.min
 
- /* package */
 internal class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvider() {
     private var position = 0
 

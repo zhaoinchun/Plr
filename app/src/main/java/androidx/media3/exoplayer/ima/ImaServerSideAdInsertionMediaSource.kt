@@ -99,8 +99,7 @@ class ImaServerSideAdInsertionMediaSource(
     streamPlayer: StreamPlayer,
     contentMediaSourceFactory: MediaSource.Factory
 ) : CompositeMediaSource<Void?>() {
-    
-    
+
     fun interface StreamEventListener {
         fun onStreamIdChanged(mediaItem: MediaItem?, streamId: String?)
     }
@@ -111,12 +110,10 @@ class ImaServerSideAdInsertionMediaSource(
     ) : MediaSource.Factory {
         private var imaSdkFactory: ImaSdkFactory
 
-        
         init {
             imaSdkFactory = ImaSdkFactory.getInstance()
         }
 
-        
         @CanIgnoreReturnValue
         override fun setLoadErrorHandlingPolicy(
             loadErrorHandlingPolicy: LoadErrorHandlingPolicy
@@ -125,7 +122,6 @@ class ImaServerSideAdInsertionMediaSource(
             return this
         }
 
-        
         @CanIgnoreReturnValue
         override fun setDrmSessionManagerProvider(
             drmSessionManagerProvider: DrmSessionManagerProvider
@@ -137,7 +133,6 @@ class ImaServerSideAdInsertionMediaSource(
         override val supportedTypes: IntArray
             get() = contentMediaSourceFactory.supportedTypes
 
-        
         override fun createMediaSource(mediaItem: MediaItem): MediaSource {
             Preconditions.checkNotNull<MediaItem.LocalConfiguration?>(mediaItem.localConfiguration)
             val player: Player = adsLoader.player!!
@@ -175,13 +170,12 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    
-    class AdsLoader (
+    class AdsLoader(
         context: Context,
         configuration: ImaUtil.ServerSideAdInsertionConfiguration,
         state: State
     ) {
-        
+
         class Builder(private val context: Context, adViewProvider: AdViewProvider?) {
             private val adViewProvider: AdViewProvider?
 
@@ -195,7 +189,6 @@ class ImaServerSideAdInsertionMediaSource(
             private var focusSkipButtonWhenAvailable: Boolean
             private var enableCustomTabs: Boolean
 
-            
             init {
                 this.adViewProvider = adViewProvider
                 companionAdSlots = ImmutableList.of<CompanionAdSlot?>()
@@ -206,63 +199,48 @@ class ImaServerSideAdInsertionMediaSource(
                     StreamEventListener { mediaItem: MediaItem?, streamId: String? -> }
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setImaSdkSettings(imaSdkSettings: ImaSdkSettings?): Builder {
                 this.imaSdkSettings = imaSdkSettings
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setStreamEventListener(streamEventListener: StreamEventListener?): Builder {
                 this.streamEventListener = streamEventListener
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setAdEventListener(adEventListener: AdEvent.AdEventListener?): Builder {
                 this.adEventListener = adEventListener
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setAdErrorListener(adErrorListener: AdErrorEvent.AdErrorListener?): Builder {
                 this.adErrorListener = adErrorListener
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setCompanionAdSlots(companionAdSlots: MutableCollection<CompanionAdSlot?>): Builder {
                 this.companionAdSlots = ImmutableList.copyOf<CompanionAdSlot?>(companionAdSlots)
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setPauseAdSlot(pauseAdSlot: AdSlot?): Builder {
                 this.pauseAdSlot = Preconditions.checkNotNull<AdSlot?>(pauseAdSlot)
                 return this
             }
 
-            
             @CanIgnoreReturnValue
             fun setAdsLoaderState(state: State): Builder {
                 this.state = state
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setFocusSkipButtonWhenAvailable(
                 focusSkipButtonWhenAvailable: Boolean
@@ -271,15 +249,12 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            
-            
             @CanIgnoreReturnValue
             fun setEnableCustomTabs(enableCustomTabs: Boolean): Builder {
                 this.enableCustomTabs = enableCustomTabs
                 return this
             }
 
-            
             fun build(): AdsLoader {
                 var imaSdkSettings: ImaSdkSettings? = this.imaSdkSettings
                 if (imaSdkSettings == null) {
@@ -303,9 +278,8 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-        
         class State @VisibleForTesting internal constructor(adPlaybackStates: ImmutableMap<String, AdPlaybackState>) {
-             val adPlaybackStates: ImmutableMap<String, AdPlaybackState>
+            val adPlaybackStates: ImmutableMap<String, AdPlaybackState>
 
             override fun equals(o: Any?): Boolean {
                 if (this === o) {
@@ -341,7 +315,6 @@ class ImaServerSideAdInsertionMediaSource(
             companion object {
                 private val FIELD_AD_PLAYBACK_STATES = Util.intToStringMaxRadix(1)
 
-                
                 @JvmStatic
                 fun fromBundle(bundle: Bundle): State {
                     val adPlaybackStateMap: ImmutableMap.Builder<String, AdPlaybackState> =
@@ -367,11 +340,11 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-         val configuration: ImaUtil.ServerSideAdInsertionConfiguration
-         val context: Context
-         val mediaSourceResources: MutableMap<String?, MediaSourceResourceHolder>
-         val adPlaybackStateMap: MutableMap<String?, AdPlaybackState?>
-         var player: Player? = null
+        val configuration: ImaUtil.ServerSideAdInsertionConfiguration
+        val context: Context
+        val mediaSourceResources: MutableMap<String?, MediaSourceResourceHolder>
+        val adPlaybackStateMap: MutableMap<String?, AdPlaybackState?>
+        var player: Player? = null
 
         init {
             this.context = context.getApplicationContext()
@@ -381,8 +354,6 @@ class ImaServerSideAdInsertionMediaSource(
             adPlaybackStateMap.putAll(state.adPlaybackStates)
         }
 
-        
-        
         fun replaceAdTagParameters(adTagParameters: MutableMap<String, String>) {
             val player = player
             if (player == null) {
@@ -408,8 +379,6 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-        
-        
         fun focusSkipButton() {
             val player = player ?: return
             if (player.playbackState != Player.STATE_IDLE && player.playbackState != Player.STATE_ENDED && player.mediaItemCount > 0) {
@@ -431,7 +400,6 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-        
         fun release(): State {
             for (resourceHolder in mediaSourceResources.values) {
                 resourceHolder.streamPlayer.release()
@@ -448,7 +416,7 @@ class ImaServerSideAdInsertionMediaSource(
         }
 
         // Internal methods.
-         fun addMediaSourceResources(
+        fun addMediaSourceResources(
             mediaSource: ImaServerSideAdInsertionMediaSource,
             streamPlayer: StreamPlayer,
             adsLoader: com.google.ads.interactivemedia.v3.api.AdsLoader
@@ -458,16 +426,16 @@ class ImaServerSideAdInsertionMediaSource(
             )
         }
 
-         fun getAdPlaybackState(adsId: String?): AdPlaybackState {
+        fun getAdPlaybackState(adsId: String?): AdPlaybackState {
             val adPlaybackState: AdPlaybackState? = adPlaybackStateMap.get(adsId)
             return if (adPlaybackState != null) adPlaybackState else AdPlaybackState.NONE
         }
 
-         fun setAdPlaybackState(adsId: String?, adPlaybackState: AdPlaybackState?) {
+        fun setAdPlaybackState(adsId: String?, adPlaybackState: AdPlaybackState?) {
             this.adPlaybackStateMap.put(adsId, adPlaybackState)
         }
 
-         class MediaSourceResourceHolder(
+        class MediaSourceResourceHolder(
             val imaServerSideAdInsertionMediaSource: ImaServerSideAdInsertionMediaSource,
             val streamPlayer: StreamPlayer,
             adsLoader: com.google.ads.interactivemedia.v3.api.AdsLoader
@@ -534,21 +502,20 @@ class ImaServerSideAdInsertionMediaSource(
             ImaServerSideAdInsertionUriBuilder.Companion.createStreamRequest(streamRequestUri)
         val isDashStream = streamRequest.getFormat() == StreamRequest.StreamFormat.DASH
         componentListener = ComponentListener(
-                if (isLiveStream)
-                    (if (isDashStream)
-                        MultiPeriodLiveAdEventListener()
-                    else
-                        SinglePeriodLiveAdEventListener())
+            if (isLiveStream)
+                (if (isDashStream)
+                    MultiPeriodLiveAdEventListener()
                 else
-                    VodAdEventListener()
-            )
+                    SinglePeriodLiveAdEventListener())
+            else
+                VodAdEventListener()
+        )
         adPlaybackState = adsLoader.getAdPlaybackState(adsId)
     }
 
-    
     override fun canUpdateMediaItem(mediaItem: MediaItem): Boolean {
         val existingMediaItem = mediaItem
-        val existingConfiguration=existingMediaItem.localConfiguration!!
+        val existingConfiguration = existingMediaItem.localConfiguration!!
         val newConfiguration = mediaItem.localConfiguration
         return newConfiguration != null && newConfiguration.uri == existingConfiguration.uri
                 && newConfiguration.streamKeys == existingConfiguration.streamKeys
@@ -557,13 +524,11 @@ class ImaServerSideAdInsertionMediaSource(
                 && existingMediaItem.liveConfiguration == mediaItem.liveConfiguration
     }
 
-    
     @Synchronized
     override fun updateMediaItem(mediaItem: MediaItem) {
         this.mediaItem = mediaItem
     }
 
-    
     public override fun prepareSourceInternal(mediaTransferListener: TransferListener?) {
         mainHandler.post(Runnable {
             assertSingleInstanceInPlaylist(
@@ -593,7 +558,6 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    
     override fun onChildSourceInfoRefreshed(
         childSourceId: Void?, mediaSource: MediaSource, newTimeline: Timeline
     ) {
@@ -610,7 +574,6 @@ class ImaServerSideAdInsertionMediaSource(
             })
     }
 
-    
     override fun createPeriod(
         id: MediaSource.MediaPeriodId,
         allocator: Allocator,
@@ -622,14 +585,12 @@ class ImaServerSideAdInsertionMediaSource(
             .createPeriod(id, allocator, startPositionUs)
     }
 
-    
     override fun releasePeriod(mediaPeriod: MediaPeriod) {
         Preconditions.checkNotNull<ServerSideAdInsertionMediaSource?>(
             serverSideAdInsertionMediaSource
         ).releasePeriod(mediaPeriod)
     }
 
-    
     @Throws(IOException::class)
     public override fun maybeThrowSourceInfoRefreshError() {
         super.maybeThrowSourceInfoRefreshError()
@@ -640,7 +601,6 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    
     protected override fun releaseSourceInternal() {
         super.releaseSourceInternal()
         if (loader != null) {
@@ -670,8 +630,8 @@ class ImaServerSideAdInsertionMediaSource(
             if (applicationAdErrorListener != null) {
                 streamManager.removeAdErrorListener(applicationAdErrorListener)
             }
-           streamManager.removeAdEventListener(componentListener)
-           streamManager.destroy()
+            streamManager.removeAdEventListener(componentListener)
+            streamManager.destroy()
             streamId = null
         }
         this.streamManager = streamManager
@@ -768,7 +728,11 @@ class ImaServerSideAdInsertionMediaSource(
             val contentMediaItem =
                 MediaItem.Builder()
                     .setUri(contentUri)
-                    .setDrmConfiguration(Preconditions.checkNotNull<MediaItem.LocalConfiguration?>(mediaItem.localConfiguration).drmConfiguration)
+                    .setDrmConfiguration(
+                        Preconditions.checkNotNull<MediaItem.LocalConfiguration?>(
+                            mediaItem.localConfiguration
+                        ).drmConfiguration
+                    )
                     .setLiveConfiguration(mediaItem.liveConfiguration)
                     .setCustomCacheKey(mediaItem.localConfiguration!!.customCacheKey)
                     .setStreamKeys(mediaItem.localConfiguration.streamKeys)
@@ -798,7 +762,6 @@ class ImaServerSideAdInsertionMediaSource(
         ServerSideAdInsertionMediaSource.AdPlaybackStateUpdater {
         private val adEventListener: AdEvent.AdEventListener
 
-        
         init {
             this.adEventListener = adEventListener
         }
@@ -807,7 +770,7 @@ class ImaServerSideAdInsertionMediaSource(
         override fun onPositionDiscontinuity(
             oldPosition: Player.PositionInfo,
             newPosition: Player.PositionInfo,
-             reason: Int
+            reason: Int
         ) {
             if (!(reason == Player.DISCONTINUITY_REASON_AUTO_TRANSITION
                         || (isLiveStream && reason == Player.DISCONTINUITY_REASON_REMOVE))
@@ -979,7 +942,6 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    
     private class StreamManagerLoadable
         (
         adsLoader: com.google.ads.interactivemedia.v3.api.AdsLoader,
@@ -995,7 +957,6 @@ class ImaServerSideAdInsertionMediaSource(
         private val adErrorListener: AdErrorEvent.AdErrorListener?
         private val conditionVariable: ConditionVariable
 
-        
         @Volatile
         var contentUri: Uri? = null
             private set
@@ -1012,7 +973,6 @@ class ImaServerSideAdInsertionMediaSource(
         @Volatile
         private var errorCode: Int
 
-        
         init {
             this.adsLoader = adsLoader
             this.imaServerSideAdInsertionMediaSource = imaServerSideAdInsertionMediaSource
@@ -1090,12 +1050,11 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    
-     class StreamPlayer(player: Player, mediaItem: MediaItem, streamRequest: StreamRequest) :
+    class StreamPlayer(player: Player, mediaItem: MediaItem, streamRequest: StreamRequest) :
         VideoStreamPlayer {
-        
+
         fun interface StreamLoadListener {
-            
+
             fun onLoadStream(
                 streamUri: String?,
                 subtitles: MutableList<HashMap<String, String>>?
@@ -1114,7 +1073,6 @@ class ImaServerSideAdInsertionMediaSource(
         private var adsId: Any? = null
         private var streamLoadListener: StreamLoadListener? = null
 
-        
         init {
             this.player = player
             this.mediaItem = mediaItem
@@ -1126,7 +1084,6 @@ class ImaServerSideAdInsertionMediaSource(
             period = Timeline.Period()
         }
 
-        
         fun setAdPlaybackStates(
             adsId: Any?,
             adPlaybackStates: ImmutableMap<Any?, AdPlaybackState?>,
@@ -1137,26 +1094,22 @@ class ImaServerSideAdInsertionMediaSource(
             this.contentTimeline = contentTimeline
         }
 
-        
         fun setStreamLoadListener(listener: StreamLoadListener?) {
             streamLoadListener = Preconditions.checkNotNull<StreamLoadListener?>(listener)
         }
 
-        
         fun onContentCompleted() {
             for (callback in callbacks) {
                 callback.onContentComplete()
             }
         }
 
-        
         fun onContentVolumeChanged(volumePct: Int) {
             for (callback in callbacks) {
                 callback.onVolumeChanged(volumePct)
             }
         }
 
-        
         fun release() {
             callbacks.clear()
             adsId = null
@@ -1310,7 +1263,8 @@ class ImaServerSideAdInsertionMediaSource(
             when (event.getType()) {
                 AdEvent.AdEventType.CUEPOINTS_CHANGED -> if (newAdPlaybackState == AdPlaybackState.NONE) {
                     newAdPlaybackState =
-                        setVodAdGroupPlaceholders(streamManager!!.getCuePoints(),
+                        setVodAdGroupPlaceholders(
+                            streamManager!!.getCuePoints(),
                             AdPlaybackState(adsId)
                         )
                 }
@@ -1511,7 +1465,8 @@ class ImaServerSideAdInsertionMediaSource(
             streamPlayer: StreamPlayer
         ): StreamDisplayContainer {
             val container: StreamDisplayContainer =
-                ImaSdkFactory.createStreamDisplayContainer(config.adViewProvider!!.adViewGroup!!, streamPlayer
+                ImaSdkFactory.createStreamDisplayContainer(
+                    config.adViewProvider!!.adViewGroup!!, streamPlayer
                 )
             container.setCompanionSlots(config.companionAdSlots)
             if (config.pauseAdSlot != null) {
