@@ -17,7 +17,7 @@ import com.google.common.base.Supplier
 
 interface MediaSource {
     interface Factory {
-        fun setCmcdConfigurationFactory(createCmcdConfiguration:((mediaItem: MediaItem?)-> CmcdConfiguration?)): Factory {
+        fun setCmcdConfigurationFactory(createCmcdConfiguration: ((mediaItem: MediaItem?) -> CmcdConfiguration?)): Factory {
             // do nothing
             return this
         }
@@ -31,7 +31,7 @@ interface MediaSource {
         }
 
         fun experimentalSetCodecsToParseWithinGopSampleDependencies(
-            codecsToParseWithinGopSampleDependencies:  Int
+            codecsToParseWithinGopSampleDependencies: Int
         ): Factory {
             return this
         }
@@ -42,10 +42,6 @@ interface MediaSource {
 
         val supportedTypes: IntArray
         fun createMediaSource(mediaItem: MediaItem): MediaSource
-    }
-
-    fun interface MediaSourceCaller {
-        fun onSourceInfoRefreshed(source: MediaSource, timeline: Timeline)
     }
 
     data class MediaPeriodId(
@@ -116,15 +112,16 @@ interface MediaSource {
     fun updateMediaItem(mediaItem: MediaItem) {}
 
     fun prepareSource(
-        caller: MediaSourceCaller, playerId: PlayerId, bandwidthMeter: BandwidthMeter
+        onSourceInfoRefreshed: (source: MediaSource, timeline: Timeline) -> Unit,
+        playerId: PlayerId, bandwidthMeter: BandwidthMeter
     )
 
-    
+
     fun maybeThrowSourceInfoRefreshError()
 
-    fun enable(caller: MediaSourceCaller)
+    fun enable(onSourceInfoRefreshed: (source: MediaSource, timeline: Timeline) -> Unit)
     fun createPeriod(id: MediaPeriodId, allocator: Allocator, startPositionUs: Long): MediaPeriod
     fun releasePeriod(mediaPeriod: MediaPeriod)
-    fun disable(caller: MediaSourceCaller)
-    fun releaseSource(caller: MediaSourceCaller)
+    fun disable(onSourceInfoRefreshed: (source: MediaSource, timeline: Timeline) -> Unit)
+    fun releaseSource(onSourceInfoRefreshed: (source: MediaSource, timeline: Timeline) -> Unit)
 }

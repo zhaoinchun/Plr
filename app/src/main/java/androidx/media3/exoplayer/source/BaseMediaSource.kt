@@ -7,13 +7,12 @@ import androidx.media3.datasource.TransferListener
 import androidx.media3.exoplayer.analytics.PlayerId
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.source.MediaSource.MediaSourceCaller
 import androidx.media3.exoplayer.upstream.BandwidthMeter
 import com.google.common.base.Preconditions
 
 abstract class BaseMediaSource : MediaSource {
-    private val mediaSourceCallers: ArrayList<MediaSourceCaller> = ArrayList(1)
-    private val enabledMediaSourceCallers: HashSet<MediaSourceCaller> = HashSet(1)
+    private val sourceInfoRefreshedListeners: ArrayList<(source: MediaSource, timeline: Timeline)-> Unit> = ArrayList(1)
+    private val enabledSourceInfoRefreshedListeners: HashSet<(source: MediaSource, timeline: Timeline)-> Unit> = HashSet(1)
     private val eventDispatcher = MediaSourceEventListener.EventDispatcher()
     private val drmEventDispatcher = DrmSessionEventListener.EventDispatcher()
 
@@ -28,8 +27,8 @@ abstract class BaseMediaSource : MediaSource {
     protected abstract fun releaseSourceInternal()
     protected fun refreshSourceInfo(timeline: Timeline) {
         this.timeline = timeline
-        for (caller in mediaSourceCallers) {
-            caller.onSourceInfoRefreshed(this, timeline)
+        for (onSourceInfoRefreshed in sourceInfoRefreshedListeners) {
+            onSourceInfoRefreshed(this, timeline)
         }
     }
 
@@ -57,7 +56,7 @@ abstract class BaseMediaSource : MediaSource {
     }
 
     protected val isEnabled: Boolean
-        get() = !enabledMediaSourceCallers.isEmpty()
+        get() = !enabledSourceInfoRefreshedListeners.isEmpty()
 
     protected fun getPlayerId(): PlayerId {
         return playerId!!
@@ -76,7 +75,7 @@ abstract class BaseMediaSource : MediaSource {
     }
 
     protected fun prepareSourceCalled(): Boolean {
-        return !mediaSourceCallers.isEmpty()
+        return !sourceInfoRefreshedListeners.isEmpty()
     }
 
     override fun addEventListener(handler: Handler, eventListener: MediaSourceEventListener) {
@@ -96,51 +95,51 @@ abstract class BaseMediaSource : MediaSource {
     }
 
     override fun prepareSource(
-        caller: MediaSourceCaller, playerId: PlayerId, bandwidthMeter: BandwidthMeter
+        onSourceInfoRefreshed:(source: MediaSource, timeline: Timeline)-> Unit, playerId: PlayerId, bandwidthMeter: BandwidthMeter
     ) {
         val looper = Looper.myLooper()
         Preconditions.checkArgument(this.looper == null || this.looper == looper)
         this.playerId = playerId
         this.bandwidthMeter = bandwidthMeter
         val timeline = this.timeline
-        mediaSourceCallers.add(caller)
+        sourceInfoRefreshedListeners.add(onSourceInfoRefreshed)
         if (this.looper == null) {
             this.looper = looper
-            enabledMediaSourceCallers.add(caller)
+            enabledSourceInfoRefreshedListeners.add(onSourceInfoRefreshed)
             prepareSourceInternal(bandwidthMeter.transferListener)
         } else if (timeline != null) {
-            enable(caller)
-            caller.onSourceInfoRefreshed(this, timeline)
+            enable(onSourceInfoRefreshed)
+            onSourceInfoRefreshed(this, timeline)
         }
     }
 
-    override fun enable(caller: MediaSourceCaller) {
+    override fun enable(onSourceInfoRefreshed:(source: MediaSource, timeline: Timeline)-> Unit) {
         looper!!
-        val wasDisabled = enabledMediaSourceCallers.isEmpty()
-        enabledMediaSourceCallers.add(caller)
+        val wasDisabled = enabledSourceInfoRefreshedListeners.isEmpty()
+        enabledSourceInfoRefreshedListeners.add(onSourceInfoRefreshed)
         if (wasDisabled) {
             enableInternal()
         }
     }
 
-    override fun disable(caller: MediaSourceCaller) {
-        val wasEnabled = !enabledMediaSourceCallers.isEmpty()
-        enabledMediaSourceCallers.remove(caller)
-        if (wasEnabled && enabledMediaSourceCallers.isEmpty()) {
+    override fun disable(onSourceInfoRefreshed:(source: MediaSource, timeline: Timeline)-> Unit) {
+        val wasEnabled = !enabledSourceInfoRefreshedListeners.isEmpty()
+        enabledSourceInfoRefreshedListeners.remove(onSourceInfoRefreshed)
+        if (wasEnabled && enabledSourceInfoRefreshedListeners.isEmpty()) {
             disableInternal()
         }
     }
 
-    override fun releaseSource(caller: MediaSourceCaller) {
-        mediaSourceCallers.remove(caller)
-        if (mediaSourceCallers.isEmpty()) {
+    override fun releaseSource(onSourceInfoRefreshed:(source: MediaSource, timeline: Timeline)-> Unit) {
+        sourceInfoRefreshedListeners.remove(onSourceInfoRefreshed)
+        if (sourceInfoRefreshedListeners.isEmpty()) {
             looper = null
             timeline = null
             playerId = null
-            enabledMediaSourceCallers.clear()
+            enabledSourceInfoRefreshedListeners.clear()
             releaseSourceInternal()
         } else {
-            disable(caller)
+            disable(onSourceInfoRefreshed)
         }
     }
 }

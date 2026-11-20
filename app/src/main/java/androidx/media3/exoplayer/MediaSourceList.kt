@@ -21,7 +21,6 @@ import androidx.media3.exoplayer.source.MediaLoadData
 import androidx.media3.exoplayer.source.MediaPeriod
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.source.MediaSource.MediaSourceCaller
 import androidx.media3.exoplayer.source.MediaSourceEventListener
 import androidx.media3.exoplayer.source.ShuffleOrder
 import androidx.media3.exoplayer.source.ShuffleOrder.DefaultShuffleOrder
@@ -225,7 +224,7 @@ class MediaSourceList(
     fun release() {
         for (childSource in childSources.values) {
             try {
-                childSource.mediaSource.releaseSource(childSource.caller)
+                childSource.mediaSource.releaseSource(childSource.onSourceInfoRefreshed)
             } catch (e: RuntimeException) {
                 // There's nothing we can do.
                 e(TAG, "Failed to release child source.", e)
@@ -255,7 +254,7 @@ class MediaSourceList(
         enabledMediaSourceHolders.add(mediaSourceHolder)
         val enabledChild = childSources.get(mediaSourceHolder)
         if (enabledChild != null) {
-            enabledChild.mediaSource.enable(enabledChild.caller)
+            enabledChild.mediaSource.enable(enabledChild.onSourceInfoRefreshed)
         }
     }
 
@@ -273,7 +272,7 @@ class MediaSourceList(
     private fun disableChildSource(holder: MediaSourceHolder?) {
         val disabledChild = childSources.get(holder)
         if (disabledChild != null) {
-            disabledChild.mediaSource.disable(disabledChild.caller)
+            disabledChild.mediaSource.disable(disabledChild.onSourceInfoRefreshed)
         }
     }
 
@@ -301,20 +300,20 @@ class MediaSourceList(
 
     private fun prepareChildSource(holder: MediaSourceHolder) {
         val mediaSource: MediaSource = holder.mediaSource
-        val caller: MediaSourceCaller =
-            MediaSourceCaller { source: MediaSource?, timeline: Timeline? -> mediaSourceListInfoListener.onPlaylistUpdateRequested() }
+        val onSourceInfoRefreshed =
+            { source: MediaSource?, timeline: Timeline? -> mediaSourceListInfoListener.onPlaylistUpdateRequested() }
         val eventListener: ForwardingEventListener = ForwardingEventListener(holder)
-        childSources.put(holder, MediaSourceAndListener(mediaSource, caller, eventListener))
+        childSources.put(holder, MediaSourceAndListener(mediaSource, onSourceInfoRefreshed, eventListener))
         mediaSource.addEventListener(createHandlerForCurrentOrMainLooper(), eventListener)
         mediaSource.addDrmEventListener(createHandlerForCurrentOrMainLooper(), eventListener)
-        mediaSource.prepareSource(caller, playerId, bandwidthMeter)
+        mediaSource.prepareSource(onSourceInfoRefreshed, playerId, bandwidthMeter)
     }
 
     private fun maybeReleaseChildSource(mediaSourceHolder: MediaSourceHolder) {
         // Release if the source has been removed from the playlist and no periods are still active.
         if (mediaSourceHolder.isRemoved && mediaSourceHolder.activeMediaPeriodIds.isEmpty()) {
             val removedChild = childSources.remove(mediaSourceHolder)!!
-            removedChild.mediaSource.releaseSource(removedChild.caller)
+            removedChild.mediaSource.releaseSource(removedChild.onSourceInfoRefreshed)
             removedChild.mediaSource.removeEventListener(removedChild.eventListener)
             removedChild.mediaSource.removeDrmEventListener(removedChild.eventListener)
             enabledMediaSourceHolders.remove(mediaSourceHolder)
@@ -348,7 +347,7 @@ class MediaSourceList(
 
     private class MediaSourceAndListener(
         val mediaSource: MediaSource,
-        val caller: MediaSourceCaller,
+        val onSourceInfoRefreshed:(source: MediaSource, timeline: Timeline)-> Unit,
         val eventListener: ForwardingEventListener
     )
 

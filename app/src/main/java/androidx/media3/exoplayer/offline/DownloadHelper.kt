@@ -33,7 +33,6 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.MediaPeriod
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.source.MediaSource.MediaSourceCaller
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.TrackGroupArray
 import androidx.media3.exoplayer.source.chunk.MediaChunk
@@ -700,7 +699,7 @@ class DownloadHelper(
     private class MediaPreparer(
         private val mediaSource: MediaSource,
         private val downloadHelper: DownloadHelper
-    ) : MediaSourceCaller, ProgressiveMediaSource.Listener,
+    ) :  ProgressiveMediaSource.Listener,
         MediaPeriod.Callback, Handler.Callback {
         private val allocator: Allocator = DefaultAllocator(true, C.DEFAULT_BUFFER_SEGMENT_SIZE)
         private val pendingMediaPeriods = ArrayList<MediaPeriod?>()
@@ -737,7 +736,7 @@ class DownloadHelper(
                         mediaSource.setListener(this)
                     }
                     mediaSource.prepareSource(
-                        this,
+                        this::onSourceInfoRefreshed,
                         PlayerId.UNSET,
                         BandwidthMeter.NO_OP
                     )
@@ -786,7 +785,7 @@ class DownloadHelper(
                     if (mediaSource is ProgressiveMediaSource) {
                         mediaSource.clearListener()
                     }
-                    mediaSource.releaseSource(this)
+                    mediaSource.releaseSource(this::onSourceInfoRefreshed)
                     mediaSourceHandler.removeCallbacksAndMessages(null)
                     mediaSourceThread.quit()
                     return true
@@ -796,8 +795,7 @@ class DownloadHelper(
             }
         }
 
-        // MediaSource.MediaSourceCaller implementation.
-        override fun onSourceInfoRefreshed(source: MediaSource, timeline: Timeline) {
+        fun onSourceInfoRefreshed(source: MediaSource, timeline: Timeline) {
             if (this.timeline != null) {
                 // Ignore dynamic updates.
                 return

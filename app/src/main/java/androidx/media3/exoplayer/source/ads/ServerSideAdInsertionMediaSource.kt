@@ -3,13 +3,11 @@ package androidx.media3.exoplayer.source.ads
 import android.os.Handler
 import android.util.Pair
 import androidx.annotation.GuardedBy
-import androidx.annotation.VisibleForTesting
 import androidx.media3.common.AdPlaybackState
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.StreamKey
 import androidx.media3.common.Timeline
-
 import androidx.media3.common.util.Util.createHandlerForCurrentLooper
 import androidx.media3.common.util.Util.msToUs
 import androidx.media3.common.util.Util.postOrRun
@@ -19,7 +17,6 @@ import androidx.media3.decoder.DecoderInputBuffer
 import androidx.media3.exoplayer.FormatHolder
 import androidx.media3.exoplayer.LoadingInfo
 import androidx.media3.exoplayer.SeekParameters
-import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.KeyRequestInfo
 import androidx.media3.exoplayer.source.BaseMediaSource
@@ -30,7 +27,6 @@ import androidx.media3.exoplayer.source.MediaLoadData
 import androidx.media3.exoplayer.source.MediaPeriod
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.source.MediaSource.MediaSourceCaller
 import androidx.media3.exoplayer.source.MediaSourceEventListener
 import androidx.media3.exoplayer.source.SampleStream
 import androidx.media3.exoplayer.source.TrackGroupArray
@@ -40,13 +36,12 @@ import com.google.common.base.Preconditions
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.collect.Iterables
 import com.google.common.collect.ListMultimap
-
 import java.io.IOException
 
 class ServerSideAdInsertionMediaSource(
     private val mediaSource: MediaSource,
     private val adPlaybackStateUpdater: AdPlaybackStateUpdater?
-) : BaseMediaSource(), MediaSourceCaller, MediaSourceEventListener, DrmSessionEventListener {
+) : BaseMediaSource(), MediaSourceEventListener, DrmSessionEventListener {
     interface AdPlaybackStateUpdater {
         fun onAdPlaybackStateUpdateRequested(contentTimeline: Timeline): Boolean
     }
@@ -164,7 +159,7 @@ class ServerSideAdInsertionMediaSource(
         }
         mediaSource.addEventListener(handler, this)
         mediaSource.addDrmEventListener(handler, this)
-        mediaSource.prepareSource(this, getPlayerId(), getBandwidthMeter())
+        mediaSource.prepareSource(this::onSourceInfoRefreshed, getPlayerId(), getBandwidthMeter())
     }
 
     
@@ -173,15 +168,15 @@ class ServerSideAdInsertionMediaSource(
     }
 
     override fun enableInternal() {
-        mediaSource.enable(this)
+        mediaSource.enable(this::onSourceInfoRefreshed)
     }
 
     override fun disableInternal() {
         releaseLastUsedMediaPeriod()
-        mediaSource.disable(this)
+        mediaSource.disable(this::onSourceInfoRefreshed)
     }
 
-    override fun onSourceInfoRefreshed(source: MediaSource, timeline: Timeline) {
+    fun onSourceInfoRefreshed(source: MediaSource, timeline: Timeline) {
         sourceTimeline = timeline
         if ((adPlaybackStateUpdater == null
                     || !adPlaybackStateUpdater.onAdPlaybackStateUpdateRequested(timeline))
@@ -196,7 +191,7 @@ class ServerSideAdInsertionMediaSource(
         synchronized(this) {
             playbackHandler = null
         }
-        mediaSource.releaseSource(this)
+        mediaSource.releaseSource(this::onSourceInfoRefreshed)
         mediaSource.removeEventListener(this)
         mediaSource.removeDrmEventListener(this)
     }

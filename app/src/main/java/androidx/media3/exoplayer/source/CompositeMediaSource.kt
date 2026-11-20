@@ -9,7 +9,6 @@ import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.KeyRequestInfo
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
-import androidx.media3.exoplayer.source.MediaSource.MediaSourceCaller
 import com.google.common.base.Preconditions
 import java.io.IOException
 
@@ -33,21 +32,21 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
     @CallSuper
     override fun enableInternal() {
         for (childSource in childSources.values) {
-            childSource.mediaSource.enable(childSource.caller)
+            childSource.mediaSource.enable(childSource.onSourceInfoRefreshed)
         }
     }
 
     @CallSuper
     override fun disableInternal() {
         for (childSource in childSources.values) {
-            childSource.mediaSource.disable(childSource.caller)
+            childSource.mediaSource.disable(childSource.onSourceInfoRefreshed)
         }
     }
 
     @CallSuper
     override fun releaseSourceInternal() {
         for (childSource in childSources.values) {
-            childSource.mediaSource.releaseSource(childSource.caller)
+            childSource.mediaSource.releaseSource(childSource.onSourceInfoRefreshed)
             childSource.mediaSource.removeEventListener(childSource.eventListener)
             childSource.mediaSource.removeDrmEventListener(childSource.eventListener)
         }
@@ -60,8 +59,8 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
 
     protected fun prepareChildSource(id: T?, mediaSource: MediaSource) {
         Preconditions.checkArgument(!childSources.containsKey(id))
-        val caller =
-            MediaSourceCaller { source: MediaSource, timeline: Timeline ->
+        val onSourceInfoRefreshed =
+            { source: MediaSource, timeline: Timeline ->
                 onChildSourceInfoRefreshed(
                     id,
                     source,
@@ -69,28 +68,28 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
                 )
             }
         val eventListener = ForwardingEventListener(id)
-        childSources[id] = MediaSourceAndListener(mediaSource, caller, eventListener)
+        childSources[id] = MediaSourceAndListener(mediaSource, onSourceInfoRefreshed, eventListener)
         mediaSource.addEventListener(eventHandler!!, eventListener)
         mediaSource.addDrmEventListener(eventHandler!!, eventListener)
-        mediaSource.prepareSource(caller, getPlayerId(), getBandwidthMeter())
+        mediaSource.prepareSource(onSourceInfoRefreshed, getPlayerId(), getBandwidthMeter())
         if (!isEnabled) {
-            mediaSource.disable(caller)
+            mediaSource.disable(onSourceInfoRefreshed)
         }
     }
 
     protected fun enableChildSource(id: T?) {
         val enabledChild = childSources[id]!!
-        enabledChild.mediaSource.enable(enabledChild.caller)
+        enabledChild.mediaSource.enable(enabledChild.onSourceInfoRefreshed)
     }
 
     protected fun disableChildSource(id: T?) {
         val disabledChild = childSources[id]!!
-        disabledChild.mediaSource.disable(disabledChild.caller)
+        disabledChild.mediaSource.disable(disabledChild.onSourceInfoRefreshed)
     }
 
     protected fun releaseChildSource(id: T?) {
         val removedChild = childSources.remove(id)!!
-        removedChild.mediaSource.releaseSource(removedChild.caller)
+        removedChild.mediaSource.releaseSource(removedChild.onSourceInfoRefreshed)
         removedChild.mediaSource.removeEventListener(removedChild.eventListener)
         removedChild.mediaSource.removeDrmEventListener(removedChild.eventListener)
     }
@@ -116,7 +115,7 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
 
     private class MediaSourceAndListener<T>(
         val mediaSource: MediaSource,
-        val caller: MediaSourceCaller,
+        val onSourceInfoRefreshed:(source: MediaSource, timeline: Timeline)-> Unit,
         val eventListener: CompositeMediaSource<T>.ForwardingEventListener
     ) {
     }
