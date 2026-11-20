@@ -8,23 +8,10 @@ import org.chromium.net.CronetProvider
 import java.util.Collections
 import kotlin.math.min
 
-/** Cronet utility methods.  */
 object CronetUtil {
     private const val TAG = "CronetUtil"
 
-    /**
-     * Builds a [CronetEngine] suitable for use with [CronetDataSource]. When choosing a
-     * [Cronet provider][CronetProvider] to build the [CronetEngine], disabled providers
-     * are not considered. Neither are fallback providers, since it's more efficient to use [ ] than it is to use [CronetDataSource] with a fallback [ ].
-     * 
-     * 
-     * Note that it's recommended for applications to create only one instance of [ ], so if your application already has an instance for performing other networking,
-     * then that instance should be used and calling this method is unnecessary. See the [Android developer
-     * guide](https://developer.android.com/guide/topics/connectivity/cronet/start) to learn more about using Cronet for network operations.
-     * 
-     * @param context A context.
-     * @return The [CronetEngine], or `null` if no suitable engine could be built.
-     */
+    
     fun buildCronetEngine(context: Context): CronetEngine? {
         return buildCronetEngine(
             context,  /* userAgent= */
@@ -33,23 +20,7 @@ object CronetUtil {
         )
     }
 
-    /**
-     * Builds a [CronetEngine] suitable for use with [CronetDataSource]. When choosing a
-     * [Cronet provider][CronetProvider] to build the [CronetEngine], disabled providers
-     * are not considered. Neither are fallback providers, since it's more efficient to use [ ] than it is to use [CronetDataSource] with a fallback [ ].
-     * 
-     * 
-     * Note that it's recommended for applications to create only one instance of [ ], so if your application already has an instance for performing other networking,
-     * then that instance should be used and calling this method is unnecessary. See the [Android developer
-     * guide](https://developer.android.com/guide/topics/connectivity/cronet/start) to learn more about using Cronet for network operations.
-     * 
-     * @param context A context.
-     * @param userAgent A default user agent, or `null` to use a default user agent of the
-     * [CronetEngine].
-     * @param preferGooglePlayServices Whether Cronet from Google Play Services should be preferred
-     * over Cronet Embedded, if both are available.
-     * @return The [CronetEngine], or `null` if no suitable engine could be built.
-     */
+    
     
     fun buildCronetEngine(
         context: Context, userAgent: String?, preferGooglePlayServices: Boolean
@@ -107,10 +78,7 @@ object CronetUtil {
             return -compareVersionStrings(providerLeft.getVersion(), providerRight.getVersion())
         }
 
-        /**
-         * Returns the priority score for a Cronet provider, where a smaller score indicates higher
-         * priority.
-         */
+        
         fun getPriority(provider: CronetProvider): Int {
             val providerName: String? = provider.getName()
             if (CronetProvider.PROVIDER_NAME_APP_PACKAGED == providerName) {
@@ -131,7 +99,7 @@ object CronetUtil {
             private const val GOOGLE_PLAY_SERVICES_PROVIDER_NAME =
                 "Google-Play-Services-Cronet-Provider"
 
-            /** Compares version strings of format "12.123.35.23".  */
+            
             private fun compareVersionStrings(
                 versionLeft: String?, versionRight: String?
             ): Int {

@@ -560,7 +560,6 @@ class DefaultMediaSourceFactory(
             )
         }
 
-
         override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
             val skipResult = input.skip(Int.MAX_VALUE)
             if (skipResult == C.RESULT_END_OF_INPUT) {

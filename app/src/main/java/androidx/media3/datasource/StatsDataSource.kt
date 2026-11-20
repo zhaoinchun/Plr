@@ -38,7 +38,6 @@ class StatsDataSource(private val dataSource: DataSource) : DataSource {
         }
     }
 
-
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         val bytesRead: Int = dataSource.read(buffer, offset, length)
         if (bytesRead != C.RESULT_END_OF_INPUT) {

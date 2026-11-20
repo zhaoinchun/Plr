@@ -32,7 +32,7 @@ class ImaServerSideAdInsertionUriBuilder {
     var format: Int
     private var loadVideoTimeoutMs: Int
 
-    /** Creates a new instance.  */
+    
     init {
         adTagParameters = ImmutableMap.of<String?, String?>()
         loadVideoTimeoutMs = DEFAULT_LOAD_VIDEO_TIMEOUT_MS
@@ -44,73 +44,42 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    /**
-     * The stream request asset key used for live streams.
-     * 
-     * @param assetKey Live stream asset key.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setAssetKey(assetKey: String?): ImaServerSideAdInsertionUriBuilder {
         this.assetKey = assetKey
         return this
     }
 
-    /**
-     * Sets the stream request authorization token. Used in place of [the API][.setApiKey] for stricter content authorization. The publisher can control individual content streams
-     * authorizations based on this token.
-     * 
-     * @param authToken Live stream authorization token.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setAuthToken(authToken: String?): ImaServerSideAdInsertionUriBuilder {
         this.authToken = authToken
         return this
     }
 
-    /**
-     * The stream request content source ID used for on-demand streams.
-     * 
-     * @param contentSourceId VOD stream content source id.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setContentSourceId(contentSourceId: String?): ImaServerSideAdInsertionUriBuilder {
         this.contentSourceId = contentSourceId
         return this
     }
 
-    /**
-     * The stream request video ID used for on-demand streams.
-     * 
-     * @param videoId VOD stream video id.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setVideoId(videoId: String?): ImaServerSideAdInsertionUriBuilder {
         this.videoId = videoId
         return this
     }
 
-    /**
-     * The stream request network code.
-     * 
-     * @param networkCode The request's network code.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setNetworkCode(networkCode: String?): ImaServerSideAdInsertionUriBuilder {
         this.networkCode = networkCode
         return this
     }
 
-    /**
-     * Sets the format of the stream request.
-     * 
-     * @param format [C.TYPE_DASH] or [C.TYPE_HLS].
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setFormat( format: Int): ImaServerSideAdInsertionUriBuilder {
         Preconditions.checkArgument(format == C.CONTENT_TYPE_DASH || format == C.CONTENT_TYPE_HLS)
@@ -118,28 +87,14 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    /**
-     * The stream request API key. This is used for content authentication. The API key is provided to
-     * the publisher to unlock their content. It's a security measure used to verify the applications
-     * that are attempting to access the content.
-     * 
-     * @param apiKey Stream api key.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setApiKey(apiKey: String?): ImaServerSideAdInsertionUriBuilder {
         this.apiKey = apiKey
         return this
     }
 
-    /**
-     * Sets the ID to be used to debug the stream with the stream activity monitor. This is used to
-     * provide a convenient way to allow publishers to find a stream log in the stream activity
-     * monitor tool.
-     * 
-     * @param streamActivityMonitorId ID for debugging the stream with the stream activity monitor.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setStreamActivityMonitorId(
         streamActivityMonitorId: String?
@@ -148,17 +103,7 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    /**
-     * Sets the overridable ad tag parameters on the stream request. [Supply targeting parameters to your
-     * stream](//support.google.com/dfp_premium/answer/7320899) provides more information.
-     * 
-     * 
-     * You can use the dai-ot and dai-ov parameters for stream variant preference. See [Override Stream Variant Parameters](//support.google.com/dfp_premium/answer/7320898)
-     * for more information.
-     * 
-     * @param adTagParameters A map of extra parameters to pass to the ad server.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setAdTagParameters(
         adTagParameters: MutableMap<String?, String?>
@@ -167,12 +112,7 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    /**
-     * Sets the custom UI options for the stream request.
-     * 
-     * @param customUiOptions Custom UI options for the stream request.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setCustomUiOptions(
         customUiOptions: CustomUiOptions?
@@ -181,54 +121,28 @@ class ImaServerSideAdInsertionUriBuilder {
         return this
     }
 
-    /**
-     * Sets the optional stream manifest's suffix, which will be appended to the stream manifest's
-     * URL. The provided string must be URL-encoded and must not include a leading question mark.
-     * 
-     * @param manifestSuffix Stream manifest's suffix.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setManifestSuffix(manifestSuffix: String?): ImaServerSideAdInsertionUriBuilder {
         this.manifestSuffix = manifestSuffix
         return this
     }
 
-    /**
-     * Specifies the deep link to the content's screen. If provided, this parameter is passed to the
-     * OM SDK. See [Android
-     * documentation](//developer.android.com/training/app-links/deep-linking) for more information.
-     * 
-     * @param contentUrl Deep link to the content's screen.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setContentUrl(contentUrl: String?): ImaServerSideAdInsertionUriBuilder {
         this.contentUrl = contentUrl
         return this
     }
 
-    /**
-     * Sets the duration after which resolving the video URI should time out, in milliseconds.
-     * 
-     * 
-     * The default is [.DEFAULT_LOAD_VIDEO_TIMEOUT_MS] milliseconds.
-     * 
-     * @param loadVideoTimeoutMs The timeout after which to give up resolving the video URI.
-     * @return This instance, for convenience.
-     */
+    
     @CanIgnoreReturnValue
     fun setLoadVideoTimeoutMs(loadVideoTimeoutMs: Int): ImaServerSideAdInsertionUriBuilder {
         this.loadVideoTimeoutMs = loadVideoTimeoutMs
         return this
     }
 
-    /**
-     * Builds a URI with the builder's current values.
-     * 
-     * @return The build [Uri].
-     * @throws IllegalStateException If the builder has missing or invalid inputs.
-     */
+    
     fun build(): Uri? {
         Preconditions.checkState(
             (TextUtils.isEmpty(assetKey)
@@ -302,7 +216,7 @@ class ImaServerSideAdInsertionUriBuilder {
     }
 
     companion object {
-        /** The default timeout for loading the video URI, in milliseconds.  */
+        
         const val DEFAULT_LOAD_VIDEO_TIMEOUT_MS: Int = 10000
 
         /* package */
@@ -324,17 +238,17 @@ class ImaServerSideAdInsertionUriBuilder {
         private const val CUSTOM_UI_OPTIONS_ABOUT_THIS_AD_SUPPORT =
             "customUiOptionsAboutThisAdSupport"
 
-        /** Returns whether the provided request is for a live stream or false if it is a VOD stream.  */ /* package */
+         /* package */
         fun isLiveStream(uri: Uri): Boolean {
             return !TextUtils.isEmpty(uri.getQueryParameter(ASSET_KEY))
         }
 
-        /** Returns the opaque adsId for this stream.  */ /* package */
+         /* package */
         fun getAdsId(uri: Uri): kotlin.String {
             return Preconditions.checkNotNull<kotlin.String>(uri.getQueryParameter(ADS_ID))
         }
 
-        /** Returns the video load timeout in milliseconds.  */ /* package */
+         /* package */
         fun getLoadVideoTimeoutMs(uri: Uri): Int {
             val adsLoaderTimeoutUs = uri.getQueryParameter(LOAD_VIDEO_TIMEOUT_MS)
             return if (TextUtils.isEmpty(adsLoaderTimeoutUs))
@@ -342,7 +256,7 @@ class ImaServerSideAdInsertionUriBuilder {
             else adsLoaderTimeoutUs!!.toInt()
         }
 
-        /** Returns the corresponding [StreamRequest].  */
+        
         fun createStreamRequest(uri: Uri): StreamRequest {
             require(!(C.SSAI_SCHEME != uri.getScheme() || IMA_AUTHORITY != uri.getAuthority())) { "Invalid URI scheme or authority." }
             val streamRequest: StreamRequest

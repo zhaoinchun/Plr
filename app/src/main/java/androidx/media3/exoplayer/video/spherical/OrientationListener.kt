@@ -14,7 +14,6 @@ class OrientationListener(
     private val onOrientationChanges: Array<(deviceOrientationMatrix: FloatArray, deviceRoll: Float) -> Unit>
 ) : SensorEventListener {
 
-
     private val deviceOrientationMatrix4x4 = FloatArray(16)
     private val tempMatrix4x4 = FloatArray(16)
     private val recenterMatrix4x4 = FloatArray(16)

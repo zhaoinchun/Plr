@@ -68,10 +68,8 @@ class DefaultBandwidthMeter(
     @GuardedBy("this") // Used in TransferListener methods that are called on a background thread.
     private var lastReportedBitrateEstimate: Long = 0
 
-
     private var networkType: Int = 0
     private var networkTypeOverrideSet = false
-
 
     private var networkTypeOverride: Int = 0
     private var countryCode: String? = null

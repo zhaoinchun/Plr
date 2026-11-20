@@ -57,12 +57,7 @@ object ImaUtil {
         }
     }
 
-    /**
-     * Returns the microsecond ad group timestamps corresponding to the specified cue points.
-     * 
-     * @param cuePoints The cue points of the ads in seconds, provided by the IMA SDK.
-     * @return The corresponding microsecond ad group timestamps.
-     */
+    
     fun getAdGroupTimesUsForCuePoints(cuePoints: MutableList<Float?>): LongArray {
         if (cuePoints.isEmpty()) {
             return longArrayOf(0L)
@@ -84,7 +79,7 @@ object ImaUtil {
         return adGroupTimesUs
     }
 
-    /** Returns an [AdsRequest] based on the specified ad tag [DataSpec].  */
+    
     @Throws(IOException::class)
     fun getAdsRequestForAdTagDataSpec(
         imaFactory: ImaFactory, adTagDataSpec: DataSpec
@@ -110,7 +105,7 @@ object ImaUtil {
         return request
     }
 
-    /** Returns whether the ad error indicates that an entire ad group failed to load.  */
+    
     fun isAdGroupLoadError(adError: AdError): Boolean {
         // TODO: Find out what other errors need to be handled (if any), and whether each one relates to
         // a single ad, ad group or the whole timeline.
@@ -119,12 +114,12 @@ object ImaUtil {
     }
 
     val imaLooper: Looper
-        /** Returns the looper on which all IMA SDK interaction must occur.  */
+        
         get() =// IMA SDK callbacks occur on the main thread. This method can be used to check that the player
             // is using the same looper, to ensure all interaction with this class is on the main thread.
             Looper.getMainLooper()
 
-    /** Returns a human-readable representation of a video progress update.  */
+    
     // VideoProgressUpdate.equals() is annotated as hidden.
     fun getStringForVideoProgressUpdate(videoProgressUpdate: VideoProgressUpdate): String {
         if (VideoProgressUpdate.VIDEO_TIME_NOT_READY.equals(videoProgressUpdate)) {
@@ -137,23 +132,7 @@ object ImaUtil {
         }
     }
 
-    /**
-     * Expands a placeholder ad group with a single ad to the requested number of ads and sets the
-     * duration of the inserted ad.
-     * 
-     * 
-     * The remaining ad group duration is propagated to the ad following the inserted ad. If the
-     * inserted ad is the last ad, the remaining ad group duration is wrapped around to the first ad
-     * in the group.
-     * 
-     * @param adGroupIndex The ad group index of the ad group to expand.
-     * @param adIndexInAdGroup The ad index to set the duration.
-     * @param adDurationUs The duration of the ad.
-     * @param adGroupDurationUs The duration of the whole ad group.
-     * @param adsInAdGroupCount The number of ads of the ad group.
-     * @param adPlaybackState The ad playback state to modify.
-     * @return The updated ad playback state.
-     */
+    
     @CheckResult
     fun expandAdGroupPlaceholder(
         adGroupIndex: Int,
@@ -173,23 +152,7 @@ object ImaUtil {
             .withAdDurationsUs(adGroupIndex, *adDurationsUs)
     }
 
-    /**
-     * Updates the duration of an ad in and ad group.
-     * 
-     * 
-     * The difference of the previous duration and the updated duration is propagated to the ad
-     * following the updated ad. If the updated ad is the last ad, the remaining duration is wrapped
-     * around to the first ad in the group.
-     * 
-     * 
-     * The remaining ad duration is only propagated if the destination ad has a duration of 0.
-     * 
-     * @param adGroupIndex The ad group index of the ad group to expand.
-     * @param adIndexInAdGroup The ad index to set the duration.
-     * @param adDurationUs The duration of the ad.
-     * @param adPlaybackState The ad playback state to modify.
-     * @return The updated ad playback state.
-     */
+    
     @CheckResult
     fun updateAdDurationInAdGroup(
         adGroupIndex: Int,
@@ -209,23 +172,7 @@ object ImaUtil {
         return adPlaybackState.withAdDurationsUs(adGroupIndex, *adDurationsUs)
     }
 
-    /**
-     * Updates the duration of the given ad in the array.
-     * 
-     * 
-     * The remaining difference when subtracting `adDurationUs` from `remainingDurationUs` is used as the duration of the next ad after `adIndex`. If the
-     * updated ad is the last ad, the remaining duration is wrapped around to the first ad of the
-     * group.
-     * 
-     * 
-     * The remaining ad duration is only propagated if the destination ad has a duration of 0.
-     * 
-     * @param adDurationsUs The array to edit.
-     * @param adIndex The index of the ad in the durations array.
-     * @param adDurationUs The new ad duration.
-     * @param remainingDurationUs The remaining ad duration before updating the new ad duration.
-     * @return The updated input array, for convenience.
-     */
+    
     private fun updateAdDurationAndPropagate(
         adDurationsUs: LongArray, adIndex: Int, adDurationUs: Long, remainingDurationUs: Long
     ): LongArray {
@@ -238,33 +185,13 @@ object ImaUtil {
         return adDurationsUs
     }
 
-    /**
-     * Gets the window start in microseconds since the Unix epoch for a window of a [ ] of the `DashMediaSource`.
-     * 
-     * @param windowStartTimeMs The window start time, in milliseconds.
-     * @param positionInFirstPeriodUs The position of the window in the first period.
-     * @return The window start time, in microseconds.
-     */
+    
     fun getWindowStartTimeUs(windowStartTimeMs: Long, positionInFirstPeriodUs: Long): Long {
         // Revert us/ms truncation introduced in `DashMediaSource.DashTimeline`.
         return Util.msToUs(windowStartTimeMs) + (positionInFirstPeriodUs % 1000)
     }
 
-    /**
-     * Splits an [AdPlaybackState] into a separate [AdPlaybackState] for each period of a
-     * content timeline.
-     * 
-     * 
-     * If a period is enclosed by an ad group, the period is considered an ad period. Splitting
-     * results in a separate [ad playback state][AdPlaybackState] for each period that has either
-     * no ads or a single ad. In the latter case, the duration of the single ad is set to the duration
-     * of the period consuming the entire duration of the period. Accordingly an ad period does not
-     * contribute to the duration of the containing window.
-     * 
-     * @param adPlaybackState The ad playback state to be split.
-     * @param contentTimeline The content timeline for each period of which to create an [     ].
-     * @return A map of ad playback states for each period UID in the content timeline.
-     */
+    
     fun splitAdPlaybackStateForPeriods(
         adPlaybackState: AdPlaybackState, contentTimeline: Timeline
     ): ImmutableMap<Any?, AdPlaybackState?> {
@@ -419,31 +346,7 @@ object ImaUtil {
         return adPlaybackState
     }
 
-    /**
-     * Updates previously inserted ad durations with actual period durations from the timeline and
-     * returns the updated [ad playback state][AdPlaybackState].
-     * 
-     * 
-     * This method must only be called for multi period live streams and is useful in the case that
-     * [a live ad has been][.addLiveAdBreak] while the duration of the corresponding period was still unknown. In this case the
-     * [estimated ad duration][Ad.getDuration] was used which must be corrected as soon as
-     * the live window of the `contentTimeline` advances and the previously unknown period
-     * duration is available.
-     * 
-     * 
-     * Roughly, the logic checks whether an ad group of the ad playback state fits in or overlaps
-     * one or several periods in the content timeline. Starting at the first ad inside the window, the
-     * ad duration is set to the duration of the corresponding period until a period with an unknown
-     * duration or the end of the ad group is reached.
-     * 
-     * 
-     * If the previously playing ad period isn't available in the content timeline anymore, no
-     * correction is applied. The resulting position discontinuity of [ ][Player.DISCONTINUITY_REASON_REMOVE] needs to be handled accordingly elsewhere.
-     * 
-     * @param contentTimeline The live content timeline.
-     * @param adPlaybackState The ad playback state.
-     * @return The (potentially) updated ad playback state.
-     */
+    
     fun maybeCorrectPreviouslyUnknownAdDurations(
         contentTimeline: Timeline, adPlaybackState: AdPlaybackState
     ): AdPlaybackState {
@@ -521,24 +424,7 @@ object ImaUtil {
         return adPlaybackState.withContentResumeOffsetUs(adGroupIndex, adGroupDurationUs)
     }
 
-    /**
-     * Returns the sum of the durations of all the ads in an ad pod, in microseconds.
-     * 
-     * 
-     * If all periods are contained in the current window and have a known duration, the sum of the
-     * period durations is returned. If this is not possible, [the][AdPodInfo.getMaxDuration] is used instead.
-     * 
-     * 
-     * Do not use this method with public timelines of VOD multi-period streams that have the ad
-     * duration subtracted from period durations.
-     * 
-     * @param timeline The timeline.
-     * @param adPodInfo The [AdPodInfo] from the SDK event.
-     * @param adPeriodIndex The period index of the period corresponding to the [     ][AdPodInfo.getAdPosition].
-     * @param window The window to be populated as the window containing the ad period.
-     * @param period The period to be populated as the ad period.
-     * @return The duration of the ad group, in microseconds.
-     */
+    
     fun getAdGroupDurationUsForLiveAdPeriodIndex(
         timeline: Timeline,
         adPodInfo: AdPodInfo,
@@ -574,19 +460,7 @@ object ImaUtil {
             secToUsRounded(adPodInfo.getMaxDuration())
     }
 
-    /**
-     * Handles the case when an ad period has been removed from the timeline while being played.
-     * 
-     * 
-     * This makes sure no unplayed ads are left in the ad playback state after buffering or after
-     * the player has been paused in a live stream. In such a case periods may be removed from the
-     * timeline before playback transitions to the next period automatically.
-     * 
-     * @param currentPeriodIndex The index of the [current][Player.getCurrentPeriodIndex].
-     * @param timeline The timeline containing the current period.
-     * @param adPlaybackState The ad playback state to query.
-     * @return The updated ad playback state.
-     */
+    
     @CheckResult
     fun handleAdPeriodRemovedFromTimeline(
         currentPeriodIndex: Int, timeline: Timeline, adPlaybackState: AdPlaybackState
@@ -700,18 +574,7 @@ object ImaUtil {
             .withContentResumeOffsetUs(adGroupIndex, newDurationsUs.sum())
     }
 
-    /**
-     * Returns the `adGroupIndex` in the ad playback state corresponding to the given period
-     * index in the timeline and the `adIndexInAdGroup` of the first unplayed ad in that ad
-     * group.
-     * 
-     * @param adPeriodIndex The index of the ad period in the timeline.
-     * @param adPlaybackState The ad playback state that holds the ad group and ad information.
-     * @param timeline The single-window timeline that contains the period for the ad period index.
-     * @return A pair with the ad group index (first) and the ad index in that ad group (second).
-     * @exception IllegalStateException If no unplayed ad is found before or at the start time of the
-     * ad period.
-     */
+    
     fun getAdGroupAndIndexInLiveMultiPeriodTimeline(
         adPeriodIndex: Int, adPlaybackState: AdPlaybackState, timeline: Timeline
     ): Pair<Int?, Int?> {
@@ -743,15 +606,7 @@ object ImaUtil {
         )
     }
 
-    /**
-     * Returns the `adGroupIndex` and the `adIndexInAdGroup` for the given period index of
-     * an ad period in a VOD multi-period timeline.
-     * 
-     * @param adPeriodIndex The period index of the ad period.
-     * @param adPlaybackState The ad playback state that holds the ad group and ad information.
-     * @param timeline The single-window timeline that contains the ad period.
-     * @return A pair with the ad group index (first) and the ad index in that ad group (second).
-     */
+    
     fun getAdGroupAndIndexInVodMultiPeriodTimeline(
         adPeriodIndex: Int, adPlaybackState: AdPlaybackState, timeline: Timeline
     ): Pair<Int?, Int?> {
@@ -798,58 +653,7 @@ object ImaUtil {
         throw IllegalStateException()
     }
 
-    /**
-     * Called when the SDK emits a `LOADED` event of an IMA SSAI live stream.
-     * 
-     * 
-     * For each ad, the SDK emits a `LOADED` event at the start of the ad. The `LOADED`
-     * event provides the information of a certain ad (index and duration) and its ad pod (number of
-     * ads and total ad duration) that is mapped to an ad in an [ad group][AdGroup] of an
-     * [ad playback state][AdPlaybackState] to reflect ads in the ExoPlayer media structure.
-     * 
-     * 
-     * In the normal case (when all ad information is available completely and in time), the
-     * life-cycle of a live ad group and its ads has these phases:
-     * 
-     * 
-     *  1. When playing content and a `LOADED` event arrives, an ad group is inserted at the
-     * current position with the number of ads reported by the ad pod. The duration of the first
-     * ad is set and its state is set to [AdPlaybackState.AD_STATE_AVAILABLE]. The
-     * duration of the 2nd ad is set to the remaining duration of the total ad group duration.
-     * This pads out the duration of the ad group, so it doesn't end before the next ad event
-     * arrives. When inserting the ad group at the current position, the player immediately
-     * advances to play the inserted ad period.
-     *  1. When playing an ad group and a further `LOADED` event arrives, the ad state is
-     * inspected to find the [ad group currently being played][AdPlaybackState.getAdGroupIndexForPositionUs]. We query for the first [       ][AdPlaybackState.AD_STATE_UNAVAILABLE] of that ad group, override its
-     * placeholder duration, mark it [available][AdPlaybackState.AD_STATE_AVAILABLE]
-     * and propagate the remainder of the placeholder duration to the next ad. Repeating this
-     * step until all ads are configured and marked as available.
-     *  1. When playing an ad and a `LOADED` event arrives but no more ads are in [       ][AdPlaybackState.AD_STATE_UNAVAILABLE], the group is expanded by inserting a new ad at the
-     * end of the ad group.
-     *  1. After playing an ad: When playback exits from an ad period to the next ad or back to
-     * content, [ImaServerSideAdInsertionMediaSource] detects [       ][Player.Listener.onPositionDiscontinuity], identifies [the][Player.PositionInfo.adIndexInAdGroup] and [marks the ad as played][AdPlaybackState.AD_STATE_PLAYED].
-     * 
-     * 
-     * 
-     * Some edge-cases need consideration. When a user joins a live stream during an ad being
-     * played, ad information previous to the first received `LOADED` event is missing. Only ads
-     * starting from the first ad with full information are inserted into the group (back to happy
-     * path step 2).
-     * 
-     * 
-     * There is further a chance, that a (pre-fetch) event arrives after the ad group has already
-     * ended. In such a case, the pre-fetch ad starts a new ad group with the remaining ads in the
-     * same way as the during-ad-joiner case that can afterwards be expanded again (back to end of
-     * happy path step 2).
-     * 
-     * @param currentContentPeriodPositionUs The current public content position, in microseconds.
-     * @param adDurationUs The duration of the ad to be inserted, in microseconds.
-     * @param adPositionInAdPod The ad position in the ad pod (Note: starts with index 1).
-     * @param totalAdDurationUs The total duration of all ads as declared by the ad pod.
-     * @param totalAdsInAdPod The total number of ads declared by the ad pod.
-     * @param adPlaybackState The ad playback state with the current ad information.
-     * @return The updated [AdPlaybackState].
-     */
+    
     @CheckResult
     fun addLiveAdBreak(
         currentContentPeriodPositionUs: Long,
@@ -930,20 +734,7 @@ object ImaUtil {
         return adPlaybackState
     }
 
-    /**
-     * Splits the ad group at an available ad at a given split index.
-     * 
-     * 
-     * When splitting, the ads from and after the split index are removed from the existing ad
-     * group. Then the ad events of all removed available ads are replicated to get the exact same
-     * result as if the new ad group was created by SDK ad events.
-     * 
-     * @param adGroup The ad group to split.
-     * @param adGroupIndex The index of the ad group in the ad playback state.
-     * @param splitIndexExclusive The first index that should be part of the newly created ad group.
-     * @param adPlaybackState The ad playback state to modify.
-     * @return The ad playback state with the split ad group.
-     */
+    
     @CheckResult
     fun splitAdGroup(
         adGroup: AdPlaybackState.AdGroup,
@@ -992,76 +783,51 @@ object ImaUtil {
         return adGroup.states.size
     }
 
-    /**
-     * Converts a time in seconds to the corresponding time in microseconds.
-     * 
-     * 
-     * Fractional values are rounded to the nearest microsecond using [RoundingMode.HALF_UP].
-     * 
-     * @param timeSec The time in seconds.
-     * @return The corresponding time in microseconds.
-     */
+    
     fun secToUsRounded(timeSec: Double): Long {
         return DoubleMath.roundToLong(
             BigDecimal.valueOf(timeSec).scaleByPowerOfTen(6).toDouble(), RoundingMode.HALF_UP
         )
     }
 
-    /**
-     * Converts a time in seconds to the corresponding time in milliseconds.
-     * 
-     * 
-     * Fractional values are rounded to the nearest millisecond using [RoundingMode.HALF_UP].
-     * 
-     * @param timeSec The time in seconds.
-     * @return The corresponding time in milliseconds.
-     */
+    
     fun secToMsRounded(timeSec: Double): Long {
         return DoubleMath.roundToLong(
             BigDecimal.valueOf(timeSec).scaleByPowerOfTen(3).toDouble(), RoundingMode.HALF_UP
         )
     }
 
-    /** Factory for objects provided by the IMA SDK.  */
+    
     interface ImaFactory {
-        /** Creates [ImaSdkSettings] for configuring the IMA SDK.  */
+        
         fun createImaSdkSettings(): ImaSdkSettings
 
-        /**
-         * Creates [AdsRenderingSettings] for giving the [AdsManager] parameters that
-         * control rendering of ads.
-         */
+        
         fun createAdsRenderingSettings(): AdsRenderingSettings
 
-        /**
-         * Creates an [AdDisplayContainer] to hold the player for video ads, a container for
-         * non-linear ads, and slots for companion ads.
-         */
+        
         fun createAdDisplayContainer(
             container: ViewGroup,
             player: VideoAdPlayer
         ): AdDisplayContainer
 
-        /** Creates an [AdDisplayContainer] to hold the player for audio ads.  */
+        
         fun createAudioAdDisplayContainer(
             context: Context,
             player: VideoAdPlayer
         ): AdDisplayContainer
 
-        /**
-         * Creates a [FriendlyObstruction] to describe an obstruction considered "friendly" for
-         * viewability measurement purposes.
-         */
+        
         fun createFriendlyObstruction(
             view: View,
             friendlyObstructionPurpose: FriendlyObstructionPurpose,
             reasonDetail: String?
         ): FriendlyObstruction
 
-        /** Creates an [AdsRequest] to contain the data used to request ads.  */
+        
         fun createAdsRequest(): AdsRequest
 
-        /** Creates an [AdsLoader] for requesting ads using the specified settings.  */
+        
         fun createAdsLoader(
             context: Context,
             imaSdkSettings: ImaSdkSettings,
@@ -1069,7 +835,7 @@ object ImaUtil {
         ): AdsLoader
     }
 
-    /** Stores configuration for ad loading and playback.  */
+    
     class Configuration(
         val adPreloadTimeoutMs: Long,
         val vastLoadTimeoutMs: Int,
@@ -1109,7 +875,7 @@ object ImaUtil {
         }
     }
 
-    /** Stores configuration for playing server side ad insertion content.  */
+    
     class ServerSideAdInsertionConfiguration(
         adViewProvider: AdViewProvider,
         imaSdkSettings: ImaSdkSettings,

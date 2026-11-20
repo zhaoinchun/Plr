@@ -32,11 +32,9 @@ class ExperimentalBandwidthMeter private constructor(
     private val resetOnNetworkTypeChange: Boolean = true
 ) : BandwidthMeter, TransferListener {
 
-
     private var networkType: Int
     private var initialBitrateEstimate: Long
     private var networkTypeOverrideSet = false
-
 
     private var networkTypeOverride: Int = 0
     private var countryCode: String? = null

@@ -6,11 +6,7 @@ import com.google.ads.interactivemedia.v3.api.AdsRequest
 import com.google.ads.interactivemedia.v3.api.VideoOrientation
 
 class ImaAdTagUriBuilder
-/**
- * Creates a new instance.
- * 
- * @param uri The URI.
- */(private val uri: Uri) {
+(private val uri: Uri) {
     private var preferredLinearOrientation: Int = IMA_ORIENTATION_UNSET
 
     fun setPreferredLinearOrientation(
@@ -20,13 +16,7 @@ class ImaAdTagUriBuilder
         return this
     }
 
-    /**
-     * Builds a URI with the builder's current values. This URI can be used in the call to
-     * AdConfiguration.Builder.setAdTagUri().
-     * 
-     * @return The build [Uri].
-     * @throws IllegalStateException If the builder has missing or invalid inputs.
-     */
+    
     fun build(): Uri? {
         val builder = Uri.Builder().scheme(C.CSAI_SCHEME).authority(IMA_AUTHORITY)
         builder.appendQueryParameter(URI, uri.toString())
@@ -66,10 +56,7 @@ class ImaAdTagUriBuilder
             return request
         }
 
-        /**
-         * Conversion from the [ImaOrientationType] enum to the [ ] enum used by the IMA SDK. Keeping this package private as this should only be
-         * used within the exoplayer/ima library.
-         */
+        
         private fun fromImaOrientation(imaOrientation: Int): VideoOrientation {
             when (imaOrientation) {
                 IMA_ORIENTATION_LANDSCAPE -> return VideoOrientation.LANDSCAPE

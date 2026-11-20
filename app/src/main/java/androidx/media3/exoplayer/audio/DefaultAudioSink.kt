@@ -775,7 +775,6 @@ class DefaultAudioSink(
         }
     }
 
-
     private fun processBuffers(avSyncPresentationTimeUs: Long) {
         // Drain existing buffer first.
         drainOutputBuffer(avSyncPresentationTimeUs)
@@ -812,7 +811,6 @@ class DefaultAudioSink(
         }
     }
 
-
     private fun drainToEndOfStream(): Boolean {
         if (!audioProcessingPipeline!!.isOperational) {
             drainOutputBuffer(C.TIME_END_OF_SOURCE)
@@ -832,7 +830,6 @@ class DefaultAudioSink(
         }
         outputBuffer = maybeRampUpVolume(buffer)
     }
-
 
     private fun drainOutputBuffer(avSyncPresentationTimeUs: Long) {
         if (outputBuffer == null) {
@@ -909,7 +906,6 @@ class DefaultAudioSink(
             outputBuffer = null
         }
     }
-
 
     override fun playToEndOfStream() {
         if (!handledEndOfStream && this.isAudioOutputInitialized && drainToEndOfStream()) {

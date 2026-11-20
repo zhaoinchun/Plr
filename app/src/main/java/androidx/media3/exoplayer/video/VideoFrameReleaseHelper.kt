@@ -403,7 +403,6 @@ class VideoFrameReleaseHelper(private val context: Context) {
     companion object {
         private const val TAG = "VideoFrameReleaseHelper"
 
-
         const val VSYNC_SAMPLE_UPDATE_PERIOD_MS: Long = 500
         private const val MAX_ALLOWED_ADJUSTMENT_NS: Long = 20000000
         private const val VSYNC_OFFSET_PERCENTAGE: Long = 80

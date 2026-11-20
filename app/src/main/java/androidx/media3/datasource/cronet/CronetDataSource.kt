@@ -45,14 +45,6 @@ import java.util.concurrent.Executor
 import kotlin.concurrent.Volatile
 import kotlin.math.min
 
-/**
- * DataSource without intermediate buffer based on Cronet API set using UrlRequest.
- * 
- * 
- * Note: HTTP request headers will be set using all parameters passed via (in order of decreasing
- * priority) the `dataSpec`, [.setRequestProperty] and the default parameters used to
- * construct the instance.
- */
 class CronetDataSource protected constructor(
     cronetEngine: CronetEngine?,
     executor: Executor?,
@@ -67,7 +59,7 @@ class CronetDataSource protected constructor(
     keepPostFor302Redirects: Boolean,
     readBufferSize: Int
 ) : BaseDataSource( /* isNetwork= */true), HttpDataSource {
-    /** [androidx.media3.datasource.DataSource.Factory] for [CronetDataSource] instances.  */
+    
     class Factory : HttpDataSource.Factory {
         private val cronetEngine: CronetEngine?
         private val executor: Executor?
@@ -116,16 +108,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the user agent that will be used.
-         * 
-         * 
-         * The default is `null`, which causes the default user agent of the underlying [ ] to be used.
-         * 
-         * @param userAgent The user agent that will be used, or `null` to use the default user
-         * agent of the underlying [CronetEngine].
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
         fun setUserAgent(userAgent: String?): Factory {
             this.userAgent = userAgent
@@ -135,16 +118,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the priority of requests made by [CronetDataSource] instances created by this
-         * factory.
-         * 
-         * 
-         * The default is [UrlRequest.Builder.REQUEST_PRIORITY_MEDIUM].
-         * 
-         * @param requestPriority The request priority, which should be one of Cronet's `UrlRequest.Builder#REQUEST_PRIORITY_*` constants.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setRequestPriority(requestPriority: Int): Factory {
@@ -152,15 +126,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the connect timeout, in milliseconds.
-         * 
-         * 
-         * The default is [DEFAULT_CONNECT_TIMEOUT_MILLIS].
-         * 
-         * @param connectTimeoutMs The connect timeout, in milliseconds, that will be used.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setConnectionTimeoutMs(connectTimeoutMs: Int): Factory {
@@ -171,15 +137,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets whether the connect timeout is reset when a redirect occurs.
-         * 
-         * 
-         * The default is `false`.
-         * 
-         * @param resetTimeoutOnRedirects Whether the connect timeout is reset when a redirect occurs.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setResetTimeoutOnRedirects(resetTimeoutOnRedirects: Boolean): Factory {
@@ -187,17 +145,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets whether "Set-Cookie" requests on redirect should be forwarded to the redirect url in the
-         * "Cookie" header.
-         * 
-         * 
-         * The default is `false`.
-         * 
-         * @param handleSetCookieRequests Whether "Set-Cookie" requests on redirect should be forwarded
-         * to the redirect url in the "Cookie" header.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setHandleSetCookieRequests(handleSetCookieRequests: Boolean): Factory {
@@ -205,15 +153,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the read timeout, in milliseconds.
-         * 
-         * 
-         * The default is [DEFAULT_READ_TIMEOUT_MILLIS].
-         * 
-         * @param readTimeoutMs The connect timeout, in milliseconds, that will be used.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setReadTimeoutMs(readTimeoutMs: Int): Factory {
@@ -224,17 +164,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets a content type [Predicate]. If a content type is rejected by the predicate then a
-         * [InvalidContentTypeException] is thrown from [.open].
-         * 
-         * 
-         * The default is `null`.
-         * 
-         * @param contentTypePredicate The content type [Predicate], or `null` to clear a
-         * predicate that was previously set.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setContentTypePredicate(contentTypePredicate: Predicate<String>?): Factory {
@@ -245,10 +175,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets whether we should keep the POST method and body when we have HTTP 302 redirects for a
-         * POST request.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setKeepPostFor302Redirects(keepPostFor302Redirects: Boolean): Factory {
@@ -259,18 +186,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the [TransferListener] that will be used.
-         * 
-         * 
-         * The default is `null`.
-         * 
-         * 
-         * See [androidx.media3.datasource.DataSource.addTransferListener].
-         * 
-         * @param transferListener The listener that will be used.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setTransferListener(transferListener: TransferListener?): Factory {
@@ -281,15 +197,7 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the fallback [HttpDataSource.Factory] that is used as a fallback if the [ ] fails to provide a [CronetEngine].
-         * 
-         * 
-         * By default a [DefaultHttpDataSource] is used as fallback factory.
-         * 
-         * @param fallbackFactory The fallback factory that will be used.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
         @Suppress("deprecation") // Intentionally referring to deprecated parameter
 
@@ -302,19 +210,13 @@ class CronetDataSource protected constructor(
             return this
         }
 
-        /**
-         * Sets the read buffer size, in bytes.
-         * 
-         * @param readBufferSize The read buffer size, in bytes.
-         * @return This factory.
-         */
+        
         @CanIgnoreReturnValue
 
         fun setReadBufferSize(readBufferSize: Int): Factory {
             this.readBufferSize = readBufferSize
             return this
         }
-
 
         override fun createDataSource(): HttpDataSource {
             if (cronetEngine == null) {
@@ -347,13 +249,10 @@ class CronetDataSource protected constructor(
         }
     }
 
-    /** Thrown when an error is encountered when trying to open a [CronetDataSource].  */
+    
 
     class OpenException : HttpDataSourceException {
-        /**
-         * Returns the status of the connection establishment at the moment when the error occurred, as
-         * defined by [Status].
-         */
+        
         val cronetConnectionStatus: Int
 
         @Deprecated("Use {@link #OpenException(IOException, DataSpec, int, int)}.")
@@ -422,7 +321,7 @@ class CronetDataSource protected constructor(
     private var transferStarted = false
     private var bytesRemaining: Long = 0
 
-    /** Returns current [UrlRequest]. May be null if the data source is not opened.  */
+    
     // Written from the calling thread only. currentUrlRequest.start() calls ensure writes are visible
     // to reads made by the Cronet thread.
 
@@ -437,7 +336,7 @@ class CronetDataSource protected constructor(
     // thread.
     private var readBuffer: ByteBuffer? = null
 
-    /** Returns current [UrlResponseInfo]. May be null if the data source is not opened.  */
+    
     // Written from the Cronet thread only. operation.open() calls ensure writes are visible to reads
     // made by the calling thread.
 
@@ -467,11 +366,9 @@ class CronetDataSource protected constructor(
         requestProperties.set(name, value)
     }
 
-
     override fun clearRequestProperty(name: String) {
         requestProperties.remove(name)
     }
-
 
     override fun clearAllRequestProperties() {
         requestProperties.clear()
@@ -483,10 +380,8 @@ class CronetDataSource protected constructor(
         else
             currentUrlResponseInfo!!.getHttpStatusCode()
 
-
     override val responseHeaders: MutableMap<String, List<String>>
         get() = if (this.currentUrlResponseInfo == null) mutableMapOf<String, List<String>>() else currentUrlResponseInfo!!.getAllHeaders()
-
 
     override val uri: Uri?
         get() {
@@ -498,7 +393,6 @@ class CronetDataSource protected constructor(
                 return null
             }
         }
-
 
     @Throws(HttpDataSourceException::class)
     override fun open(dataSpec: DataSpec): Long {
@@ -645,7 +539,6 @@ class CronetDataSource protected constructor(
         return bytesRemaining
     }
 
-
     @Throws(HttpDataSourceException::class)
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         Preconditions.checkState(transferStarted)
@@ -691,32 +584,7 @@ class CronetDataSource protected constructor(
         return bytesRead
     }
 
-    /**
-     * Reads up to `buffer.remaining()` bytes of data and stores them into `buffer`,
-     * starting at `buffer.position()`. Advances the position of the buffer by the number of
-     * bytes read and returns this length.
-     * 
-     * 
-     * If there is an error, a [HttpDataSourceException] is thrown and the contents of `buffer` should be ignored. If the exception has error code `HttpDataSourceException.TYPE_READ`, note that Cronet may continue writing into `buffer`
-     * after the method has returned. Thus the caller should not attempt to reuse the buffer.
-     * 
-     * 
-     * If `buffer.remaining()` is zero then 0 is returned. Otherwise, if no data is available
-     * because the end of the opened range has been reached, then [C.RESULT_END_OF_INPUT] is
-     * returned. Otherwise, the call will block until at least one byte of data has been read and the
-     * number of bytes read is returned.
-     * 
-     * 
-     * Passed buffer must be direct ByteBuffer. If you have a non-direct ByteBuffer, consider the
-     * alternative read method with its backed array.
-     * 
-     * @param buffer The ByteBuffer into which the read data should be stored. Must be a direct
-     * ByteBuffer.
-     * @return The number of bytes read, or [C.RESULT_END_OF_INPUT] if no data is available
-     * because the end of the opened range has been reached.
-     * @throws HttpDataSourceException If an error occurs reading from the source.
-     * @throws IllegalArgumentException If `buffer` is not a direct ByteBuffer.
-     */
+    
 
     @Throws(HttpDataSourceException::class)
     fun read(buffer: ByteBuffer): Int {
@@ -762,7 +630,6 @@ class CronetDataSource protected constructor(
         return bytesRead
     }
 
-
     @Synchronized
     override fun close() {
         closeCurrentUrlRequestAndCallback()
@@ -801,9 +668,7 @@ class CronetDataSource protected constructor(
         currentUrlRequest = buildRequestBuilder(dataSpec).build()
     }
 
-    /**
-     * Returns [UrlRequest.Builder] from dataSpec. Would not work if data source is not opened.
-     */
+    
 
     @RequiresNonNull("this.currentUrlRequestCallback")
     @Throws(
@@ -877,19 +742,7 @@ class CronetDataSource protected constructor(
         currentConnectTimeoutMs = clock.elapsedRealtime() + connectTimeoutMs
     }
 
-    /**
-     * Attempts to skip the specified number of bytes in full.
-     * 
-     * 
-     * The methods throws an [OpenException] with [OpenException.reason] set to [ ][PlaybackException.ERROR_CODE_IO_READ_POSITION_OUT_OF_RANGE] when the data ended before the
-     * specified number of bytes were skipped.
-     * 
-     * @param bytesToSkip The number of bytes to skip.
-     * @param dataSpec The [DataSpec].
-     * @throws HttpDataSourceException If the thread is interrupted during the operation, or an error
-     * occurs reading from the source; or when the data ended before the specified number of bytes
-     * were skipped.
-     */
+    
     @Throws(HttpDataSourceException::class)
     private fun skipFully(bytesToSkip: Long, dataSpec: DataSpec?) {
         var bytesToSkip = bytesToSkip
@@ -939,12 +792,7 @@ class CronetDataSource protected constructor(
         }
     }
 
-    /**
-     * Reads the whole response body.
-     * 
-     * @return The response body.
-     * @throws IOException If an error occurs reading from the source.
-     */
+    
     @Throws(IOException::class)
     private fun readResponseBody(): ByteArray {
         var responseBody = Util.EMPTY_BYTE_ARRAY
@@ -963,14 +811,7 @@ class CronetDataSource protected constructor(
         return responseBody
     }
 
-    /**
-     * Reads up to `buffer.remaining()` bytes of data from `currentUrlRequest` and stores
-     * them into `buffer`. If there is an error and `buffer == readBuffer`, then it resets
-     * the current `readBuffer` object so that it is not reused in the future.
-     * 
-     * @param buffer The ByteBuffer into which the read data is stored. Must be a direct ByteBuffer.
-     * @throws HttpDataSourceException If an error occurs reading from the source.
-     */
+    
     @Throws(HttpDataSourceException::class)
     private fun readInternal(buffer: ByteBuffer?, dataSpec: DataSpec?) {
         currentUrlRequest!!.read(buffer)
@@ -1179,11 +1020,11 @@ class CronetDataSource protected constructor(
             MediaLibraryInfo.registerModule("media3.datasource.cronet")
         }
 
-        /** The default connection timeout, in milliseconds.  */
+        
 
         val DEFAULT_CONNECT_TIMEOUT_MILLIS: Int = 8 * 1000
 
-        /** The default read timeout, in milliseconds.  */
+        
 
         val DEFAULT_READ_TIMEOUT_MILLIS: Int = 8 * 1000
 

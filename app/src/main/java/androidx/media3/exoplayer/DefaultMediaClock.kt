@@ -31,7 +31,6 @@ class DefaultMediaClock(private val listener: PlaybackParametersListener, clock:
         standaloneClock.resetPosition(positionUs)
     }
 
-
     fun onRendererEnabled(renderer: Renderer) {
         val rendererMediaClock = renderer.mediaClock
         if (rendererMediaClock != null && rendererMediaClock !== rendererClock) {

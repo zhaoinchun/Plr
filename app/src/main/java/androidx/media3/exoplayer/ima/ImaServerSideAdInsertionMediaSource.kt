@@ -89,7 +89,6 @@ import kotlin.text.indices
 import kotlin.text.replace
 import com.google.ads.interactivemedia.v3.api.AdsLoader.AdsLoadedListener
 
-/** MediaSource for IMA server side inserted ad streams.  */
 class ImaServerSideAdInsertionMediaSource(
     imaSdkFactory: ImaSdkFactory,
     player: Player,
@@ -100,7 +99,7 @@ class ImaServerSideAdInsertionMediaSource(
     streamPlayer: StreamPlayer,
     contentMediaSourceFactory: MediaSource.Factory
 ) : CompositeMediaSource<Void?>() {
-    /** A listener to be notified of stream events.  */
+    
     
     fun interface StreamEventListener {
         fun onStreamIdChanged(mediaItem: MediaItem?, streamId: String?)
@@ -112,12 +111,7 @@ class ImaServerSideAdInsertionMediaSource(
     ) : MediaSource.Factory {
         private var imaSdkFactory: ImaSdkFactory
 
-        /**
-         * Creates a new factory for [ ImaServerSideAdInsertionMediaSources][ImaServerSideAdInsertionMediaSource].
-         * 
-         * @param adsLoader The [AdsLoader].
-         * @param contentMediaSourceFactory The content media source factory to create content sources.
-         */
+        
         init {
             imaSdkFactory = ImaSdkFactory.getInstance()
         }
@@ -181,13 +175,13 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    /** An ads loader for IMA server side ad insertion streams.  */
+    
     class AdsLoader (
         context: Context,
         configuration: ImaUtil.ServerSideAdInsertionConfiguration,
         state: State
     ) {
-        /** Builder for building an [AdsLoader].  */
+        
         class Builder(private val context: Context, adViewProvider: AdViewProvider?) {
             private val adViewProvider: AdViewProvider?
 
@@ -201,12 +195,7 @@ class ImaServerSideAdInsertionMediaSource(
             private var focusSkipButtonWhenAvailable: Boolean
             private var enableCustomTabs: Boolean
 
-            /**
-             * Creates an instance.
-             * 
-             * @param context A context.
-             * @param adViewProvider A provider for [ViewGroup] instances.
-             */
+            
             init {
                 this.adViewProvider = adViewProvider
                 companionAdSlots = ImmutableList.of<CompanionAdSlot?>()
@@ -217,15 +206,7 @@ class ImaServerSideAdInsertionMediaSource(
                     StreamEventListener { mediaItem: MediaItem?, streamId: String? -> }
             }
 
-            /**
-             * Sets the IMA SDK settings.
-             * 
-             * 
-             * If this method is not called, the [ default settings][ImaSdkFactory.createImaSdkSettings] will be used with the language set to [ ][Util.getSystemLanguageCodes].
-             * 
-             * @param imaSdkSettings The [ImaSdkSettings].
-             * @return This builder, for convenience.
-             */
+            
             
             @CanIgnoreReturnValue
             fun setImaSdkSettings(imaSdkSettings: ImaSdkSettings?): Builder {
@@ -233,12 +214,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets the optional [StreamEventListener] that will be called for stream events.
-             * 
-             * @param streamEventListener The stream event listener.
-             * @return This builder, for convenience.
-             */
+            
             
             @CanIgnoreReturnValue
             fun setStreamEventListener(streamEventListener: StreamEventListener?): Builder {
@@ -246,18 +222,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets the optional [AdEventListener] that will be passed to [ ][StreamManager.addAdEventListener] when the stream manager becomes
-             * available.
-             * 
-             * 
-             * Note: This method can be considered a stable API as long as the [AdEventListener]
-             * is provided by the IMA library. We can't declare this method stable because we don't have
-             * the same guarantee from the library we depend on.
-             * 
-             * @param adEventListener The ad event listener.
-             * @return This builder, for convenience.
-             */
+            
             
             @CanIgnoreReturnValue
             fun setAdEventListener(adEventListener: AdEvent.AdEventListener?): Builder {
@@ -265,17 +230,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets the optional [AdErrorEvent.AdErrorListener] that will be passed to [ ][StreamManager.addAdErrorListener] when the stream manager
-             * becomes available.
-             * 
-             * 
-             * Note: This method can be considered a stable API as long as the [ ] is provided by the IMA library. We can't declare this method
-             * stable because we don't have the same guarantee from the library we depend on.
-             * 
-             * @param adErrorListener The [AdErrorEvent.AdErrorListener].
-             * @return This builder, for convenience.
-             */
+            
             
             @CanIgnoreReturnValue
             fun setAdErrorListener(adErrorListener: AdErrorEvent.AdErrorListener?): Builder {
@@ -283,13 +238,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets the slots to use for companion ads, if they are present in the loaded ad.
-             * 
-             * @param companionAdSlots The slots to use for companion ads.
-             * @return This builder, for convenience.
-             * @see AdDisplayContainer.setCompanionSlots
-             */
+            
             
             @CanIgnoreReturnValue
             fun setCompanionAdSlots(companionAdSlots: MutableCollection<CompanionAdSlot?>): Builder {
@@ -297,12 +246,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets the slot to use for pause ads.
-             * 
-             * @param pauseAdSlot The slot to use for pause ads.
-             * @return This builder, for convenience.
-             */
+            
             
             @CanIgnoreReturnValue
             fun setPauseAdSlot(pauseAdSlot: AdSlot?): Builder {
@@ -310,30 +254,14 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets the optional state to resume with.
-             * 
-             * 
-             * The state can be received when [releasing][.release] the [AdsLoader].
-             * 
-             * @param state The state to resume with.
-             * @return This builder, for convenience.
-             */
+            
             @CanIgnoreReturnValue
             fun setAdsLoaderState(state: State): Builder {
                 this.state = state
                 return this
             }
 
-            /**
-             * Sets whether to focus the skip button (when available) on Android TV devices. The default
-             * setting is `true`.
-             * 
-             * @param focusSkipButtonWhenAvailable Whether to focus the skip button (when available) on
-             * Android TV devices.
-             * @return This builder, for convenience.
-             * @see AdsRenderingSettings.setFocusSkipButtonWhenAvailable
-             */
+            
             
             @CanIgnoreReturnValue
             fun setFocusSkipButtonWhenAvailable(
@@ -343,14 +271,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /**
-             * Sets whether to enable custom tabs for the ad click-through URLs. The default value is
-             * `false`.
-             * 
-             * @param enableCustomTabs Whether to enable custom tabs for the ad click-through URLs.
-             * @return This builder, for convenience.
-             * @see AdsRenderingSettings.setEnableCustomTabs
-             */
+            
             
             @CanIgnoreReturnValue
             fun setEnableCustomTabs(enableCustomTabs: Boolean): Builder {
@@ -358,7 +279,7 @@ class ImaServerSideAdInsertionMediaSource(
                 return this
             }
 
-            /** Returns a new [AdsLoader].  */
+            
             fun build(): AdsLoader {
                 var imaSdkSettings: ImaSdkSettings? = this.imaSdkSettings
                 if (imaSdkSettings == null) {
@@ -382,7 +303,7 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-        /** The state of the [AdsLoader] that can be used when resuming from the background.  */
+        
         class State @VisibleForTesting internal constructor(adPlaybackStates: ImmutableMap<String, AdPlaybackState>) {
              val adPlaybackStates: ImmutableMap<String, AdPlaybackState>
 
@@ -420,7 +341,7 @@ class ImaServerSideAdInsertionMediaSource(
             companion object {
                 private val FIELD_AD_PLAYBACK_STATES = Util.intToStringMaxRadix(1)
 
-                /** Restores a `State` from a [Bundle].  */
+                
                 @JvmStatic
                 fun fromBundle(bundle: Bundle): State {
                     val adPlaybackStateMap: ImmutableMap.Builder<String, AdPlaybackState> =
@@ -460,11 +381,7 @@ class ImaServerSideAdInsertionMediaSource(
             adPlaybackStateMap.putAll(state.adPlaybackStates)
         }
 
-        /**
-         * Replaces all the ad tag parameters used for the upcoming ad requests for a live stream.
-         * 
-         * @see StreamManager.replaceAdTagParameters
-         */
+        
         
         fun replaceAdTagParameters(adTagParameters: MutableMap<String, String>) {
             val player = player
@@ -491,11 +408,7 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-        /**
-         * Puts the focus on the skip button, if a skip button is present and an ad is playing.
-         * 
-         * @see StreamManager.focus
-         */
+        
         
         fun focusSkipButton() {
             val player = player ?: return
@@ -518,11 +431,7 @@ class ImaServerSideAdInsertionMediaSource(
             }
         }
 
-        /**
-         * Releases resources.
-         * 
-         * @return The [State] that can be used when resuming from the background.
-         */
+        
         fun release(): State {
             for (resourceHolder in mediaSourceResources.values) {
                 resourceHolder.streamPlayer.release()
@@ -889,7 +798,7 @@ class ImaServerSideAdInsertionMediaSource(
         ServerSideAdInsertionMediaSource.AdPlaybackStateUpdater {
         private val adEventListener: AdEvent.AdEventListener
 
-        /** Creates an new instance.  */
+        
         init {
             this.adEventListener = adEventListener
         }
@@ -1070,7 +979,7 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    /** Loads the [StreamManager] and the content URI.  */
+    
     private class StreamManagerLoadable
         (
         adsLoader: com.google.ads.interactivemedia.v3.api.AdsLoader,
@@ -1086,7 +995,7 @@ class ImaServerSideAdInsertionMediaSource(
         private val adErrorListener: AdErrorEvent.AdErrorListener?
         private val conditionVariable: ConditionVariable
 
-        /** Returns the DAI content URI or null if not yet available.  */
+        
         @Volatile
         var contentUri: Uri? = null
             private set
@@ -1103,7 +1012,7 @@ class ImaServerSideAdInsertionMediaSource(
         @Volatile
         private var errorCode: Int
 
-        /** Creates an instance.  */
+        
         init {
             this.adsLoader = adsLoader
             this.imaServerSideAdInsertionMediaSource = imaServerSideAdInsertionMediaSource
@@ -1181,28 +1090,12 @@ class ImaServerSideAdInsertionMediaSource(
         }
     }
 
-    /**
-     * Receives the content URI from the SDK and sends back in-band media metadata and playback
-     * progression data to the SDK.
-     */
+    
      class StreamPlayer(player: Player, mediaItem: MediaItem, streamRequest: StreamRequest) :
         VideoStreamPlayer {
-        /** A listener to listen for the stream URI loaded by the SDK.  */
+        
         fun interface StreamLoadListener {
-            /**
-             * Loads a stream with dynamic ad insertion given the stream url and subtitles array. The
-             * subtitles array is only used in VOD streams.
-             * 
-             * 
-             * Each entry in the subtitles array is a HashMap that corresponds to a language. Each map
-             * will have a "language" key with a two letter language string value, a "language name" to
-             * specify the set of subtitles if multiple sets exist for the same language, and one or more
-             * subtitle key/value pairs. Here's an example the map for English:
-             * 
-             * 
-             * "language" -> "en" "language_name" -> "English" "webvtt" ->
-             * "https://example.com/vtt/en.vtt" "ttml" -> "https://example.com/ttml/en.ttml"
-             */
+            
             fun onLoadStream(
                 streamUri: String?,
                 subtitles: MutableList<HashMap<String, String>>?
@@ -1221,7 +1114,7 @@ class ImaServerSideAdInsertionMediaSource(
         private var adsId: Any? = null
         private var streamLoadListener: StreamLoadListener? = null
 
-        /** Creates an instance.  */
+        
         init {
             this.player = player
             this.mediaItem = mediaItem
@@ -1233,7 +1126,7 @@ class ImaServerSideAdInsertionMediaSource(
             period = Timeline.Period()
         }
 
-        /** Registers the ad playback states matching to the given content timeline.  */
+        
         fun setAdPlaybackStates(
             adsId: Any?,
             adPlaybackStates: ImmutableMap<Any?, AdPlaybackState?>,
@@ -1244,26 +1137,26 @@ class ImaServerSideAdInsertionMediaSource(
             this.contentTimeline = contentTimeline
         }
 
-        /** Sets the [StreamLoadListener] to be called when the SSAI content URI was loaded.  */
+        
         fun setStreamLoadListener(listener: StreamLoadListener?) {
             streamLoadListener = Preconditions.checkNotNull<StreamLoadListener?>(listener)
         }
 
-        /** Called when the content has completed playback.  */
+        
         fun onContentCompleted() {
             for (callback in callbacks) {
                 callback.onContentComplete()
             }
         }
 
-        /** Called when the content player changed the volume.  */
+        
         fun onContentVolumeChanged(volumePct: Int) {
             for (callback in callbacks) {
                 callback.onVolumeChanged(volumePct)
             }
         }
 
-        /** Releases the player.  */
+        
         fun release() {
             callbacks.clear()
             adsId = null

@@ -381,7 +381,6 @@ abstract class SegmentDownloader<M : FilterableManifest<M>>(
         private val cacheWriter: CacheWriter =
             CacheWriter(dataSource, segment.dataSpec, temporaryBuffer, progressNotifier)
 
-
         override fun doWork(): Void? {
             cacheWriter.cache()
             progressNotifier?.onSegmentDownloaded()

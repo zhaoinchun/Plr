@@ -277,7 +277,6 @@ class FrameworkMediaDrm private constructor(uuid: UUID) : ExoMediaDrm {
         mediaDrm.setPropertyByteArray(propertyName, value)
     }
 
-
     override fun createCryptoConfig(sessionId: ByteArray): FrameworkCryptoConfig {
         return FrameworkCryptoConfig(adjustUuid(uuid), sessionId)
     }

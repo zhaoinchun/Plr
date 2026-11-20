@@ -3,7 +3,6 @@ package androidx.media3.extractor.mp4
 import androidx.annotation.IntDef
 import androidx.media3.common.C
 
-
 import androidx.media3.common.Format
 import androidx.media3.common.Label
 import androidx.media3.common.Metadata

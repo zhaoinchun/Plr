@@ -81,67 +81,50 @@ internal class AdTagLoader(
     private var released = false
 
     // Fields tracking IMA's state.
-    /** Whether IMA has sent an ad event to pause content since the last resume content event.  */
+    
     private var imaPausedContent = false
 
-    /** The current ad playback state.  */
+    
     private var imaAdState: Int = 0
 
-    /** The current ad media info, or `null` if in state [.IMA_AD_STATE_NONE].  */
+    
     private var imaAdMediaInfo: AdMediaInfo? = null
 
-    /** The current ad info, or `null` if in state [.IMA_AD_STATE_NONE].  */
+    
     private var imaAdInfo: AdInfo? = null
 
-    /** Whether IMA has been notified that playback of content has finished.  */
+    
     private var sentContentComplete = false
 
     // Fields tracking the player/loader state.
-    /** Whether the player is playing an ad.  */
+    
     private var playingAd = false
 
-    /** Whether the player is buffering an ad.  */
+    
     private var bufferingAd = false
 
-    /**
-     * If the player is playing an ad, stores the ad index in its ad group. [C.INDEX_UNSET]
-     * otherwise.
-     */
+    
     private var playingAdIndexInAdGroup = 0
 
-    /**
-     * The ad info for a pending ad for which the media failed preparation, or `null` if no
-     * pending ads have failed to prepare.
-     */
+    
     private var pendingAdPrepareErrorAdInfo: AdInfo? = null
 
-    /**
-     * If a content period has finished but IMA has not yet called [ ][ComponentListener.playAd], stores the value of [ ][SystemClock.elapsedRealtime] when the content stopped playing. This can be used to determine
-     * a fake, increasing content position. [C.TIME_UNSET] otherwise.
-     */
+    
     private var fakeContentProgressElapsedRealtimeMs: Long
 
-    /**
-     * If [.fakeContentProgressElapsedRealtimeMs] is set, stores the offset from which the
-     * content progress should increase. [C.TIME_UNSET] otherwise.
-     */
+    
     private var fakeContentProgressOffsetMs: Long
 
-    /** Stores the pending content position when a seek operation was intercepted to play an ad.  */
+    
     private var pendingContentPositionMs: Long
 
-    /**
-     * Whether [ComponentListener.getContentProgress] has sent [ ][.pendingContentPositionMs] to IMA.
-     */
+    
     private var sentPendingContentPositionMs = false
 
-    /**
-     * Stores the real time in milliseconds at which the player started buffering, possibly due to not
-     * having preloaded an ad, or [C.TIME_UNSET] if not applicable.
-     */
+    
     private var waitingForPreloadElapsedRealtimeMs: Long
 
-    /** Creates a new ad tag loader, starting the ad request if the ad tag is valid.  */
+    
     init {
         this.imaFactory = imaFactory
         var imaSdkSettings: ImaSdkSettings? = configuration.imaSdkSettings
@@ -191,33 +174,27 @@ internal class AdTagLoader(
         adsLoader = requestAds(context, imaSdkSettings, adDisplayContainer)
     }
 
-    /** Returns the underlying IMA SDK ads loader.  */
+    
     fun getAdsLoader(): AdsLoader {
         return adsLoader
     }
 
-    /** Returns the IMA SDK ad display container.  */
+    
     fun getAdDisplayContainer(): AdDisplayContainer {
         return adDisplayContainer
     }
 
-    /** Skips the current skippable ad, if there is one.  */
+    
     fun skipAd() {
         adsManager?.skip()
     }
 
-    /**
-     * Moves UI focus to the skip button (or other interactive elements), if currently shown. See
-     * [AdsManager.focus].
-     */
+    
     fun focusSkipButton() {
         adsManager?.focus()
     }
 
-    /**
-     * Starts passing events from this instance (including any pending ad playback state) and
-     * registers obstructions.
-     */
+    
     fun addListenerWithAdView(
         eventListener: EventListener,
         adViewProvider: AdViewProvider
@@ -259,15 +236,12 @@ internal class AdTagLoader(
         }
     }
 
-    /**
-     * Populates the ad playback state with loaded cue points, if available. Any preroll will be
-     * paused immediately while waiting for this instance to be [activated][.activate].
-     */
+    
     fun maybePreloadAds(contentPositionMs: Long, contentDurationMs: Long) {
         maybeInitializeAdsManager(contentPositionMs, contentDurationMs)
     }
 
-    /** Activates playback.  */
+    
     fun activate(player: Player) {
         this.player = player
         player.addListener(this)
@@ -295,7 +269,7 @@ internal class AdTagLoader(
         }
     }
 
-    /** Deactivates playback.  */
+    
     fun deactivate() {
         val player: Player = player!!
         // Post deactivation behind any already queued Player.Listener events to ensure that
@@ -303,11 +277,7 @@ internal class AdTagLoader(
         handler.post(Runnable { deactivateInternal(player) })
     }
 
-    /**
-     * Deactivates playback internally, after the Listener.onEvents() cycle completes so the complete
-     * state change picture is clear. For example, if an error caused the deactivation, the error
-     * callback can be handled first.
-     */
+    
     private fun deactivateInternal(player: Player) {
         if ((adPlaybackState != AdPlaybackState.NONE) && imaPausedContent
             && player.playerError == null
@@ -326,7 +296,7 @@ internal class AdTagLoader(
         this.player = null
     }
 
-    /** Stops passing of events from this instance and unregisters obstructions.  */
+    
     fun removeListener(eventListener: EventListener?) {
         eventListeners.remove(eventListener)
         if (eventListeners.isEmpty()) {
@@ -334,7 +304,7 @@ internal class AdTagLoader(
         }
     }
 
-    /** Releases all resources used by the ad tag loader.  */
+    
     fun release() {
         if (released) {
             return
@@ -361,7 +331,7 @@ internal class AdTagLoader(
         updateAdPlaybackState()
     }
 
-    /** Notifies the IMA SDK that the specified ad has been prepared for playback.  */
+    
     fun handlePrepareComplete(adGroupIndex: Int, adIndexInAdGroup: Int) {
         val adInfo = AdInfo(adGroupIndex, adIndexInAdGroup)
         if (configuration.debugModeEnabled) {
@@ -377,7 +347,7 @@ internal class AdTagLoader(
         }
     }
 
-    /** Notifies the IMA SDK that the specified ad has failed to prepare for playback.  */
+    
     fun handlePrepareError(adGroupIndex: Int, adIndexInAdGroup: Int, exception: IOException?) {
         if (player == null) {
             return
@@ -522,10 +492,7 @@ internal class AdTagLoader(
         }
     }
 
-    /**
-     * Configures ads rendering for starting playback, returning the settings for the IMA SDK or
-     * `null` if no ads should play.
-     */
+    
     private fun setupAdsRendering(
         contentPositionMs: Long,
         contentDurationMs: Long
@@ -776,10 +743,7 @@ internal class AdTagLoader(
     }
 
     private val isWaitingForFirstAdToPreload: Boolean
-        /**
-         * Returns whether this instance is expecting the first ad in an the upcoming ad group to load
-         * within the [preload timeout][ImaUtil.Configuration.adPreloadTimeoutMs].
-         */
+        
         get() {
             val player: Player? = this.player
             if (player == null) {
@@ -1275,10 +1239,7 @@ internal class AdTagLoader(
     }
 
     private val loadingAdGroupIndex: Int
-        /**
-         * Returns the index of the ad group that will preload next, or [C.INDEX_UNSET] if there is
-         * no such ad group.
-         */
+        
         get() {
             if (player == null) {
                 return C.INDEX_UNSET
@@ -1537,37 +1498,24 @@ internal class AdTagLoader(
         private const val IMA_SDK_SETTINGS_PLAYER_TYPE = "google/exo.ext.ima"
         private val IMA_SDK_SETTINGS_PLAYER_VERSION: String = MediaLibraryInfo.VERSION
 
-        /**
-         * Interval at which ad progress updates are provided to the IMA SDK, in milliseconds. 200 ms is
-         * the interval recommended by the Media Rating Council (MRC) for minimum polling of viewable
-         * video impressions.
-         * http://www.mediaratingcouncil.org/063014%20Viewable%20Ad%20Impression%20Guideline_Final.pdf.
-         * 
-         * @see VideoAdPlayer.VideoAdPlayerCallback
-         */
+        
         private const val AD_PROGRESS_UPDATE_INTERVAL_MS = 200
 
-        /** The value used in [VideoProgressUpdate]s to indicate an unset duration.  */
+        
         private val IMA_DURATION_UNSET = -1L
 
-        /**
-         * Threshold before the end of content at which IMA is notified that content is complete if the
-         * player buffers, in milliseconds.
-         */
+        
         private const val THRESHOLD_END_OF_CONTENT_MS: Long = 5000
 
-        /** The threshold below which ad cue points are treated as matching, in microseconds.  */
+        
         private const val THRESHOLD_AD_MATCH_US: Long = 1000
 
-        /** The ad playback state when IMA is not playing an ad.  */
+        
         private const val IMA_AD_STATE_NONE = 0
 
         private const val IMA_AD_STATE_PLAYING = 1
 
-        /**
-         * The ad playback state when IMA has called [ComponentListener.pauseAd] while
-         * playing an ad.
-         */
+        
         private const val IMA_AD_STATE_PAUSED = 2
 
         private fun getContentPeriodPositionMs(

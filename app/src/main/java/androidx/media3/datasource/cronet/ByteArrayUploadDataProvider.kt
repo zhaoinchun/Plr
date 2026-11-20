@@ -6,7 +6,7 @@ import java.io.IOException
 import java.nio.ByteBuffer
 import kotlin.math.min
 
-/** A [UploadDataProvider] implementation that provides data from a `byte[]`.  */ /* package */
+ /* package */
 internal class ByteArrayUploadDataProvider(private val data: ByteArray) : UploadDataProvider() {
     private var position = 0
 

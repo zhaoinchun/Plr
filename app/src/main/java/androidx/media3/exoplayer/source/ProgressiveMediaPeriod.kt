@@ -178,7 +178,6 @@ class ProgressiveMediaPeriod(
         }
     }
 
-
     override fun maybeThrowPrepareError() {
         maybeThrowError()
         if (loadingFinished && !prepared) {
@@ -550,12 +549,10 @@ class ProgressiveMediaPeriod(
         return !suppressRead() && sampleQueues[track].isReady(loadingFinished)
     }
 
-
     fun maybeThrowError(sampleQueueIndex: Int) {
         sampleQueues[sampleQueueIndex].maybeThrowError()
         maybeThrowError()
     }
-
 
     fun maybeThrowError() {
         loader.maybeThrowError(loadErrorHandlingPolicy.getMinimumLoadableRetryCount(dataType))
@@ -1078,7 +1075,6 @@ class ProgressiveMediaPeriod(
         override val isReady: Boolean
             get() = this@ProgressiveMediaPeriod.isReady(track)
 
-
         override fun maybeThrowError() {
             this@ProgressiveMediaPeriod.maybeThrowError(track)
         }
@@ -1126,7 +1122,6 @@ class ProgressiveMediaPeriod(
         override fun cancelLoad() {
             loadCanceled = true
         }
-
 
         override fun load() {
             var result = Extractor.RESULT_CONTINUE
@@ -1280,7 +1275,6 @@ class ProgressiveMediaPeriod(
             DISCARDING,
         }
 
-
         override fun sampleData(
             input: DataReader,
             length: Int,
@@ -1288,7 +1282,6 @@ class ProgressiveMediaPeriod(
         ): Int {
             return this.currentOutput.sampleData(input, length, allowEndOfInput)
         }
-
 
         override fun sampleData(
             input: DataReader,

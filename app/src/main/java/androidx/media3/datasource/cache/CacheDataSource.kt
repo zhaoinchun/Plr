@@ -471,7 +471,6 @@ class CacheDataSource private constructor(
         }
     }
 
-
     private fun setNoBytesRemainingAndMaybeStoreLength(key: String) {
         bytesRemaining = 0
         if (this.isWritingToCache) {
@@ -492,7 +491,6 @@ class CacheDataSource private constructor(
 
     private val isWritingToCache: Boolean
         get() = currentDataSource === cacheWriteDataSource
-
 
     private fun closeCurrentSource() {
         if (currentDataSource == null) {

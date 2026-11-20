@@ -95,7 +95,6 @@ class MediaCodecAudioRenderer(
     override val name: String
         get() = TAG
 
-
     override fun supportsFormat(
         mediaCodecSelector: MediaCodecSelector,
         format: Format
@@ -206,7 +205,6 @@ class MediaCodecAudioRenderer(
         }
         return audioOffloadSupport
     }
-
 
     override fun getDecoderInfos(
         mediaCodecSelector: MediaCodecSelector, format: Format, requiresSecureDecoder: Boolean
@@ -356,7 +354,6 @@ class MediaCodecAudioRenderer(
         eventDispatcher.audioCodecError(codecError)
     }
 
-
     override fun onInputFormatChanged(formatHolder: FormatHolder): DecoderReuseEvaluation? {
         val inputFormat = formatHolder.format!!
         this.inputFormat = inputFormat
@@ -364,7 +361,6 @@ class MediaCodecAudioRenderer(
         eventDispatcher.inputFormatChanged(inputFormat, evaluation)
         return evaluation
     }
-
 
     override fun onOutputFormatChanged(format: Format, mediaFormat: MediaFormat?) {
         val audioSinkInputFormat: Format
@@ -466,7 +462,6 @@ class MediaCodecAudioRenderer(
         allowPositionDiscontinuity = true
     }
 
-
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         super.onEnabled(joining, mayRenderStartOfStream)
         eventDispatcher.enabled(decoderCounters)
@@ -479,7 +474,6 @@ class MediaCodecAudioRenderer(
         audioSink.setClock(getClock())
         audioSink.setListener(AudioSinkListener())
     }
-
 
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
@@ -599,7 +593,6 @@ class MediaCodecAudioRenderer(
         audioSink.handleDiscontinuity()
     }
 
-
     override fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -703,7 +696,6 @@ class MediaCodecAudioRenderer(
         eventDispatcher.audioCodecParametersChanged(codecParameters!!)
     }
 
-
     override fun renderToEndOfStream() {
         try {
             audioSink.playToEndOfStream()
@@ -726,7 +718,6 @@ class MediaCodecAudioRenderer(
     override fun onOutputStreamOffsetUsChanged(outputStreamOffsetUs: Long) {
         audioSink.setOutputStreamOffsetUs(outputStreamOffsetUs)
     }
-
 
     override fun handleMessage(messageType: Int, message: Any?) {
         when (messageType) {
@@ -982,7 +973,6 @@ class MediaCodecAudioRenderer(
         private const val TAG = "MediaCodecAudioRenderer"
         private const val VIVO_BITS_PER_SAMPLE_KEY = "v-bits-per-sample"
         private const val READY_GRACE_PERIOD_MS: Long = 100
-
 
         private fun getDecoderInfos(
             mediaCodecSelector: MediaCodecSelector,

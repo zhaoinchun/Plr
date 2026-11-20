@@ -50,7 +50,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         return decoderFactory.supportsFormat(format)
     }
 
-
     override fun render(positionUs: Long, elapsedRealtimeUs: Long) {
         if (outputStreamEnded) {
             return
@@ -106,7 +105,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     override val isEnded: Boolean
         get() = outputStreamEnded
 
-
     override fun onEnabled(joining: Boolean, mayRenderStartOfStream: Boolean) {
         firstFrameState =
             if (mayRenderStartOfStream)
@@ -114,7 +112,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             else
                 C.FIRST_FRAME_NOT_RENDERED_ONLY_ALLOWED_IF_STARTED
     }
-
 
     override fun onStreamChanged(
         formats: Array<Format>,
@@ -139,7 +136,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             )
         }
     }
-
 
     override fun onPositionReset(
         positionUs: Long, joining: Boolean, sampleStreamIsResetToKeyFrame: Boolean
@@ -172,7 +168,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
     override fun onRelease() {
         releaseDecoderResources()
     }
-
 
     override fun handleMessage(messageType: Int, message: Any?) {
         when (messageType) {
@@ -264,7 +259,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
     }
 
-
     private fun processOutputBuffer(
         positionUs: Long,
         elapsedRealtimeUs: Long,
@@ -285,7 +279,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
         }
         return false
     }
-
 
     private fun maybeInitializeProcessingPipeline(): Boolean {
         // Do nothing.
@@ -369,7 +362,6 @@ class ImageRenderer(private val decoderFactory: ImageDecoder.Factory, imageOutpu
             else -> throw IllegalStateException()
         }
     }
-
 
     private fun maybeInitCodec(): Boolean {
         if (!maybeInitializeProcessingPipeline()) {

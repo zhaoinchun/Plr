@@ -532,7 +532,7 @@ class ExoPlayerImplInternal(
 
     // Handler.Callback implementation.
     override fun handleMessage(msg: Message): Boolean {
-        Log.e(TAG, "handleMessage: ${msg.what}")
+//        Log.e(TAG, "handleMessage: ${msg.what}")
         try {
             when (msg.what) {
                 MSG_PREPARE -> prepareInternal()
@@ -1245,7 +1245,6 @@ class ExoPlayerImplInternal(
         var renderersEnded = true
         var renderersAllowPlayback = true
         var hasActiveVideoOrImageRenderer = false
-        Log.e(TAG, "doSomeWork: " + playingPeriodHolder.prepared)
         if (playingPeriodHolder.prepared) {
             rendererPositionElapsedRealtimeUs = msToUs(clock.elapsedRealtime())
             playingPeriodHolder.mediaPeriod.discardBuffer(

@@ -3,7 +3,6 @@ package androidx.media3.extractor.mp4
 import android.util.Pair
 import androidx.media3.common.C
 
-
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format

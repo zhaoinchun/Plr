@@ -64,7 +64,6 @@ class NetworkTypeObserver private constructor(context: Context) {
         }
     }
 
-
     fun getNetworkType(): Int {
         synchronized(lock) {
             return networkType
@@ -177,7 +176,6 @@ class NetworkTypeObserver private constructor(context: Context) {
             return staticInstance!!
         }
 
-
         @Synchronized
         fun resetForTests() {
             staticInstance = null
@@ -212,7 +210,6 @@ class NetworkTypeObserver private constructor(context: Context) {
                 else -> return C.NETWORK_TYPE_OTHER
             }
         }
-
 
         private fun getMobileNetworkType(networkInfo: NetworkInfo): Int {
             when (networkInfo.getSubtype()) {
