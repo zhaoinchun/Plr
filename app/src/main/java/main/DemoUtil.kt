@@ -132,15 +132,15 @@ object DemoUtil {
 
 
     @Synchronized
-    fun getDownloadManager(context: Context): DownloadManager? {
+    fun getDownloadManager(context: Context): DownloadManager {
         ensureDownloadManagerInitialized(context)
-        return downloadManager
+        return downloadManager!!
     }
 
     @Synchronized
-    fun getDownloadTracker(context: Context): DownloadTracker? {
+    fun getDownloadTracker(context: Context): DownloadTracker {
         ensureDownloadManagerInitialized(context)
-        return downloadTracker
+        return downloadTracker!!
     }
 
 

@@ -4,9 +4,11 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
 class DefaultDatabaseProvider(private val sqliteOpenHelper: SQLiteOpenHelper) : DatabaseProvider {
-    override val writableDatabase: SQLiteDatabase?
-        get() = sqliteOpenHelper.writableDatabase
+    override fun getWritableDatabase(): SQLiteDatabase {
+        return sqliteOpenHelper.readableDatabase
+    }
 
-    override val readableDatabase: SQLiteDatabase?
-        get() = sqliteOpenHelper.readableDatabase
+    override fun getReadableDatabase(): SQLiteDatabase {
+        return sqliteOpenHelper.readableDatabase
+    }
 }

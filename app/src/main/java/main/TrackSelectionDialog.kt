@@ -27,7 +27,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.common.collect.ImmutableList
 
 class TrackSelectionDialog : DialogFragment() {
-    interface TrackSelectionListener {
+   fun interface TrackSelectionListener {
         fun onTracksSelected(trackSelectionParameters: TrackSelectionParameters)
     }
 
@@ -60,7 +60,7 @@ class TrackSelectionDialog : DialogFragment() {
 
         for (i in SUPPORTED_TRACK_TYPES.indices) {
             val trackType: Int = SUPPORTED_TRACK_TYPES.get(i)!!
-            val trackGroups = ArrayList<Tracks.Group?>()
+            val trackGroups = ArrayList<Tracks.Group>()
             for (trackGroup in tracks.groups) {
                 if (trackGroup.type == trackType) {
                     trackGroups.add(trackGroup)
@@ -98,9 +98,9 @@ class TrackSelectionDialog : DialogFragment() {
      * @param trackType The track type.
      * @return The track overrides for the track type.
      */
-    fun getOverrides(trackType: Int): MutableMap<TrackGroup?, TrackSelectionOverride> {
+    fun getOverrides(trackType: Int): MutableMap<TrackGroup, TrackSelectionOverride> {
         val trackView = tabFragments.get(trackType)
-        return if (trackView == null) mutableMapOf<TrackGroup?, TrackSelectionOverride?>() else trackView.overrides
+        return if (trackView == null) mutableMapOf<TrackGroup, TrackSelectionOverride>() else trackView.overrides!!
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -108,7 +108,7 @@ class TrackSelectionDialog : DialogFragment() {
         // AlertDialog because it owns the view itself, so we use AppCompatDialog instead, themed using
         // the AlertDialog theme overlay with force-enabled title.
         val dialog =
-            AppCompatDialog(getActivity()!!, R.style.TrackSelectionDialogThemeOverlay)
+            AppCompatDialog(requireActivity(), R.style.TrackSelectionDialogThemeOverlay)
         dialog.setTitle(titleId)
         return dialog
     }
@@ -156,7 +156,7 @@ class TrackSelectionDialog : DialogFragment() {
 
     /** Fragment to show a track selection in tab of the track selection dialog.  */
     class TrackSelectionViewFragment : Fragment(), TrackSelectionView.TrackSelectionListener {
-        private var trackGroups: MutableList<Tracks.Group?>? = null
+        private var trackGroups: MutableList<Tracks.Group>? = null
         private var allowAdaptiveSelections = false
         private var allowMultipleOverrides = false
 
@@ -164,7 +164,7 @@ class TrackSelectionDialog : DialogFragment() {
         var isDisabled: Boolean = false
 
         /* package */
-        var overrides: MutableMap<TrackGroup?, TrackSelectionOverride?>? = null
+        var overrides: MutableMap<TrackGroup, TrackSelectionOverride>? = null
 
         init {
             // Retain instance across activity re-creation to prevent losing access to init data.
@@ -172,9 +172,9 @@ class TrackSelectionDialog : DialogFragment() {
         }
 
         fun init(
-            trackGroups: MutableList<Tracks.Group?>,
+            trackGroups: MutableList<Tracks.Group>,
             isDisabled: Boolean,
-            overrides: MutableMap<TrackGroup?, TrackSelectionOverride?>?,
+            overrides: MutableMap<TrackGroup, TrackSelectionOverride>,
             allowAdaptiveSelections: Boolean,
             allowMultipleOverrides: Boolean
         ) {
@@ -185,7 +185,7 @@ class TrackSelectionDialog : DialogFragment() {
             // TrackSelectionView does this filtering internally, but we need to do it here as well to
             // handle the case where the TrackSelectionView is never created.
             this.overrides =
-                HashMap<Any?, Any?>(
+                HashMap<TrackGroup, TrackSelectionOverride>(
                     TrackSelectionView.filterOverrides(
                         overrides,
                         trackGroups,
@@ -201,19 +201,19 @@ class TrackSelectionDialog : DialogFragment() {
         ): View {
             val rootView: View =
                 inflater.inflate(
-                    androidx.media3.ui.R.layout.exo_track_selection_dialog,
+                    R.layout.exo_track_selection_dialog,
                     container,  /* attachToRoot= */
                     false
                 )
             val trackSelectionView =
-                rootView.findViewById<TrackSelectionView>(androidx.media3.ui.R.id.exo_track_selection_view)
+                rootView.findViewById<TrackSelectionView>(R.id.exo_track_selection_view)
             trackSelectionView.setShowDisableOption(true)
             trackSelectionView.setAllowMultipleOverrides(allowMultipleOverrides)
             trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
             trackSelectionView.init(
-                trackGroups,
+                trackGroups!!,
                 isDisabled,
-                overrides,  /* trackFormatComparator= */
+                overrides!!,  /* trackFormatComparator= */
                 null,  /* listener= */
                 this
             )
@@ -221,7 +221,7 @@ class TrackSelectionDialog : DialogFragment() {
         }
 
         override fun onTrackSelectionChanged(
-            isDisabled: Boolean, overrides: MutableMap<TrackGroup?, TrackSelectionOverride?>
+            isDisabled: Boolean, overrides: MutableMap<TrackGroup, TrackSelectionOverride>
         ) {
             this.isDisabled = isDisabled
             this.overrides = overrides
@@ -271,7 +271,7 @@ class TrackSelectionDialog : DialogFragment() {
                 player.trackSelectionParameters!!,  /* allowAdaptiveSelections= */
                 true,  /* allowMultipleOverrides= */
                 false,
-                player::trackSelectionParameters,
+                {player.trackSelectionParameters = it},
                 onDismissListener
             )
         }

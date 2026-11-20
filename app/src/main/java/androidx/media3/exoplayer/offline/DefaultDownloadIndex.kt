@@ -54,7 +54,7 @@ class DefaultDownloadIndex(
     override fun putDownload(download: Download) {
         ensureInitialized()
         try {
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             putDownloadInternal(download, writableDatabase!!)
         } catch (e: SQLiteException) {
             throw DatabaseIOException(e)
@@ -65,7 +65,7 @@ class DefaultDownloadIndex(
     override fun removeDownload(id: String) {
         ensureInitialized()
         try {
-            databaseProvider.writableDatabase!!.delete(
+            databaseProvider.getReadableDatabase()!!.delete(
                 tableName,
                 WHERE_ID_EQUALS,
                 arrayOf<String?>(id)
@@ -81,7 +81,7 @@ class DefaultDownloadIndex(
         try {
             val values = ContentValues()
             values.put(COLUMN_STATE, Download.STATE_QUEUED)
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             writableDatabase!!.update(
                 tableName,
                 values,
@@ -102,7 +102,7 @@ class DefaultDownloadIndex(
             // Only downloads in STATE_FAILED are allowed a failure reason, so we need to clear it here in
             // case we're moving downloads from STATE_FAILED to STATE_REMOVING.
             values.put(COLUMN_FAILURE_REASON, Download.FAILURE_REASON_NONE)
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             writableDatabase!!.update(
                 tableName,
                 values,
@@ -120,7 +120,7 @@ class DefaultDownloadIndex(
         try {
             val values = ContentValues()
             values.put(COLUMN_STOP_REASON, stopReason)
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             writableDatabase!!.update(
                 tableName,
                 values,
@@ -138,7 +138,7 @@ class DefaultDownloadIndex(
         try {
             val values = ContentValues()
             values.put(COLUMN_STOP_REASON, stopReason)
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             writableDatabase!!.update(
                 tableName,
                 values,
@@ -157,11 +157,11 @@ class DefaultDownloadIndex(
                 return
             }
             try {
-                val readableDatabase = databaseProvider.readableDatabase
+                val readableDatabase = databaseProvider.getReadableDatabase()
                 val version =
                     VersionTable.getVersion(readableDatabase!!, VersionTable.FEATURE_OFFLINE, name)
                 if (version != TABLE_VERSION) {
-                    val writableDatabase = databaseProvider.writableDatabase
+                    val writableDatabase = databaseProvider.getReadableDatabase()
                     writableDatabase!!.beginTransactionNonExclusive()
                     try {
                         VersionTable.setVersion(
@@ -250,7 +250,7 @@ class DefaultDownloadIndex(
         try {
             val sortOrder = "$COLUMN_START_TIME_MS ASC"
             return databaseProvider
-                .readableDatabase!!
+                .getReadableDatabase()!!
                 .query(
                     tableName,
                     COLUMNS,

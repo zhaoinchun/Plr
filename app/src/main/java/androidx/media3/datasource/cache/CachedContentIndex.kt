@@ -434,7 +434,7 @@ class CachedContentIndex(
         override fun exists(): Boolean {
             try {
                 return (VersionTable.getVersion(
-                    databaseProvider.readableDatabase!!,
+                    databaseProvider.getReadableDatabase()!!,
                     VersionTable.FEATURE_CACHE_CONTENT_METADATA,
                     hexUid!!
                 )
@@ -457,12 +457,12 @@ class CachedContentIndex(
             try {
                 val version: Int =
                     VersionTable.getVersion(
-                        databaseProvider.readableDatabase!!,
+                        databaseProvider.getReadableDatabase()!!,
                         VersionTable.FEATURE_CACHE_CONTENT_METADATA,
                         hexUid!!
                     )
                 if (version != TABLE_VERSION) {
-                    val writableDatabase = databaseProvider.writableDatabase!!
+                    val writableDatabase = databaseProvider.getReadableDatabase()!!
                     writableDatabase.beginTransactionNonExclusive()
                     try {
                         initializeTable(writableDatabase)
@@ -497,7 +497,7 @@ class CachedContentIndex(
         
         override fun storeFully(content: HashMap<String, CachedContent>) {
             try {
-                val writableDatabase = databaseProvider.writableDatabase!!
+                val writableDatabase = databaseProvider.getReadableDatabase()!!
                 writableDatabase.beginTransactionNonExclusive()
                 try {
                     initializeTable(writableDatabase)
@@ -520,7 +520,7 @@ class CachedContentIndex(
                 return
             }
             try {
-                val writableDatabase = databaseProvider.writableDatabase!!
+                val writableDatabase = databaseProvider.getReadableDatabase()!!
                 writableDatabase.beginTransactionNonExclusive()
                 try {
                     for (i in 0..<pendingUpdates.size()) {
@@ -555,7 +555,7 @@ class CachedContentIndex(
 
         val cursor: Cursor
             get() = databaseProvider
-                .readableDatabase!!
+                .getReadableDatabase()!!
                 .query(
                     tableName!!,
                     COLUMNS,
@@ -634,7 +634,7 @@ class CachedContentIndex(
             private fun delete(databaseProvider: DatabaseProvider, hexUid: String) {
                 try {
                     val tableName = getTableName(hexUid)
-                    val writableDatabase = databaseProvider.writableDatabase!!
+                    val writableDatabase = databaseProvider.getReadableDatabase()!!
                     writableDatabase.beginTransactionNonExclusive()
                     try {
                         VersionTable.removeVersion(

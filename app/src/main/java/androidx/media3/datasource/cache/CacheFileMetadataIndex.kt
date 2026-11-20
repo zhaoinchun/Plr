@@ -23,13 +23,13 @@ class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
         try {
             val hexUid = uid.toHexString()
             tableName = getTableName(hexUid)
-            val readableDatabase = databaseProvider.readableDatabase
+            val readableDatabase = databaseProvider.getReadableDatabase()
             val version =
                 VersionTable.getVersion(
                     readableDatabase!!, VersionTable.FEATURE_CACHE_FILE_METADATA, hexUid
                 )
             if (version != TABLE_VERSION) {
-                val writableDatabase = databaseProvider.writableDatabase
+                val writableDatabase = databaseProvider.getReadableDatabase()
                 writableDatabase!!.beginTransactionNonExclusive()
                 try {
                     VersionTable.setVersion(
@@ -75,7 +75,7 @@ class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
     @WorkerThread
     fun set(name: String?, length: kotlin.Long, lastTouchTimestamp: kotlin.Long) {
         try {
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             val values = ContentValues()
             values.put(COLUMN_NAME, name)
             values.put(COLUMN_LENGTH, length)
@@ -89,7 +89,7 @@ class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
     @WorkerThread
     fun remove(name: String?) {
         try {
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             writableDatabase!!.delete(tableName!!, WHERE_NAME_EQUALS, arrayOf<String?>(name))
         } catch (e: SQLException) {
             throw DatabaseIOException(e)
@@ -99,7 +99,7 @@ class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
     @WorkerThread
     fun removeAll(names: MutableSet<String?>) {
         try {
-            val writableDatabase = databaseProvider.writableDatabase
+            val writableDatabase = databaseProvider.getReadableDatabase()
             writableDatabase!!.beginTransactionNonExclusive()
             try {
                 for (name in names) {
@@ -121,7 +121,7 @@ class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
     private val cursor: Cursor
         get() {
             return databaseProvider
-                .readableDatabase!!
+                .getReadableDatabase()!!
                 .query(
                     tableName!!,
                     COLUMNS,
@@ -164,7 +164,7 @@ class CacheFileMetadataIndex(private val databaseProvider: DatabaseProvider) {
             val hexUid = uid.toHexString()
             try {
                 val tableName: String = getTableName(hexUid)
-                val writableDatabase = databaseProvider.writableDatabase
+                val writableDatabase = databaseProvider.getReadableDatabase()
                 writableDatabase!!.beginTransactionNonExclusive()
                 try {
                     VersionTable.removeVersion(

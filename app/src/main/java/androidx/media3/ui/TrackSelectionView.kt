@@ -23,7 +23,7 @@ class TrackSelectionView(
     
     interface TrackSelectionListener {
         fun onTrackSelectionChanged(
-            isDisabled: Boolean, overrides: MutableMap<TrackGroup, TrackSelectionOverride>?
+            isDisabled: Boolean, overrides: MutableMap<TrackGroup, TrackSelectionOverride>
         )
     }
 

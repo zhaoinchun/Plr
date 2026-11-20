@@ -10,6 +10,7 @@ android {
         }
     }
     buildFeatures { buildConfig = true }
+    compileOptions { isCoreLibraryDesugaringEnabled = true }
 
     defaultConfig {
         applicationId = "com.example.plr"
@@ -47,6 +48,7 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)

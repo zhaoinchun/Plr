@@ -393,16 +393,16 @@ abstract class DownloadService protected constructor(
             }
         }
 
-        override fun onDownloadRemoved(downloadManager: DownloadManager?, download: Download?) {
+        override fun onDownloadRemoved(downloadManager: DownloadManager, download: Download) {
             downloadService?.notifyDownloadRemoved()
         }
 
-        override fun onIdle(downloadManager: DownloadManager?) {
+        override fun onIdle(downloadManager: DownloadManager) {
             downloadService?.onIdle()
         }
 
         override fun onRequirementsStateChanged(
-            downloadManager: DownloadManager?,
+            downloadManager: DownloadManager,
             requirements: Requirements?,
            notMetRequirements:  Int
         ) {

@@ -14,6 +14,7 @@ media3CommonKtx = "1.11.1"
 media3Extractor = "1.11.1"
 cronetVersion = "143.7445.0"
 firebaseFirestoreKtx = "27.2.0"
+desugarJdkLibsVersion = "2.1.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -30,6 +31,7 @@ androidx-media3-common-ktx = { group = "androidx.media3", name = "media3-common-
 androidx-media3-extractor = { group = "androidx.media3", name = "media3-extractor", version.ref = "media3Extractor" }
 cronet-api = { group = "org.chromium.net", name = "cronet-api", version.ref = "cronetVersion" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibsVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
