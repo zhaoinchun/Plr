@@ -5,14 +5,13 @@ import androidx.annotation.CallSuper
 import androidx.media3.common.Timeline
 import androidx.media3.common.util.Util.createHandlerForCurrentLooper
 import androidx.media3.datasource.TransferListener
-import androidx.media3.exoplayer.drm.DrmSession
 import androidx.media3.exoplayer.drm.DrmSessionEventListener
 import androidx.media3.exoplayer.drm.KeyRequestInfo
 import androidx.media3.exoplayer.source.MediaSource.MediaPeriodId
 import com.google.common.base.Preconditions
 import java.io.IOException
 
-abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource() {
+abstract class CompositeMediaSource<T> : BaseMediaSource() {
     private val childSources = mutableMapOf<T?, MediaSourceAndListener<T>>()
     private var eventHandler: Handler? = null
 
@@ -22,33 +21,32 @@ abstract class CompositeMediaSource<T> protected constructor() : BaseMediaSource
     }
 
     @CallSuper
-    
     override fun maybeThrowSourceInfoRefreshError() {
-        for (childSource in childSources.values) {
-            childSource.mediaSource.maybeThrowSourceInfoRefreshError()
+        childSources.values.forEach {
+            it.mediaSource.maybeThrowSourceInfoRefreshError()
         }
     }
 
     @CallSuper
     override fun enableInternal() {
-        for (childSource in childSources.values) {
-            childSource.mediaSource.enable(childSource.onSourceInfoRefreshed)
+        childSources.values.forEach {
+            it.mediaSource.enable(it.onSourceInfoRefreshed)
         }
     }
 
     @CallSuper
     override fun disableInternal() {
-        for (childSource in childSources.values) {
-            childSource.mediaSource.disable(childSource.onSourceInfoRefreshed)
+        childSources.values.forEach {
+            it.mediaSource.disable(it.onSourceInfoRefreshed)
         }
     }
 
     @CallSuper
     override fun releaseSourceInternal() {
-        for (childSource in childSources.values) {
-            childSource.mediaSource.releaseSource(childSource.onSourceInfoRefreshed)
-            childSource.mediaSource.removeEventListener(childSource.eventListener)
-            childSource.mediaSource.removeDrmEventListener(childSource.eventListener)
+        childSources.values.forEach {
+            it.mediaSource.releaseSource(it.onSourceInfoRefreshed)
+            it.mediaSource.removeEventListener(it.eventListener)
+            it.mediaSource.removeDrmEventListener(it.eventListener)
         }
         childSources.clear()
     }
