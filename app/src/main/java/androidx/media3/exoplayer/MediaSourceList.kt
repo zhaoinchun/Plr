@@ -1,7 +1,6 @@
 
 package androidx.media3.exoplayer
 
-import android.util.Log
 import android.util.Pair
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Timeline
@@ -187,8 +186,6 @@ class MediaSourceList(
         Preconditions.checkState(!isPrepared)
         for (i in mediaSourceHolders.indices) {
             val mediaSourceHolder = mediaSourceHolders[i]
-            Log.e(TAG, "prepare: "+mediaSourceHolder )
-            Log.e(TAG, "prepare: "+mediaSourceHolder.mediaSource )
             prepareChildSource(mediaSourceHolder)
             enabledMediaSourceHolders.add(mediaSourceHolder)
         }
