@@ -81,11 +81,16 @@ class ExoVideoSwitchActivity : AppCompatActivity(), CoroutineScope by MainScope(
                 addListener(this@ExoVideoSwitchActivity)
             }
             pv.setPlayer(this@ExoVideoSwitchActivity.player)
+
             val uri = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .path(R.raw.a6.toString())
                 .build()
+            val uri2 = Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
+                .path(R.raw.a3.toString())
+                .build()
             val mediaItem = MediaItem.fromUri(uri)
             player.setMediaItem(mediaItem)
+            player.addMediaItem(MediaItem.fromUri(uri2))
 
             player.prepare()
             player.play()

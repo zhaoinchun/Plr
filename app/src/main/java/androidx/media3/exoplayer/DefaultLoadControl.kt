@@ -524,11 +524,11 @@ class DefaultLoadControl protected constructor(
 
         @Synchronized
         override fun release(allocationNode: Allocator.AllocationNode) {
-            var allocationNode = allocationNode
             allocator.release(allocationNode)
+            var allocationNode:Allocator.AllocationNode? = allocationNode
             while (allocationNode != null) {
                 releaseInternal(allocationNode.allocation)
-                allocationNode = allocationNode.next()!!
+                allocationNode = allocationNode.next()
             }
         }
 
