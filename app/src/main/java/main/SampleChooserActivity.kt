@@ -450,6 +450,7 @@ class SampleChooserActivity : AppCompatActivity(), DownloadTracker.Listener, OnC
                 if (drmUuid != null) {
                     mediaItem.setDrmConfiguration(
                         MediaItem.DrmConfiguration(
+                            scheme = drmUuid,
                             licenseUri = drmLicenseUri?.toUri(),
                             licenseRequestHeaders = drmLicenseRequestHeaders,
                             multiSession = drmMultiSession,

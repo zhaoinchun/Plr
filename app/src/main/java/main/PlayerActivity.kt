@@ -270,7 +270,8 @@ class PlayerActivity : AppCompatActivity(), View.OnClickListener, ControllerVisi
             player = ExoPlayerImpl(
                 this, mediaSourceFactory = createMediaSourceFactory(),
                 renderersFactory = renderersFactory
-            )
+            ).apply { init() }
+
             player!!.trackSelectionParameters = trackSelectionParameters
             player!!.addListener(PlayerEventListener())
             player!!.addAnalyticsListener(EventLogger())
