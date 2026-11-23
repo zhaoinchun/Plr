@@ -95,13 +95,9 @@ class ProgressiveMediaPeriod(
             callback!!.onContinueLoadingRequested(this@ProgressiveMediaPeriod)
         }
     }
-    private val handler: Handler
-
+    private val handler: Handler = createHandlerForCurrentLooper()
     private var callback: MediaPeriod.Callback? = null
     private var icyHeaders: IcyHeaders? = null
-
-    // TODO(b/457738425) - Consider merging controledTrackOutputs, sampleQueues together, since they
-    // are essentially the same objects.
     private var controlledTrackOutputs: Array<ControlledTrackOutput> = arrayOf()
     private var sampleQueues: Array<SampleQueue> = arrayOf()
     private var sampleQueueTrackIds: Array<TrackId> = arrayOf()
@@ -132,11 +128,6 @@ class ProgressiveMediaPeriod(
     private var extractedSamplesCountAtStartOfLoad = 0
     private var loadingFinished = false
     private var released = false
-
-    // maybeFinishPrepare is not posted to the handler until initialization completes.
-    init {
-        handler = createHandlerForCurrentLooper()
-    }
 
     fun release() {
         if (prepared) {
@@ -942,14 +933,13 @@ class ProgressiveMediaPeriod(
     }
 
     private fun startLoading() {
-        val loadable =
-            ExtractingLoadable(
-                uri,
-                dataSource,
-                progressiveMediaExtractor,
-                this,
-                loadCondition
-            )
+        val loadable = ExtractingLoadable(
+            uri,
+            dataSource,
+            progressiveMediaExtractor,
+            this,
+            loadCondition
+        )
         if (prepared) {
             Preconditions.checkState(this.isPendingReset)
             val maxLoadPositionUs =
@@ -1070,8 +1060,7 @@ class ProgressiveMediaPeriod(
         seekMap!!
     }
 
-    inner class SampleStreamImpl(val track: Int, val hasPreroll: Boolean) :
-        SampleStream {
+    inner class SampleStreamImpl(val track: Int, val hasPreroll: Boolean) : SampleStream {
         override val isReady: Boolean
             get() = this@ProgressiveMediaPeriod.isReady(track)
 
@@ -1110,13 +1099,9 @@ class ProgressiveMediaPeriod(
 
         var pendingExtractorSeek: Boolean = true
         var seekTimeUs: Long = 0
-        var dataSpec: DataSpec
         var icyTrackOutput: TrackOutput? = null
         var seenIcyMetadata = false
-
-        init {
-            dataSpec = buildDataSpec(0, null)
-        }
+        var dataSpec: DataSpec = buildDataSpec(0, null)
 
         // Loadable implementation.
         override fun cancelLoad() {
@@ -1246,22 +1231,7 @@ class ProgressiveMediaPeriod(
         val trackNotifiedDownstreamFormats: BooleanArray = BooleanArray(tracks.length)
     }
 
-    private class TrackId(val id: Int, val isIcyTrack: Boolean) {
-        override fun equals(obj: Any?): Boolean {
-            if (this === obj) {
-                return true
-            }
-            if (obj == null || javaClass != obj.javaClass) {
-                return false
-            }
-            val other: TrackId = obj as TrackId
-            return id == other.id && isIcyTrack == other.isIcyTrack
-        }
-
-        override fun hashCode(): Int {
-            return 31 * id + (if (isIcyTrack) 1 else 0)
-        }
-    }
+    data class TrackId(val id: Int, val isIcyTrack: Boolean)
 
     private class ControlledTrackOutput(private val sampleQueue: SampleQueue) :
         ForwardingTrackOutput(sampleQueue) {
@@ -1280,7 +1250,7 @@ class ProgressiveMediaPeriod(
             length: Int,
             allowEndOfInput: Boolean
         ): Int {
-            return this.currentOutput.sampleData(input, length, allowEndOfInput)
+            return currentOutput.sampleData(input, length, allowEndOfInput)
         }
 
         override fun sampleData(

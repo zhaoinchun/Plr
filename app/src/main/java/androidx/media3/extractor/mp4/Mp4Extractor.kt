@@ -1,8 +1,7 @@
 package androidx.media3.extractor.mp4
 
-import androidx.annotation.IntDef
+import android.util.Log
 import androidx.media3.common.C
-
 import androidx.media3.common.Format
 import androidx.media3.common.Label
 import androidx.media3.common.Metadata
@@ -44,18 +43,17 @@ import androidx.media3.extractor.text.SubtitleTranscodingExtractorOutput
 import com.google.common.base.Function
 import com.google.common.base.Preconditions
 import com.google.common.base.Predicate
-import java.io.IOException
 import java.util.ArrayDeque
 import java.util.Locale
 import kotlin.collections.toTypedArray
 import kotlin.math.max
 import kotlin.math.min
 
-class Mp4Extractor constructor(
+class Mp4Extractor(
     private val subtitleParserFactory: SubtitleParser.Factory,
-    private val flags:  Int = 0
+    private val flags: Int = 0
 ) : Extractor {
-    private val omitTrackSampleTable: Boolean
+    private val omitTrackSampleTable = (flags and FLAG_OMIT_TRACK_SAMPLE_TABLE) != 0
 
     // Temporary arrays.
     private val nalStartCode: ParsableByteArray
@@ -71,7 +69,7 @@ class Mp4Extractor constructor(
 
     override var sniffFailureDetails: List<SniffFailure>
         private set
-    private var parserState:  Int
+    private var parserState: Int
     private var atomType = 0
     private var atomSize: Long = 0
     private var atomHeaderBytesRead = 0
@@ -97,10 +95,9 @@ class Mp4Extractor constructor(
     private var extractorOutput: ExtractorOutput
     private var tracks: Array<Mp4Track>
     private var accumulatedSampleSizes: Array<LongArray>? = null
-    private var fileType:  Int = 0
+    private var fileType: Int = 0
 
     init {
-        omitTrackSampleTable = (flags and FLAG_OMIT_TRACK_SAMPLE_TABLE) != 0
         this.sniffFailureDetails = mutableListOf<SniffFailure>()
         parserState =
             if ((flags and FLAG_READ_SEF_DATA) != 0) STATE_READING_SEF else STATE_READING_ATOM_HEADER
@@ -118,7 +115,6 @@ class Mp4Extractor constructor(
         quickTimeChapters = ArrayList<Chapter>()
     }
 
-    
     override fun sniff(input: ExtractorInput): Boolean {
         val sniffFailure = Sniffer.sniffUnfragmented(input)
         this.sniffFailureDetails =
@@ -131,7 +127,7 @@ class Mp4Extractor constructor(
             (if ((flags and Mp4Extractor.FLAG_EMIT_RAW_SUBTITLE_DATA) == 0)
                 SubtitleTranscodingExtractorOutput(output, subtitleParserFactory)
             else
-                output)!!
+                output)
     }
 
     override fun seek(position: Long, timeUs: Long) {
@@ -159,9 +155,7 @@ class Mp4Extractor constructor(
         } else {
             for (track in tracks) {
                 updateSampleIndex(track, timeUs)
-                if (track.trueHdSampleRechunker != null) {
-                    track.trueHdSampleRechunker.reset()
-                }
+                track.trueHdSampleRechunker?.reset()
             }
         }
     }
@@ -170,7 +164,6 @@ class Mp4Extractor constructor(
         // Do nothing
     }
 
-    
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
         if (omitTrackSampleTable && moovAtomProcessed) {
             return Extractor.RESULT_END_OF_INPUT
@@ -210,7 +203,6 @@ class Mp4Extractor constructor(
         atomHeaderBytesRead = 0
     }
 
-    
     private fun readAtomHeader(input: ExtractorInput): Boolean {
         if (atomHeaderBytesRead == 0) {
             // Read the standard length atom header.
@@ -285,7 +277,6 @@ class Mp4Extractor constructor(
         return true
     }
 
-    
     private fun readAtomPayload(input: ExtractorInput, positionHolder: PositionHolder): Boolean {
         val atomPayloadSize = atomSize - atomHeaderBytesRead
         val atomEndPosition = input.position + atomPayloadSize
@@ -323,12 +314,11 @@ class Mp4Extractor constructor(
         return seekRequired && parserState != STATE_READING_SAMPLE
     }
 
-    
     private fun readSefData(
         input: ExtractorInput,
         seekPosition: PositionHolder
-    ):  Int {
-        val result:  Int =
+    ): Int {
+        val result: Int =
             sefReader.read(input, seekPosition, slowMotionMetadataEntries)
         if (result == Extractor.RESULT_SEEK && seekPosition.position == 0L) {
             enterReadingAtomHeaderState()
@@ -336,7 +326,6 @@ class Mp4Extractor constructor(
         return result
     }
 
-    
     private fun processAtomEnded(atomEndPosition: Long) {
         while (!containerAtoms.isEmpty() && containerAtoms.peek().endPosition == atomEndPosition) {
             val containerAtom = containerAtoms.pop()
@@ -361,7 +350,6 @@ class Mp4Extractor constructor(
         }
     }
 
-    
     private fun processMoovAtom(moov: ContainerBox) {
         // Process metadata first to determine whether to abort processing and seek to the axte atom.
         var mdtaMetadata: Metadata? = null
@@ -609,7 +597,6 @@ class Mp4Extractor constructor(
         return auxiliaryTrackTypes
     }
 
-    
     private fun readSample(input: ExtractorInput, positionHolder: PositionHolder): Int {
         val inputPosition = input.position
         if (sampleTrackIndex == C.INDEX_UNSET) {
@@ -762,7 +749,7 @@ class Mp4Extractor constructor(
         }
 
         val timeUs = track.sampleTable.timestampsUs[sampleIndex]
-        var sampleFlags:  Int = track.sampleTable.flags[sampleIndex]
+        var sampleFlags: Int = track.sampleTable.flags[sampleIndex]
         if (!isSampleDependedOn) {
             sampleFlags = sampleFlags or C.BUFFER_FLAG_NOT_DEPENDED_ON
         }
@@ -796,7 +783,6 @@ class Mp4Extractor constructor(
         return Extractor.RESULT_CONTINUE
     }
 
-    
     private fun readQuickTimeChapters(input: ExtractorInput, seekPosition: PositionHolder): Int {
         val chapterSampleTable = chapterSampleTables.get(chapterTrackIndex)
         if (chapterSampleIndex < chapterSampleTable.sampleCount) {
@@ -936,7 +922,6 @@ class Mp4Extractor constructor(
         track.sampleIndex = sampleIndex
     }
 
-    
     private fun maybeSkipRemainingMetaAtomHeaderBytes(input: ExtractorInput) {
         scratch.reset(Mp4Box.HEADER_SIZE)
         input.peekFully(scratch.data, 0, Mp4Box.HEADER_SIZE)
@@ -1091,9 +1076,9 @@ class Mp4Extractor constructor(
         private val MAXIMUM_READ_AHEAD_BYTES_STREAM = (10 * 1024 * 1024).toLong()
 
         fun codecsToParseWithinGopSampleDependenciesAsFlags(
-            videoCodecFlags:  Int
-        ):  Int {
-            var flags:  Int = 0
+            videoCodecFlags: Int
+        ): Int {
+            var flags: Int = 0
             if ((videoCodecFlags and C.VIDEO_CODEC_FLAG_H264) != 0) {
                 flags = flags or FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES
             }
@@ -1201,10 +1186,10 @@ class Mp4Extractor constructor(
             return sampleIndex
         }
 
-        private fun processFtypAtom(atomData: ParsableByteArray):  Int {
+        private fun processFtypAtom(atomData: ParsableByteArray): Int {
             atomData.setPosition(Mp4Box.HEADER_SIZE)
             val majorBrand = atomData.readInt()
-            var fileType:  Int = brandToFileType(majorBrand)
+            var fileType: Int = brandToFileType(majorBrand)
             if (fileType != FILE_TYPE_MP4) {
                 return fileType
             }
@@ -1218,7 +1203,7 @@ class Mp4Extractor constructor(
             return FILE_TYPE_MP4
         }
 
-        private fun brandToFileType(brand: Int):  Int {
+        private fun brandToFileType(brand: Int): Int {
             when (brand) {
                 Sniffer.BRAND_QUICKTIME -> return FILE_TYPE_QUICKTIME
                 else -> return FILE_TYPE_MP4

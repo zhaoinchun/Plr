@@ -390,7 +390,6 @@ class DefaultMediaSourceFactory(
             drmSessionManagerProvider?.also { mediaSourceFactory.setDrmSessionManagerProvider(it) }
             loadErrorHandlingPolicy?.also { mediaSourceFactory.setLoadErrorHandlingPolicy(it) }
             downloadExecutorSupplier?.also { mediaSourceFactory.setDownloadExecutor(it) }
-            downloadExecutorSupplier?.also { mediaSourceFactory.setDownloadExecutor(it) }
 
             mediaSourceFactory.setSubtitleParserFactory(subtitleParserFactory)
             mediaSourceFactory.experimentalSetCodecsToParseWithinGopSampleDependencies(
