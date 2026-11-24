@@ -66,34 +66,20 @@ import kotlin.math.max
 
 object BoxParser {
     private const val TAG = "BoxParsers"
-
     private const val TYPE_clcp = 0x636c6370
-
     private const val TYPE_mdta = 0x6d647461
-
     private const val TYPE_meta = 0x6d657461
-
     private const val TYPE_nclc = 0x6e636c63
-
     private const val TYPE_nclx = 0x6e636c78
-
     private const val TYPE_sbtl = 0x7362746c
-
     private const val TYPE_soun = 0x736f756e
-
     private const val TYPE_subt = 0x73756274
-
     private const val TYPE_subp = 0x73756270
-
     private const val TYPE_text = 0x74657874
-
     private const val TYPE_vide = 0x76696465
-
     private const val SAMPLE_RATE_AMR_NB = 8000
     private const val SAMPLE_RATE_AMR_WB = 16000
-
     private const val MAX_GAPLESS_TRIM_SIZE_SAMPLES = 4
-
     private const val EDIT_LIST_DURATION_TOLERANCE_TIMESCALE_UNITS = 2
 
     private val opusMagic = getUtf8Bytes("OpusHead")
@@ -106,7 +92,6 @@ object BoxParser {
         return 0x00FFFFFF and fullBoxInt
     }
 
-    
     fun parseTraks(
         moov: ContainerBox,
         gaplessInfoHolder: GaplessInfoHolder,
@@ -117,7 +102,7 @@ object BoxParser {
         modifyTrackFunction: Function<Track?, Track?>,
         omitTrackSampleTable: Boolean
     ): MutableList<TrackSampleTable> {
-        val trackSampleTables: MutableList<TrackSampleTable> = ArrayList<TrackSampleTable>()
+        val trackSampleTables: MutableList<TrackSampleTable> = ArrayList()
         for (i in moov.containerChildren.indices) {
             val atom = moov.containerChildren[i]
             if (atom.type != Mp4Box.TYPE_trak) {
@@ -140,7 +125,7 @@ object BoxParser {
                 .getContainerBoxOfType(Mp4Box.TYPE_minf)!!
                 .getContainerBoxOfType(Mp4Box.TYPE_stbl)!!
             val trackSampleTable =
-                BoxParser.parseStbl(track, stblAtom, gaplessInfoHolder, omitTrackSampleTable)
+                parseStbl(track, stblAtom, gaplessInfoHolder, omitTrackSampleTable)
             trackSampleTables.add(trackSampleTable)
         }
         return trackSampleTables
@@ -149,7 +134,7 @@ object BoxParser {
     fun parseUdta(udtaBox: LeafBox, ignoreArtwork: Boolean): Metadata {
         val udtaData = udtaBox.data
         udtaData!!.setPosition(Mp4Box.HEADER_SIZE)
-        var metadata: Metadata = Metadata(listOf())
+        var metadata = Metadata(listOf())
         while (udtaData.bytesLeft() >= Mp4Box.HEADER_SIZE) {
             val atomPosition = udtaData.getPosition()
             val atomSize = udtaData.readInt()
@@ -158,7 +143,7 @@ object BoxParser {
                 udtaData.setPosition(atomPosition)
                 metadata =
                     metadata.copyWithAppendedEntriesFrom(
-                        BoxParser.parseUdtaMeta(udtaData, atomPosition + atomSize, ignoreArtwork)
+                        parseUdtaMeta(udtaData, atomPosition + atomSize, ignoreArtwork)
                     )
             } else if (atomType == Mp4Box.TYPE_smta) {
                 udtaData.setPosition(atomPosition)
@@ -167,9 +152,9 @@ object BoxParser {
                         SmtaAtomUtil.parseSmta(udtaData, atomPosition + atomSize)
                     )
             } else if (atomType == Mp4Box.TYPE_xyz) {
-                metadata = metadata.copyWithAppendedEntriesFrom(BoxParser.parseXyz(udtaData))
+                metadata = metadata.copyWithAppendedEntriesFrom(parseXyz(udtaData))
             } else if (atomType == Mp4Box.TYPE_chpl) {
-                metadata = metadata.copyWithAppendedEntriesFrom(BoxParser.parseChpl(udtaData))
+                metadata = metadata.copyWithAppendedEntriesFrom(parseChpl(udtaData))
             }
             udtaData.setPosition(atomPosition + atomSize)
         }
@@ -198,7 +183,7 @@ object BoxParser {
         val hdlrAtom = meta.getLeafBoxOfType(Mp4Box.TYPE_hdlr)
         val keysAtom = meta.getLeafBoxOfType(Mp4Box.TYPE_keys)
         val ilstAtom = meta.getLeafBoxOfType(Mp4Box.TYPE_ilst)
-        if (hdlrAtom == null || keysAtom == null || ilstAtom == null || BoxParser.parseHdlr(hdlrAtom.data!!) != TYPE_mdta) {
+        if (hdlrAtom == null || keysAtom == null || ilstAtom == null || parseHdlr(hdlrAtom.data!!) != TYPE_mdta) {
             // There isn't enough information to parse the metadata, or the handler type is unexpected.
             return null
         }
@@ -235,7 +220,7 @@ object BoxParser {
                     entries.add(entry)
                 }
             } else {
-                w(TAG, "Skipped metadata with unknown key index: " + keyIndex)
+                w(TAG, "Skipped metadata with unknown key index: $keyIndex")
             }
             ilst.setPosition(atomPosition + atomSize)
         }
@@ -255,7 +240,6 @@ object BoxParser {
         meta.setPosition(endPosition)
     }
 
-    
     fun parseTrak(
         trak: ContainerBox,
         mvhd: LeafBox,
@@ -268,33 +252,26 @@ object BoxParser {
         val mdia = trak.getContainerBoxOfType(Mp4Box.TYPE_mdia)!!
         val trackType: Int =
             getTrackTypeForHdlr(
-                BoxParser.parseHdlr(
-                    mdia.getLeafBoxOfType(
-                        Mp4Box.TYPE_hdlr
-                    )!!.data!!
-                )
+                parseHdlr(mdia.getLeafBoxOfType(Mp4Box.TYPE_hdlr)!!.data!!)
             )
         if (trackType == C.TRACK_TYPE_UNKNOWN) {
             return null
         }
 
-        val tkhdData =
-            BoxParser.parseTkhd(trak.getLeafBoxOfType(Mp4Box.TYPE_tkhd)!!.data!!)
+        val tkhdData = parseTkhd(trak.getLeafBoxOfType(Mp4Box.TYPE_tkhd)!!.data!!)
         if (duration == C.TIME_UNSET) {
             duration = tkhdData.duration
         }
-        val movieTimescale = BoxParser.parseMvhd(mvhd.data!!).timescale
+        val movieTimescale = parseMvhd(mvhd.data!!).timescale
         val durationUs: Long
         if (duration == C.TIME_UNSET) {
             durationUs = C.TIME_UNSET
         } else {
             durationUs = scaleLargeTimestamp(duration, C.MICROS_PER_SECOND, movieTimescale)
         }
-        val stbl =
-            mdia.getContainerBoxOfType(Mp4Box.TYPE_minf)!!
-                .getContainerBoxOfType(Mp4Box.TYPE_stbl)!!
-        val mdhdData =
-            BoxParser.parseMdhd(mdia.getLeafBoxOfType(Mp4Box.TYPE_mdhd)!!.data!!)
+        val stbl = mdia.getContainerBoxOfType(Mp4Box.TYPE_minf)!!
+            .getContainerBoxOfType(Mp4Box.TYPE_stbl)!!
+        val mdhdData = parseMdhd(mdia.getLeafBoxOfType(Mp4Box.TYPE_mdhd)!!.data!!)
         val stsd = stbl.getLeafBoxOfType(Mp4Box.TYPE_stsd)
         if (stsd == null) {
             w(
@@ -304,7 +281,7 @@ object BoxParser {
             return null
         }
         val stsdData =
-            BoxParser.parseStsd(stsd.data!!, tkhdData, mdhdData.language, drmInitData, isQuickTime)
+            parseStsd(stsd.data!!, tkhdData, mdhdData.language, drmInitData, isQuickTime)
 
         var chapterTrackId = C.INDEX_UNSET
         val tref = trak.getContainerBoxOfType(Mp4Box.TYPE_tref)
@@ -336,22 +313,18 @@ object BoxParser {
         }
         val format: Format?
         if (tkhdData.alternateGroup != 0) {
-            val alternateGroupEntry =
-                Mp4AlternateGroupData(tkhdData.alternateGroup)
-            format =
-                stsdData
-                    .format!!
-                    .copy(
-                        metadata =
-                            if (stsdData.format!!.metadata != null)
-                                stsdData.format!!.metadata!!.copyWithAppendedEntries(
-                                    listOf(
-                                        alternateGroupEntry
-                                    )
-                                )
-                            else
-                                Metadata(listOf(alternateGroupEntry))
-                    )
+            val alternateGroupEntry = Mp4AlternateGroupData(tkhdData.alternateGroup)
+            format = stsdData.format!!.copy(
+                metadata =
+                    if (stsdData.format!!.metadata != null)
+                        stsdData.format!!.metadata!!.copyWithAppendedEntries(
+                            listOf(
+                                alternateGroupEntry
+                            )
+                        )
+                    else
+                        Metadata(listOf(alternateGroupEntry))
+            )
         } else {
             format = stsdData.format
         }
@@ -373,7 +346,7 @@ object BoxParser {
         )
     }
 
-    
+
     fun parseStbl(
         track: Track,
         stblBox: ContainerBox,
@@ -429,10 +402,10 @@ object BoxParser {
         val stts = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stts)!!.data
         // Entries are the indices of samples that are synchronization samples.
         val stssAtom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_stss)
-        var stss = if (stssAtom != null) stssAtom.data else null
+        var stss = stssAtom?.data
         // Entries are (number of samples, timestamp offset).
         val cttsAtom = stblBox.getLeafBoxOfType(Mp4Box.TYPE_ctts)
-        val ctts = if (cttsAtom != null) cttsAtom.data else null
+        val ctts = cttsAtom?.data
 
         // Prepare to read chunk information.
         val chunkIterator = ChunkIterator(stsc!!, chunkOffsets!!, chunkOffsetsAreLongs)
@@ -529,7 +502,7 @@ object BoxParser {
                     w(TAG, "Unexpected end of chunk data")
                     sampleCount = i
                     if (!omitTrackSampleTable) {
-                        offsets = offsets!!.copyOf(sampleCount)
+                        offsets = offsets.copyOf(sampleCount)
                         sizes = sizes.copyOf(sampleCount)
                         timestamps = timestamps.copyOf(sampleCount)
                         flags = flags.copyOf(sampleCount)
@@ -559,7 +532,7 @@ object BoxParser {
                 }
 
                 if (!omitTrackSampleTable) {
-                    offsets!![i] = offset
+                    offsets[i] = offset
                     sizes[i] = currentSampleSize
                     timestamps[i] = timestampTimeUnits + timestampOffset
                     // All samples are synchronization samples if the stss is not present.
@@ -573,7 +546,7 @@ object BoxParser {
                 if (stss != null && i == nextSynchronizationSampleIndex) {
                     remainingSynchronizationSamples--
                     if (remainingSynchronizationSamples > 0) {
-                        nextSynchronizationSampleIndex = stss!!.readUnsignedIntToInt() - 1
+                        nextSynchronizationSampleIndex = stss.readUnsignedIntToInt() - 1
                     }
                 }
 
@@ -1152,7 +1125,7 @@ object BoxParser {
         return String(chars)
     }
 
-    
+
     private fun parseStsd(
         stsd: ParsableByteArray,
         tkhdData: TkhdData,
@@ -1308,7 +1281,7 @@ object BoxParser {
     }
 
     // hdrStaticInfo is allocated using allocate() in allocateHdrStaticInfo().
-    
+
     private fun parseVideoSampleEntry(
         parent: ParsableByteArray,
         atomType: Int,
@@ -1868,7 +1841,7 @@ object BoxParser {
         return hSpacing.toFloat() / vSpacing
     }
 
-    
+
     private fun parseAudioSampleEntry(
         parent: ParsableByteArray,
         atomType: Int,
@@ -2249,7 +2222,7 @@ object BoxParser {
         }
     }
 
-    
+
     private fun findBoxPosition(
         parent: ParsableByteArray, boxType: Int, parentBoxPosition: Int, parentBoxSize: Int
     ): Int {
@@ -2334,7 +2307,7 @@ object BoxParser {
         return BtrtData(avgBitrate, maxBitrate)
     }
 
-    
+
     fun parseVideoExtendedUsageBox(
         parent: ParsableByteArray, position: Int, size: Int
     ): VexuData? {
@@ -2354,7 +2327,7 @@ object BoxParser {
         return if (eyesData == null) null else VexuData(eyesData)
     }
 
-    
+
     private fun parseStereoViewBox(parent: ParsableByteArray, position: Int, size: Int): EyesData? {
         parent.setPosition(position + Mp4Box.HEADER_SIZE)
         var childPosition = parent.getPosition()
@@ -2379,7 +2352,7 @@ object BoxParser {
         return null
     }
 
-    
+
     private fun parseSampleEntryEncryptionData(
         parent: ParsableByteArray, position: Int, size: Int
     ): Pair<Int?, TrackEncryptionBox?>? {
@@ -2401,7 +2374,7 @@ object BoxParser {
         return null
     }
 
-    
+
     fun parseCommonEncryptionSinfFromParent(
         parent: ParsableByteArray, position: Int, size: Int
     ): Pair<Int?, TrackEncryptionBox?>? {
@@ -2595,7 +2568,7 @@ object BoxParser {
 
         var format: Format? = null
         var nalUnitLengthFieldLength: Int = 0
-        var requiredSampleTransformation:  Int
+        var requiredSampleTransformation: Int
 
         init {
             trackEncryptionBoxes = arrayOfNulls<TrackEncryptionBox>(numberOfEntries)
