@@ -6,7 +6,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 object FixedSampleSizeRechunker {
-    private val MAX_SAMPLE_SIZE = 8 * 1024
+    private const val MAX_SAMPLE_SIZE = 8 * 1024
 
     fun rechunk(
         fixedSampleSize: Int,

@@ -41,6 +41,7 @@ import java.util.ArrayDeque
 import java.util.Arrays
 import java.util.Collections
 import kotlin.math.max
+import androidx.core.util.size
 
 class FragmentedMp4Extractor(
     private val subtitleParserFactory: SubtitleParser.Factory,
@@ -204,7 +205,7 @@ class FragmentedMp4Extractor(
     }
 
     override fun seek(position: Long, timeUs: Long) {
-        val trackCount = trackBundles.size()
+        val trackCount = trackBundles.size
         for (i in 0..<trackCount) {
             trackBundles.valueAt(i).resetFragmentInfo()
         }
@@ -353,7 +354,7 @@ class FragmentedMp4Extractor(
 
         if (atomType == Mp4Box.TYPE_moof) {
             // The data positions may be updated when parsing the tfhd/trun.
-            val trackCount = trackBundles.size()
+            val trackCount = trackBundles.size
             for (i in 0..<trackCount) {
                 val fragment = trackBundles.valueAt(i).fragment
                 fragment.atomPosition = atomPosition

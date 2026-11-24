@@ -6,7 +6,6 @@ import androidx.media3.common.C
 import androidx.media3.common.ColorInfo
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format
-import androidx.media3.common.Format.Companion.NO_VALUE
 import androidx.media3.common.Label
 import androidx.media3.common.Metadata
 import androidx.media3.common.MimeTypes
@@ -50,7 +49,6 @@ import androidx.media3.extractor.GaplessInfoHolder
 import androidx.media3.extractor.HevcConfig
 import androidx.media3.extractor.VorbisUtil.parseVorbisCsdFromEsdsInitializationData
 import androidx.media3.extractor.VvcConfig
-import androidx.media3.extractor.metadata.Chapter
 import androidx.media3.extractor.metadata.ChapterImpl
 import com.google.common.base.Function
 import com.google.common.base.Joiner
@@ -139,22 +137,27 @@ object BoxParser {
             val atomPosition = udtaData.getPosition()
             val atomSize = udtaData.readInt()
             val atomType = udtaData.readInt()
-            if (atomType == Mp4Box.TYPE_meta) {
-                udtaData.setPosition(atomPosition)
-                metadata =
-                    metadata.copyWithAppendedEntriesFrom(
-                        parseUdtaMeta(udtaData, atomPosition + atomSize, ignoreArtwork)
-                    )
-            } else if (atomType == Mp4Box.TYPE_smta) {
-                udtaData.setPosition(atomPosition)
-                metadata =
-                    metadata.copyWithAppendedEntriesFrom(
-                        SmtaAtomUtil.parseSmta(udtaData, atomPosition + atomSize)
-                    )
-            } else if (atomType == Mp4Box.TYPE_xyz) {
-                metadata = metadata.copyWithAppendedEntriesFrom(parseXyz(udtaData))
-            } else if (atomType == Mp4Box.TYPE_chpl) {
-                metadata = metadata.copyWithAppendedEntriesFrom(parseChpl(udtaData))
+            when (atomType) {
+                Mp4Box.TYPE_meta -> {
+                    udtaData.setPosition(atomPosition)
+                    metadata =
+                        metadata.copyWithAppendedEntriesFrom(
+                            parseUdtaMeta(udtaData, atomPosition + atomSize, ignoreArtwork)
+                        )
+                }
+                Mp4Box.TYPE_smta -> {
+                    udtaData.setPosition(atomPosition)
+                    metadata =
+                        metadata.copyWithAppendedEntriesFrom(
+                            SmtaAtomUtil.parseSmta(udtaData, atomPosition + atomSize)
+                        )
+                }
+                Mp4Box.TYPE_xyz -> {
+                    metadata = metadata.copyWithAppendedEntriesFrom(parseXyz(udtaData))
+                }
+                Mp4Box.TYPE_chpl -> {
+                    metadata = metadata.copyWithAppendedEntriesFrom(parseChpl(udtaData))
+                }
             }
             udtaData.setPosition(atomPosition + atomSize)
         }
@@ -263,11 +266,10 @@ object BoxParser {
             duration = tkhdData.duration
         }
         val movieTimescale = parseMvhd(mvhd.data!!).timescale
-        val durationUs: Long
-        if (duration == C.TIME_UNSET) {
-            durationUs = C.TIME_UNSET
+        val durationUs: Long = if (duration == C.TIME_UNSET) {
+            C.TIME_UNSET
         } else {
-            durationUs = scaleLargeTimestamp(duration, C.MICROS_PER_SECOND, movieTimescale)
+            scaleLargeTimestamp(duration, C.MICROS_PER_SECOND, movieTimescale)
         }
         val stbl = mdia.getContainerBoxOfType(Mp4Box.TYPE_minf)!!
             .getContainerBoxOfType(Mp4Box.TYPE_stbl)!!
@@ -451,7 +453,7 @@ object BoxParser {
         var maximumSize = 0
         var timestamps: LongArray
         var flags: IntArray
-        val syncSampleIndicesList: MutableList<Int?> = ArrayList<Int?>()
+        val syncSampleIndicesList: MutableList<Int?> = ArrayList()
         val hasOnlySyncSamples = stss == null
         var timestampTimeUnits: Long = 0
         val duration: Long
@@ -846,18 +848,18 @@ object BoxParser {
 
         // Calculate edited sample timestamps and update the corresponding metadata arrays.
         val editedOffsets: LongArray =
-            (if (copyMetadata) kotlin.LongArray(editedSampleCount) else offsets)!!
+            (if (copyMetadata) LongArray(editedSampleCount) else offsets)
         val editedSizes = if (copyMetadata) IntArray(editedSampleCount) else sizes
         var editedMaximumSize = if (copyMetadata) 0 else maximumSize
         val editedFlags = if (copyMetadata) IntArray(editedSampleCount) else flags
         val editedSyncSampleIndicesList =
-            if (copyMetadata) ArrayList<Int?>() else syncSampleIndicesList
+            if (copyMetadata) ArrayList() else syncSampleIndicesList
         val editedTimestamps = LongArray(editedSampleCount)
         var pts: Long = 0
         var sampleIndex = 0
         var hasPrerollSamples = false
         for (i in 0..<track.editListDurations.length()) {
-            val editMediaTime = track.editListMediaTimes!![i]
+            val editMediaTime = track.editListMediaTimes[i]
             val startIndex = startIndices[i]
             val endIndex = endIndices[i]
             if (copyMetadata) {
@@ -952,10 +954,10 @@ object BoxParser {
             val latitude = location.substring(0, latitudeEndIndex).toFloat()
             val longitude = location.substring(latitudeEndIndex, location.length - 1).toFloat()
             return Metadata(listOf(Mp4LocationData(latitude, longitude)))
-        } catch (exception: IndexOutOfBoundsException) {
+        } catch (_: IndexOutOfBoundsException) {
             // Invalid input.
             return null
-        } catch (exception: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             return null
         }
     }
@@ -964,8 +966,8 @@ object BoxParser {
         try {
             chplData.skipBytes(5) // 1 byte version + 3 bytes flags + 1 byte reserved.
             val chapterCount = chplData.readInt()
-            val chapters: MutableList<Metadata.Entry> = ArrayList<Metadata.Entry>()
-            for (i in 0..<chapterCount) {
+            val chapters: MutableList<Metadata.Entry> = ArrayList()
+            repeat(chapterCount) {
                 var startTimeMs =
                     chplData.readLong() / 10000 // Start time in 100-nanoseconds resolution
                 if (startTimeMs < 0) {
@@ -981,7 +983,7 @@ object BoxParser {
                 )
             }
             return if (chapters.isEmpty()) null else Metadata(chapters)
-        } catch (e: IndexOutOfBoundsException) {
+        } catch (_: IndexOutOfBoundsException) {
             // Invalid input.
             return null
         }
@@ -1030,15 +1032,15 @@ object BoxParser {
         // Matrices which imply reflection are resolved to a correct rotation and a horizontal mirror.
         val rotationDegrees: Int
         val fixedOne = 65536
-        if (a00 == 0 && a01 == fixedOne && (a10 == -fixedOne || a10 == fixedOne) && a11 == 0) {
-            rotationDegrees = 90
+        rotationDegrees = if (a00 == 0 && a01 == fixedOne && (a10 == -fixedOne || a10 == fixedOne) && a11 == 0) {
+            90
         } else if (a00 == 0 && a01 == -fixedOne && (a10 == fixedOne || a10 == -fixedOne) && a11 == 0) {
-            rotationDegrees = 270
+            270
         } else if ((a00 == -fixedOne || a00 == fixedOne) && a01 == 0 && a10 == 0 && a11 == -fixedOne) {
-            rotationDegrees = 180
+            180
         } else {
             // Only 0, 90, 180 and 270 are supported. Treat anything else as 0.
-            rotationDegrees = 0
+            0
         }
         // skip remaining 4 matrix entries
         tkhd.skipBytes(16)
@@ -1061,16 +1063,12 @@ object BoxParser {
     }
 
     private fun getTrackTypeForHdlr(hdlr: Int): Int {
-        if (hdlr == TYPE_soun) {
-            return C.TRACK_TYPE_AUDIO
-        } else if (hdlr == TYPE_vide) {
-            return C.TRACK_TYPE_VIDEO
-        } else if (hdlr == TYPE_text || hdlr == TYPE_sbtl || hdlr == TYPE_subt || hdlr == TYPE_clcp || hdlr == TYPE_subp) {
-            return C.TRACK_TYPE_TEXT
-        } else if (hdlr == TYPE_meta) {
-            return C.TRACK_TYPE_METADATA
-        } else {
-            return C.TRACK_TYPE_UNKNOWN
+        return when (hdlr) {
+            TYPE_soun -> C.TRACK_TYPE_AUDIO
+            TYPE_vide -> C.TRACK_TYPE_VIDEO
+            TYPE_text, TYPE_sbtl, TYPE_subt, TYPE_clcp, TYPE_subp -> C.TRACK_TYPE_TEXT
+            TYPE_meta -> C.TRACK_TYPE_METADATA
+            else -> C.TRACK_TYPE_UNKNOWN
         }
     }
 
@@ -1139,44 +1137,54 @@ object BoxParser {
             val childAtomSize = stsd.readInt()
             checkContainerInput(childAtomSize > 0, "childAtomSize must be positive")
             val childAtomType = stsd.readInt()
-            if (childAtomType == Mp4Box.TYPE_avc1 || childAtomType == Mp4Box.TYPE_avc3 || childAtomType == Mp4Box.TYPE_encv || childAtomType == Mp4Box.TYPE_m1v_ || childAtomType == Mp4Box.TYPE_mp4v || childAtomType == Mp4Box.TYPE_hvc1 || childAtomType == Mp4Box.TYPE_hev1 || childAtomType == Mp4Box.TYPE_vvc1 || childAtomType == Mp4Box.TYPE_vvi1 || childAtomType == Mp4Box.TYPE_s263 || childAtomType == Mp4Box.TYPE_H263 || childAtomType == Mp4Box.TYPE_h263 || childAtomType == Mp4Box.TYPE_vp08 || childAtomType == Mp4Box.TYPE_vp09 || childAtomType == Mp4Box.TYPE_av01 || childAtomType == Mp4Box.TYPE_dvav || childAtomType == Mp4Box.TYPE_dva1 || childAtomType == Mp4Box.TYPE_dvhe || childAtomType == Mp4Box.TYPE_dvh1 || childAtomType == Mp4Box.TYPE_apv1 || childAtomType == Mp4Box.TYPE_dav1) {
-                parseVideoSampleEntry(
-                    stsd,
-                    childAtomType,
-                    childStartPosition,
-                    childAtomSize,
-                    tkhdData,
-                    language,
-                    drmInitData,
-                    out,
-                    i
-                )
-            } else if (childAtomType == Mp4Box.TYPE_mp4a || childAtomType == Mp4Box.TYPE_enca || childAtomType == Mp4Box.TYPE_ac_3 || childAtomType == Mp4Box.TYPE_ec_3 || childAtomType == Mp4Box.TYPE_ac_4 || childAtomType == Mp4Box.TYPE_mlpa || childAtomType == Mp4Box.TYPE_dtsc || childAtomType == Mp4Box.TYPE_dtse || childAtomType == Mp4Box.TYPE_dtsh || childAtomType == Mp4Box.TYPE_dtsl || childAtomType == Mp4Box.TYPE_dtsx || childAtomType == Mp4Box.TYPE_samr || childAtomType == Mp4Box.TYPE_sawb || childAtomType == Mp4Box.TYPE_lpcm || childAtomType == Mp4Box.TYPE_sowt || childAtomType == Mp4Box.TYPE_twos || childAtomType == Mp4Box.TYPE__mp2 || childAtomType == Mp4Box.TYPE__mp3 || childAtomType == Mp4Box.TYPE_mha1 || childAtomType == Mp4Box.TYPE_mhm1 || childAtomType == Mp4Box.TYPE_alac || childAtomType == Mp4Box.TYPE_alaw || childAtomType == Mp4Box.TYPE_ulaw || childAtomType == Mp4Box.TYPE_Opus || childAtomType == Mp4Box.TYPE_fLaC || childAtomType == Mp4Box.TYPE_iamf || childAtomType == Mp4Box.TYPE_ipcm || childAtomType == Mp4Box.TYPE_fpcm
-            ) {
-                parseAudioSampleEntry(
-                    stsd,
-                    childAtomType,
-                    childStartPosition,
-                    childAtomSize,
-                    tkhdData.id,
-                    language,
-                    isQuickTime,
-                    drmInitData,
-                    out,
-                    i
-                )
-            } else if (childAtomType == Mp4Box.TYPE_TTML || childAtomType == Mp4Box.TYPE_tx3g || childAtomType == Mp4Box.TYPE_wvtt || childAtomType == Mp4Box.TYPE_stpp || childAtomType == Mp4Box.TYPE_c608 || childAtomType == Mp4Box.TYPE_mp4s || childAtomType == TYPE_text) {
-                parseTextSampleEntry(
-                    stsd, childAtomType, childStartPosition, childAtomSize, tkhdData, language, out
-                )
-            } else if (childAtomType == Mp4Box.TYPE_mett || childAtomType == Mp4Box.TYPE_it35) {
-                parseMetaDataSampleEntry(stsd, childAtomType, childStartPosition, tkhdData.id, out)
-            } else if (childAtomType == Mp4Box.TYPE_camm) {
-                out.format =
-                    Format(
-                        id = tkhdData.id.toString(),
-                        sampleMimeType = MimeTypes.APPLICATION_CAMERA_MOTION
+            when (childAtomType) {
+                Mp4Box.TYPE_avc1, Mp4Box.TYPE_avc3, Mp4Box.TYPE_encv, Mp4Box.TYPE_m1v_, Mp4Box.TYPE_mp4v, Mp4Box.TYPE_hvc1, Mp4Box.TYPE_hev1, Mp4Box.TYPE_vvc1, Mp4Box.TYPE_vvi1, Mp4Box.TYPE_s263, Mp4Box.TYPE_H263, Mp4Box.TYPE_h263, Mp4Box.TYPE_vp08, Mp4Box.TYPE_vp09, Mp4Box.TYPE_av01, Mp4Box.TYPE_dvav, Mp4Box.TYPE_dva1, Mp4Box.TYPE_dvhe, Mp4Box.TYPE_dvh1, Mp4Box.TYPE_apv1, Mp4Box.TYPE_dav1 -> {
+                    parseVideoSampleEntry(
+                        stsd,
+                        childAtomType,
+                        childStartPosition,
+                        childAtomSize,
+                        tkhdData,
+                        language,
+                        drmInitData,
+                        out,
+                        i
                     )
+                }
+
+                Mp4Box.TYPE_mp4a, Mp4Box.TYPE_enca, Mp4Box.TYPE_ac_3, Mp4Box.TYPE_ec_3, Mp4Box.TYPE_ac_4, Mp4Box.TYPE_mlpa, Mp4Box.TYPE_dtsc, Mp4Box.TYPE_dtse, Mp4Box.TYPE_dtsh, Mp4Box.TYPE_dtsl, Mp4Box.TYPE_dtsx, Mp4Box.TYPE_samr, Mp4Box.TYPE_sawb, Mp4Box.TYPE_lpcm, Mp4Box.TYPE_sowt, Mp4Box.TYPE_twos, Mp4Box.TYPE__mp2, Mp4Box.TYPE__mp3, Mp4Box.TYPE_mha1, Mp4Box.TYPE_mhm1, Mp4Box.TYPE_alac, Mp4Box.TYPE_alaw, Mp4Box.TYPE_ulaw, Mp4Box.TYPE_Opus, Mp4Box.TYPE_fLaC, Mp4Box.TYPE_iamf, Mp4Box.TYPE_ipcm, Mp4Box.TYPE_fpcm
+                    -> {
+                    parseAudioSampleEntry(
+                        stsd,
+                        childAtomType,
+                        childStartPosition,
+                        childAtomSize,
+                        tkhdData.id,
+                        language,
+                        isQuickTime,
+                        drmInitData,
+                        out,
+                        i
+                    )
+                }
+
+                Mp4Box.TYPE_TTML, Mp4Box.TYPE_tx3g, Mp4Box.TYPE_wvtt, Mp4Box.TYPE_stpp, Mp4Box.TYPE_c608, Mp4Box.TYPE_mp4s, TYPE_text -> {
+                    parseTextSampleEntry(
+                        stsd, childAtomType, childStartPosition, childAtomSize, tkhdData, language, out
+                    )
+                }
+
+                Mp4Box.TYPE_mett, Mp4Box.TYPE_it35 -> {
+                    parseMetaDataSampleEntry(stsd, childAtomType, childStartPosition, tkhdData.id, out)
+                }
+
+                Mp4Box.TYPE_camm -> {
+                    out.format =
+                        Format(
+                            id = tkhdData.id.toString(),
+                            sampleMimeType = MimeTypes.APPLICATION_CAMERA_MOTION
+                        )
+                }
             }
             stsd.setPosition(childStartPosition + childAtomSize)
         }
@@ -1227,7 +1235,7 @@ object BoxParser {
                 }
                 mimeType = MimeTypes.APPLICATION_VOBSUB
                 val idx = formatVobsubIdx(esds.initializationData, tkhdData.width, tkhdData.height)
-                initializationData = listOf<ByteArray>(getUtf8Bytes(idx))
+                initializationData = listOf(getUtf8Bytes(idx))
             }
         } else if (atomType == TYPE_text) {
             // The TYPE_text track is a generic fallback text format. We assign a placeholder MIME type so
@@ -1253,7 +1261,7 @@ object BoxParser {
 
     private fun formatVobsubIdx(src: ByteArray, width: Int, height: Int): String {
         Preconditions.checkState(src.size == 64)
-        val palette: MutableList<String?> = ArrayList<String?>(16)
+        val palette: MutableList<String?> = ArrayList(16)
         var i = 0
         while (i < src.size - 3) {
             val yuv = Ints.fromBytes(src[i], src[i + 1], src[i + 2], src[i + 3])
@@ -1320,11 +1328,6 @@ object BoxParser {
             }
             parent.setPosition(childPosition)
         }
-
-        // TODO: Uncomment when [Internal: b/63092960] is fixed.
-        // else {
-        //   drmInitData = null;
-        // }
         var mimeType: String? = null
         if (atomType == Mp4Box.TYPE_m1v_) {
             mimeType = MimeTypes.VIDEO_MPEG
@@ -1536,7 +1539,7 @@ object BoxParser {
                 val initializationDataChunk = ByteArray(childAtomBodySize)
                 parent.readBytes(initializationDataChunk, 0, childAtomBodySize)
 
-                initializationData = listOf<ByteArray>()
+                initializationData = listOf()
                 val av1Config = Av1Config.parse(initializationDataChunk)
                 if (av1Config != null) {
                     bitdepthLuma = av1Config.bitdepth
@@ -1678,8 +1681,8 @@ object BoxParser {
             return
         }
 
-        var avgBitrate = NO_VALUE
-        var peakBitrate = NO_VALUE
+        var avgBitrate = Format.NO_VALUE
+        var peakBitrate = Format.NO_VALUE
         // Prefer btrtData over esdsData for video track.
         if (btrtData != null) {
             avgBitrate = Ints.saturatedCast(btrtData.avgBitrate)
@@ -1731,10 +1734,10 @@ object BoxParser {
         var colorSpace = Format.NO_VALUE
         var colorRange = Format.NO_VALUE
         var colorTransfer = Format.NO_VALUE
-        for (i in 0..<numConfigurationEntries) {
+        repeat(numConfigurationEntries) {
             bitArray.skipBytes(1) // pbu_type
             val numberOfFrameInfo = bitArray.readBits(8)
-            for (j in 0..<numberOfFrameInfo) {
+            repeat(numberOfFrameInfo) {
                 bitArray.skipBits(6) // reserved_zero_6bits
                 val isColorDescriptionPresent =
                     bitArray.readBit() // color_description_present_flag_info
@@ -1804,10 +1807,7 @@ object BoxParser {
     private fun parseEdts(
         edtsAtom: ContainerBox
     ): Pair<ImmutableLongArray?, ImmutableLongArray?>? {
-        val elstAtom = edtsAtom.getLeafBoxOfType(Mp4Box.TYPE_elst)
-        if (elstAtom == null) {
-            return null
-        }
+        val elstAtom = edtsAtom.getLeafBoxOfType(Mp4Box.TYPE_elst) ?: return null
         val elstData = elstAtom.data
         elstData!!.setPosition(Mp4Box.HEADER_SIZE)
         val fullAtom = elstData.readInt()
@@ -1815,7 +1815,7 @@ object BoxParser {
         val entryCount = elstData.readUnsignedIntToInt()
         val editListDurations = ImmutableLongArray.builder(entryCount)
         val editListMediaTimes = ImmutableLongArray.builder(entryCount)
-        for (i in 0..<entryCount) {
+        repeat(entryCount) {
             editListDurations.add(
                 if (version == 1) elstData.readUnsignedLongToLong() else elstData.readUnsignedInt()
             )
@@ -1914,20 +1914,24 @@ object BoxParser {
             return
         }
 
-        if (atomType == Mp4Box.TYPE_iamf) {
-            // As per the IAMF spec (https://aomediacodec.github.io/iamf/#iasampleentry-section),
-            // channelCount and sampleRate SHALL be set to 0 and ignored. We ignore it by using
-            // Format.NO_VALUE instead of 0.
-            channelCount = Format.NO_VALUE
-            sampleRate = Format.NO_VALUE
-        } else if (atomType == Mp4Box.TYPE_samr) {
-            // AMR NB audio is always mono, 8kHz
-            channelCount = 1
-            sampleRate = SAMPLE_RATE_AMR_NB
-        } else if (atomType == Mp4Box.TYPE_sawb) {
-            // AMR WB audio is always mono, 16kHz
-            channelCount = 1
-            sampleRate = SAMPLE_RATE_AMR_WB
+        when (atomType) {
+            Mp4Box.TYPE_iamf -> {
+                // As per the IAMF spec (https://aomediacodec.github.io/iamf/#iasampleentry-section),
+                // channelCount and sampleRate SHALL be set to 0 and ignored. We ignore it by using
+                // Format.NO_VALUE instead of 0.
+                channelCount = Format.NO_VALUE
+                sampleRate = Format.NO_VALUE
+            }
+            Mp4Box.TYPE_samr -> {
+                // AMR NB audio is always mono, 8kHz
+                channelCount = 1
+                sampleRate = SAMPLE_RATE_AMR_NB
+            }
+            Mp4Box.TYPE_sawb -> {
+                // AMR WB audio is always mono, 16kHz
+                channelCount = 1
+                sampleRate = SAMPLE_RATE_AMR_WB
+            }
         }
 
         var childPosition = parent.getPosition()
@@ -1937,10 +1941,7 @@ object BoxParser {
             if (sampleEntryEncryptionData != null) {
                 atomType = sampleEntryEncryptionData.first!!
                 drmInitData =
-                    if (drmInitData == null)
-                        null
-                    else
-                        drmInitData.copyWithSchemeType(sampleEntryEncryptionData.second!!.schemeType)
+                    drmInitData?.copyWithSchemeType(sampleEntryEncryptionData.second!!.schemeType)
                 out.trackEncryptionBoxes[entryIndex] = sampleEntryEncryptionData.second
             }
             parent.setPosition(childPosition)
@@ -2027,12 +2028,12 @@ object BoxParser {
                 val initializationDataBytes = ByteArray(mpegh3daConfigLength)
                 parent.readBytes(initializationDataBytes, 0, mpegh3daConfigLength)
                 // The mpegh3daConfig should always be the first entry in initializationData.
-                if (initializationData == null) {
-                    initializationData = listOf(initializationDataBytes)
+                initializationData = if (initializationData == null) {
+                    listOf(initializationDataBytes)
                 } else {
                     // We assume that the mhaP box has been parsed before and so add the compatible profile
                     // level sets as the second entry.
-                    initializationData = listOf(
+                    listOf(
                         initializationDataBytes,
                         initializationData[0]
                     )
@@ -2045,16 +2046,15 @@ object BoxParser {
                 if (numCompatibleSets > 0) {
                     val mpeghCompatibleProfileLevelSet = ByteArray(numCompatibleSets)
                     parent.readBytes(mpeghCompatibleProfileLevelSet, 0, numCompatibleSets)
-                    if (initializationData == null) {
-                        initializationData = listOf(mpeghCompatibleProfileLevelSet)
+                    initializationData = if (initializationData == null) {
+                        listOf(mpeghCompatibleProfileLevelSet)
                     } else {
                         // We assume that the mhaC box has been parsed before and so add the compatible profile
                         // level sets as the second entry.
-                        initializationData =
-                            listOf(
-                                initializationData[0],
-                                mpeghCompatibleProfileLevelSet
-                            )
+                        listOf(
+                            initializationData[0],
+                            mpeghCompatibleProfileLevelSet
+                        )
                     }
                 }
             } else if (childAtomType == Mp4Box.TYPE_esds
@@ -2105,7 +2105,7 @@ object BoxParser {
             } else if (childAtomType == Mp4Box.TYPE_dmlp) {
                 if (sampleRateMlp <= 0) {
                     throw ParserException.createForMalformedContainer(
-                        "Invalid sample rate for Dolby TrueHD MLP stream: " + sampleRateMlp,
+                        "Invalid sample rate for Dolby TrueHD MLP stream: $sampleRateMlp",
                         null
                     )
                 }
@@ -2191,8 +2191,8 @@ object BoxParser {
         }
 
         if (out.format == null && mimeType != null) {
-            var avgBitrate = NO_VALUE
-            var peakBitrate = NO_VALUE
+            var avgBitrate = Format.NO_VALUE
+            var peakBitrate = Format.NO_VALUE
             // Prefer btrtData over esdsData for video track.
             if (esdsData != null) {
                 avgBitrate = Ints.saturatedCast(esdsData.bitrate)
@@ -2469,11 +2469,7 @@ object BoxParser {
             val childAtomSize = parent.readInt()
             val childAtomType = parent.readInt()
             if (childAtomType == Mp4Box.TYPE_proj) {
-                return Arrays.copyOfRange(
-                    parent.data,
-                    childPosition,
-                    childPosition + childAtomSize
-                )
+                return parent.data.copyOfRange(childPosition, childPosition + childAtomSize)
             }
             childPosition += childAtomSize
         }
@@ -2563,7 +2559,7 @@ object BoxParser {
         var requiredSampleTransformation: Int
 
         init {
-            trackEncryptionBoxes = arrayOfNulls<TrackEncryptionBox>(numberOfEntries)
+            trackEncryptionBoxes = arrayOfNulls(numberOfEntries)
             requiredSampleTransformation = Track.TRANSFORMATION_NONE
         }
 
@@ -2614,10 +2610,9 @@ object BoxParser {
     class StszSampleSizeBox(stszAtom: LeafBox, trackFormat: Format) : SampleSizeBox {
         override val fixedSampleSize: Int
         override val sampleCount: Int
-        private val data: ParsableByteArray?
+        private val data = stszAtom.data
 
         init {
-            data = stszAtom.data
             data!!.setPosition(Mp4Box.FULL_HEADER_SIZE)
             var fixedSampleSize = data.readUnsignedIntToInt()
             if (MimeTypes.AUDIO_RAW == trackFormat.sampleMimeType) {
@@ -2647,7 +2642,7 @@ object BoxParser {
     }
 
     class Stz2SampleSizeBox(stz2Atom: LeafBox) : SampleSizeBox {
-        private val data: ParsableByteArray?
+        private val data = stz2Atom.data
         override val sampleCount: Int
         private val fieldSize: Int // Can be 4, 8, or 16.
 
@@ -2656,7 +2651,6 @@ object BoxParser {
         private var currentByte = 0
 
         init {
-            data = stz2Atom.data
             data!!.setPosition(Mp4Box.FULL_HEADER_SIZE)
             fieldSize = data.readUnsignedIntToInt() and 0x000000FF
             sampleCount = data.readUnsignedIntToInt()
