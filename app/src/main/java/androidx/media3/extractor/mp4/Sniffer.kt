@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.media3.common.C
@@ -10,9 +9,7 @@ import androidx.media3.extractor.SniffFailure
 import java.io.IOException
 
 object Sniffer {
-    
     const val BRAND_QUICKTIME: Int = 0x71742020
-
     private val SEARCH_LENGTH = 4 * 1024
 
     private val COMPATIBLE_BRANDS = intArrayOf(
@@ -47,17 +44,14 @@ object Sniffer {
         0x70696666,  // piff
     )
 
-    
     fun sniffFragmented(input: ExtractorInput): SniffFailure? {
-        return sniffInternal(input,  true)
+        return sniffInternal(input, true)
     }
 
-    
     fun sniffUnfragmented(input: ExtractorInput): SniffFailure? {
-        return sniffInternal(input,  false)
+        return sniffInternal(input, false)
     }
 
-    
     private fun sniffInternal(input: ExtractorInput, fragmented: Boolean): SniffFailure? {
         val inputLength = input.length
         var bytesToSearch =
@@ -76,7 +70,7 @@ object Sniffer {
             var headerSize = Mp4Box.HEADER_SIZE
             buffer.reset(headerSize)
             val success =
-                input.peekFully(buffer.data, 0, headerSize,  true)
+                input.peekFully(buffer.data, 0, headerSize, true)
             if (!success) {
                 // We've reached the end of the file.
                 break

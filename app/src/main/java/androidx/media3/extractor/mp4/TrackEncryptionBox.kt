@@ -1,48 +1,26 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.media3.common.C
 import androidx.media3.common.util.Log.w
-
 import androidx.media3.extractor.TrackOutput.CryptoData
-import com.google.common.base.Preconditions
 
 class TrackEncryptionBox(
-    isEncrypted: Boolean,
-    schemeType: String?,
-    perSampleIvSize: Int,
+    val isEncrypted: Boolean,
+    val schemeType: String?,
+    val perSampleIvSize: Int,
     keyId: ByteArray?,
     defaultEncryptedBlocks: Int,
     defaultClearBlocks: Int,
-    defaultInitializationVector: ByteArray?
-) {
-    
-    val isEncrypted: Boolean
-
-    val schemeType: String?
-
-    val cryptoData: CryptoData
-
-    val perSampleIvSize: Int
-
     val defaultInitializationVector: ByteArray?
-
-    init {
-        Preconditions.checkArgument((perSampleIvSize == 0) xor (defaultInitializationVector == null))
-        this.isEncrypted = isEncrypted
-        this.schemeType = schemeType
-        this.perSampleIvSize = perSampleIvSize
-        this.defaultInitializationVector = defaultInitializationVector
-        cryptoData =
-            CryptoData(
-                schemeToCryptoMode(schemeType), keyId, defaultEncryptedBlocks, defaultClearBlocks
-            )
-    }
+) {
+    val cryptoData = CryptoData(
+        schemeToCryptoMode(schemeType), keyId, defaultEncryptedBlocks, defaultClearBlocks
+    )
 
     companion object {
         private const val TAG = "TrackEncryptionBox"
 
-        private fun schemeToCryptoMode(schemeType: String?):  Int {
+        private fun schemeToCryptoMode(schemeType: String?): Int {
             if (schemeType == null) {
                 // If unknown, assume cenc.
                 return C.CRYPTO_MODE_AES_CTR

@@ -346,7 +346,6 @@ object BoxParser {
         )
     }
 
-
     fun parseStbl(
         track: Track,
         stblBox: ContainerBox,
@@ -1125,7 +1124,6 @@ object BoxParser {
         return String(chars)
     }
 
-
     private fun parseStsd(
         stsd: ParsableByteArray,
         tkhdData: TkhdData,
@@ -1841,7 +1839,6 @@ object BoxParser {
         return hSpacing.toFloat() / vSpacing
     }
 
-
     private fun parseAudioSampleEntry(
         parent: ParsableByteArray,
         atomType: Int,
@@ -2222,7 +2219,6 @@ object BoxParser {
         }
     }
 
-
     private fun findBoxPosition(
         parent: ParsableByteArray, boxType: Int, parentBoxPosition: Int, parentBoxSize: Int
     ): Int {
@@ -2307,7 +2303,6 @@ object BoxParser {
         return BtrtData(avgBitrate, maxBitrate)
     }
 
-
     fun parseVideoExtendedUsageBox(
         parent: ParsableByteArray, position: Int, size: Int
     ): VexuData? {
@@ -2326,7 +2321,6 @@ object BoxParser {
         }
         return if (eyesData == null) null else VexuData(eyesData)
     }
-
 
     private fun parseStereoViewBox(parent: ParsableByteArray, position: Int, size: Int): EyesData? {
         parent.setPosition(position + Mp4Box.HEADER_SIZE)
@@ -2352,7 +2346,6 @@ object BoxParser {
         return null
     }
 
-
     private fun parseSampleEntryEncryptionData(
         parent: ParsableByteArray, position: Int, size: Int
     ): Pair<Int?, TrackEncryptionBox?>? {
@@ -2373,7 +2366,6 @@ object BoxParser {
         }
         return null
     }
-
 
     fun parseCommonEncryptionSinfFromParent(
         parent: ParsableByteArray, position: Int, size: Int

@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.media3.common.C
@@ -6,8 +5,7 @@ import androidx.media3.common.util.Util.ceilDivide
 import kotlin.math.max
 import kotlin.math.min
 
-internal object FixedSampleSizeRechunker {
-    
+object FixedSampleSizeRechunker {
     private val MAX_SAMPLE_SIZE = 8 * 1024
 
     fun rechunk(
@@ -59,7 +57,7 @@ internal object FixedSampleSizeRechunker {
         return Results(offsets, sizes, maximumSize, timestamps, flags, duration, totalSize.toLong())
     }
 
-    class Results  constructor(
+    class Results(
         val offsets: LongArray,
         val sizes: IntArray,
         val maximumSize: Int,

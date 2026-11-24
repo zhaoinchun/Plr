@@ -2,7 +2,6 @@ package androidx.media3.extractor.mp4
 
 import android.util.Pair
 import android.util.SparseArray
-import androidx.annotation.IntDef
 import androidx.media3.common.C
 import androidx.media3.common.DrmInitData
 import androidx.media3.common.Format
@@ -13,7 +12,6 @@ import androidx.media3.common.util.Log
 import androidx.media3.common.util.ParsableByteArray
 import androidx.media3.common.util.TimestampAdjuster
 import androidx.media3.common.util.Util
-import androidx.media3.common.util.Util.nullSafeArrayCopy
 import androidx.media3.container.Mp4Box
 import androidx.media3.container.NalUnitUtil
 import androidx.media3.container.ReorderingBufferQueue
@@ -39,23 +37,19 @@ import androidx.media3.extractor.text.SubtitleParser
 import androidx.media3.extractor.text.SubtitleTranscodingExtractorOutput
 import com.google.common.base.Function
 import com.google.common.base.Preconditions
-
-import java.io.IOException
 import java.util.ArrayDeque
 import java.util.Arrays
 import java.util.Collections
 import kotlin.math.max
 
-class FragmentedMp4Extractor constructor(
-    subtitleParserFactory: SubtitleParser.Factory,
+class FragmentedMp4Extractor(
+    private val subtitleParserFactory: SubtitleParser.Factory,
     flags:  Int = 0,
     timestampAdjuster: TimestampAdjuster? = null,
     sideloadedTrack: Track? = null,
     closedCaptionFormats: List<Format> = listOf(),
     additionalEmsgTrackOutput: TrackOutput? = null
 ) : Extractor {
-
-    private val subtitleParserFactory: SubtitleParser.Factory
     private val flags:  Int
     private val sideloadedTrack: Track?
 
@@ -83,7 +77,6 @@ class FragmentedMp4Extractor constructor(
     private val pendingMetadataSampleInfos: ArrayDeque<MetadataSampleInfo>
     private val reorderingBufferQueue: ReorderingBufferQueue
     private val additionalEmsgTrackOutput: TrackOutput?
-
     private val chunkIndexMerger: ChunkIndexMerger
 
     private var lastSniffFailures: List<SniffFailure>
@@ -121,7 +114,6 @@ class FragmentedMp4Extractor constructor(
     private var seekPositionBeforeMfraProcessing: Long
 
     init {
-        this.subtitleParserFactory = subtitleParserFactory
         this.flags = flags
         this.timestampAdjuster = timestampAdjuster
         this.sideloadedTrack = sideloadedTrack

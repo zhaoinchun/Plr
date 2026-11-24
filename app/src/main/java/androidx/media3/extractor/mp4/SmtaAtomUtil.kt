@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.annotation.IntDef
@@ -10,7 +9,7 @@ import androidx.media3.container.Mp4Box
 import androidx.media3.extractor.metadata.mp4.SmtaMetadataEntry
 
 object SmtaAtomUtil {
-    private const  val NO_VALUE = -1
+    private const val NO_VALUE = -1
     private const val CAMCORDER_NORMAL = 0
     private const val CAMCORDER_SINGLE_SUPERSLOW_MOTION = 7
     private const val CAMCORDER_FRC_SUPERSLOW_MOTION = 9
@@ -35,7 +34,7 @@ object SmtaAtomUtil {
 
                 // Each field is stored as a key (1  byte) value (1 byte) pairs.
                 // The order of the fields is not guaranteed.
-                var recordingMode:  Int = NO_VALUE
+                var recordingMode: Int = NO_VALUE
                 var svcTemporalLayerCount = 0
                 for (i in 0..1) {
                     val key = smta.readUnsignedByte()
@@ -53,10 +52,12 @@ object SmtaAtomUtil {
                 }
 
                 return Metadata(
-                    listOf(SmtaMetadataEntry(
-                        captureFrameRate.toFloat(),
-                        svcTemporalLayerCount
-                    ))
+                    listOf(
+                        SmtaMetadataEntry(
+                            captureFrameRate.toFloat(),
+                            svcTemporalLayerCount
+                        )
+                    )
                 )
             }
             smta.setPosition(atomPosition + atomSize)
@@ -65,7 +66,7 @@ object SmtaAtomUtil {
     }
 
     private fun getCaptureFrameRate(
-        recordingMode:  Int, smta: ParsableByteArray, limit: Int
+        recordingMode: Int, smta: ParsableByteArray, limit: Int
     ): Int {
         // V2 and V2_120 have fixed capture frame rates.
         if (recordingMode == CAMCORDER_SLOW_MOTION_V2) {

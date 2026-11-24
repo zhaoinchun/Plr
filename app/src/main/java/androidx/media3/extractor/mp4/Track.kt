@@ -1,12 +1,8 @@
 package androidx.media3.extractor.mp4
 
-import androidx.annotation.IntDef
 import androidx.media3.common.C
 import androidx.media3.common.Format
-
-import com.google.common.base.Preconditions
 import com.google.common.primitives.ImmutableLongArray
-import com.google.errorprone.annotations.CanIgnoreReturnValue
 
 data class Track(
     var id: Int = 0,

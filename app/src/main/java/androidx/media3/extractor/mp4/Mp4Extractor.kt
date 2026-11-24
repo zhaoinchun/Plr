@@ -568,7 +568,7 @@ class Mp4Extractor(
     }
 
     private fun getAuxiliaryTrackTypesForAuxiliaryTracks(metadata: Metadata): MutableList<Int?> {
-        val trackTypesMetadata = metadata.getFirstMatchingEntry<MdtaMetadataEntry>(
+        val trackTypesMetadata = metadata.getFirstMatchingEntry(
             MdtaMetadataEntry::class.java,
             Predicate { mdtaEntry: MdtaMetadataEntry? -> mdtaEntry!!.key == MdtaMetadataEntry.KEY_AUXILIARY_TRACKS_MAP })!!
         val auxiliaryTrackTypesFromMap = trackTypesMetadata.auxiliaryTrackTypesFromMap
@@ -938,23 +938,14 @@ class Mp4Extractor(
         val sampleTable: TrackSampleTable,
         val trackOutput: TrackOutput
     ) {
-        val trueHdSampleRechunker: TrueHdSampleRechunker?
-        val isVideo: Boolean
-        val isItutT35: Boolean
-
+        val trueHdSampleRechunker = if (MimeTypes.AUDIO_TRUEHD == track.format!!.sampleMimeType)
+            TrueHdSampleRechunker()
+        else
+            null
+        val isVideo = track.type == C.TRACK_TYPE_VIDEO
+        val isItutT35 = track.format!!.sampleMimeType == MimeTypes.APPLICATION_ITUT_T35
         var sampleIndex: Int = 0
-
         var pendingFormat: Format? = null
-
-        init {
-            this.isVideo = track.type == C.TRACK_TYPE_VIDEO
-            this.isItutT35 = track.format!!.sampleMimeType == MimeTypes.APPLICATION_ITUT_T35
-            trueHdSampleRechunker =
-                if (MimeTypes.AUDIO_TRUEHD == track.format.sampleMimeType)
-                    TrueHdSampleRechunker()
-                else
-                    null
-        }
     }
 
     private class Mp4SeekMap(
@@ -1192,9 +1183,9 @@ class Mp4Extractor(
         }
 
         private fun brandToFileType(brand: Int): Int {
-            when (brand) {
-                Sniffer.BRAND_QUICKTIME -> return FILE_TYPE_QUICKTIME
-                else -> return FILE_TYPE_MP4
+            return when (brand) {
+                Sniffer.BRAND_QUICKTIME -> FILE_TYPE_QUICKTIME
+                else -> FILE_TYPE_MP4
             }
         }
 

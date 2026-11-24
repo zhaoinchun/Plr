@@ -19,25 +19,15 @@ class TrackSampleTable(
     durationUs: Long,
     sampleCount: Int
 ) {
-    
     val track: Track?
-
     val sampleCount: Int
-
     val offsets: LongArray
-
     val sizes: IntArray
-
     val maximumSize: Int
-
     val timestampsUs: LongArray
-
     val flags: IntArray
-
     val syncSampleIndices: IntArray
-
     val durationUs: Long
-
     val hasOnlySyncSamples: Boolean
 
     init {
@@ -55,13 +45,13 @@ class TrackSampleTable(
         this.hasOnlySyncSamples = hasOnlySyncSamples
         this.durationUs = durationUs
         this.sampleCount = sampleCount
-        if (flags.size > 0) {
+        if (flags.isNotEmpty()) {
             flags[flags.size - 1] = flags[flags.size - 1] or C.BUFFER_FLAG_LAST_SAMPLE
         }
     }
 
     fun hasSampleTableData(): Boolean {
-        return timestampsUs.size > 0
+        return timestampsUs.isNotEmpty()
     }
 
     fun getIndexOfEarlierOrEqualSynchronizationSample(timeUs: Long): Int {

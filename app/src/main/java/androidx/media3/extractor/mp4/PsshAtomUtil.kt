@@ -1,4 +1,3 @@
-
 package androidx.media3.extractor.mp4
 
 import androidx.media3.common.util.Log.w
@@ -18,16 +17,16 @@ object PsshAtomUtil {
     fun buildPsshAtom(
         systemId: UUID, keyIds: Array<UUID>?, data: ByteArray?
     ): ByteArray {
-        val dataLength = if (data != null) data.size else 0
+        val dataLength = data?.size ?: 0
         var psshBoxLength =
-            Mp4Box.FULL_HEADER_SIZE + 16  + 4  + dataLength
+            Mp4Box.FULL_HEADER_SIZE + 16 + 4 + dataLength
         if (keyIds != null) {
-            psshBoxLength += 4  + (keyIds.size * 16) 
+            psshBoxLength += 4 + (keyIds.size * 16)
         }
         val psshBox = ByteBuffer.allocate(psshBoxLength)
         psshBox.putInt(psshBoxLength)
         psshBox.putInt(Mp4Box.TYPE_pssh)
-        psshBox.putInt(if (keyIds != null) 0x01000000 else 0 )
+        psshBox.putInt(if (keyIds != null) 0x01000000 else 0)
         psshBox.putLong(systemId.getMostSignificantBits())
         psshBox.putLong(systemId.getLeastSignificantBits())
         if (keyIds != null) {
@@ -80,7 +79,7 @@ object PsshAtomUtil {
 
     fun parsePsshAtom(atom: ByteArray): PsshAtom? {
         val atomData = ParsableByteArray(atom)
-        if (atomData.limit() < Mp4Box.FULL_HEADER_SIZE + 16  + 4 ) {
+        if (atomData.limit() < Mp4Box.FULL_HEADER_SIZE + 16 + 4) {
             // Data too short.
             return null
         }
@@ -108,7 +107,7 @@ object PsshAtomUtil {
         var keyIds: Array<UUID>? = null
         if (atomVersion == 1) {
             val keyIdCount = atomData.readUnsignedIntToInt()
-            keyIds = Array<UUID>(keyIdCount){
+            keyIds = Array<UUID>(keyIdCount) {
                 UUID(atomData.readLong(), atomData.readLong())
             }
         }
@@ -126,14 +125,14 @@ object PsshAtomUtil {
         return PsshAtom(uuid, atomVersion, data, keyIds)
     }
 
-    class PsshAtom (
-        
+    class PsshAtom(
+
         val uuid: UUID?,
-        
+
         val version: Int,
-        
+
         val schemeData: ByteArray?,
-        
+
         val keyIds: Array<UUID>?
     )
 }
