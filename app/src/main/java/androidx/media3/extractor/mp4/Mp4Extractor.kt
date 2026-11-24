@@ -1,6 +1,5 @@
 package androidx.media3.extractor.mp4
 
-import android.util.Log
 import androidx.media3.common.C
 import androidx.media3.common.Format
 import androidx.media3.common.Label
@@ -40,12 +39,10 @@ import androidx.media3.extractor.metadata.ChapterImpl
 import androidx.media3.extractor.metadata.ThumbnailMetadata
 import androidx.media3.extractor.text.SubtitleParser
 import androidx.media3.extractor.text.SubtitleTranscodingExtractorOutput
-import com.google.common.base.Function
 import com.google.common.base.Preconditions
 import com.google.common.base.Predicate
 import java.util.ArrayDeque
 import java.util.Locale
-import kotlin.collections.toTypedArray
 import kotlin.math.max
 import kotlin.math.min
 
@@ -98,11 +95,11 @@ class Mp4Extractor(
     private var fileType: Int = 0
 
     init {
-        this.sniffFailureDetails = mutableListOf<SniffFailure>()
+        sniffFailureDetails = mutableListOf()
         parserState =
             if ((flags and FLAG_READ_SEF_DATA) != 0) STATE_READING_SEF else STATE_READING_ATOM_HEADER
         sefReader = SefReader()
-        slowMotionMetadataEntries = ArrayList<Metadata.Entry>()
+        slowMotionMetadataEntries = ArrayList()
         atomHeader = ParsableByteArray(Mp4Box.LONG_HEADER_SIZE)
         containerAtoms = ArrayDeque<ContainerBox>()
         nalStartCode = ParsableByteArray(NalUnitUtil.NAL_START_CODE)
@@ -111,20 +108,20 @@ class Mp4Extractor(
         sampleTrackIndex = C.INDEX_UNSET
         extractorOutput = ExtractorOutput.PLACEHOLDER
         tracks = arrayOf()
-        chapterSampleTables = ArrayList<TrackSampleTable>()
-        quickTimeChapters = ArrayList<Chapter>()
+        chapterSampleTables = ArrayList()
+        quickTimeChapters = ArrayList()
     }
 
     override fun sniff(input: ExtractorInput): Boolean {
         val sniffFailure = Sniffer.sniffUnfragmented(input)
         this.sniffFailureDetails =
-            if (sniffFailure != null) listOf(sniffFailure) else listOf<SniffFailure>()
+            if (sniffFailure != null) listOf(sniffFailure) else listOf()
         return sniffFailure == null
     }
 
     override fun init(output: ExtractorOutput) {
         extractorOutput =
-            (if ((flags and Mp4Extractor.FLAG_EMIT_RAW_SUBTITLE_DATA) == 0)
+            (if ((flags and FLAG_EMIT_RAW_SUBTITLE_DATA) == 0)
                 SubtitleTranscodingExtractorOutput(output, subtitleParserFactory)
             else
                 output)
@@ -161,7 +158,6 @@ class Mp4Extractor(
     }
 
     override fun release() {
-        // Do nothing
     }
 
     override fun read(input: ExtractorInput, seekPosition: PositionHolder): Int {
@@ -190,7 +186,7 @@ class Mp4Extractor(
         }
     }
 
-    fun getSampleTimestampsUs(trackId: Int): LongArray? {
+    fun getSampleTimestampsUs(trackId: Int): LongArray {
         if (tracks.size <= trackId) {
             return LongArray(0)
         }
@@ -314,10 +310,7 @@ class Mp4Extractor(
         return seekRequired && parserState != STATE_READING_SAMPLE
     }
 
-    private fun readSefData(
-        input: ExtractorInput,
-        seekPosition: PositionHolder
-    ): Int {
+    private fun readSefData(input: ExtractorInput, seekPosition: PositionHolder): Int {
         val result: Int =
             sefReader.read(input, seekPosition, slowMotionMetadataEntries)
         if (result == Extractor.RESULT_SEEK && seekPosition.position == 0L) {
@@ -368,7 +361,7 @@ class Mp4Extractor(
         }
         var firstVideoTrackIndex = C.INDEX_UNSET
         var durationUs = C.TIME_UNSET
-        val tracks: MutableList<Mp4Track> = ArrayList<Mp4Track>()
+        val tracks: MutableList<Mp4Track> = ArrayList()
 
         // Process remaining metadata.
         val isQuickTime = fileType == FILE_TYPE_QUICKTIME
@@ -403,7 +396,7 @@ class Mp4Extractor(
                 null,
                 ignoreEditLists,
                 isQuickTime,
-                Function { track: Track? -> track },
+                { track: Track? -> track },
                 omitTrackSampleTable
             )
 
@@ -420,9 +413,9 @@ class Mp4Extractor(
             )
         }
 
-        val chapterTrackIds: MutableList<Int?> = ArrayList<Int?>()
+        val chapterTrackIds: MutableList<Int> = ArrayList()
         for (table in trackSampleTables) {
-            if (table!!.track!!.chapterTrackId != C.INDEX_UNSET
+            if (table.track!!.chapterTrackId != C.INDEX_UNSET
                 && !chapterTrackIds.contains(table.track.chapterTrackId)
             ) {
                 chapterTrackIds.add(table.track.chapterTrackId)
@@ -431,7 +424,7 @@ class Mp4Extractor(
 
         chapterSampleTables.clear()
         for (table in trackSampleTables) {
-            if (chapterTrackIds.contains(table!!.track!!.id)) {
+            if (chapterTrackIds.contains(table.track!!.id)) {
                 chapterSampleTables.add(table)
             }
         }
@@ -440,7 +433,7 @@ class Mp4Extractor(
         val containerMimeType = MimeTypeResolver.getContainerMimeType(trackSampleTables)
         for (i in trackSampleTables.indices) {
             val trackSampleTable = trackSampleTables[i]
-            if (trackSampleTable!!.sampleCount == 0) {
+            if (trackSampleTable.sampleCount == 0) {
                 continue
             }
             val track = trackSampleTable.track
@@ -574,9 +567,7 @@ class Mp4Extractor(
         }
     }
 
-    private fun getAuxiliaryTrackTypesForAuxiliaryTracks(
-        metadata: Metadata
-    ): MutableList<Int?> {
+    private fun getAuxiliaryTrackTypesForAuxiliaryTracks(metadata: Metadata): MutableList<Int?> {
         val trackTypesMetadata = metadata.getFirstMatchingEntry<MdtaMetadataEntry>(
             MdtaMetadataEntry::class.java,
             Predicate { mdtaEntry: MdtaMetadataEntry? -> mdtaEntry!!.key == MdtaMetadataEntry.KEY_AUXILIARY_TRACKS_MAP })!!
@@ -623,7 +614,7 @@ class Mp4Extractor(
             sampleSize -= Mp4Box.HEADER_SIZE
         }
         input.skipFully(skipAmount.toInt())
-        if (!canReadWithinGopSampleDependencies(track!!.track!!.format!!)) {
+        if (!canReadWithinGopSampleDependencies(track.track.format!!)) {
             isSampleDependedOn = true
         }
         if (track.track.nalUnitLengthFieldLength != 0) {
@@ -735,8 +726,8 @@ class Mp4Extractor(
                     updateFormatWithDtsHdInfo(input, sampleSize, pendingFormat)
                 )
                 track.pendingFormat = null
-            } else if (trueHdSampleRechunker != null) {
-                trueHdSampleRechunker.startSample(input)
+            } else {
+                trueHdSampleRechunker?.startSample(input)
             }
 
             while (sampleBytesWritten < sampleSize) {
@@ -885,7 +876,7 @@ class Mp4Extractor(
                 }
             }
             val sampleOffset = track.sampleTable.offsets[sampleIndex]
-            val sampleAccumulatedBytes = accumulatedSampleSizes!![trackIndex]!![sampleIndex]
+            val sampleAccumulatedBytes = accumulatedSampleSizes!![trackIndex][sampleIndex]
             val skipAmount = sampleOffset - inputPosition
             val requiresReload = skipAmount < 0 || skipAmount >= RELOAD_MINIMUM_SEEK_DISTANCE
             if ((!requiresReload && preferredRequiresReload)
@@ -1042,7 +1033,6 @@ class Mp4Extractor(
     }
 
     companion object {
-
         fun newFactory(subtitleParserFactory: SubtitleParser.Factory): ExtractorsFactory {
             return object : ExtractorsFactory {
                 override fun createExtractors(): Array<Extractor> {
@@ -1075,9 +1065,7 @@ class Mp4Extractor(
 
         private val MAXIMUM_READ_AHEAD_BYTES_STREAM = (10 * 1024 * 1024).toLong()
 
-        fun codecsToParseWithinGopSampleDependenciesAsFlags(
-            videoCodecFlags: Int
-        ): Int {
+        fun codecsToParseWithinGopSampleDependenciesAsFlags(videoCodecFlags: Int): Int {
             var flags: Int = 0
             if ((videoCodecFlags and C.VIDEO_CODEC_FLAG_H264) != 0) {
                 flags = flags or FLAG_READ_WITHIN_GOP_SAMPLE_DEPENDENCIES
@@ -1148,11 +1136,11 @@ class Mp4Extractor(
                     }
                 }
                 var trackSampleIndex = nextSampleIndex[minTimeTrackIndex]
-                accumulatedSampleSizes[minTimeTrackIndex]!![trackSampleIndex] =
+                accumulatedSampleSizes[minTimeTrackIndex][trackSampleIndex] =
                     accumulatedSampleSize
                 accumulatedSampleSize += tracks[minTimeTrackIndex].sampleTable.sizes[trackSampleIndex].toLong()
                 nextSampleIndex[minTimeTrackIndex] = ++trackSampleIndex
-                if (trackSampleIndex < accumulatedSampleSizes[minTimeTrackIndex]!!.size) {
+                if (trackSampleIndex < accumulatedSampleSizes[minTimeTrackIndex].size) {
                     nextSampleTimesUs[minTimeTrackIndex] =
                         tracks[minTimeTrackIndex].sampleTable.timestampsUs[trackSampleIndex]
                 } else {
